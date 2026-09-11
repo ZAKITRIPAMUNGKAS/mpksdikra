@@ -91,7 +91,7 @@
 
     {{-- MODAL PENGATUR POSISI WAJAH & CROPPER 3:4 --}}
     <div x-show="modalOpen" x-cloak
-         class="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-slate-950/80 backdrop-blur-sm"
+         class="fixed inset-0 z-[200] overflow-y-auto bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4 flex flex-col justify-start sm:justify-center items-center"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -99,39 +99,39 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
 
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden relative"
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-sm sm:max-w-md my-auto flex flex-col overflow-hidden relative"
              @click.outside="closeModal()"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="scale-95 opacity-0"
              x-transition:enter-end="scale-100 opacity-100">
 
             {{-- Modal Header --}}
-            <div class="px-5 sm:px-6 py-4 border-b border-slate-100 bg-[#f8fafc] flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-slate-100 bg-[#f8fafc] flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2 sm:gap-2.5">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold shrink-0">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">Sesuaikan Posisi Pasfoto (3x4)</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">Posisikan wajah &amp; bahu di dalam garis panduan resmi</p>
+                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">Sesuaikan Posisi Pasfoto (3x4)</h3>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium leading-none mt-0.5">Posisikan wajah di garis panduan resmi</p>
                     </div>
                 </div>
                 <button type="button" @click="closeModal()"
-                    class="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
 
             {{-- Modal Body: Interactive Viewport with Face Overlay --}}
-            <div class="p-4 sm:p-6 flex flex-col items-center bg-slate-900 select-none">
-                {{-- 3:4 Viewport Canvas --}}
-                <div class="relative overflow-hidden rounded-2xl shadow-2xl border-2 border-slate-700 bg-slate-950 cursor-grab active:cursor-grabbing touch-none"
-                     style="width: 270px; height: 360px;"
+            <div class="p-3 sm:p-5 flex flex-col items-center bg-slate-900 select-none overflow-y-auto">
+                {{-- 3:4 Viewport Canvas (210px x 280px) --}}
+                <div class="relative overflow-hidden rounded-2xl shadow-2xl border-2 border-slate-700 bg-slate-950 cursor-grab active:cursor-grabbing touch-none shrink-0"
+                     style="width: 210px; height: 280px;"
                      @pointerdown="startDrag($event)"
                      @pointermove="onDrag($event)"
                      @pointerup="endDrag($event)"
@@ -155,48 +155,48 @@
                              `">
                     </template>
 
-                    {{-- Face Silhouette Alignment Guide Overlay (SVG) --}}
-                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 270 360">
-                        {{-- Darkened corner masks --}}
-                        <rect x="0" y="0" width="270" height="360" fill="none" stroke="#f8bb00" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.85" />
+                    {{-- Face Silhouette Alignment Guide Overlay (SVG 210x280) --}}
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 210 280">
+                        {{-- Border guideline --}}
+                        <rect x="1" y="1" width="208" height="278" rx="14" fill="none" stroke="#f8bb00" stroke-width="2" stroke-dasharray="6,4" opacity="0.85" />
 
                         {{-- Head Oval (Kepala & Peci) --}}
-                        <ellipse cx="135" cy="140" rx="64" ry="86" fill="rgba(1, 176, 245, 0.05)" stroke="#01b0f5" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.9" />
+                        <ellipse cx="105" cy="110" rx="50" ry="67" fill="rgba(1, 176, 245, 0.06)" stroke="#01b0f5" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.9" />
 
                         {{-- Eye Line Guide (Tinggi Mata) --}}
-                        <line x1="85" y1="135" x2="185" y2="135" stroke="#f8bb00" stroke-width="1.6" stroke-dasharray="3,3" opacity="0.95" />
-                        <rect x="98" y="122" width="74" height="14" rx="4" fill="rgba(0,0,0,0.6)" />
-                        <text x="135" y="132" text-anchor="middle" font-size="8.5" fill="#f8bb00" font-weight="bold" letter-spacing="0.5">TINGGI MATA</text>
+                        <line x1="65" y1="106" x2="145" y2="106" stroke="#f8bb00" stroke-width="1.6" stroke-dasharray="3,3" opacity="0.95" />
+                        <rect x="73" y="96" width="64" height="12" rx="3" fill="rgba(0,0,0,0.65)" />
+                        <text x="105" y="105" text-anchor="middle" font-size="7.5" fill="#f8bb00" font-weight="bold" letter-spacing="0.4">TINGGI MATA</text>
 
                         {{-- Top of Head Guideline --}}
-                        <line x1="105" y1="54" x2="165" y2="54" stroke="#01b0f5" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.85" />
-                        <rect x="75" y="42" width="120" height="13" rx="4" fill="rgba(0,0,0,0.6)" />
-                        <text x="135" y="52" text-anchor="middle" font-size="8" fill="#01b0f5" font-weight="bold">PUNCAK KEPALA / PECI</text>
+                        <line x1="80" y1="43" x2="130" y2="43" stroke="#01b0f5" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.85" />
+                        <rect x="58" y="33" width="94" height="12" rx="3" fill="rgba(0,0,0,0.65)" />
+                        <text x="105" y="42" text-anchor="middle" font-size="7" fill="#01b0f5" font-weight="bold">PUNCAK KEPALA</text>
 
                         {{-- Shoulder Guideline Curve --}}
-                        <path d="M 20 360 C 45 285, 85 260, 135 260 C 185 260, 225 285, 250 360"
+                        <path d="M 15 280 C 35 220, 65 202, 105 202 C 145 202, 175 220, 195 280"
                               fill="none" stroke="#f8bb00" stroke-width="2" stroke-dasharray="5,4" opacity="0.9" />
-                        <rect x="100" y="268" width="70" height="14" rx="4" fill="rgba(0,0,0,0.6)" />
-                        <text x="135" y="278" text-anchor="middle" font-size="8.5" fill="#f8bb00" font-weight="bold" letter-spacing="0.5">GARIS BAHU</text>
+                        <rect x="75" y="208" width="60" height="12" rx="3" fill="rgba(0,0,0,0.65)" />
+                        <text x="105" y="217" text-anchor="middle" font-size="7.5" fill="#f8bb00" font-weight="bold" letter-spacing="0.4">GARIS BAHU</text>
 
                         {{-- Center crosshair --}}
-                        <circle cx="135" cy="180" r="3" fill="#ffffff" opacity="0.5" />
+                        <circle cx="105" cy="140" r="2.5" fill="#ffffff" opacity="0.5" />
                     </svg>
 
                     {{-- Interactive Floating Drag Indicator Tip --}}
                     <div class="absolute bottom-2 inset-x-2 text-center pointer-events-none">
-                        <span class="inline-block px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-sm text-[10px] font-bold text-slate-200 border border-slate-700/80 shadow-md">
-                            👆 Sentuh / geser foto untuk memposisikan
+                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-slate-950/85 backdrop-blur-sm text-[9.5px] font-bold text-slate-200 border border-slate-700/80 shadow-md">
+                            👆 Geser foto untuk memposisikan
                         </span>
                     </div>
                 </div>
 
                 {{-- Toolbar Controls: Zoom, Rotate, Reset --}}
-                <div class="w-full max-w-xs mt-4 space-y-3">
+                <div class="w-full max-w-[260px] sm:max-w-xs mt-3 space-y-2 shrink-0">
                     {{-- Zoom Slider + Buttons --}}
-                    <div class="flex items-center gap-2 bg-slate-800/90 rounded-2xl p-2 border border-slate-700">
+                    <div class="flex items-center gap-2 bg-slate-800/90 rounded-xl px-2.5 py-1 border border-slate-700">
                         <button type="button" @click="zoomOut()" title="Perkecil Ukuran"
-                            class="w-8 h-8 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-black text-sm flex items-center justify-center transition shrink-0 active:scale-95">
+                            class="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black text-xs flex items-center justify-center transition shrink-0 active:scale-95">
                             &minus;
                         </button>
                         <div class="flex-1 px-1">
@@ -208,7 +208,7 @@
                                 class="w-full h-1.5 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-[#f8bb00]">
                         </div>
                         <button type="button" @click="zoomIn()" title="Perbesar Ukuran"
-                            class="w-8 h-8 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-black text-sm flex items-center justify-center transition shrink-0 active:scale-95">
+                            class="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black text-xs flex items-center justify-center transition shrink-0 active:scale-95">
                             &#43;
                         </button>
                     </div>
@@ -216,37 +216,37 @@
                     {{-- Rotate & Reset Buttons --}}
                     <div class="flex items-center justify-center gap-2">
                         <button type="button" @click="rotate()"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition active:scale-95">
-                            <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition active:scale-95">
+                            <svg class="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
                             <span>Putar 90&deg;</span>
                         </button>
 
                         <button type="button" @click="resetTransform()"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition active:scale-95">
-                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition active:scale-95">
+                            <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            <span>Reset Posisi</span>
+                            <span>Reset</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             {{-- Modal Footer: Save & Cancel Buttons --}}
-            <div class="px-5 sm:px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3">
+            <div class="px-4 py-3 sm:px-5 sm:py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2 shrink-0">
                 <button type="button" @click="useOriginal()"
-                    class="px-4 py-2.5 rounded-full border border-slate-300 hover:bg-white text-slate-600 text-xs font-bold transition text-center">
-                    Gunakan Foto Asli (Tanpa Potong)
+                    class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-white text-slate-600 text-[11px] sm:text-xs font-bold transition text-center">
+                    Gunakan Foto Asli
                 </button>
 
                 <button type="button" @click="applyCrop()"
-                    class="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs shadow-xs hover:scale-[1.01] transition duration-150 flex items-center justify-center gap-2">
+                    class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs shadow-xs transition duration-150 flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
-                    <span>Terapkan &amp; Pas-kan Foto (3:4)</span>
+                    <span>Terapkan (3:4)</span>
                 </button>
             </div>
         </div>
@@ -269,15 +269,15 @@ document.addEventListener('alpine:init', () => {
         imgWidth: 0,
         imgHeight: 0,
 
-        // Viewport 3:4 aspect ratio
-        viewportW: 270,
-        viewportH: 360,
+        // Viewport 3:4 aspect ratio (compact 210x280 for mobile, exported as HD 600x800)
+        viewportW: 210,
+        viewportH: 280,
         outputW: 600,
         outputH: 800,
 
         // Position & Transformation State
-        centerX: 135,
-        centerY: 180,
+        centerX: 105,
+        centerY: 140,
         scale: 1,
         minScale: 0.3,
         maxScale: 3.5,
@@ -287,8 +287,8 @@ document.addEventListener('alpine:init', () => {
         isDragging: false,
         startX: 0,
         startY: 0,
-        initialCenterX: 135,
-        initialCenterY: 180,
+        initialCenterX: 105,
+        initialCenterY: 140,
 
         init() {
             if (config.currentPhoto) {

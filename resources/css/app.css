@@ -162,7 +162,7 @@ textarea:focus {
 
 /* Interactive Card Animations & Motion Effects */
 .card-lift {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
     will-change: transform, box-shadow;
 }
 
@@ -172,13 +172,50 @@ textarea:focus {
 }
 
 .card-lift-sm {
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
     will-change: transform, box-shadow;
 }
 
 .card-lift-sm:hover {
     transform: translateY(-4px);
     box-shadow: 0 14px 24px -8px rgba(0, 92, 138, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
+}
+
+/* Ensure reveal entrance works at full 1.15s duration on cards */
+.reveal.card-lift,
+.reveal-left.card-lift,
+.reveal-right.card-lift,
+.reveal-scale.card-lift,
+.reveal-pop.card-lift,
+.reveal-top.card-lift,
+.reveal.card-lift-sm,
+.reveal-left.card-lift-sm,
+.reveal-right.card-lift-sm,
+.reveal-scale.card-lift-sm,
+.reveal-pop.card-lift-sm,
+.reveal-top.card-lift-sm {
+    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.3s ease;
+}
+
+/* Once revealed, hover transforms seamlessly */
+.reveal.is-revealed.card-lift:hover,
+.reveal-left.is-revealed.card-lift:hover,
+.reveal-right.is-revealed.card-lift:hover,
+.reveal-scale.is-revealed.card-lift:hover,
+.reveal-pop.is-revealed.card-lift:hover,
+.reveal-top.is-revealed.card-lift:hover {
+    transform: translateY(-8px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.reveal.is-revealed.card-lift-sm:hover,
+.reveal-left.is-revealed.card-lift-sm:hover,
+.reveal-right.is-revealed.card-lift-sm:hover,
+.reveal-scale.is-revealed.card-lift-sm:hover,
+.reveal-pop.is-revealed.card-lift-sm:hover,
+.reveal-top.is-revealed.card-lift-sm:hover {
+    transform: translateY(-4px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
 }
 
 /* Diagonal Shimmer Sheen on Card Hover */

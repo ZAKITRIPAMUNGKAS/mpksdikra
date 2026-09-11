@@ -40,7 +40,11 @@
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 revealed = true;
-                observer.disconnect();
+            } else {
+                const rect = $el.getBoundingClientRect();
+                if (rect.top > window.innerHeight * 0.92 || rect.bottom < -150) {
+                    revealed = false;
+                }
             }
         }, { threshold: 0.01, rootMargin: '60px 0px 60px 0px' });
         observer.observe($el);

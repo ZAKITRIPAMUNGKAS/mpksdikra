@@ -57,7 +57,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
             
             {{-- Logo Brand --}}
-            <a href="{{ route('landing') }}" class="flex items-center gap-3 shrink-0">
+            <a href="{{ route('landing') }}" class="flex items-center gap-3 shrink-0 reveal-left reveal-delay-50">
                 <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
                 <div class="flex flex-col">
                     <span class="font-extrabold text-lg tracking-tight text-slate-900 leading-none">MPKSDI<span class="text-sky-500">.</span></span>
@@ -66,7 +66,7 @@
             </a>
 
             {{-- Center Navigation Links --}}
-            <nav class="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
+            <nav class="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600 reveal-top reveal-delay-100">
                 <a href="#beranda" class="text-sky-600 hover:text-sky-700 transition">Beranda</a>
                 <a href="#program" class="hover:text-sky-600 transition">Program BA</a>
                 <a href="#keunggulan" class="hover:text-sky-600 transition">Keunggulan</a>
@@ -80,7 +80,7 @@
             </nav>
 
             {{-- Right CTA Pill Buttons --}}
-            <div class="hidden sm:flex items-center gap-2.5">
+            <div class="hidden sm:flex items-center gap-2.5 reveal-right reveal-delay-150">
                 @auth
                     <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}"
                        class="px-5 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition">
@@ -127,8 +127,8 @@
             <div class="bg-[#f3f5f8] rounded-3xl p-7 sm:p-12 lg:p-14 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 min-h-[380px] reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.34]" />
-                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-sky-600 opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.34] reveal-fade reveal-delay-100" />
+                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-sky-600 opacity-[0.30] reveal-fade reveal-delay-150" />
                 
                 {{-- Background Visual: Foto Gedung Dakwah PDM Karanganyar dengan Siluet Fade dari Kanan ke Kiri --}}
                 <div class="absolute right-0 top-0 bottom-0 w-full lg:w-7/12 h-full overflow-hidden pointer-events-none select-none z-0 reveal-right reveal-delay-200">
@@ -327,7 +327,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         
                         {{-- 1 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-100 cursor-pointer">
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-100 cursor-pointer">
                             <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -340,7 +340,7 @@
                         </div>
 
                         {{-- 2 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-200 cursor-pointer">
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-200 cursor-pointer">
                             <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -353,7 +353,7 @@
                         </div>
 
                         {{-- 3 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-300 cursor-pointer">
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-300 cursor-pointer">
                             <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -366,7 +366,7 @@
                         </div>
 
                         {{-- 4 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-400 cursor-pointer">
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-400 cursor-pointer">
                             <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -443,11 +443,11 @@
             <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 space-y-8 relative overflow-hidden reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-right" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.36]" />
-                <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-sky-700 opacity-[0.32]" />
+                <x-batik-corner position="top-right" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.36] reveal-fade reveal-delay-100" />
+                <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-sky-700 opacity-[0.32] reveal-fade reveal-delay-150" />
                 
                 {{-- Title --}}
-                <div class="text-center max-w-xl mx-auto space-y-1.5 reveal">
+                <div class="text-center max-w-xl mx-auto space-y-1.5 reveal-top reveal-delay-100">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Program Perkaderan</h2>
                     <p class="text-xs sm:text-sm text-slate-500">Pilihan jenjang pelatihan Baitul Arqam sesuai dengan amanah dan jenjang kepemimpinan.</p>
                 </div>
@@ -456,7 +456,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     
                     {{-- Card 1: BA Pimpinan (Cabang & Ranting) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-100">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal-scale reveal-delay-100">
                         <div>
                             {{-- Visual Header with Thematic Leadership & Syura Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#003d5c] via-[#005c8a] to-[#01b0f5] p-4 flex flex-col justify-between overflow-hidden">
@@ -579,7 +579,7 @@
                     </div>
 
                     {{-- Card 2: BA Guru AUM (Pendidik & Sekolah) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-amber-400 hover:shadow-2xl hover:shadow-amber-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-200">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-amber-400 hover:shadow-2xl hover:shadow-amber-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal-scale reveal-delay-200">
                         <div>
                             {{-- Visual Header with Thematic Islamic Education Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#853704] via-[#d97706] to-[#f59e0b] p-4 flex flex-col justify-between overflow-hidden">
@@ -686,7 +686,7 @@
                     </div>
 
                     {{-- Card 3: BA Tenaga Medis PKU (Kesehatan PKU Muhammadiyah) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-300">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal-scale reveal-delay-300">
                         <div>
                             {{-- Visual Header with Thematic Healthcare & PKU Crescent Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#064e3b] via-[#0d9488] to-[#10b981] p-4 flex flex-col justify-between overflow-hidden">
@@ -785,7 +785,7 @@
                     </div>
 
                     {{-- Card 4: TOT Instruktur (Pelatihan Instruktur BA) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-400">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal-scale reveal-delay-400">
                         <div>
                             {{-- Visual Header with Thematic Master Trainer Podium & Soundwave Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#2e1065] via-[#4f46e5] to-[#7c3aed] p-4 flex flex-col justify-between overflow-hidden">
@@ -905,7 +905,7 @@
 
         {{-- SECTION 6: Alur Peserta Perkaderan (Dengan Dashed Line Connector Sesuai Desain Modern) --}}
         <section id="tahapan" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-xl mx-auto mb-12 space-y-1.5 reveal">
+            <div class="text-center max-w-xl mx-auto mb-12 space-y-1.5 reveal-top reveal-delay-100">
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Alur Peserta Perkaderan</h2>
                 <p class="text-xs sm:text-sm text-slate-500">Empat tahapan terstruktur dari pendaftaran hingga penetapan kelulusan resmi.</p>
             </div>
@@ -913,10 +913,10 @@
             <div class="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 
                 {{-- Decorative Connecting Line (Desktop Only) --}}
-                <div class="hidden lg:block absolute top-9 left-[14%] right-[14%] h-0.5 border-t-2 border-dashed border-slate-200 z-0 pointer-events-none"></div>
+                <div class="hidden lg:block absolute top-9 left-[14%] right-[14%] h-0.5 border-t-2 border-dashed border-slate-200 z-0 pointer-events-none reveal-fade reveal-delay-200"></div>
 
                 {{-- Step 1 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-100 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-sky-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-100 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-sky-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-sky-50 border-2 border-white shadow-sm flex items-center justify-center text-sky-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-sky-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">1</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -928,7 +928,7 @@
                 </div>
 
                 {{-- Step 2 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-200 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-indigo-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-200 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-indigo-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-indigo-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">2</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -940,7 +940,7 @@
                 </div>
 
                 {{-- Step 3 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-300 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-amber-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-300 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-amber-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-amber-50 border-2 border-white shadow-sm flex items-center justify-center text-amber-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">3</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -952,7 +952,7 @@
                 </div>
 
                 {{-- Step 4 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-400 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-emerald-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-400 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-emerald-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-emerald-50 border-2 border-white shadow-sm flex items-center justify-center text-emerald-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">4</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
@@ -973,12 +973,12 @@
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-9 space-y-6 relative overflow-hidden reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-sky-900 opacity-[0.32]" />
-                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-[#005c8a] opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-sky-900 opacity-[0.32] reveal-fade reveal-delay-100" />
+                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-[#005c8a] opacity-[0.30] reveal-fade reveal-delay-150" />
                 
                 {{-- Header Section: Title, Stats Chips & Subtitle --}}
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-slate-100 pb-6 reveal reveal-delay-100">
-                    <div class="space-y-1.5">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-slate-100 pb-6">
+                    <div class="space-y-1.5 reveal-left reveal-delay-100">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-100">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <span>Peta Spasial Perkaderan</span>
@@ -990,16 +990,16 @@
                     </div>
 
                     {{-- Quick Aggregate Chips --}}
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <div class="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2.5 reveal-right reveal-delay-150">
+                        <div class="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center gap-2 card-lift-sm">
                             <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                             <span class="text-xs font-bold text-slate-800">17 Cabang</span>
                         </div>
-                        <div class="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center gap-2">
+                        <div class="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center gap-2 card-lift-sm">
                             <span class="w-2 h-2 rounded-full bg-amber-500"></span>
                             <span class="text-xs font-bold text-slate-800">{{ $totalRanting ?? 178 }} Ranting PRM</span>
                         </div>
-                        <div class="px-4 py-2 rounded-2xl bg-sky-500 text-white flex items-center gap-2 shadow-xs">
+                        <div class="px-4 py-2 rounded-2xl bg-sky-500 text-white flex items-center gap-2 shadow-xs card-lift-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <span class="text-xs font-black">{{ number_format($totalKader) }} Kader</span>
                         </div>
@@ -1007,9 +1007,9 @@
                 </div>
 
                 {{-- Filter Zona & Search Bar Row --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 reveal reveal-delay-150">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     {{-- Filter Tabs --}}
-                    <div class="flex flex-wrap gap-1 p-1 bg-slate-100 rounded-full self-start">
+                    <div class="flex flex-wrap gap-1 p-1 bg-slate-100 rounded-full self-start reveal-left reveal-delay-200">
                         <button type="button" @click="setFilter('semua')"
                             :class="filterZona === 'semua' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
                             class="px-3.5 py-1.5 rounded-full text-xs transition">
@@ -1033,11 +1033,11 @@
                     </div>
 
                     {{-- Search Input --}}
-                    <div class="relative w-full sm:w-72">
+                    <div class="relative w-full sm:w-72 reveal-right reveal-delay-200">
                         <input type="text"
-                               x-model="searchQuery"
-                               placeholder="Cari Cabang / Kecamatan..."
-                               class="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-slate-50/50">
+                                x-model="searchQuery"
+                                placeholder="Cari Cabang / Kecamatan..."
+                                class="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-slate-50/50">
                         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
                 </div>
@@ -1046,7 +1046,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
                     
                     {{-- Interactive Leaflet Map Container (Compact Height: 380px - 440px) --}}
-                    <div class="lg:col-span-7 xl:col-span-8 flex flex-col h-full reveal-left reveal-delay-200">
+                    <div class="lg:col-span-7 xl:col-span-8 flex flex-col h-full reveal-left reveal-delay-250">
                         <div class="bg-slate-100 rounded-3xl border border-slate-200 overflow-hidden relative isolate z-10 shadow-inner flex-1 min-h-[380px] sm:min-h-[440px]">
                             {{-- Map Canvas --}}
                             <div id="map-karanganyar" class="w-full h-full min-h-[380px] sm:min-h-[440px] z-0"></div>
@@ -1201,14 +1201,14 @@
         <section id="faq" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ active: 1 }">
             <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 relative overflow-hidden reveal">
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.34]" />
-                <x-batik-corner position="bottom-right" class="w-36 h-36 sm:w-52 sm:h-52 text-sky-600 opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.34] reveal-fade reveal-delay-100" />
+                <x-batik-corner position="bottom-right" class="w-36 h-36 sm:w-52 sm:h-52 text-sky-600 opacity-[0.30] reveal-fade reveal-delay-150" />
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start relative z-10">
                     
                     {{-- Left Column: Section Heading & Helpdesk Contact Card --}}
-                    <div class="lg:col-span-5 space-y-6 reveal-left reveal-delay-100">
-                        <div>
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="reveal-left reveal-delay-100">
                             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100/80 text-sky-800 text-[11px] font-bold border border-sky-200 mb-3">
                                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                                 <span>Pusat Bantuan &amp; Informasi</span>
@@ -1222,7 +1222,7 @@
                         </div>
 
                         {{-- Helpdesk Card --}}
-                        <div class="group p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4 card-lift-sm card-sheen hover:border-sky-300 hover:shadow-md transition-all duration-300">
+                        <div class="group p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4 card-lift-sm card-sheen hover:border-sky-300 hover:shadow-md transition-all duration-300 reveal-left reveal-delay-200">
                             <div class="flex items-center gap-3.5">
                                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#005c8a] to-[#01b0f5] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -1247,7 +1247,7 @@
                     <div class="lg:col-span-7 space-y-3">
                         
                         {{-- FAQ 1 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-100 card-lift-sm"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal-right reveal-delay-100 card-lift-sm"
                              :class="active === 1 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 1 ? null : 1)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1278,7 +1278,7 @@
                         </div>
 
                         {{-- FAQ 2 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-150 card-lift-sm"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal-right reveal-delay-180 card-lift-sm"
                              :class="active === 2 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 2 ? null : 2)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1324,7 +1324,7 @@
                         </div>
 
                         {{-- FAQ 3 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-200 card-lift-sm"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal-right reveal-delay-260 card-lift-sm"
                              :class="active === 3 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 3 ? null : 3)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1355,7 +1355,7 @@
                         </div>
 
                         {{-- FAQ 4 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-250 card-lift-sm"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal-right reveal-delay-340 card-lift-sm"
                              :class="active === 4 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 4 ? null : 4)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1386,7 +1386,7 @@
                         </div>
 
                         {{-- FAQ 5 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-300 card-lift-sm"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal-right reveal-delay-420 card-lift-sm"
                              :class="active === 5 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 5 ? null : 5)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1425,17 +1425,17 @@
     </main>
 
     {{-- SECTION 9: Multi-Column Themed Footer --}}
-    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-14 pb-20 lg:pb-10 text-slate-600 relative overflow-hidden">
+    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-14 pb-20 lg:pb-10 text-slate-600 relative overflow-hidden reveal">
         {{-- Batik Solo Surya Pattern Corners --}}
-        <x-batik-corner position="top-right" class="w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.28]" />
-        <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.26]" />
+        <x-batik-corner position="top-right" class="w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.28] reveal-fade reveal-delay-100" />
+        <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.26] reveal-fade reveal-delay-150" />
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {{-- Main Themed Grid (12 Columns) --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-10 border-b border-slate-200/80">
                 
                 {{-- Col 1: Brand & Kontak Resmi (5 cols) --}}
-                <div class="md:col-span-2 lg:col-span-5 space-y-4 reveal reveal-left">
+                <div class="md:col-span-2 lg:col-span-5 space-y-4 reveal-left reveal-delay-100">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
                         <div class="flex flex-col">
@@ -1479,7 +1479,7 @@
                 </div>
 
                 {{-- Col 2: Organisasi (2 cols) --}}
-                <div class="lg:col-span-2 space-y-3 reveal reveal-delay-150">
+                <div class="lg:col-span-2 space-y-3 reveal-top reveal-delay-150">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-3 rounded-full bg-sky-500"></span>
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Organisasi</h4>
@@ -1493,7 +1493,7 @@
                 </div>
 
                 {{-- Col 3: Perkaderan (2 cols) --}}
-                <div class="lg:col-span-2 space-y-3 reveal reveal-delay-300">
+                <div class="lg:col-span-2 space-y-3 reveal-top reveal-delay-200">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-3 rounded-full bg-amber-400"></span>
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Perkaderan</h4>
@@ -1507,7 +1507,7 @@
                 </div>
 
                 {{-- Col 4: Sekretariat & Portal (3 cols) --}}
-                <div class="lg:col-span-3 space-y-3 reveal reveal-right reveal-delay-450">
+                <div class="lg:col-span-3 space-y-3 reveal-right reveal-delay-250">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-3 rounded-full bg-[#005c8a]"></span>
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Sekretariat</h4>
@@ -1535,9 +1535,9 @@
             </div>
 
             {{-- Sub-Footer: Clean, Integrated, Single-Row Responsive Layout --}}
-            <div class="pt-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs reveal reveal-delay-200">
+            <div class="pt-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs">
                 {{-- Left: Copyright & Tagline --}}
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-slate-500 text-center lg:text-left">
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-slate-500 text-center lg:text-left reveal-left reveal-delay-150">
                     <div class="flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
                         <p class="font-semibold text-slate-700 whitespace-nowrap">&copy; {{ date('Y') }} MPKSDI PDM Karanganyar.</p>
@@ -1547,7 +1547,7 @@
                 </div>
 
                 {{-- Right: Policy Links, Developed by gemala.dev, and Back to Top --}}
-                <div class="flex flex-wrap items-center justify-center gap-3.5 text-[11px] text-slate-500 font-medium">
+                <div class="flex flex-wrap items-center justify-center gap-3.5 text-[11px] text-slate-500 font-medium reveal-right reveal-delay-200">
                     <a href="#beranda" class="hover:text-sky-600 transition">Kebijakan Privasi</a>
                     <span class="text-slate-300">&bull;</span>
                     <a href="#beranda" class="hover:text-sky-600 transition">Ketentuan Layanan</a>
@@ -1575,7 +1575,6 @@
                 </div>
             </div>
 
-        </div>
     </footer>
 
     {{-- Leaflet Map Initialization Script dengan Alpine.js Data Store --}}

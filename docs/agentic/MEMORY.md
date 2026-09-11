@@ -81,11 +81,21 @@ Pola berguna dari referensi:
   7. Sebaran 17 Cabang PCM Interaktif terintegrasi filter zona (Pusat & Barat, Lereng Lawu, Selatan).
 - 2026-09-11: Full-Page Continuous Scroll Animation Engine & Dynamic Progress Indicator:
   1. Animasi scroll diperberat (*heavyweight & cinematic curve* `cubic-bezier(0.16, 1, 0.3, 1)` dengan translasi 42-46px) agar pergerakan terasa substansial dan premium.
-  2. Continuous Scroll Re-arm: IntersectionObserver tidak melepas listener (`unobserve`) melainkan melakukan re-arming otomatis ketika elemen keluar dari viewport, sehingga elemen terus beranimasi dinamis setiap kali di-scroll naik atau turun.
-  3. Cakupan penuh seluruh halaman: Hero Banner, 8 Pilar Kategori, Keunggulan 2x2 Grid & Kartu Tokoh, 4 Kursus Perkaderan, 4 Alur Tahapan, Peta & Direktori 17 Cabang, 5 Accordion FAQ, hingga 4 Kolom Footer.
+  2. Continuous Scroll Re-arm: IntersectionObserver tidak melepas listener (`unobserve`) melainkan melakukan re-arming otomatis ketika elemen keluar dari viewport (`rect.top > window.innerHeight * 0.92 || rect.bottom < -150`), sehingga elemen terus beranimasi dinamis setiap kali di-scroll naik atau turun.
+  3. Cakupan penuh seluruh halaman (100% reveal coverage):
+     - Navbar: Brand (`reveal-left`), Nav Links (`reveal-top`), CTA Buttons (`reveal-right`).
+     - Hero Section: Wadah, Motif Batik Pojok (`reveal-fade`), Gedung Dakwah (`reveal-right`), Headline & Subtitle (`reveal` stagger), Tombol CTA, dan Floating Info Badges.
+     - 8 Pilar Kategori: 8 kartu micro-interactions dengan `reveal-scale` dan stagger delay harmonis (100ms - 450ms).
+     - Keunggulan Standar Mutu: Heading & Subtitle (`reveal-left`), 4 kartu fitur mutu (`reveal-left` stagger 100-400ms), dan Kartu Tokoh KH. Zainudin Alfandi (`reveal-right`).
+     - Program Perkaderan: Batik pojok (`reveal-fade`), Judul (`reveal-top`), 4 Course Cards tematik (`reveal-scale` stagger 100-400ms).
+     - Alur Tahapan Peserta: Judul (`reveal-top`), Garis penghubung dashed (`reveal-fade`), 4 kartu tahapan langkah (`reveal-pop` stagger 100-400ms).
+     - Sebaran 17 Cabang: Batik pojok (`reveal-fade`), Header judul & subtitle (`reveal-left`), Quick aggregate chips (`reveal-right`), Tab filter zona (`reveal-left`), Search input (`reveal-right`), Wadah Peta Leaflet (`reveal-left`), Panel Direktori & Selected Cabang Card (`reveal-right`).
+     - FAQ: Batik pojok (`reveal-fade`), Header & Helpdesk Card (`reveal-left`), 5 kartu akordeon interaktif (`reveal-right` stagger 100-420ms).
+     - Footer: Wadah, Batik pojok (`reveal-fade`), 4 kolom informasi (`reveal-left`, `reveal-top`, `reveal-right`), serta Sub-footer kiri & kanan (`reveal-left` & `reveal-right`).
+     - Batik Corner Component: Observer re-arm otomatis di `batik-corner.blade.php` agar ornamen batik bersinar dan muncul kembali setiap kali di-scroll bolak-balik.
   4. Global Scroll Progress Indicator: Bar gradient fixed top (`#scroll-progress-bar`) yang mengisi proporsional seiring pergerakan scroll pengguna.
-  8. FAQ Accordion interaktif (Alpine.js) dan Footer multi-kolom modern.
-  Seluruh 63 tests lulus (100% green), Pint passed, Vite build sukses.
+  5. Resolusi konflik CSS: Selektor gabungan `.reveal.card-lift`, `.reveal-scale.card-lift`, dll. untuk menjaga durasi animasi masuk 1.15s tetap utuh sebelum transisi hover 0.35s aktif saat `:hover`.
+  Seluruh 63 tests lulus (100% green), Vite build sukses.
 - 2026-09-11: Interactive Card Animations & Motion Design:
   1. Card Lift & Sheen: Utilitas `.card-lift`, `.card-lift-sm`, dan `.card-sheen` menghadirkan elevasi hover yang halus (`translateY(-8px)` / `translateY(-4px)`), bayangan lembut, dan pantulan kilau diagonal (*diagonal light sweep*).
   2. Floating Badges: Keyframe `@keyframes card-float-gentle` pada badge Gedung Dakwah dan Pangkalan Data (`animate-card-float` & `animate-card-float-delayed`).

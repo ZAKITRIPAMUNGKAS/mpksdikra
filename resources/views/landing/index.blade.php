@@ -172,24 +172,24 @@
                 <div class="relative w-full lg:w-[380px] flex flex-col justify-end items-start lg:items-end gap-3 z-10 self-center lg:self-end mt-4 lg:mt-0 reveal-right reveal-delay-300">
                     
                     {{-- Badge 1: Gedung Dakwah PDM --}}
-                    <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs">
+                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float cursor-pointer hover:border-sky-300 hover:shadow-md transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         <div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pusat Dakwah &amp; Perkaderan</span>
-                            <span class="text-xs font-black text-slate-900 leading-tight">Gedung Dakwah PDM Karanganyar</span>
+                            <span class="text-xs font-black text-slate-900 leading-tight group-hover:text-sky-600 transition-colors">Gedung Dakwah PDM Karanganyar</span>
                         </div>
                     </div>
 
                     {{-- Badge 2: Pangkalan Data Terintegrasi --}}
-                    <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs">
+                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float-delayed cursor-pointer hover:border-amber-300 hover:shadow-md transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
                         <div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pangkalan Data Terintegrasi</span>
-                            <span class="text-xs font-black text-slate-900 leading-tight">{{ number_format($totalKader) }} Kader di 17 Cabang</span>
+                            <span class="text-xs font-black text-slate-900 leading-tight group-hover:text-amber-600 transition-colors">{{ number_format($totalKader) }} Kader di 17 Cabang</span>
                         </div>
                     </div>
 
@@ -202,101 +202,101 @@
                 <div class="grid grid-cols-4 sm:grid-cols-8 gap-3 sm:gap-4 text-center">
                     
                     {{-- 1. Ideologi (Kitab Suci Al-Quran / Rehal Terbuka) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-100">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-100 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 9h3M6 12h3M15 9h3M15 12h3"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-amber-700 transition">Ideologi</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-amber-700 transition-colors">Ideologi</span>
                     </div>
 
                     {{-- 2. Ke-Muhammadiyahan (Matahari Bersinar 12 Sinar - Lambang Persyarikatan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-150">
-                        <div class="w-12 h-12 rounded-2xl bg-sky-50 group-hover:bg-sky-100 border border-sky-200/60 flex items-center justify-center text-sky-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-150 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-50 group-hover:bg-sky-100 border border-sky-200/60 flex items-center justify-center text-sky-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="4.2" stroke-width="1.8"/>
                                 <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
                                 <path stroke-linecap="round" stroke-width="1.8" d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.93 4.93l1.8 1.8M17.27 17.27l1.8 1.8M4.93 19.07l1.8-1.8M17.27 6.73l1.8-1.8M7.2 3.2l1 2M15.8 18.8l1 2M3.2 16.8l2-1M18.8 8.2l2-1"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-sky-700 transition">Ke-Muhammadiyahan</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-sky-700 transition-colors">Ke-Muhammadiyahan</span>
                     </div>
 
                     {{-- 3. Kepemimpinan (Kompas Arah Kemajuan & Bintang Panduan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-200">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 group-hover:bg-indigo-100 border border-indigo-200/60 flex items-center justify-center text-indigo-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-200 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 group-hover:bg-indigo-100 border border-indigo-200/60 flex items-center justify-center text-indigo-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
                                 <polygon points="16 8 13.5 13.5 8 16 10.5 10.5 16 8" stroke-width="1.8" stroke-linejoin="round" fill="currentColor" fill-opacity="0.18"/>
                                 <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-indigo-700 transition">Kepemimpinan</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-indigo-700 transition-colors">Kepemimpinan</span>
                     </div>
 
                     {{-- 4. Fikih Ibadah (Kubah & Mihrab Shalat Sesuai Tarjih) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-250">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 border border-emerald-200/60 flex items-center justify-center text-emerald-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-250 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 border border-emerald-200/60 flex items-center justify-center text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v2m0 0C8.5 7.5 7 10 7 13v7h10v-7c0-3-1.5-5.5-5-8z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20v-3.5a2 2 0 114 0V20"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 20h18"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 14v6M20 14v6"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-emerald-700 transition">Fikih Ibadah</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-emerald-700 transition-colors">Fikih Ibadah</span>
                     </div>
 
                     {{-- 5. Ujian CBT (Layar Evaluasi Digital & Checklist Lembar Ujian) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-300">
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-50 group-hover:bg-cyan-100 border border-cyan-200/60 flex items-center justify-center text-cyan-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-300 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-50 group-hover:bg-cyan-100 border border-cyan-200/60 flex items-center justify-center text-cyan-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <rect x="3" y="3" width="18" height="13" rx="2" stroke-width="1.8"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 20h8m-4-4v4"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8l1.8 1.8 3.2-3.2"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 7.5h3M7 12h10"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-cyan-700 transition">Ujian CBT</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-cyan-700 transition-colors">Ujian CBT</span>
                     </div>
 
                     {{-- 6. Psikomotor (Target Keterampilan Praktis & Simulasi Lapangan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-350">
-                        <div class="w-12 h-12 rounded-2xl bg-teal-50 group-hover:bg-teal-100 border border-teal-200/60 flex items-center justify-center text-teal-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-350 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-teal-50 group-hover:bg-teal-100 border border-teal-200/60 flex items-center justify-center text-teal-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
                                 <circle cx="12" cy="12" r="5" stroke-width="1.8"/>
                                 <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9l5-5m0 0h-3.5m3.5 0V7.5"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-teal-700 transition">Psikomotor</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-teal-700 transition-colors">Psikomotor</span>
                     </div>
 
                     {{-- 7. Keteladanan (Perisai Integritas & Bintang Moralitas Akhlak) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-400">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-50 group-hover:bg-rose-100 border border-rose-200/60 flex items-center justify-center text-rose-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-400 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-50 group-hover:bg-rose-100 border border-rose-200/60 flex items-center justify-center text-rose-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2l7 3.5v6c0 5.25-3.5 10.15-7 11.5-3.5-1.35-7-6.25-7-11.5v-6L12 2z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 7l1.2 2.5 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4L12 7z" fill="currentColor" fill-opacity="0.22"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-rose-700 transition">Keteladanan</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-rose-700 transition-colors">Keteladanan</span>
                     </div>
 
                     {{-- 8. 17 Cabang (Peta Spasial Berjejaring PCM se-Karanganyar) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-450">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 border border-blue-200/60 flex items-center justify-center text-blue-600 transition-all duration-200 group-hover:-translate-y-1 shadow-2xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-450 card-lift-sm p-1.5 rounded-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 border border-blue-200/60 flex items-center justify-center text-blue-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
+                            <svg class="w-5 h-5 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                 <line x1="8" y1="2" x2="8" y2="18" stroke-width="1.8" stroke-linecap="round"/>
                                 <line x1="16" y1="6" x2="16" y2="22" stroke-width="1.8" stroke-linecap="round"/>
                                 <circle cx="12" cy="11" r="2.2" stroke-width="1.8" fill="currentColor" fill-opacity="0.25"/>
                             </svg>
                         </div>
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-blue-700 transition">17 Cabang</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-blue-700 transition-colors">17 Cabang</span>
                     </div>
 
                 </div>
@@ -327,12 +327,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         
                         {{-- 1 --}}
-                        <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 hover:bg-white transition duration-200 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-100">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-100 cursor-pointer">
+                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">Kurikulum Baku PP</h3>
+                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Kurikulum Baku PP</h3>
                                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                                     Materi ideologi, manhaj tarjih, dan kepemimpinan selaras pedoman baku MPKSDI PP Muhammadiyah.
                                 </p>
@@ -340,12 +340,12 @@
                         </div>
 
                         {{-- 2 --}}
-                        <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 hover:bg-white transition duration-200 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-200">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-200 cursor-pointer">
+                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">Penilaian 4 Format</h3>
+                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Penilaian 4 Format</h3>
                                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                                     Evaluasi terpadu: Kognitif CBT (40%), Praktik Ibadah (35%), Afektif (25%), dan Presensi 100%.
                                 </p>
@@ -353,12 +353,12 @@
                         </div>
 
                         {{-- 3 --}}
-                        <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 hover:bg-white transition duration-200 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-300">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-300 cursor-pointer">
+                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">Instruktur Tersertifikasi</h3>
+                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Instruktur Tersertifikasi</h3>
                                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                                     Didampingi tim master of training dan instruktur ahli persyarikatan PDM Karanganyar.
                                 </p>
@@ -366,12 +366,12 @@
                         </div>
 
                         {{-- 4 --}}
-                        <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 hover:bg-white transition duration-200 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-400">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal reveal-delay-400 cursor-pointer">
+                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">ID Card &amp; E-Sertifikat QR</h3>
+                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">ID Card &amp; E-Sertifikat QR</h3>
                                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                                     Dokumen resmi digital dengan verifikasi QR Code instan terhubung database pimpinan.
                                 </p>
@@ -389,7 +389,7 @@
                         <div class="absolute inset-0 bg-sky-200/50 rounded-3xl translate-x-2.5 translate-y-2.5 -z-10 blur-[1px]"></div>
                         
                         {{-- Foreground Content Card with Portrait --}}
-                        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-lg space-y-4 overflow-hidden relative">
+                        <div class="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-lg space-y-4 overflow-hidden relative card-lift card-sheen cursor-pointer hover:border-sky-300 transition-all duration-500">
                             
                             {{-- Batik Solo Surya Pattern Corners --}}
                             <x-batik-corner position="top-right" class="w-32 h-32 text-sky-800 opacity-[0.28]" />
@@ -399,11 +399,11 @@
                             <div class="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-b from-sky-50 via-slate-50 to-slate-100 border border-slate-100 shadow-inner">
                                 <img src="{{ asset('aset/ketua-mpksdi-vector.jpg') }}" 
                                      alt="KH. Zainudin Alfandi - Ketua MPKSDI Karanganyar" 
-                                     class="w-full h-full object-cover object-top hover:scale-102 transition duration-300">
+                                     class="w-full h-full object-cover object-top group-hover:scale-104 transition duration-500">
                                 
                                 {{-- Top Role Tag --}}
                                 <div class="absolute top-3.5 left-3.5 z-10">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-white/95 text-slate-900 shadow-sm border border-slate-100 backdrop-blur-md">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-white/95 text-slate-900 shadow-sm border border-slate-100 backdrop-blur-md animate-pulse-ring">
                                         <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                                         <span>Pimpinan Majelis</span>
                                     </span>
@@ -413,12 +413,12 @@
                             {{-- Identity & Official Quote --}}
                             <div class="text-center space-y-2 pt-1">
                                 <div>
-                                    <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl leading-tight">KH. Zainudin Alfandi</h3>
+                                    <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl leading-tight group-hover:text-sky-700 transition-colors">KH. Zainudin Alfandi</h3>
                                     <p class="text-xs font-bold text-sky-600 uppercase tracking-wide mt-1">Ketua MPKSDI PDM Karanganyar</p>
                                 </div>
 
                                 {{-- Quotation Box --}}
-                                <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-100/90 text-left relative mt-2">
+                                <div class="bg-slate-50 group-hover:bg-sky-50/50 group-hover:border-sky-200/60 rounded-2xl p-3.5 border border-slate-100/90 text-left relative mt-2 transition-colors duration-300">
                                     <p class="text-xs text-slate-600 leading-relaxed italic text-center">
                                          &ldquo;Membina ideologi, meneguhkan komitmen, dan menggerakkan persyarikatan menuju kader berkemajuan.&rdquo;
                                     </p>
@@ -456,7 +456,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     
                     {{-- Card 1: BA Pimpinan (Cabang & Ranting) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-100">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-100">
                         <div>
                             {{-- Visual Header with Thematic Leadership & Syura Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#003d5c] via-[#005c8a] to-[#01b0f5] p-4 flex flex-col justify-between overflow-hidden">
@@ -467,7 +467,7 @@
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Musyawarah Pimpinan & Strategi Cabang --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300">
+                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Sinar Matahari 12 Radiasi --}}
                                         <g opacity="0.4" stroke="#f8bb00" stroke-width="2">
@@ -579,7 +579,7 @@
                     </div>
 
                     {{-- Card 2: BA Guru AUM (Pendidik & Sekolah) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-amber-300 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-200">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-amber-400 hover:shadow-2xl hover:shadow-amber-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-200">
                         <div>
                             {{-- Visual Header with Thematic Islamic Education Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#853704] via-[#d97706] to-[#f59e0b] p-4 flex flex-col justify-between overflow-hidden">
@@ -591,7 +591,7 @@
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Kitab Al-Qur'an Rehal, Toga & Lentera Ilmu --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300">
+                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Cahaya Pencerahan / Aura Kuning --}}
                                         <circle cx="85" cy="85" r="45" fill="#fef08a" opacity="0.25"/>
@@ -686,7 +686,7 @@
                     </div>
 
                     {{-- Card 3: BA Tenaga Medis PKU (Kesehatan PKU Muhammadiyah) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-teal-300 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-300">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-300">
                         <div>
                             {{-- Visual Header with Thematic Healthcare & PKU Crescent Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#064e3b] via-[#0d9488] to-[#10b981] p-4 flex flex-col justify-between overflow-hidden">
@@ -697,7 +697,7 @@
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Bulan Sabit PKU, Stetoskop Hati & EKG --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300">
+                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Garis Detak Jantung EKG Berkilau --}}
                                         <path d="M10 110L45 110L52 95L60 125L68 85L76 118L84 106L90 110L150 110" stroke="#a7f3d0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
@@ -785,7 +785,7 @@
                     </div>
 
                     {{-- Card 4: TOT Instruktur (Pelatihan Instruktur BA) --}}
-                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-indigo-300 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-400">
+                    <div class="group bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift card-sheen hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/15 transition-all duration-300 flex flex-col justify-between overflow-hidden reveal reveal-delay-400">
                         <div>
                             {{-- Visual Header with Thematic Master Trainer Podium & Soundwave Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#2e1065] via-[#4f46e5] to-[#7c3aed] p-4 flex flex-col justify-between overflow-hidden">
@@ -798,7 +798,7 @@
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Podium Fasilitator, Dual Mic & Medali Instruktur --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300">
+                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Sorot Cahaya Spotlight Panggung --}}
                                         <polygon points="40,10 130,10 150,130 20,130" fill="#a5b4fc" opacity="0.15"/>
@@ -916,48 +916,48 @@
                 <div class="hidden lg:block absolute top-9 left-[14%] right-[14%] h-0.5 border-t-2 border-dashed border-slate-200 z-0 pointer-events-none"></div>
 
                 {{-- Step 1 --}}
-                <div class="relative z-10 text-center space-y-3 reveal reveal-delay-100">
-                    <div class="w-18 h-18 mx-auto rounded-2xl bg-sky-50 border-2 border-white shadow-sm flex items-center justify-center text-sky-600 relative group">
-                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-sky-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs">1</span>
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-100 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-sky-100 transition-all duration-300">
+                    <div class="w-18 h-18 mx-auto rounded-2xl bg-sky-50 border-2 border-white shadow-sm flex items-center justify-center text-sky-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
+                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-sky-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">1</span>
+                        <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm">Registrasi Mandiri</h3>
+                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-600 transition-colors">Registrasi Mandiri</h3>
                     <p class="text-xs text-slate-500 leading-relaxed px-2">
                         Kader mengisi formulir biodata lengkap, riwayat organisasi, dan mengunggah pasfoto resmi.
                     </p>
                 </div>
 
                 {{-- Step 2 --}}
-                <div class="relative z-10 text-center space-y-3 reveal reveal-delay-200">
-                    <div class="w-18 h-18 mx-auto rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 relative group">
-                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-indigo-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs">2</span>
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-200 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-indigo-100 transition-all duration-300">
+                    <div class="w-18 h-18 mx-auto rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
+                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-indigo-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">2</span>
+                        <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm">Verifikasi PDM</h3>
+                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">Verifikasi PDM</h3>
                     <p class="text-xs text-slate-500 leading-relaxed px-2">
                         Admin MPKSDI memvalidasi NBM, data AUM, dan domisili cabang sebelum akun diaktifkan.
                     </p>
                 </div>
 
                 {{-- Step 3 --}}
-                <div class="relative z-10 text-center space-y-3 reveal reveal-delay-300">
-                    <div class="w-18 h-18 mx-auto rounded-2xl bg-amber-50 border-2 border-white shadow-sm flex items-center justify-center text-amber-600 relative group">
-                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs">3</span>
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-300 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-amber-100 transition-all duration-300">
+                    <div class="w-18 h-18 mx-auto rounded-2xl bg-amber-50 border-2 border-white shadow-sm flex items-center justify-center text-amber-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
+                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">3</span>
+                        <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm">Pelaksanaan BA</h3>
+                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition-colors">Pelaksanaan BA</h3>
                     <p class="text-xs text-slate-500 leading-relaxed px-2">
                         Mengikuti materi terpadu, presensi QR Code tiap sesi, simulasi outbound, dan ujian CBT.
                     </p>
                 </div>
 
                 {{-- Step 4 --}}
-                <div class="relative z-10 text-center space-y-3 reveal reveal-delay-400">
-                    <div class="w-18 h-18 mx-auto rounded-2xl bg-emerald-50 border-2 border-white shadow-sm flex items-center justify-center text-emerald-600 relative group">
-                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs">4</span>
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                <div class="group relative z-10 text-center space-y-3 reveal reveal-delay-400 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-emerald-100 transition-all duration-300">
+                    <div class="w-18 h-18 mx-auto rounded-2xl bg-emerald-50 border-2 border-white shadow-sm flex items-center justify-center text-emerald-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
+                        <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">4</span>
+                        <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm">Sertifikat &amp; RTL</h3>
+                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition-colors">Sertifikat &amp; RTL</h3>
                     <p class="text-xs text-slate-500 leading-relaxed px-2">
                         Penetapan kelulusan, unduh e-sertifikat ber-QR Code, dan komitmen Rencana Tindak Lanjut.
                     </p>
@@ -1099,7 +1099,7 @@
                     <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-3.5 h-full reveal-right reveal-delay-250">
                         
                         {{-- Active / Selected Cabang Details Card (Compact) --}}
-                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm space-y-2.5 relative overflow-hidden shrink-0"
+                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm space-y-2.5 relative overflow-hidden shrink-0 card-lift card-sheen hover:border hover:border-sky-500/50 hover:shadow-xl transition-all duration-300"
                              x-show="selectedCabang">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
@@ -1130,11 +1130,11 @@
 
                             <div class="pt-0.5 flex items-center gap-2">
                                 <a :href="'{{ route('anggota.register') }}?cabang=' + encodeURIComponent(selectedCabang?.key || '')"
-                                   class="flex-1 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold text-center transition shadow-xs">
+                                   class="flex-1 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold text-center transition shadow-xs hover:scale-[1.02] active:scale-[0.98]">
                                     Daftar dari Cabang Ini
                                 </a>
                                 <button type="button" @click="focusCabang(selectedCabang)"
-                                        class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition">
+                                        class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition hover:scale-[1.02] active:scale-[0.98]">
                                     Fokus Peta
                                 </button>
                             </div>
@@ -1156,8 +1156,8 @@
                                 <template x-for="cabang in filteredCabang" :key="cabang.nama">
                                     <button type="button"
                                             @click="selectCabang(cabang)"
-                                            :class="selectedCabang?.nama === cabang.nama ? 'bg-sky-50/90 border-l-4 border-l-sky-500' : 'hover:bg-slate-50'"
-                                            class="w-full text-left px-3.5 py-2 flex items-center justify-between gap-3 transition">
+                                            :class="selectedCabang?.nama === cabang.nama ? 'bg-sky-50/90 border-l-4 border-l-sky-500' : 'hover:bg-slate-50 hover:pl-4.5'"
+                                            class="w-full text-left px-3.5 py-2 flex items-center justify-between gap-3 transition-all duration-200">
                                         <div class="min-w-0 flex-1">
                                             <div class="flex items-center gap-1.5">
                                                 <h4 class="font-bold text-slate-900 text-xs truncate" x-text="'PCM ' + cabang.nama"></h4>
@@ -1222,13 +1222,13 @@
                         </div>
 
                         {{-- Helpdesk Card --}}
-                        <div class="p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4">
+                        <div class="group p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4 card-lift-sm card-sheen hover:border-sky-300 hover:shadow-md transition-all duration-300">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#005c8a] to-[#01b0f5] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#005c8a] to-[#01b0f5] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-extrabold text-slate-900 text-sm">Butuh Konsultasi Lanjutan?</h4>
+                                    <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Butuh Konsultasi Lanjutan?</h4>
                                     <p class="text-xs text-slate-500 mt-0.5">Sekretariat MPKSDI PDM Karanganyar</p>
                                 </div>
                             </div>
@@ -1236,7 +1236,7 @@
                                 Belum menemukan solusi yang Anda cari? Tim admin dan instruktur kami siap membantu verifikasi atau pertanyaan seputar perkaderan.
                             </p>
                             <a href="https://wa.me/6281226309576" target="_blank"
-                               class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#005c8a] to-[#01b0f5] hover:from-[#004b73] hover:to-[#0284c7] text-white font-bold text-xs shadow-xs hover:shadow-md transition duration-200">
+                               class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#005c8a] to-[#01b0f5] hover:from-[#004b73] hover:to-[#0284c7] text-white font-bold text-xs shadow-xs hover:shadow-md transition duration-200 hover:scale-[1.02] active:scale-[0.98]">
                                 <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.966.526 1.761.807 2.796.807 3.18 0 5.767-2.586 5.768-5.766 0-3.18-2.587-5.767-5.768-5.767zm0 10.373c-.933 0-1.636-.263-2.428-.733l-.174-.103-1.782.467.476-1.737-.113-.181c-.53-.847-.809-1.579-.808-2.502.001-2.535 2.064-4.597 4.599-4.597 2.534 0 4.596 2.062 4.597 4.597 0 2.536-2.062 4.598-4.597 4.598zm5.736-12.355c-2.433-2.435-5.67-3.778-9.117-3.78-7.098 0-12.875 5.776-12.878 12.877-.001 2.27.6 4.484 1.739 6.459l-1.849 6.757 6.91-1.813c1.905 1.039 4.053 1.587 6.24 1.588h.005c7.097 0 12.875-5.776 12.878-12.878.001-3.441-1.34-6.678-3.774-9.11z"/></svg>
                                 <span>Hubungi WhatsApp Helpdesk</span>
                             </a>
@@ -1247,7 +1247,7 @@
                     <div class="lg:col-span-7 space-y-3">
                         
                         {{-- FAQ 1 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-100"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-100 card-lift-sm"
                              :class="active === 1 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 1 ? null : 1)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1278,7 +1278,7 @@
                         </div>
 
                         {{-- FAQ 2 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-150"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-150 card-lift-sm"
                              :class="active === 2 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 2 ? null : 2)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1324,7 +1324,7 @@
                         </div>
 
                         {{-- FAQ 3 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-200"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-200 card-lift-sm"
                              :class="active === 3 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 3 ? null : 3)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1355,7 +1355,7 @@
                         </div>
 
                         {{-- FAQ 4 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-250"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-250 card-lift-sm"
                              :class="active === 4 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 4 ? null : 4)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1386,7 +1386,7 @@
                         </div>
 
                         {{-- FAQ 5 --}}
-                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-300"
+                        <div class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden reveal reveal-delay-300 card-lift-sm"
                              :class="active === 5 ? 'border-sky-400 shadow-md ring-2 ring-sky-100' : 'border-slate-200/80 shadow-2xs hover:border-sky-300'">
                             <button type="button" @click="active = (active === 5 ? null : 5)"
                                 class="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3.5 transition">
@@ -1451,8 +1451,8 @@
                     {{-- Contact Cards with Clean SVG Badges --}}
                     <div class="pt-1 flex flex-col sm:flex-row gap-2.5">
                         <a href="https://wa.me/6281226309576" target="_blank" rel="noopener noreferrer"
-                           class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 text-xs text-slate-700 hover:text-emerald-700 transition shadow-2xs">
-                            <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                           class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 text-xs text-slate-700 hover:text-emerald-700 transition-all duration-300 shadow-2xs card-lift-sm">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
                                 </svg>
@@ -1464,8 +1464,8 @@
                         </a>
 
                         <a href="mailto:mpksdi@pdmkaranganyar.org"
-                           class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 text-xs text-slate-700 hover:text-sky-700 transition shadow-2xs">
-                            <div class="w-6 h-6 rounded-lg bg-[#005c8a] text-white flex items-center justify-center shrink-0 shadow-xs">
+                           class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 text-xs text-slate-700 hover:text-sky-700 transition-all duration-300 shadow-2xs card-lift-sm">
+                            <div class="w-6 h-6 rounded-lg bg-[#005c8a] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                 </svg>
@@ -1485,10 +1485,10 @@
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Organisasi</h4>
                     </div>
                     <ul class="space-y-2 text-xs text-slate-500 font-medium">
-                        <li><a href="#beranda" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Tentang MPKSDI</a></li>
-                        <li><a href="#keunggulan" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Visi &amp; Misi</a></li>
-                        <li><a href="#sebaran" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> 17 Cabang PCM</a></li>
-                        <li><a href="#kontak" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Gedung Dakwah</a></li>
+                        <li><a href="#beranda" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Tentang MPKSDI</a></li>
+                        <li><a href="#keunggulan" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Visi &amp; Misi</a></li>
+                        <li><a href="#sebaran" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> 17 Cabang PCM</a></li>
+                        <li><a href="#kontak" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Gedung Dakwah</a></li>
                     </ul>
                 </div>
 
@@ -1499,10 +1499,10 @@
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Perkaderan</h4>
                     </div>
                     <ul class="space-y-2 text-xs text-slate-500 font-medium">
-                        <li><a href="#program" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Pimpinan Cabang</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Guru AUM</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Nakes PKU</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 transition flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> TOT Instruktur</a></li>
+                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Pimpinan Cabang</a></li>
+                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Guru AUM</a></li>
+                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Nakes PKU</a></li>
+                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> TOT Instruktur</a></li>
                     </ul>
                 </div>
 
@@ -1512,7 +1512,7 @@
                         <span class="w-1.5 h-3 rounded-full bg-[#005c8a]"></span>
                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Sekretariat</h4>
                     </div>
-                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5">
+                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5 card-lift-sm hover:border-sky-300 hover:shadow-md transition-all duration-300">
                         <div class="flex items-start gap-2 text-xs text-slate-600">
                             <svg class="w-4 h-4 text-sky-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -1523,7 +1523,7 @@
                             </p>
                         </div>
                         <a href="{{ route('anggota.register') }}" 
-                           class="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-xs">
+                           class="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-xs hover:scale-[1.02] active:scale-[0.98]">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                             </svg>

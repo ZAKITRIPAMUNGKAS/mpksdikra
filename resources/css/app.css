@@ -148,10 +148,97 @@ textarea:focus {
     .reveal-scale,
     .reveal-pop,
     .reveal-top,
-    .reveal-fade {
+    .reveal-fade,
+    .card-lift,
+    .card-lift-sm,
+    .animate-card-float,
+    .animate-card-float-delayed {
         opacity: 1 !important;
         transform: none !important;
         transition: none !important;
+        animation: none !important;
     }
 }
+
+/* Interactive Card Animations & Motion Effects */
+.card-lift {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    will-change: transform, box-shadow;
+}
+
+.card-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 36px -12px rgba(0, 92, 138, 0.16), 0 12px 20px -8px rgba(0, 0, 0, 0.06);
+}
+
+.card-lift-sm {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    will-change: transform, box-shadow;
+}
+
+.card-lift-sm:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 24px -8px rgba(0, 92, 138, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
+}
+
+/* Diagonal Shimmer Sheen on Card Hover */
+.card-sheen {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-sheen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transform: skewX(-22deg);
+    pointer-events: none;
+    transition: none;
+    z-index: 25;
+}
+
+.card-sheen:hover::after {
+    left: 150%;
+    transition: left 0.85s ease-in-out;
+}
+
+/* Gentle Micro Floating Animation for Hero Badges */
+@keyframes card-float-gentle {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.animate-card-float {
+    animation: card-float-gentle 4.5s ease-in-out infinite;
+}
+
+.animate-card-float-delayed {
+    animation: card-float-gentle 4.5s ease-in-out infinite 2.25s;
+}
+
+/* Pulsing Glow Ring for Key Focus Badges */
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(1, 176, 245, 0.45);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(1, 176, 245, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(1, 176, 245, 0);
+    }
+}
+
+.animate-pulse-ring {
+    animation: pulse-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 

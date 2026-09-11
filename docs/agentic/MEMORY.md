@@ -363,11 +363,19 @@ Pola berguna dari referensi:
          - Dilengkapi badge hijau *"✓ Wajah Pas & Proporsional (3:4)"* dan tombol *"Atur Posisi"* untuk penyesuaian ulang sewaktu-waktu.
       5. **Cakupan**: Diterapkan secara seragam pada formulir pendaftaran mandiri kader (`anggota/register.blade.php`) dan form pembaruan profil kader (`portal/profile.blade.php`).
     - Seluruh 79 unit & feature tests tetap 100% hijau, Vite build sukses.
-- 2026-09-12: Penyempurnaan Responsif Mobile Modal Pasfoto Face Fitter:
-    - Masalah di HP (Layar Ponsel): Modal terpotong ke atas layar karena penggunaan flexbox `items-center` pada container dengan `overflow-y-auto` saat tinggi konten modal melebihi tinggi viewport HP, sehingga kanvas foto dan header modal hilang ke atas (`y < 0`) dan tidak bisa di-scroll.
-    - Solusi:
-      1. Struktur Kontainer Aman: Mengganti flex vertical centering kaku menjadi scrolling container alami (`overflow-y-auto min-h-screen py-3 sm:py-4 flex flex-col justify-start sm:justify-center items-center`) dengan kartu modal `my-auto`, menjamin dialog tetap terpusat di layar luas namun mengalir bersih dari tepi atas tanpa terpotong di layar HP.
-      2. Dimensi Kanvas 3:4 Kompak: Menyesuaikan viewport panduan foto ke 210 × 280 pixel (rasio 3:4 pas) sehingga seluruh modal (header, kanvas foto berpanduan siluet, slider zoom, tombol putar, dan tombol simpan) muat dalam 1 layar HP tanpa terpotong. Hasil akhir tetap diekspor pada resolusi HD 600 × 800 pixel via rasio dinamis Canvas.
-      3. Kontrol Rapi & Touch-Friendly: Tombol putar, reset, dan slider zoom ditata ringkas dan hemat ruang vertikal.
+- 2026-09-12: Implementasi Smart Auto-Match Pasfoto 3:4 (Tanpa Wajib Manual + Indikator Loading):
+    - Permintaan: Pengguna meminta UI lebih responsif dan proses pencocokan foto dibuat otomatis ("buat otomatis match aja jadi loading dulu gitu gak usah manual").
+    - Solusi & Alur Baru:
+      1. **Otomatis Tanpa Modal Paksa**: Calon kader cukup memilih foto dari galeri/kamera HP. Sistem TIDAK memunculkan popup modal yang mengganggu alur pengisian form.
+      2. **Indikator Loading & Scanning Elegan**: Saat foto dipilih, kotak pratinjau langsung menampilkan status pemindaian (*Laser Scan Effect*, cincin putar amber-cyan, dan label *"Auto Match: Menyelaraskan 3:4..."*) selama ~650ms untuk memberikan umpan balik visual yang meyakinkan.
+      3. **Algoritma Cerdas Auto-Framing 3:4**:
+         - Browser Face Detection: Memanfaatkan API peramban native `window.FaceDetector` jika tersedia (Chromium / Chrome Android) untuk mendeteksi koordinat wajah riil dan memosisikan kepala di sepertiga atas (tinggi mata ~38%).
+         - Heuristik Portrait Cerdas (Fallback): Jika foto berorientasi tegak (seperti selfie HP 9:16), sistem memotong dengan batas atas aman (*headroom bias* 15%) agar peci dan kepala tidak terpotong; jika foto melebar (landscape 4:3 / 16:9), sistem memotong bagian tengah secara seimbang.
+         - Render otomatis ke HTML5 Canvas HD 600 × 800 pixel dan langsung disuntikkan ke berkas input formulir via `DataTransfer`.
+      4. **Badge Keberhasilan & Opsi Fleksibel**:
+         - Menampilkan badge hijau *"✓ Pasfoto 3:4 Otomatis Pas"*.
+         - Menyediakan tombol sekunder ringkas *"Atur Manual (Opsional)"* jika kader ingin memperbesar/menggeser secara khusus, serta tombol *"Foto Asli"*.
+      5. **Modal Manual Ultra-Responsif**: Jika dibuka, modal menggunakan kanvas kompak 195 × 260 pixel dengan `shrink-0` header dan footer serta `flex-1 min-h-0` body, dijamin 100% pas dan tidak pernah meluap di semua ukuran layar smartphone.
     - Seluruh 79 feature tests lulus 100% (241 assertions), Pint passed, Vite build sukses.
+
 

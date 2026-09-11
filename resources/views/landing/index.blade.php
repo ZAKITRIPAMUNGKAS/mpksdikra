@@ -1761,36 +1761,97 @@
         }
     </script>
 
-    {{-- Floating Mobile Bottom Navigation Bar --}}
-    <div class="lg:hidden fixed bottom-3 inset-x-3 sm:inset-x-8 z-[100] bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-2xl px-3 py-2 flex items-center justify-around text-[10px] font-bold text-slate-600">
-        <a href="#beranda" class="flex flex-col items-center gap-0.5 hover:text-sky-600 transition">
-            <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            <span>Beranda</span>
-        </a>
-        <a href="#program" class="flex flex-col items-center gap-0.5 hover:text-sky-600 transition">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            <span>Program</span>
-        </a>
-        <a href="#sebaran" class="flex flex-col items-center gap-0.5 hover:text-sky-600 transition">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span>Peta PCM</span>
-        </a>
-        @auth
-            <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}" 
-               class="flex flex-col items-center gap-0.5 text-sky-600 font-bold">
-                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                <span>Dashboard</span>
+    {{-- Floating Mobile Bottom Navigation Bar (Proporsional & Ergonomis) --}}
+    <nav aria-label="Navigasi Bawah Seluler"
+         x-data="{
+             activeSection: 'beranda',
+             init() {
+                 const sections = ['beranda', 'program', 'sebaran'];
+                 const onScroll = () => {
+                     const scrollPos = window.scrollY + 220;
+                     for (let i = sections.length - 1; i >= 0; i--) {
+                         const s = sections[i];
+                         const el = document.getElementById(s);
+                         if (el && scrollPos >= el.offsetTop) {
+                             this.activeSection = s;
+                             return;
+                         }
+                     }
+                     if (window.scrollY < 200) this.activeSection = 'beranda';
+                 };
+                 window.addEventListener('scroll', onScroll, { passive: true });
+                 onScroll();
+             }
+         }"
+         class="lg:hidden fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-sm sm:max-w-md z-[100] bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.18),0_2px_8px_-2px_rgba(15,23,42,0.06)] p-1.5 transition-all">
+        
+        <div class="grid {{ auth()->check() ? 'grid-cols-4' : 'grid-cols-5' }} items-center gap-1">
+            
+            {{-- 1. Beranda --}}
+            <a href="#beranda"
+               @click="activeSection = 'beranda'"
+               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
+               :class="activeSection === 'beranda' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
+                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'beranda' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Beranda</span>
             </a>
-        @else
-            <a href="{{ route('login') }}" class="flex flex-col items-center gap-0.5 hover:text-sky-600 transition">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                <span>Masuk</span>
+
+            {{-- 2. Program --}}
+            <a href="#program"
+               @click="activeSection = 'program'"
+               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
+               :class="activeSection === 'program' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
+                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'program' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Program</span>
             </a>
-            <a href="{{ route('anggota.register') }}" class="flex items-center gap-1 px-3 py-1 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold shadow-xs transition">
-                <span>Daftar</span>
+
+            {{-- 3. Peta Cabang --}}
+            <a href="#sebaran"
+               @click="activeSection = 'sebaran'"
+               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
+               :class="activeSection === 'sebaran' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
+                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'sebaran' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Peta PCM</span>
             </a>
-        @endauth
-    </div>
+
+            @auth
+                {{-- 4. Dashboard (Logged in) --}}
+                <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}" 
+                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-600 text-white font-bold shadow-xs shadow-sky-500/25 transition-all duration-200 group active:scale-95">
+                    <svg class="w-5 h-5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Dashboard</span>
+                </a>
+            @else
+                {{-- 4. Masuk --}}
+                <a href="{{ route('login') }}" 
+                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium transition-all duration-200 group active:scale-95">
+                    <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Masuk</span>
+                </a>
+
+                {{-- 5. Daftar (Primary Action - Proporsional dengan Ikon & Label) --}}
+                <a href="{{ route('anggota.register') }}" 
+                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-600 text-white font-bold shadow-xs shadow-sky-500/25 hover:brightness-105 transition-all duration-200 group active:scale-95">
+                    <svg class="w-5 h-5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Daftar</span>
+                </a>
+            @endauth
+
+        </div>
+    </nav>
 
 </body>
 </html>

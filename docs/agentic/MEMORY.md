@@ -311,5 +311,6 @@ Pola berguna dari referensi:
       2. Kartu Pilihan Visual 2-State: Kartu besar dengan kontras tegas untuk status Takmir (*Bukan Takmir* vs *Ya, Pengurus Takmir*) beserta tombol cepat jabatan takmir (*Ketua Takmir, Sekretaris, Bendahara, Sie Ibadah/Dakwah, Sarpras, Sie Remaja/TPA, Imam/Marbot*).
       3. Sinkronisasi Otomatis 2 Arah: Sentuhan chip langsung mengisi textarea / input secara otomatis, namun kader tetap leluasa menambahkan rincian khusus secara manual (misal: nama masjid atau dusun).
       4. Banner konfirmasi yang melegakan & tombol aksi ukuran sentuh besar (*touch-friendly*).
+      5. Standardisasi Tombol Stepper: Penyelarasan tinggi tombol navigasi (tinggi seragam `h-11`), penyingkatan label (`Lanjut: Kemasyarakatan`), dan penambahan `whitespace-nowrap` sehingga tidak ada lagi tombol yang membengkak atau patah teks menjadi 3 baris di layar ponsel.
     - Diterapkan secara identik pada formulir pendaftaran mandiri (`anggota/register.blade.php`) dan portal edit profil kader (`portal/profile.blade.php`).
     - Seluruh 64 feature tests lulus 100% (208 assertions), Vite build sukses, committed & pushed ke GitHub `main`.

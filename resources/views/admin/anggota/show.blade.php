@@ -80,8 +80,68 @@
                     </button>
                 </form>
                 @endif
+
+                {{-- Reset Password Button --}}
+                <form method="POST" action="{{ route('admin.anggota.reset-password', $anggota) }}"
+                    onsubmit="return confirm('Reset kata sandi anggota ini ke sandi bawaan (6 digit NIK terakhir)?')">
+                    @csrf
+                    <button type="submit" class="px-4 py-2.5 border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold rounded-full shadow-2xs transition flex items-center gap-1.5" title="Reset Kata Sandi Akun">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                        <span>Reset Sandi</span>
+                    </button>
+                </form>
             </div>
         </div>
+
+        {{-- Alert Notifikasi Pasca Reset Password --}}
+        @if(session('wa_reset_url'))
+        <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs flex items-center justify-between flex-wrap gap-3 shadow-xs animate-fade-in">
+            <div class="flex items-center gap-2.5 text-emerald-950">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Kata sandi baru: <strong class="font-mono text-sm font-bold bg-white px-2.5 py-1 rounded-lg border border-emerald-200">{{ session('reset_password_value') }}</strong></span>
+            </div>
+            <a href="{{ session('wa_reset_url') }}" target="_blank" rel="noopener noreferrer"
+               class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-xs flex items-center gap-1.5 transition hover:scale-[1.02]">
+                <span>💬 Kirim Sandi ke WhatsApp Kader</span>
+                <span>&rarr;</span>
+            </a>
+        </div>
+        @endif
+
+        {{-- WhatsApp Quick Action Bar --}}
+        @if($anggota->no_wa)
+        <div class="mb-6 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-base shrink-0 shadow-2xs">
+                    💬
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-emerald-950 block">Komunikasi WhatsApp Kader</span>
+                    <span class="text-[11px] text-emerald-800 font-mono">{{ $anggota->no_wa }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, "Assalamu'alaikum wr. wb. Bapak/Ibu {$anggota->nama_lengkap}...") }}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="px-4 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                    <span>Buka Chat WA</span>
+                </a>
+                @if($anggota->user->status === 'aktif')
+                <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanVerifikasiSukses($anggota)) }}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-xs hover:scale-[1.01]">
+                    <span>Kirim Notifikasi Akun Aktif</span>
+                </a>
+                @elseif($anggota->user->status === 'ditolak')
+                <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanPerbaikanDitolak($anggota)) }}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-xs hover:scale-[1.01]">
+                    <span>Kirim Catatan Revisi</span>
+                </a>
+                @endif
+            </div>
+        </div>
+        @endif
 
         @if($anggota->catatan_verifikasi)
         <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-red-50 border border-red-200 text-xs flex items-start gap-3 shadow-xs">

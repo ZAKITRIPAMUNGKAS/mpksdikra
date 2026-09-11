@@ -7,8 +7,10 @@ use App\Models\Absensi;
 use App\Models\Event;
 use App\Models\EventSesi;
 use App\Services\AbsensiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AbsensiController extends Controller
@@ -71,5 +73,25 @@ class AbsensiController extends Controller
             ]);
 
         return response()->json(['records' => $records]);
+    }
+
+    public function cetakLembar(Event $event, EventSesi $sesi)
+    {
+        if ((int) $sesi->event_id !== (int) $event->id) {
+            abort(403);
+        }
+
+        $peserta = $event->pesertaAktif()
+            ->with('anggota')
+            ->get()
+            ->sortBy('anggota.nama_lengkap')
+            ->values();
+
+        $pdf = Pdf::loadView('pdf.lembar-presensi', compact('event', 'sesi', 'peserta'))
+            ->setPaper('a4', 'portrait');
+
+        $slug = Str::slug($event->nama_event);
+
+        return $pdf->download("lembar-presensi-{$slug}-sesi-{$sesi->urutan}.pdf");
     }
 }

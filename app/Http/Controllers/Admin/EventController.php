@@ -117,6 +117,7 @@ class EventController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'kuota' => ['nullable', 'integer', 'min:1', 'max:65535'],
             'status' => ['required', 'in:persiapan,berlangsung,selesai'],
+            'format_nomor_sertifikat' => ['nullable', 'string', 'max:255'],
         ]);
     }
 }

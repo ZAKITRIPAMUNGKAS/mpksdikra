@@ -36,7 +36,7 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (64 test hijau per 2026-09-11).
+- `php artisan test` — PHPUnit feature tests (79 test hijau per 2026-09-12).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
@@ -314,3 +314,32 @@ Pola berguna dari referensi:
       5. Standardisasi Tombol Stepper: Penyelarasan tinggi tombol navigasi (tinggi seragam `h-11`), penyingkatan label (`Lanjut: Kemasyarakatan`), dan penambahan `whitespace-nowrap` sehingga tidak ada lagi tombol yang membengkak atau patah teks menjadi 3 baris di layar ponsel.
     - Diterapkan secara identik pada formulir pendaftaran mandiri (`anggota/register.blade.php`) dan portal edit profil kader (`portal/profile.blade.php`).
     - Seluruh 64 feature tests lulus 100% (208 assertions), Vite build sukses, committed & pushed ke GitHub `main`.
+- 2026-09-12: Implementasi 6 Fitur Penyempurnaan Sistem Operasional Baitul Arqam (Non-Berita):
+    - Menolak penambahan modul berita/artikel CMS sesuai instruksi tegas pengguna ("berita gak perlu, kerjakan selain ini").
+    - Membangun 6 pilar fitur operasional lapangan dan administrasi perkaderan:
+      1. **Aksi Cepat WhatsApp Otomatis (`WhatsAppNotificationService`)**:
+         - Generator URL WhatsApp click-to-chat dengan nomor ternormalisasi (standar 628xxx).
+         - Template pesan resmi persyarikatan: Verifikasi Akun Sukses, Catatan Revisi Pendaftaran Ditolak, Undangan Jadwal Event BA, Reset Sandi Baru, dan Chat Bantuan Helpdesk.
+         - Tombol aksi cepat WA di detail kader (`admin/anggota/show`), kolom tabel data kader (`admin/anggota/index`), dan modal login.
+      2. **Reset Kata Sandi Ramah Kader Usia 40+**:
+         - Menghindari alur token email yang sering gagal/masuk spam pada kader senior.
+         - Method `resetPassword()` di `AdminAnggotaController` untuk me-reset sandi ke 6 digit terakhir NIK kader secara instan.
+         - Alert sukses dilengkapi tombol satu klik kirim sandi baru via WhatsApp ke nomor kader.
+         - Modal bantuan "Lupa Kata Sandi?" di halaman login dengan akses langsung Helpdesk WhatsApp MPKSDI dan tombol Cek Status.
+      3. **Impor Massal Kader dari Spreadsheet Excel (`maatwebsite/excel`)**:
+         - Class `AnggotaTemplateExport`: Format spreadsheet standar MPKSDI dengan header styling rapi dan baris contoh.
+         - Class `AnggotaImport`: Validasi NIK 16 digit, pencegahan duplikat otomatis, pembuatan akun user aktif langsung, pembuatan password bawaan (6 digit NIK), dan kalkulasi umur otomatis.
+         - Controller `AnggotaImportController` & View `resources/views/admin/anggota/import.blade.php` lengkap dengan kartu rekap hasil (berhasil, dilewati, error).
+      4. **Standar Penomoran Sertifikat Resmi Persyarikatan**:
+         - Migrasi database `2026_09_12_000001_add_format_sertifikat_to_events_table.php` (kolom `format_nomor_sertifikat` default: `{nomor}/BA-MPKSDI/{bulan_romawi}/{tahun}`).
+         - Helper method `Event::generateNomorSertifikat($nomorUrut)` yang menerjemahkan bulan ke angka Romawi (I-XII) dan nomor urut 3 digit (misal: `001/BA-MPKSDI/IX/2026`).
+         - Input konfigurasi format di form event admin (`admin/events/form.blade.php`) dan terintegrasi pada PDF sertifikat admin & portal kader.
+      5. **Lembar Presensi Fisik Manual Siap Cetak (PDF A4)**:
+         - Method `AbsensiController::cetakLembar(Event $event, EventSesi $sesi)`.
+         - View `resources/views/pdf/lembar-presensi.blade.php`: Format A4 resmi dengan Kop Surat MPKSDI PDM Karanganyar, rincian sesi materi, tabel tanda tangan presensi selang-seling rapi, dan kolom tanda tangan Master of Training / Petugas Presensi sebagai cadangan darurat di lokasi acara.
+         - Tombol aksi "Cetak Lembar Fisik (PDF)" di halaman scanner presensi (`admin/absensi/scan.blade.php`) dan kartu sesi pada detail event (`admin/events/show.blade.php`).
+      6. **Cek Status Pendaftaran Mandiri Publik (`/cek-status`)**:
+         - Controller `CekStatusController` & View `resources/views/auth/cek-status.blade.php`.
+         - Calon peserta cukup memasukkan NIK atau No WA untuk mengetahui status terkini (Aktif, Menunggu Verifikasi, Ditolak dengan catatan verifikator, atau Belum Terdaftar) tanpa perlu login.
+         - Terhubung di navbar utama dan mobile navigation landing page.
+    - Seluruh 79 feature & unit tests lulus 100% (241 assertions), Laravel Pint lolos, Vite production build sukses.

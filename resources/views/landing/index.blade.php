@@ -75,6 +75,7 @@
                     <span>Peta 17 Cabang</span>
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                 </a>
+                <a href="{{ route('cek-status') }}" class="hover:text-sky-600 transition">Cek Status</a>
                 <a href="#faq" class="hover:text-sky-600 transition">FAQ</a>
                 <a href="#kontak" class="hover:text-sky-600 transition">Kontak</a>
             </nav>
@@ -112,6 +113,7 @@
             <a href="#keunggulan" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Keunggulan Mutu</a>
             <a href="#tahapan" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Alur Peserta</a>
             <a href="#sebaran" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Peta 17 Cabang PCM</a>
+            <a href="{{ route('cek-status') }}" @click="mobileOpen = false" class="block py-2 text-sky-600 font-bold">Cek Status Pendaftaran</a>
             <a href="#faq" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">FAQ</a>
             <div class="pt-3 border-t border-slate-100 flex gap-2">
                 <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-full border border-slate-300 text-xs font-semibold text-slate-700">Masuk</a>

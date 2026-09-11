@@ -76,6 +76,14 @@
                 </select>
             </div>
 
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Format Nomor Sertifikat</label>
+                <input name="format_nomor_sertifikat" value="{{ old('format_nomor_sertifikat', $event->format_nomor_sertifikat ?? '{nomor}/BA-MPKSDI/{bulan_romawi}/{tahun}') }}"
+                    placeholder="{nomor}/BA-MPKSDI/{bulan_romawi}/{tahun}"
+                    class="w-full px-4 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-sm font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition">
+                <p class="text-[11px] text-slate-400 mt-1 font-medium">Tag dinamis: <code class="text-sky-600 font-bold">{nomor}</code> (001), <code class="text-sky-600 font-bold">{bulan_romawi}</code> (IX), <code class="text-sky-600 font-bold">{bulan}</code> (09), <code class="text-sky-600 font-bold">{tahun}</code> (2026)</p>
+            </div>
+
             <button type="submit" class="w-full py-3 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black text-sm rounded-full shadow-xs transition hover:scale-[1.01]">
                 {{ isset($event) ? 'Simpan Perubahan' : 'Buat Event' }}
             </button>

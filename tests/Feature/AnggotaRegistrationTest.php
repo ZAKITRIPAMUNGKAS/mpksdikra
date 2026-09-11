@@ -122,4 +122,3 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('Ketua RT 02 / RW 05 dan Anggota BPD', $anggota->keaktifan_kemasyarakatan);
     }
 }
-

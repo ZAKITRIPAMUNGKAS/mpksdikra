@@ -19,6 +19,7 @@ class Event extends Model
         'deskripsi',
         'kuota',
         'status',
+        'format_nomor_sertifikat',
         'created_by',
     ];
 
@@ -94,5 +95,25 @@ class Event extends Model
     public function kelompokOutbound(): HasMany
     {
         return $this->hasMany(OutboundKelompok::class);
+    }
+
+    public function generateNomorSertifikat(int|string $nomorUrut): string
+    {
+        $nomorFormatted = is_numeric($nomorUrut) ? sprintf('%03d', (int) $nomorUrut) : (string) $nomorUrut;
+        $bulanAngka = (int) ($this->tanggal_mulai?->format('n') ?? date('n'));
+        $romawi = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+        ];
+        $bulanRomawi = $romawi[$bulanAngka] ?? 'I';
+        $tahun = $this->tanggal_mulai?->format('Y') ?? date('Y');
+
+        $template = $this->format_nomor_sertifikat ?: '{nomor}/BA-MPKSDI/{bulan_romawi}/{tahun}';
+
+        return str_replace(
+            ['{nomor}', '{bulan_romawi}', '{bulan}', '{tahun}', '{nama_event}'],
+            [$nomorFormatted, $bulanRomawi, sprintf('%02d', $bulanAngka), $tahun, $this->nama_event],
+            $template
+        );
     }
 }

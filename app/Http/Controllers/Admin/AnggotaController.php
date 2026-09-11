@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\User;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AnggotaController extends Controller
@@ -89,5 +91,28 @@ class AnggotaController extends Controller
         return redirect()
             ->route('admin.anggota.show', $anggota)
             ->with('success', 'Anggota dinonaktifkan.');
+    }
+
+    public function resetPassword(Anggota $anggota): RedirectResponse
+    {
+        $defaultPassword = strlen($anggota->nik) >= 6
+            ? substr($anggota->nik, -6)
+            : 'mpksdi'.rand(1000, 9999);
+
+        $anggota->user->update([
+            'password' => Hash::make($defaultPassword),
+        ]);
+
+        $waUrl = null;
+        if ($anggota->no_wa) {
+            $pesan = WhatsAppNotificationService::pesanResetPassword($anggota, $defaultPassword);
+            $waUrl = WhatsAppNotificationService::makeUrl($anggota->no_wa, $pesan);
+        }
+
+        return redirect()
+            ->route('admin.anggota.show', $anggota)
+            ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword}")
+            ->with('wa_reset_url', $waUrl)
+            ->with('reset_password_value', $defaultPassword);
     }
 }

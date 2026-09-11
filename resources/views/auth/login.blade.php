@@ -48,7 +48,7 @@
 
             {{-- Right Side: Login Form --}}
             <div class="md:col-span-7 p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center bg-white relative"
-                 x-data="{ showPass: false }">
+                 x-data="{ showPass: false, showForgotModal: false }">
                 <div class="mb-5 sm:mb-6">
                     <div class="flex items-center justify-between gap-3 mb-1.5">
                         <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Masuk ke Portal</h1>
@@ -60,13 +60,19 @@
                     <p class="text-xs sm:text-sm text-slate-500">Masukkan alamat email dan kata sandi akun Anda.</p>
                 </div>
 
-                @if($errors->any())
-                    <div class="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
-                        <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span class="leading-relaxed">{{ $errors->first() }}</span>
+                {{-- Session Errors --}}
+                @if ($errors->any())
+                <div class="mb-5 p-3.5 sm:p-4 rounded-2xl bg-red-50/90 border border-red-200 text-xs text-red-800 space-y-1 shadow-2xs card-lift-sm">
+                    <div class="font-bold flex items-center gap-2">
+                        <svg class="w-4 h-4 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Gagal masuk ke akun:</span>
                     </div>
+                    <ul class="list-disc list-inside pl-1 text-[11px] sm:text-xs space-y-0.5 text-red-700">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-4">
@@ -75,8 +81,8 @@
                         <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Alamat Email
                         </label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
-                            placeholder="nama@email.com"
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                            placeholder="kader@email.com"
                             class="w-full px-3.5 sm:px-4 py-2.5 text-sm bg-slate-50 border border-slate-200/90 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
                     </div>
 
@@ -85,6 +91,9 @@
                             <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
                                 Kata Sandi (Password)
                             </label>
+                            <button type="button" @click="showForgotModal = true" class="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline">
+                                Lupa kata sandi?
+                            </button>
                         </div>
                         <div class="relative">
                             <input id="password" name="password" :type="showPass ? 'text' : 'password'" required
@@ -119,6 +128,36 @@
                             Daftar Anggota Baru &rarr;
                         </a>
                     </p>
+                </div>
+
+                {{-- Modal Bantuan Lupa Sandi --}}
+                <div x-show="showForgotModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
+                    <div @click.away="showForgotModal = false" class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 border border-slate-200 card-lift-sm text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                            🔑
+                        </div>
+                        <h3 class="text-lg font-black text-slate-900 mb-1 tracking-tight">Bantuan Kata Sandi Akun</h3>
+                        <p class="text-xs text-slate-500 mb-5 leading-relaxed">
+                            Untuk menjaga keamanan pangkalan data kader, reset kata sandi dapat dibantu secara cepat oleh tim Helpdesk Sekretariat MPKSDI PDM Karanganyar via WhatsApp.
+                        </p>
+                        
+                        <div class="space-y-2.5">
+                            <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="w-full py-3 px-5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-full shadow-xs transition duration-150 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                <span>💬 Chat Helpdesk via WhatsApp</span>
+                                <span>&rarr;</span>
+                            </a>
+                            <a href="{{ route('cek-status') }}"
+                               class="w-full py-2.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-full border border-slate-200 text-xs transition flex items-center justify-center gap-1.5">
+                                <span>🔍 Cek Status Verifikasi Pendaftaran</span>
+                            </a>
+                            <button type="button" @click="showForgotModal = false"
+                                class="w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

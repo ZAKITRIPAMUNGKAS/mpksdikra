@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AbsensiController;
 use App\Http\Controllers\Admin\AfektifController;
 use App\Http\Controllers\Admin\AnggotaController as AdminAnggotaController;
+use App\Http\Controllers\Admin\AnggotaImportController;
 use App\Http\Controllers\Admin\AngketController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventOutputController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AnggotaRegistrationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\CekStatusController;
 use App\Http\Controllers\FotoController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Portal\AfektifController as PortalAfektifController;
@@ -32,6 +34,8 @@ use App\Http\Controllers\Portal\TesController as PortalTesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/cek-status', [CekStatusController::class, 'index'])->name('cek-status');
+Route::post('/cek-status', [CekStatusController::class, 'check'])->name('cek-status.check');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -67,11 +71,16 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
 
     // Admin only: members + event config
     Route::middleware('role:admin')->group(function () {
+        Route::get('/anggota/import', [AnggotaImportController::class, 'show'])->name('anggota.import');
+        Route::get('/anggota/template-excel', [AnggotaImportController::class, 'downloadTemplate'])->name('anggota.import.template');
+        Route::post('/anggota/import', [AnggotaImportController::class, 'store'])->name('anggota.import.store');
+
         Route::get('/anggota', [AdminAnggotaController::class, 'index'])->name('anggota.index');
         Route::get('/anggota/{anggota}', [AdminAnggotaController::class, 'show'])->name('anggota.show');
         Route::post('/anggota/{anggota}/verify', [AdminAnggotaController::class, 'verify'])->name('anggota.verify');
         Route::post('/anggota/{anggota}/reject', [AdminAnggotaController::class, 'reject'])->name('anggota.reject');
         Route::post('/anggota/{anggota}/deactivate', [AdminAnggotaController::class, 'deactivate'])->name('anggota.deactivate');
+        Route::post('/anggota/{anggota}/reset-password', [AdminAnggotaController::class, 'resetPassword'])->name('anggota.reset-password');
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
@@ -135,6 +144,7 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
         Route::delete('/events/{event}/keaktifan/{keaktifan}', [KeaktifanController::class, 'destroy'])->name('events.keaktifan.destroy');
         Route::get('/events/{event}/sesi/{sesi}/scan', [AbsensiController::class, 'scanPage'])->name('events.absensi.scan');
         Route::get('/events/{event}/sesi/{sesi}/recent', [AbsensiController::class, 'recent'])->name('events.absensi.recent');
+        Route::get('/events/{event}/sesi/{sesi}/cetak-lembar', [AbsensiController::class, 'cetakLembar'])->name('events.absensi.cetak');
         Route::post('/events/{event}/absensi/process', [AbsensiController::class, 'process'])->name('events.absensi.process');
         Route::post('/events/{event}/absensi/manual', [AbsensiController::class, 'manual'])->name('events.absensi.manual');
     });

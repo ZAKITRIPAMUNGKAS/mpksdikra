@@ -29,28 +29,37 @@
                 <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl font-medium">Master database kader Muhammadiyah Karanganyar untuk penugasan dan kepesertaan Baitul Arqam.</p>
             </div>
 
-            <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                <div class="relative">
-                    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama, NIK, cabang..."
-                        class="pl-9 pr-3.5 py-2.5 text-xs font-medium rounded-full border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full sm:w-60 bg-white outline-none shadow-2xs">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a href="{{ route('admin.anggota.import') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs hover:scale-[1.01]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                     </svg>
-                </div>
-                <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 bg-white border border-slate-200/90 rounded-full text-xs font-bold text-slate-700 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition cursor-pointer shadow-2xs">
-                    <option value="">Semua Status</option>
-                    <option value="menunggu_verifikasi" @selected($status==='menunggu_verifikasi')>Menunggu Verifikasi</option>
-                    <option value="aktif" @selected($status==='aktif')>Aktif</option>
-                    <option value="ditolak" @selected($status==='ditolak')>Ditolak</option>
-                    <option value="nonaktif" @selected($status==='nonaktif')>Nonaktif</option>
-                </select>
-                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white rounded-full text-xs font-bold transition shadow-xs hover:scale-[1.01]">
-                    Cari
-                </button>
-                @if(!empty($q) || !empty($status))
-                    <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition">Reset</a>
-                @endif
-            </form>
+                    <span>Impor Excel</span>
+                </a>
+
+                <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    <div class="relative">
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama, NIK, cabang..."
+                            class="pl-9 pr-3.5 py-2.5 text-xs font-medium rounded-full border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full sm:w-56 bg-white outline-none shadow-2xs">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 bg-white border border-slate-200/90 rounded-full text-xs font-bold text-slate-700 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition cursor-pointer shadow-2xs">
+                        <option value="">Semua Status</option>
+                        <option value="menunggu_verifikasi" @selected($status==='menunggu_verifikasi')>Menunggu Verifikasi</option>
+                        <option value="aktif" @selected($status==='aktif')>Aktif</option>
+                        <option value="ditolak" @selected($status==='ditolak')>Ditolak</option>
+                        <option value="nonaktif" @selected($status==='nonaktif')>Nonaktif</option>
+                    </select>
+                    <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white rounded-full text-xs font-bold transition shadow-xs hover:scale-[1.01]">
+                        Cari
+                    </button>
+                    @if(!empty($q) || !empty($status))
+                        <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition">Reset</a>
+                    @endif
+                </form>
+            </div>
         </div>
     </div>
 
@@ -97,12 +106,24 @@
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right">
-                            <a href="{{ route('admin.anggota.show', $a) }}" class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-slate-200 hover:border-sky-400 hover:bg-sky-50 hover:text-sky-900 text-xs font-bold text-slate-700 transition shadow-2xs">
-                                <span>Detail</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </a>
+                            <div class="inline-flex items-center gap-1.5">
+                                @if($a->no_wa)
+                                    <a href="https://api.whatsapp.com/send?phone={{ \App\Services\WhatsAppNotificationService::formatNomor($a->no_wa) }}"
+                                       target="_blank" rel="noopener noreferrer"
+                                       title="Hubungi via WhatsApp ({{ $a->no_wa }})"
+                                       class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition shadow-2xs">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.004.577 1.773.847 2.806.847h.001c3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.768-5.769-5.768zm3.376 8.21c-.14.394-.712.753-1.001.782-.289.028-.59.13-1.928-.423-1.338-.553-2.193-1.91-2.26-2-.067-.09-1.042-1.388-1.042-2.646 0-1.258.657-1.878.891-2.133.234-.255.511-.318.682-.318.17 0 .341.002.49.01.157.008.367-.06.574.437.213.513.725 1.767.789 1.896.064.13.106.28.021.451-.085.17-.128.277-.255.426-.128.149-.27.332-.385.446-.128.128-.261.267-.113.522.149.255.66 1.088 1.416 1.762.973.867 1.792 1.137 2.048 1.265.255.128.405.107.554-.064.149-.17.639-.745.81-1.001.17-.255.341-.213.575-.128.234.085 1.491.703 1.747.831.255.128.426.191.49.298.064.106.064.618-.076 1.012z"/>
+                                        </svg>
+                                    </a>
+                                @endif
+                                <a href="{{ route('admin.anggota.show', $a) }}" class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-slate-200 hover:border-sky-400 hover:bg-sky-50 hover:text-sky-900 text-xs font-bold text-slate-700 transition shadow-2xs">
+                                    <span>Detail</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @empty

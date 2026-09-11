@@ -18,9 +18,9 @@
 </head>
 <body>
     <div class="cert">
-        <div class="org">Majelis Pendidikan Kader dan Sumber Daya Insani<br>PCM Karanganyar</div>
+        <div class="org">Majelis Pembinaan Kader dan Sumber Daya Insani<br>Pimpinan Daerah Muhammadiyah Karanganyar</div>
         <h1>SERTIFIKAT</h1>
-        <div class="num">Nomor: {{ sprintf('%03d', $ep->id) }}/BA-MPKSDI/{{ $event->tanggal_mulai->format('Y') }}</div>
+        <div class="num">Nomor: {{ $event->generateNomorSertifikat($ep->id) }}</div>
 
         <div class="body">
             Diberikan kepada peserta Baitul Arqam<br>

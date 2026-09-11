@@ -363,3 +363,11 @@ Pola berguna dari referensi:
          - Dilengkapi badge hijau *"✓ Wajah Pas & Proporsional (3:4)"* dan tombol *"Atur Posisi"* untuk penyesuaian ulang sewaktu-waktu.
       5. **Cakupan**: Diterapkan secara seragam pada formulir pendaftaran mandiri kader (`anggota/register.blade.php`) dan form pembaruan profil kader (`portal/profile.blade.php`).
     - Seluruh 79 unit & feature tests tetap 100% hijau, Vite build sukses.
+- 2026-09-12: Penyempurnaan Responsif Mobile Modal Pasfoto Face Fitter:
+    - Masalah di HP (Layar Ponsel): Modal terpotong ke atas layar karena penggunaan flexbox `items-center` pada container dengan `overflow-y-auto` saat tinggi konten modal melebihi tinggi viewport HP, sehingga kanvas foto dan header modal hilang ke atas (`y < 0`) dan tidak bisa di-scroll.
+    - Solusi:
+      1. Struktur Kontainer Aman: Mengganti flex vertical centering kaku menjadi scrolling container alami (`overflow-y-auto min-h-screen py-3 sm:py-4 flex flex-col justify-start sm:justify-center items-center`) dengan kartu modal `my-auto`, menjamin dialog tetap terpusat di layar luas namun mengalir bersih dari tepi atas tanpa terpotong di layar HP.
+      2. Dimensi Kanvas 3:4 Kompak: Menyesuaikan viewport panduan foto ke 210 × 280 pixel (rasio 3:4 pas) sehingga seluruh modal (header, kanvas foto berpanduan siluet, slider zoom, tombol putar, dan tombol simpan) muat dalam 1 layar HP tanpa terpotong. Hasil akhir tetap diekspor pada resolusi HD 600 × 800 pixel via rasio dinamis Canvas.
+      3. Kontrol Rapi & Touch-Friendly: Tombol putar, reset, dan slider zoom ditata ringkas dan hemat ruang vertikal.
+    - Seluruh 79 feature tests lulus 100% (241 assertions), Pint passed, Vite build sukses.
+

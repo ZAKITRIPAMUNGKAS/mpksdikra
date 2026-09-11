@@ -3,36 +3,40 @@
 @section('title', 'Pendaftaran Kader — MPKSDI PDM Karanganyar')
 
 @section('body')
-<div class="min-h-screen py-8 sm:py-12 px-4 bg-slate-100 selection:bg-mpksdi-600 selection:text-white">
+<div class="min-h-screen py-8 sm:py-12 px-4 bg-[#f8fafc] text-slate-800 selection:bg-sky-500 selection:text-white">
     <div class="max-w-3xl mx-auto">
         {{-- Top Navigation & Brand Bar --}}
         <div class="flex items-center justify-between mb-6">
-            <a href="/" class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-mpksdi-700 transition">
+            <a href="/" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200/80 hover:bg-sky-50 hover:border-sky-200 text-xs font-bold text-slate-600 hover:text-sky-700 transition shadow-2xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
                 <span>Kembali ke Beranda</span>
             </a>
             <div class="text-xs text-slate-600">
-                Sudah memiliki akun? <a href="{{ route('login') }}" class="font-bold text-mpksdi-700 hover:underline">Masuk Portal</a>
+                Sudah memiliki akun? <a href="{{ route('login') }}" class="font-bold text-sky-600 hover:text-sky-700 hover:underline">Masuk Portal &rarr;</a>
             </div>
         </div>
 
-        {{-- Form Header with MPKSDI Crest --}}
-        <div class="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-mpksdi-600 shadow-xs p-6 sm:p-8 mb-6">
-            <div class="flex items-center gap-4">
-                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-14 sm:h-16 w-auto shrink-0">
+        {{-- Form Header with MPKSDI Crest & Batik Corner --}}
+        <div class="bg-[#f3f5f8] rounded-3xl border border-sky-100/80 shadow-xs p-6 sm:p-8 mb-6 relative overflow-hidden">
+            <x-batik-corner position="top-right" class="w-40 h-40 text-[#005c8a] opacity-[0.24]" />
+            <div class="flex items-center gap-4 relative z-10">
+                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-14 sm:h-16 w-auto shrink-0 drop-shadow-xs">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-mpksdi-600 block mb-0.5">Pangkalan Data Kader Persyarikatan</span>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Daftar Anggota MPKSDI</h1>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[11px] font-bold text-sky-800 uppercase tracking-wider mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
+                        Pangkalan Data Kader Persyarikatan
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Daftar Anggota MPKSDI<span class="text-sky-500">.</span></h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">Lengkapi formulir pendaftaran anggota dan biodata diri secara akurat untuk verifikasi kepesertaan Baitul Arqam.</p>
                 </div>
             </div>
         </div>
 
         @if(session('success'))
-            <div class="mb-6 px-4 py-3.5 rounded-xl bg-mpksdi-50 border-l-4 border-mpksdi-600 text-mpksdi-950 text-sm flex items-start gap-2.5 shadow-2xs">
-                <svg class="w-5 h-5 text-mpksdi-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-6 px-4 py-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-950 text-sm flex items-start gap-2.5 shadow-xs">
+                <svg class="w-5 h-5 text-sky-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <span class="font-medium">{{ session('success') }}</span>
@@ -40,14 +44,14 @@
         @endif
 
         @if($errors->any())
-            <div class="mb-6 px-4 py-3.5 rounded-xl bg-red-50 border-l-4 border-red-600 text-red-950 text-sm shadow-2xs">
-                <div class="font-bold mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider">
-                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-6 px-4 py-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 text-sm shadow-xs">
+                <div class="font-bold mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider text-rose-900">
+                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     Mohon lengkapi atau perbaiki isian berikut:
                 </div>
-                <ul class="space-y-1 list-disc pl-5 text-xs text-red-800">
+                <ul class="space-y-1 list-disc pl-5 text-xs text-rose-800">
                     @foreach($errors->all() as $err)
                         <li>{{ $err }}</li>
                     @endforeach
@@ -56,7 +60,7 @@
         @endif
 
         <form method="POST" action="{{ route('anggota.register.store') }}" enctype="multipart/form-data"
-              class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8"
+              class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8 card-lift-sm"
               x-data="{ 
                   tab: 'diri',
                   photoPreview: null,
@@ -68,7 +72,7 @@
             @csrf
 
             {{-- Stepper Progress Header --}}
-            <div class="mb-8 pb-5 border-b border-slate-200">
+            <div class="mb-8 pb-5 border-b border-slate-200/80">
                 <div class="grid grid-cols-4 gap-2">
                     @php
                         $steps = [
@@ -83,17 +87,17 @@
                         class="text-left group focus:outline-none transition">
                         <div class="flex items-center gap-2 mb-1.5">
                             <span class="w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center transition-all duration-150"
-                                :class="tab==='{{ $s['key'] }}' ? 'bg-mpksdi-600 text-white font-extrabold shadow-2xs' : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'">
+                                :class="tab==='{{ $s['key'] }}' ? 'bg-sky-500 text-white font-extrabold shadow-2xs' : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'">
                                 {{ $s['no'] }}
                             </span>
                             <span class="text-xs font-bold hidden sm:inline"
-                                :class="tab==='{{ $s['key'] }}' ? 'text-mpksdi-900' : 'text-slate-500 group-hover:text-slate-800'">
+                                :class="tab==='{{ $s['key'] }}' ? 'text-sky-700' : 'text-slate-500 group-hover:text-slate-800'">
                                 {{ $s['title'] }}
                             </span>
                         </div>
                         <div class="w-full h-1.5 rounded-full overflow-hidden bg-slate-100">
                             <div class="h-full transition-all duration-200"
-                                :class="tab==='{{ $s['key'] }}' ? 'bg-gold-400 w-full' : 'bg-transparent w-0'"></div>
+                                :class="tab==='{{ $s['key'] }}' ? 'bg-amber-400 w-full' : 'bg-transparent w-0'"></div>
                         </div>
                     </button>
                     @endforeach
@@ -247,7 +251,7 @@
 
                 <div class="flex justify-end pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('agama')"
-                        class="px-6 py-2.5 bg-mpksdi-600 hover:bg-mpksdi-700 text-white font-bold text-xs sm:text-sm rounded-lg shadow-xs transition flex items-center gap-2">
+                        class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center gap-2">
                         <span>Lanjut: Data Keagamaan</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -353,12 +357,12 @@
 
                 <div class="flex justify-between pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('diri')"
-                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
+                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('org')"
-                        class="px-6 py-2.5 bg-mpksdi-600 hover:bg-mpksdi-700 text-white font-bold text-xs sm:text-sm rounded-lg shadow-xs transition flex items-center gap-2">
+                        class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center gap-2">
                         <span>Lanjut: Organisasi</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -414,12 +418,12 @@
 
                 <div class="flex justify-between pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('agama')"
-                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
+                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('harapan')"
-                        class="px-6 py-2.5 bg-mpksdi-600 hover:bg-mpksdi-700 text-white font-bold text-xs sm:text-sm rounded-lg shadow-xs transition flex items-center gap-2">
+                        class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center gap-2">
                         <span>Lanjut: Harapan &amp; Pengiriman</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -433,7 +437,7 @@
                         Harapan terhadap Pimpinan Cabang Muhammadiyah (PCM)
                     </label>
                     <textarea name="harapan_pcm" rows="3" placeholder="Tuliskan masukan atau harapan untuk kemajuan persyarikatan di tingkat cabang..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-mpksdi-500 focus:border-mpksdi-500 outline-none bg-white resize-none">{{ old('harapan_pcm') }}</textarea>
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none">{{ old('harapan_pcm') }}</textarea>
                 </div>
 
                 <div>
@@ -441,23 +445,23 @@
                         Harapan selama Mengikuti Baitul Arqam (BA)
                     </label>
                     <textarea name="harapan_ba" rows="3" placeholder="Tuliskan target pengembangan diri atau pemahaman yang ingin dicapai..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-mpksdi-500 focus:border-mpksdi-500 outline-none bg-white resize-none">{{ old('harapan_ba') }}</textarea>
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none">{{ old('harapan_ba') }}</textarea>
                 </div>
 
-                <div class="p-4 rounded-xl bg-mpksdi-50 border border-mpksdi-200 text-xs text-mpksdi-950">
+                <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-950">
                     <span class="font-bold block mb-1">Konfirmasi Pengiriman:</span>
                     Pastikan seluruh data yang Anda masukkan telah benar dan pasfoto yang diunggah jelas. Setelah dikirim, admin MPKSDI PDM Karanganyar akan memverifikasi berkas Anda sebelum akun diaktifkan.
                 </div>
 
                 <div class="flex justify-between pt-4 border-t border-slate-100 items-center">
                     <button type="button" @click="goTo('org')"
-                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
+                        class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center gap-1.5 text-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="submit"
-                        class="px-8 py-3 bg-gold-400 hover:bg-gold-500 text-mpksdi-950 font-extrabold text-sm rounded-xl border border-gold-500 shadow-md transition">
-                        Kirim Pendaftaran Kader
+                        class="px-8 py-3 bg-[#f8bb00] hover:bg-amber-400 text-slate-950 font-black text-sm rounded-full border border-amber-400 shadow-md transition hover:scale-[1.02]">
+                        Kirim Pendaftaran Kader &rarr;
                     </button>
                 </div>
             </div>

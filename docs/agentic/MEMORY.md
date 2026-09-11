@@ -283,5 +283,18 @@ Pola berguna dari referensi:
      3. Mengembalikan kelas ukuran Tailwind resmi (`w-40 h-40 sm:w-56 sm:h-56` dsb.).
      4. Menyetel IntersectionObserver reveal ke `threshold: 0.01` dan `rootMargin: 60px 0px 60px 0px` agar langsung terpicu dan tampil saat di-scroll.
    - Seluruh 63 feature tests lulus 100% (200 assertions), build Vite sukses, dan perubahan telah di-push ke GitHub repository `main`.
-
-
+- 2026-09-11: Standarisasi Total Seluruh Tampilan Aplikasi Selaras Identitas Desain Landing Page:
+    - Dilakukan refaktorisasi dan restyling komprehensif pada 32 file view di seluruh sistem (Master Layouts, Autentikasi, Registrasi Mandiri, Portal Kader, dan Seluruh Modul Manajemen Admin/Fasilitator/Executive) agar konsisten 100% dengan bahasa visual landing page MPKSDI:
+      1. Master Layouts (`layouts/app.blade.php`, `layouts/guest.blade.php`): Penambahan top scroll progress bar gradient emas-biru, brand logo `MPKSDI<span class="text-sky-500">.</span>`, tab navigasi pill, badge status radar berkedip (*pulsing live dot*), alert toast `rounded-2xl` dengan card-lift, serta institutional footer dengan lencana pengembang `gemala.dev` dan tombol scroll "Ke Atas ↑".
+      2. Autentikasi & Registrasi (`auth/login.blade.php`, `anggota/register.blade.php`): Form login berornamen batik sudut, badge live status, kartu split elegan `rounded-3xl`, stepper pill dengan progress bar amber pada form pendaftaran anggota 4 langkah.
+      3. Personal Portal Kader: Antarmuka terpadu pada `portal/dashboard`, `portal/profile`, `portal/kehadiran` (digital pass badge emas & unduh ID Card), `portal/tes` (CBT exam runner dengan nomor grid interaktif), `portal/afektif`, `portal/angket`, dan `portal/rtl` dengan hero banner berornamen batik, kartu putih murni `rounded-3xl card-lift-sm`, radio options dengan highlight sky tint, dan tombol aksi rounded-full.
+      4. Workstation Admin, Fasilitator & Executive: Penyelarasan seluruh 16 modul operasional (`admin/dashboard`, `admin/executive`, `admin/events/*` [index, show command center, form, enroll, soal CBT, keaktifan, ranking, psikomotor, afektif, angket, outbound], `admin/anggota/*`, `admin/users/*`, dan `admin/absensi/scan` dengan target viewfinder laser scan bercahaya amber-cyan).
+      5. Token Desain Terstandarisasi:
+         - Background canvas: `bg-[#f8fafc]` (soft slate).
+         - Header Hero: `bg-[#f3f5f8] rounded-3xl border border-sky-100/80 p-6 sm:p-8 shadow-xs relative overflow-hidden card-lift-sm` + `<x-batik-corner position="top-right" />`.
+         - Kartu Konten: `bg-white rounded-3xl border border-slate-200/80 shadow-xs card-lift-sm card-sheen hover:border-sky-400 p-6`.
+         - Tombol Utama: `px-6 py-2.5 rounded-full bg-sky-500 hover:bg-sky-600 font-bold text-white shadow-xs hover:scale-[1.01]`.
+         - Tombol Aksen Emas: `rounded-full bg-[#f8bb00] hover:bg-amber-400 text-slate-950 font-black shadow-md`.
+         - Kontrol Input: `rounded-xl border border-slate-200/90 bg-slate-50/60 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20`.
+         - Tabel & Data Feed: `rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden bg-white card-lift-sm`.
+    - Seluruh 63 unit & feature tests lulus 100% (200 assertions), build Vite clean tanpa warning.

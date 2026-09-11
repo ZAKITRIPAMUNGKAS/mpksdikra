@@ -12,7 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased bg-slate-50 text-slate-800 min-h-screen selection:bg-mpksdi-600 selection:text-white">
+<body class="antialiased bg-[#f8fafc] text-slate-800 min-h-screen selection:bg-sky-500 selection:text-white">
+    {{-- Global Scroll Progress Indicator --}}
+    <div id="scroll-progress-bar" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-[#f8bb00] z-[999] transition-[width] duration-75 ease-out pointer-events-none" style="width: 0%;"></div>
     @yield('body')
 </body>
 </html>

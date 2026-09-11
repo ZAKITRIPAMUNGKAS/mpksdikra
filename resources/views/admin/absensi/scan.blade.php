@@ -4,62 +4,63 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6">
-    {{-- Breadcrumb & Event Title --}}
-    <div>
-        <a href="{{ route('admin.events.show', $event) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-mpksdi-700 transition mb-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Kembali ke {{ $event->nama_event }}
-        </a>
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    {{-- Header Banner with Batik Corner --}}
+    <div class="bg-[#f3f5f8] rounded-3xl border border-sky-100/80 p-6 sm:p-8 shadow-xs relative overflow-hidden card-lift-sm">
+        <x-batik-corner position="top-right" class="w-40 h-40 text-[#005c8a] opacity-[0.20]" />
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Presensi: {{ $sesi->nama_sesi }}</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Sesi #{{ $sesi->urutan }} &bull; Kategori: <span class="capitalize font-semibold text-slate-700">{{ $sesi->jenis }}</span></p>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-mpksdi-50 text-mpksdi-700 border border-mpksdi-200">
-                    <span class="w-2 h-2 rounded-full bg-mpksdi-500 animate-ping"></span>
-                    Scanner Siap
-                </span>
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                    <a href="{{ route('admin.events.show', $event) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-600 transition shadow-2xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span>{{ $event->nama_event }}</span>
+                    </a>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
+                        Scanner Aktif
+                    </span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Presensi: {{ $sesi->nama_sesi }}</h1>
+                <p class="text-xs text-slate-500 mt-1">Sesi #{{ $sesi->urutan }} &bull; Kategori: <span class="capitalize font-bold text-slate-700">{{ $sesi->jenis }}</span></p>
             </div>
         </div>
     </div>
 
     <div class="grid md:grid-cols-5 gap-6 items-start" x-data="scanApp()">
         {{-- Left: Scanner Console --}}
-        <div class="md:col-span-3 bg-white rounded-xl border border-slate-200 shadow-xs p-6 sm:p-7 space-y-5">
+        <div class="md:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-7 space-y-5 card-lift-sm">
             {{-- Target Viewfinder Frame --}}
-            <div class="relative bg-mpksdi-950 rounded-xl p-8 text-center text-white overflow-hidden shadow-inner border border-mpksdi-900">
-                <div class="w-36 h-36 mx-auto border-2 border-dashed border-gold-400/80 rounded-xl flex flex-col items-center justify-center relative group bg-mpksdi-900/50">
-                    <div class="absolute inset-x-2 top-1/2 h-0.5 bg-cyan-mpksdi shadow-sm shadow-cyan-mpksdi"></div>
-                    <svg class="w-10 h-10 text-gold-400/80 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative bg-slate-950 rounded-2xl p-8 text-center text-white overflow-hidden shadow-inner border border-slate-800">
+                <div class="w-36 h-36 mx-auto border-2 border-dashed border-[#f8bb00] rounded-2xl flex flex-col items-center justify-center relative group bg-slate-900/60 shadow-lg shadow-amber-500/10">
+                    <div class="absolute inset-x-2 top-1/2 h-0.5 bg-sky-400 shadow-sm shadow-sky-400 animate-pulse"></div>
+                    <svg class="w-10 h-10 text-[#f8bb00] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                     </svg>
-                    <span class="text-[10px] text-gold-300 font-mono uppercase tracking-wider">Arahkan QR Code</span>
+                    <span class="text-[10px] text-amber-300 font-mono uppercase tracking-wider font-bold">Arahkan QR Code</span>
                 </div>
                 <p class="text-xs text-slate-400 mt-4">Gunakan barcode scanner USB / Bluetooth atau tempel token QR di bawah</p>
             </div>
 
             {{-- Input and Trigger --}}
             <div class="space-y-2">
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Input Kode QR / Token Peserta</label>
-                <div class="flex gap-2">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Input Kode QR / Token Peserta</label>
+                <div class="flex flex-col sm:flex-row gap-2">
                     <input x-model="qr" @keyup.enter="scan" autofocus placeholder="Tempel / ketik kode QR di sini..."
-                        class="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-mono focus:bg-white focus:ring-2 focus:ring-mpksdi-500 focus:border-mpksdi-500 outline-none transition">
+                        class="flex-1 px-4 py-3 bg-slate-50/70 border border-slate-200 rounded-xl text-sm font-mono focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition">
                     <button @click="scan" :disabled="!qr.trim()"
-                        class="px-5 py-3 bg-mpksdi-600 hover:bg-mpksdi-700 active:bg-mpksdi-800 disabled:opacity-50 text-white font-bold text-sm rounded-lg shadow-xs transition duration-150">
+                        class="px-6 py-3 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 disabled:opacity-50 text-white font-bold text-xs rounded-full shadow-xs hover:scale-[1.01] transition duration-150 shrink-0">
                         Proses Presensi
                     </button>
                 </div>
             </div>
 
             {{-- Live Result Notification --}}
-            <div x-show="message" x-transition class="p-4 rounded-lg text-sm flex items-start gap-3 border"
-                :class="ok ? 'bg-mpksdi-50 border-mpksdi-200 text-mpksdi-900' : 'bg-red-50 border-red-200 text-red-800'" style="display: none;">
+            <div x-show="message" x-transition class="p-4 rounded-2xl text-sm flex items-start gap-3 border"
+                :class="ok ? 'bg-sky-50 border-sky-200 text-sky-900' : 'bg-red-50 border-red-200 text-red-800'" style="display: none;">
                 <div class="shrink-0 mt-0.5">
                     <template x-if="ok">
-                        <svg class="w-5 h-5 text-mpksdi-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </template>
@@ -69,15 +70,15 @@
                         </svg>
                     </template>
                 </div>
-                <div class="font-medium" x-text="message"></div>
+                <div class="font-bold" x-text="message"></div>
             </div>
         </div>
 
         {{-- Right: Recent Scans Activity Feed --}}
-        <div class="md:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
+        <div class="md:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4 card-lift-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 class="font-bold text-slate-900 text-sm">Riwayat Presensi Terbaru</h2>
-                <button @click="load" title="Segarkan data" class="text-slate-400 hover:text-mpksdi-700 transition">
+                <h2 class="font-black text-slate-900 text-sm">Riwayat Presensi Terbaru</h2>
+                <button @click="load" title="Segarkan data" class="text-slate-400 hover:text-sky-600 transition p-1 rounded-full hover:bg-slate-100">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
@@ -127,12 +128,12 @@ function scanApp() {
                     return;
                 }
                 container.innerHTML = data.records.map(x => `
-                    <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-100 flex items-center justify-between gap-2">
+                    <div class="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100 flex items-center justify-between gap-2">
                         <div>
-                            <span class="font-bold text-slate-800 block text-xs">${x.nama}</span>
+                            <span class="font-bold text-slate-900 block text-xs">${x.nama}</span>
                             <span class="text-[10px] text-slate-400">${x.waktu} &bull; Metode: ${x.metode}</span>
                         </div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-mpksdi-50 text-mpksdi-700 border border-mpksdi-200">Hadir</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-800 border border-sky-200">Hadir</span>
                     </div>
                 `).join('');
             } catch (e) {}

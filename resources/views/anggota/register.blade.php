@@ -454,69 +454,239 @@
                 </div>
             </div>
 
-            {{-- Tab 4: Kemasjidan, Kemasyarakatan & Selesai --}}
-            <div x-show="tab==='kemasyarakatan'" class="space-y-4 sm:space-y-6" style="display: none;"
-                 x-data="{ isTakmir: '{{ old('keaktifan_takmir', 'Tidak') }}' }">
+            {{-- Tab 4: Kemasjidan, Kemasyarakatan & Selesai (Ramah Usia 40+) --}}
+            <div x-show="tab==='kemasyarakatan'" class="space-y-6" style="display: none;"
+                 x-data="{ 
+                     isTakmir: '{{ old('keaktifan_takmir', 'Tidak') }}',
+                     takmirRole: '{{ old('jabatan_takmir', '') }}',
+                     masjidText: '{{ addslashes(old('aktifitas_jamaah_masjid', '')) }}',
+                     masyarakatText: '{{ addslashes(old('keaktifan_kemasyarakatan', '')) }}',
+                     
+                     masjidPresets: [
+                         'Sholat Berjamaah 5 Waktu',
+                         'Sholat Berjamaah Subuh / Isya',
+                         'Pengajian Rutin Subuh / Malam',
+                         'Pengajian Ahad Pagi',
+                         'Tadarus / Kajian Al-Qur\'an',
+                         'Panitia Kegiatan Masjid / PHBI'
+                     ],
+                     takmirPresets: [
+                         'Ketua Takmir',
+                         'Sekretaris',
+                         'Bendahara',
+                         'Seksi Ibadah & Dakwah',
+                         'Seksi Pembangunan / Sarpras',
+                         'Seksi Remaja / TPA',
+                         'Imam / Marbot Masjid'
+                     ],
+                     masyarakatPresets: [
+                         'Pengurus RT (Ketua / Pengurus)',
+                         'Pengurus RW',
+                         'Anggota BPD Desa',
+                         'Pengurus Paguyuban Warga',
+                         'Kader Posyandu / Kesehatan Desa',
+                         'Anggota Linmas / Relawan',
+                         'Kelompok Tani / Gapoktan',
+                         'Pengurus Rukun Kematian / Sosial',
+                         'Pembina Karang Taruna',
+                         'Warga Masyarakat'
+                     ],
+
+                     toggleMasjid(item) {
+                         let list = this.masjidText ? this.masjidText.split(',').map(s => s.trim()).filter(Boolean) : [];
+                         if (list.includes(item)) {
+                             list = list.filter(x => x !== item);
+                         } else {
+                             list.push(item);
+                         }
+                         this.masjidText = list.join(', ');
+                     },
+                     hasMasjid(item) {
+                         return this.masjidText && this.masjidText.includes(item);
+                     },
+
+                     toggleMasyarakat(item) {
+                         let list = this.masyarakatText ? this.masyarakatText.split(',').map(s => s.trim()).filter(Boolean) : [];
+                         if (list.includes(item)) {
+                             list = list.filter(x => x !== item);
+                         } else {
+                             list.push(item);
+                         }
+                         this.masyarakatText = list.join(', ');
+                     },
+                     hasMasyarakat(item) {
+                         return this.masyarakatText && this.masyarakatText.includes(item);
+                     }
+                 }">
                 
+                {{-- Banner Ramah Informasi --}}
+                <div class="p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex items-start gap-3 text-sky-950">
+                    <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-base">
+                        🕌
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
+                        <p class="text-xs text-sky-800/90 mt-0.5 leading-relaxed">
+                            Sentuh pilihan cepat di bawah ini sesuai rutinitas sehari-hari Bapak/Ibu. Boleh memilih lebih dari satu tanpa perlu mengetik panjang.
+                        </p>
+                    </div>
+                </div>
+
                 {{-- 1. Aktivitas Jamaah di Masjid --}}
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Aktifitas Jamaah di Masjid
-                    </label>
-                    <textarea name="aktifitas_jamaah_masjid" rows="2" placeholder="Tuliskan rutinitas/aktifitas jamaah Anda di masjid (contoh: Sholat fardhu berjamaah 5 waktu, pengajian rutin subuh, tadarus, dll.)..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition">{{ old('aktifitas_jamaah_masjid') }}</textarea>
-                    @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                    <div>
+                        <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                            1. Rutinitas Jamaah di Masjid Lingkungan Sekitar
+                        </label>
+                        <p class="text-xs text-slate-500 mt-1">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
+                    </div>
+
+                    {{-- Quick-Tap Preset Chips --}}
+                    <div class="flex flex-wrap gap-2 pt-0.5">
+                        <template x-for="item in masjidPresets" :key="item">
+                            <button type="button" @click="toggleMasjid(item)"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-2xs active:scale-95 text-left"
+                                :class="hasMasjid(item) 
+                                    ? 'bg-sky-500 text-white border-sky-600 shadow-sky-500/20' 
+                                    : 'bg-white text-slate-700 border-slate-200 hover:border-sky-300 hover:bg-sky-50/50'">
+                                <span x-show="hasMasjid(item)" class="text-white font-black">✓</span>
+                                <span x-show="!hasMasjid(item)" class="text-slate-400 font-bold">+</span>
+                                <span x-text="item"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
+                    <div class="pt-1">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                            Rincian / Catatan Tambahan &amp; Nama Masjid:
+                        </label>
+                        <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="2"
+                            placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik nama masjid atau kegiatan lain (contoh: Masjid Al-Falah Jetis)..."
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed"></textarea>
+                        @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 {{-- 2. Keaktifan sebagai Takmir Masjid --}}
-                <div class="p-3.5 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Keaktifan sebagai Takmir Masjid
-                    </label>
-                    <div class="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3">
-                        <label class="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs text-center active:scale-[0.98]">
-                            <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir"
-                                class="text-sky-600 focus:ring-sky-500">
-                            <span>Tidak</span>
+                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                    <div>
+                        <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                            2. Amanah sebagai Pengurus / Takmir Masjid
                         </label>
-                        <label class="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs text-center active:scale-[0.98]">
-                            <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir"
-                                class="text-sky-600 focus:ring-sky-500">
-                            <span>Ya, Pengurus</span>
+                        <p class="text-xs text-slate-500 mt-1">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
+                    </div>
+
+                    {{-- Large Selection Cards --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-3.5 bg-white shadow-2xs active:scale-[0.99]"
+                            :class="isTakmir === 'Tidak' ? 'border-slate-800 bg-slate-900 text-white shadow-md' : 'border-slate-200 text-slate-700 hover:border-slate-300'">
+                            <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir" class="sr-only">
+                            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                                :class="isTakmir === 'Tidak' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">
+                                👤
+                            </div>
+                            <div>
+                                <span class="text-xs sm:text-sm font-extrabold block">Bukan Takmir</span>
+                                <span class="text-[11px] block" :class="isTakmir === 'Tidak' ? 'text-slate-300' : 'text-slate-400'">Sebagai jamaah masjid / musholla</span>
+                            </div>
+                        </label>
+
+                        <label class="p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-3.5 bg-white shadow-2xs active:scale-[0.99]"
+                            :class="isTakmir === 'Ya' ? 'border-sky-500 bg-sky-50 text-sky-950 shadow-md' : 'border-slate-200 text-slate-700 hover:border-slate-300'">
+                            <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir" class="sr-only">
+                            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                                :class="isTakmir === 'Ya' ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-500'">
+                                🕌
+                            </div>
+                            <div>
+                                <span class="text-xs sm:text-sm font-extrabold block">Ya, Pengurus Takmir</span>
+                                <span class="text-[11px] block" :class="isTakmir === 'Ya' ? 'text-sky-700' : 'text-slate-400'">Aktif di kepengurusan takmir</span>
+                            </div>
                         </label>
                     </div>
 
-                    {{-- Conditional Input: Sebagai... --}}
-                    <div x-show="isTakmir === 'Ya'" x-transition class="pt-2">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                            Sebagai (Amanah / Jabatan di Takmir):
+                    {{-- Conditional Role Picker if "Ya" --}}
+                    <div x-show="isTakmir === 'Ya'" x-transition class="pt-3 border-t border-slate-200/80 space-y-2.5">
+                        <label class="block text-xs font-bold text-slate-700">
+                            Sentuh Amanah / Posisi Anda di Takmir:
                         </label>
-                        <input type="text" name="jabatan_takmir" value="{{ old('jabatan_takmir') }}"
-                            placeholder="Contoh: Ketua Takmir / Sekretaris / Bendahara / Sie Ibadah & Dakwah / Marbot"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                        @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="role in takmirPresets" :key="role">
+                                <button type="button" @click="takmirRole = role"
+                                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-2xs active:scale-95"
+                                    :class="takmirRole === role 
+                                        ? 'bg-sky-500 text-white border-sky-600' 
+                                        : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-50/50 hover:border-sky-300'">
+                                    <span x-text="role"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <div class="pt-1">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                Rincian Jabatan &amp; Nama Masjid:
+                            </label>
+                            <input type="text" name="jabatan_takmir" x-model="takmirRole"
+                                placeholder="Contoh: Ketua Takmir Masjid Mujahidin / Sie Dakwah..."
+                                class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                            @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        </div>
                     </div>
                 </div>
 
                 {{-- 3. Keaktifan di Kemasyarakatan --}}
-                <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-2 mb-1">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                            Keaktifan di Kemasyarakatan
-                        </label>
-                        <span class="text-[11px] text-slate-400 font-medium">RT / RW / BPD / Karang Taruna dll.</span>
+                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                    <div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                                3. Keaktifan di Lingkungan Kemasyarakatan
+                            </label>
+                            <span class="text-xs text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
                     </div>
-                    <textarea name="keaktifan_kemasyarakatan" rows="3"
-                        placeholder="Sebutkan amanah/peran aktif di masyarakat (contoh: Ketua RT 02 / RW 04, Anggota BPD Desa, Pengurus Karang Taruna, Linmas, Relawan Posyandu, dll.)..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition">{{ old('keaktifan_kemasyarakatan') }}</textarea>
-                    @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+
+                    {{-- Quick-Tap Preset Chips --}}
+                    <div class="flex flex-wrap gap-2 pt-0.5">
+                        <template x-for="item in masyarakatPresets" :key="item">
+                            <button type="button" @click="toggleMasyarakat(item)"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-2xs active:scale-95 text-left"
+                                :class="hasMasyarakat(item) 
+                                    ? 'bg-sky-500 text-white border-sky-600 shadow-sky-500/20' 
+                                    : 'bg-white text-slate-700 border-slate-200 hover:border-sky-300 hover:bg-sky-50/50'">
+                                <span x-show="hasMasyarakat(item)" class="text-white font-black">✓</span>
+                                <span x-show="!hasMasyarakat(item)" class="text-slate-400 font-bold">+</span>
+                                <span x-text="item"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
+                    <div class="pt-1">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                            Rincian Peran &amp; Nama Dusun/Wilayah:
+                        </label>
+                        <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="2"
+                            placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik rincian RT/RW/Desa (contoh: Ketua RT 02 RW 04 Dusun Dagen)..."
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed"></textarea>
+                        @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
-                <div class="p-3.5 sm:p-4 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-950 leading-relaxed">
-                    <span class="font-bold block mb-1">Konfirmasi Pengiriman:</span>
-                    Pastikan seluruh data yang Anda masukkan telah benar dan pasfoto yang diunggah jelas. Setelah dikirim, admin MPKSDI PDM Karanganyar akan memverifikasi berkas Anda sebelum akun diaktifkan.
+                {{-- Kotak Konfirmasi Pengiriman --}}
+                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-xs text-emerald-950 flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
+                        ✓
+                    </div>
+                    <div class="leading-relaxed">
+                        <span class="font-bold block text-emerald-900 text-xs sm:text-sm mb-0.5">Alhamdulillah, Seluruh Data Formulir Telah Lengkap!</span>
+                        Silakan periksa kembali sebelum mengirim. Setelah menekan tombol kirim di bawah, pendaftaran Bapak/Ibu akan diverifikasi oleh tim sekretariat MPKSDI PDM Karanganyar.
+                    </div>
                 </div>
 
+                {{-- Action Buttons --}}
                 <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('org')"
                         class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs">

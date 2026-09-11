@@ -253,3 +253,10 @@ Pola berguna dari referensi:
    - Inisialisasi Git repository lokal, verifikasi `.gitignore` (file sensitif `.env`, `storage/*.key`, dan `vendor/` aman terisolasi).
    - Commit perdana: `Initial release: Sistem Perkaderan Terpadu Baitul Arqam MPKSDI PDM Karanganyar`.
    - Push berhasil ke remote repository: `https://github.com/ZAKITRIPAMUNGKAS/mpksdikra.git` pada branch `main`.
+- 2026-09-11: Perbaikan Posisi & Keselarasan Pola Batik Sudut Bawah (Bottom Corner Flush & Aligned):
+   - Investigasi & Identifikasi Root Cause: Pada elemen berposisi sudut bawah (`bottom-left` dan `bottom-right`), parent container yang memiliki utilitas Tailwind `space-y-*` (seperti Section 5 `space-y-8`) menambahkan `margin-bottom: 2rem` (32px) pada anak non-terakhir. Hal ini menyebabkan komponen yang memiliki `position: absolute; bottom: 0;` terdorong melayang 32px ke atas dan terpotong garis lurus horizontal.
+   - Isolasi Margin Mutlak: Menambahkan utilitas `!m-0 !mt-0 !mb-0 !ml-0 !mr-0` dan inline CSS `style="margin: 0 !important;"` pada elemen pembungkus `batik-corner.blade.php`, meniadakan segala dorongan margin dari parent `space-y-*`.
+   - Native SVG Radial Gradient Coordinates: Menghapus CSS transform flip pada tag `<svg>` dan menerapkan koordinat jangkar native (`cx="0%" cy="100%"` untuk `bottom-left`, `cx="100%" cy="100%"` untuk `bottom-right`) sehingga gradasi memudar akurat langsung dari sudut bawah kartu tanpa anomali render di berbagai browser.
+   - Penyelarasan Dimensi Grid 80px: Seluruh instansiasi sudut di landing page distandarkan ke kelipatan 80px (`w-40 h-40` = 160px untuk mobile, `sm:w-60 sm:h-60` = 240px untuk desktop), memastikan setiap tepi motif mendarat tepat pada batas sel 80px.
+   - Seluruh 63 feature tests lulus 100% (200 assertions), build Vite sukses, dan perubahan telah di-push ke GitHub repository `main`.
+

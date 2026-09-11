@@ -1,0 +1,288 @@
+@extends('layouts.app')
+
+@section('title', ucfirst($tipe) . ' — ' . $event->nama_event)
+
+@section('content')
+<div class="max-w-6xl mx-auto space-y-6"
+    x-data="cbtExam({
+        total: {{ $questions->count() }},
+        initialRemaining: {{ $remaining }},
+        submitUrl: '{{ route('portal.tes.submit', [$event, $tipe]) }}'
+    })">
+
+    {{-- Top Sticky CBT Header & Timer Bar --}}
+    <div class="sticky top-16 z-30 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 transition-all">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase tracking-wider {{ $tipe === 'pretest' ? 'bg-mpksdi-100 text-mpksdi-900 border border-mpksdi-300' : 'bg-gold-100 text-mpksdi-950 border border-gold-300' }}">
+                        {{ strtoupper($tipe) }}
+                    </span>
+                    <span class="text-xs text-slate-300">&bull;</span>
+                    <span class="text-xs font-semibold text-slate-600">{{ $questions->count() }} Butir Soal</span>
+                    <span class="text-xs text-slate-300">&bull;</span>
+                    <span class="text-xs text-emerald-700 font-bold">
+                        <span x-text="answeredCount"></span> Terjawab (<span x-text="Math.round((answeredCount / total) * 100)"></span>%)
+                    </span>
+                </div>
+                <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight mt-1">{{ $event->nama_event }}</h1>
+            </div>
+
+            {{-- Timer Counter --}}
+            <div class="flex items-center gap-3 self-end sm:self-auto">
+                <div class="text-right">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono shadow-2xs transition-colors"
+                        :class="remaining < 60 ? 'bg-red-50 border-red-300 text-red-700 animate-pulse' : 'bg-slate-50 border-slate-300 text-slate-900'">
+                        <svg class="w-4 h-4 text-mpksdi-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-lg sm:text-xl font-black tabular-nums" x-text="timerDisplay"></span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Sisa Waktu</p>
+                </div>
+
+                {{-- Mobile Navigator Trigger --}}
+                <button type="button" @click="mobileNavOpen = true" class="lg:hidden p-2.5 rounded-xl bg-mpksdi-50 text-mpksdi-900 border border-mpksdi-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                    <span>Daftar Soal</span>
+                </button>
+            </div>
+        </div>
+
+        {{-- Progress Bar --}}
+        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-3.5 overflow-hidden">
+            <div class="bg-gradient-to-r from-mpksdi-600 to-gold-400 h-1.5 rounded-full transition-all duration-300"
+                :style="`width: ${(answeredCount / total) * 100}%`"></div>
+        </div>
+    </div>
+
+    {{-- Main Grid: Soal List + Sidebar Navigator --}}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {{-- Left: List of Questions --}}
+        <div class="lg:col-span-8 space-y-5">
+            <form method="POST" action="{{ route('portal.tes.submit', [$event, $tipe]) }}" id="tes-form" class="space-y-5">
+                @csrf
+
+                @foreach($questions as $i => $s)
+                <div id="soal-card-{{ $i + 1 }}" class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-7 transition-all duration-150 scroll-mt-36 hover:border-slate-300">
+                    <div class="flex items-start gap-3.5 mb-5">
+                        <span class="w-9 h-9 rounded-xl font-black text-sm flex items-center justify-center shrink-0 shadow-2xs transition-colors"
+                            :class="answers['{{ $s->id }}'] ? 'bg-mpksdi-600 text-white border border-mpksdi-700' : 'bg-slate-100 text-slate-700 border border-slate-200'">
+                            {{ $i + 1 }}
+                        </span>
+                        <div class="flex-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Butir Pertanyaan #{{ $i + 1 }}</span>
+                            <p class="font-bold text-slate-900 text-base sm:text-lg leading-relaxed">{{ $s->teks_soal }}</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="answers[{{ $s->id }}][soal_id]" value="{{ $s->id }}">
+
+                    <div class="space-y-3 pl-0 sm:pl-12">
+                        @foreach($s->pilihan as $p)
+                        <label class="group relative flex items-start gap-3.5 p-4 rounded-xl border border-slate-200 bg-white hover:border-mpksdi-400 hover:bg-mpksdi-50/20 cursor-pointer transition-all duration-150 shadow-2xs"
+                            :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'border-mpksdi-600 bg-mpksdi-50/60 ring-2 ring-mpksdi-600/30' : ''">
+                            
+                            {{-- Radio Option Indicator --}}
+                            <div class="pt-0.5">
+                                <input type="radio" name="answers[{{ $s->id }}][pilihan_id]" value="{{ $p->id }}"
+                                    @change="registerAnswer('{{ $s->id }}', '{{ $p->id }}')"
+                                    class="w-4 h-4 border-slate-300 text-mpksdi-600 focus:ring-mpksdi-600 mt-0.5">
+                            </div>
+
+                            {{-- Option Badge Letter --}}
+                            <span class="w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center shrink-0 transition-colors"
+                                :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'bg-mpksdi-600 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200 group-hover:bg-mpksdi-100 group-hover:text-mpksdi-900'">
+                                {{ $p->label }}
+                            </span>
+
+                            {{-- Option Text --}}
+                            <span class="text-sm font-medium text-slate-800 group-hover:text-slate-900 leading-relaxed flex-1">
+                                {{ $p->teks }}
+                            </span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+
+                {{-- Bottom Mobile Submit Button --}}
+                <div class="lg:hidden p-4 bg-white rounded-xl border border-slate-200 shadow-xs flex items-center justify-between gap-4">
+                    <div class="text-xs text-slate-500">
+                        Terjawab: <strong class="text-slate-900"><span x-text="answeredCount"></span> / {{ $questions->count() }}</strong>
+                    </div>
+                    <button type="button" @click="confirmSubmit()"
+                        class="px-6 py-2.5 bg-gold-400 hover:bg-gold-500 text-mpksdi-950 font-extrabold text-xs sm:text-sm rounded-lg border border-gold-500 shadow-xs transition">
+                        Kumpulkan Ujian
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Right: Desktop Sticky Question Navigator --}}
+        <div class="hidden lg:block lg:col-span-4 sticky top-44 space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-mpksdi-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span>Navigator Soal</span>
+                    </h2>
+                    <span class="text-xs font-semibold text-slate-500">
+                        <span x-text="answeredCount"></span>/<span x-text="total"></span>
+                    </span>
+                </div>
+
+                {{-- Navigator Grid --}}
+                <div class="grid grid-cols-5 gap-2.5">
+                    @foreach($questions as $i => $s)
+                    <button type="button" @click="scrollToSoal({{ $i + 1 }})"
+                        class="h-10 rounded-xl text-xs font-black transition flex flex-col items-center justify-center border shadow-2xs"
+                        :class="answers['{{ $s->id }}'] ? 'bg-mpksdi-600 text-white border-mpksdi-700 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'">
+                        <span>{{ $i + 1 }}</span>
+                    </button>
+                    @endforeach
+                </div>
+
+                {{-- Legend --}}
+                <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-md bg-mpksdi-600"></span>
+                        <span>Sudah Diisi</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-md bg-slate-100 border border-slate-300"></span>
+                        <span>Belum Diisi</span>
+                    </div>
+                </div>
+
+                {{-- Submit Action --}}
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                    <button type="button" @click="confirmSubmit()"
+                        class="w-full py-3 bg-gold-400 hover:bg-gold-500 active:bg-gold-600 text-mpksdi-950 font-extrabold text-sm rounded-xl border border-gold-500 shadow-xs transition">
+                        Kumpulkan Jawaban
+                    </button>
+                    <p class="text-[11px] text-slate-400 text-center mt-2">Pastikan semua butir telah terjawab sebelum mengumpulkan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Mobile Bottom Drawer Navigator Modal --}}
+    <div x-show="mobileNavOpen" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end justify-center p-0 sm:p-4 lg:hidden" style="display: none;">
+        <div @click.away="mobileNavOpen = false" class="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-900">Daftar Nomor Soal</h3>
+                <button type="button" @click="mobileNavOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-5 gap-2.5">
+                @foreach($questions as $i => $s)
+                <button type="button" @click="scrollToSoal({{ $i + 1 }}); mobileNavOpen = false"
+                    class="h-11 rounded-xl text-xs font-black transition flex items-center justify-center border shadow-2xs"
+                    :class="answers['{{ $s->id }}'] ? 'bg-mpksdi-600 text-white border-mpksdi-700' : 'bg-slate-50 text-slate-700 border-slate-200'">
+                    <span>{{ $i + 1 }}</span>
+                </button>
+                @endforeach
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                <span>Terisi: <strong class="text-slate-900" x-text="answeredCount"></strong> dari {{ $questions->count() }} soal</span>
+                <button type="button" @click="mobileNavOpen = false; confirmSubmit()" class="px-4 py-2 bg-gold-400 text-mpksdi-950 font-bold rounded-lg text-xs">
+                    Kumpulkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Confirmation Modal before Submit --}}
+    <div x-show="showConfirmModal" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="showConfirmModal = false" class="w-full max-w-md bg-white rounded-2xl p-6 sm:p-7 shadow-2xl space-y-4 border border-slate-200">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                :class="unansweredCount > 0 ? 'bg-amber-100 text-amber-600' : 'bg-mpksdi-100 text-mpksdi-700'">
+                <svg x-show="unansweredCount > 0" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <svg x-show="unansweredCount === 0" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight" x-text="unansweredCount > 0 ? 'Masih Ada Soal Kosong!' : 'Konfirmasi Kumpulkan Jawaban'"></h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                    <template x-if="unansweredCount > 0">
+                        <span>Anda telah menjawab <strong class="text-slate-900" x-text="answeredCount"></strong> soal, namun masih ada <strong class="text-amber-700" x-text="unansweredCount"></strong> butir soal yang belum terjawab. Yakin ingin mengumpulkan sekarang?</span>
+                    </template>
+                    <template x-if="unansweredCount === 0">
+                        <span>Alhamdulillah, seluruh <strong>{{ $questions->count() }}</strong> butir soal telah terjawab lengkap. Apakah Anda ingin mengakhiri dan mengumpulkan jawaban ujian sekarang?</span>
+                    </template>
+                </p>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" @click="showConfirmModal = false"
+                    class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition">
+                    Periksa Kembali
+                </button>
+                <button type="button" @click="submitFinal()"
+                    class="px-5 py-2.5 rounded-xl bg-gold-400 hover:bg-gold-500 text-mpksdi-950 font-extrabold text-xs shadow-xs transition">
+                    Ya, Kumpulkan Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function cbtExam(config) {
+    return {
+        total: config.total,
+        remaining: config.initialRemaining,
+        timerDisplay: '00:00',
+        answers: {},
+        answeredCount: 0,
+        unansweredCount: config.total,
+        mobileNavOpen: false,
+        showConfirmModal: false,
+
+        init() {
+            this.tick();
+        },
+
+        tick() {
+            const m = Math.floor(this.remaining / 60);
+            const s = this.remaining % 60;
+            this.timerDisplay = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+            if (this.remaining <= 0) {
+                document.getElementById('tes-form')?.submit();
+                return;
+            }
+
+            this.remaining--;
+            setTimeout(() => this.tick(), 1000);
+        },
+
+        registerAnswer(soalId, pilihanId) {
+            this.answers[soalId] = pilihanId;
+            this.answeredCount = Object.keys(this.answers).length;
+            this.unansweredCount = this.total - this.answeredCount;
+        },
+
+        scrollToSoal(num) {
+            const el = document.getElementById('soal-card-' + num);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        },
+
+        confirmSubmit() {
+            this.showConfirmModal = true;
+        },
+
+        submitFinal() {
+            document.getElementById('tes-form')?.submit();
+        }
+    }
+}
+</script>
+@endsection
+

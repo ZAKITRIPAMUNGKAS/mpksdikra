@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Anggota;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class FotoController extends Controller
+{
+    public function show(Anggota $anggota): Response|BinaryFileResponse|StreamedResponse
+    {
+        $user = auth()->user();
+
+        $canView = $user->isAdmin()
+            || $user->isExecutive()
+            || ($user->anggota && (int) $user->anggota->id === (int) $anggota->id);
+
+        abort_unless($canView, 403, 'Akses foto tidak diizinkan.');
+
+        if (! $anggota->foto || ! Storage::disk('local')->exists($anggota->foto)) {
+            return $this->placeholderSvg($anggota->nama_lengkap);
+        }
+
+        return Storage::disk('local')->response($anggota->foto, null, [
+            'Cache-Control' => 'private, max-age=86400',
+        ]);
+    }
+
+    private function placeholderSvg(string $name): Response
+    {
+        $initials = htmlspecialchars(strtoupper(substr($name, 0, 2)));
+        $svg = <<<SVG
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+            <rect width="200" height="200" fill="#002b40"/>
+            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#f8bb00" font-family="Arial, sans-serif" font-size="64" font-weight="bold">$initials</text>
+        </svg>
+        SVG;
+
+        return response($svg, 200, [
+            'Content-Type' => 'image/svg+xml',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+    }
+}

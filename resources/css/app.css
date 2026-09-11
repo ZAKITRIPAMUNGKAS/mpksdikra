@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../app/**/*.php';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Identitas Resmi Logo MPKSDI Karanganyar */
+    --color-mpksdi-950: #001724;
+    --color-mpksdi-900: #002b40;
+    --color-mpksdi-800: #003e5c;
+    --color-mpksdi-700: #004d73;
+    --color-mpksdi-600: #005c8a; /* Warna perisai logo MPKSDI */
+    --color-mpksdi-500: #0276b0;
+    --color-mpksdi-400: #1a97d7;
+    --color-mpksdi-300: #62bff3;
+    --color-mpksdi-200: #afe1fb;
+    --color-mpksdi-100: #ddf1fd;
+    --color-mpksdi-50:  #f0f8fd;
+
+    /* Saffron Gold (Buku Terbuka Logo MPKSDI) */
+    --color-gold-700: #a37b00;
+    --color-gold-600: #c49400;
+    --color-gold-500: #dfa700;
+    --color-gold-400: #f8bb00; /* Warna emas buku rehal */
+    --color-gold-300: #ffd84d;
+    --color-gold-200: #ffeaa1;
+    --color-gold-100: #fff6d6;
+    --color-gold-50:  #fffdf5;
+
+    /* Aksen Cerulean Cyan (Titik ikat tengah logo) */
+    --color-cyan-mpksdi: #01b0f5;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+select,
+textarea {
+    border-color: #cbd5e1;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #005c8a;
+    box-shadow: 0 0 0 3px rgba(0, 92, 138, 0.15);
+}
+
+/* Heavy & Cinematic Scroll Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-36px);
+    transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(36px);
+    transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.88) translateY(24px);
+    transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.is-revealed,
+.reveal-left.is-revealed,
+.reveal-right.is-revealed,
+.reveal-scale.is-revealed {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+}
+
+/* Stagger Delays */
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-150 { transition-delay: 150ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-250 { transition-delay: 250ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+.reveal-delay-350 { transition-delay: 350ms; }
+.reveal-delay-400 { transition-delay: 400ms; }
+.reveal-delay-500 { transition-delay: 500ms; }
+.reveal-delay-600 { transition-delay: 600ms; }
+.reveal-delay-700 { transition-delay: 700ms; }
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .reveal-left,
+    .reveal-right,
+    .reveal-scale {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+

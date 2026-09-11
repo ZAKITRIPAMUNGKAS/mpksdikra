@@ -1,0 +1,40 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Anggota;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class FotoAccessTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_photo_access_permissions(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+
+        $u1 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a1 = Anggota::factory()->create(['user_id' => $u1->id, 'nama_lengkap' => 'Kader Satu']);
+
+        $u2 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a2 = Anggota::factory()->create(['user_id' => $u2->id, 'nama_lengkap' => 'Kader Dua']);
+
+        // Admin can access any photo (returns SVG placeholder if file not present)
+        $this->actingAs($admin)
+            ->get(route('foto.anggota', $a1))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/svg+xml');
+
+        // Owner can access own photo
+        $this->actingAs($u1)
+            ->get(route('foto.anggota', $a1))
+            ->assertOk();
+
+        // Other member cannot access another member's photo
+        $this->actingAs($u2)
+            ->get(route('foto.anggota', $a1))
+            ->assertForbidden();
+    }
+}

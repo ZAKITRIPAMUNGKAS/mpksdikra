@@ -86,6 +86,11 @@ Pola berguna dari referensi:
   4. Global Scroll Progress Indicator: Bar gradient fixed top (`#scroll-progress-bar`) yang mengisi proporsional seiring pergerakan scroll pengguna.
   8. FAQ Accordion interaktif (Alpine.js) dan Footer multi-kolom modern.
   Seluruh 63 tests lulus (100% green), Pint passed, Vite build sukses.
+- 2026-09-11: Interactive Card Animations & Motion Design:
+  1. Card Lift & Sheen: Utilitas `.card-lift`, `.card-lift-sm`, dan `.card-sheen` menghadirkan elevasi hover yang halus (`translateY(-8px)` / `translateY(-4px)`), bayangan lembut, dan pantulan kilau diagonal (*diagonal light sweep*).
+  2. Floating Badges: Keyframe `@keyframes card-float-gentle` pada badge Gedung Dakwah dan Pangkalan Data (`animate-card-float` & `animate-card-float-delayed`).
+  3. Responsive Micro-interactions: Ikon berotasi dan membesar dinamis saat kartu disentuh/dihilangkan hover-nya di seluruh kartu (8 Pilar, 4 Program Perkaderan, 4 Alur Tahapan, Peta/Direktori Cabang, FAQ, dan Footer).
+  Seluruh 63 tests lulus (100% green), Pint passed, Vite build sukses.
 - 2026-09-11: Integrasi Visual Gedung Dakwah PDM Karanganyar pada Hero Section:
   1. Menghadirkan visual representatif Gedung Dakwah PDM Karanganyar (kubah biru dan masjid) di sisi kanan hero banner melengkung.
   2. Menerapkan efek siluet gradasi memudar (*feathered gradient fade*) dari kanan ke kiri (`from-[#f3f5f8] via-[#f3f5f8]/80 to-transparent`), sehingga foto gedung di sisi kanan menyatu mulus (*seamless blend*) dengan latar teks di sisi kiri.

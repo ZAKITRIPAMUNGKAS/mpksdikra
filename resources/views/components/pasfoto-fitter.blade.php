@@ -367,74 +367,191 @@ document.addEventListener('alpine:init', () => {
             reader.readAsDataURL(file);
         },
 
-        // Intelligent Auto-Matcher Algorithm
+        // Detect Face and Head Region via Canvas Skin-Cluster Analysis
+        detectFaceAndHead(image) {
+            const origW = image.naturalWidth || image.width;
+            const origH = image.naturalHeight || image.height;
+
+            // Downsample to max 160px for instant analysis (< 5ms)
+            const maxDim = 160;
+            const scale = Math.min(1, maxDim / Math.max(origW, origH));
+            const sw = Math.max(10, Math.round(origW * scale));
+            const sh = Math.max(10, Math.round(origH * scale));
+
+            const canvas = document.createElement('canvas');
+            canvas.width = sw;
+            canvas.height = sh;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(image, 0, 0, sw, sh);
+
+            let imgData;
+            try {
+                imgData = ctx.getImageData(0, 0, sw, sh);
+            } catch (err) {
+                return null;
+            }
+
+            const data = imgData.data;
+            const skinPoints = [];
+
+            // Focus on upper 65% of the frame where heads normally reside
+            const minY = Math.round(sh * 0.05);
+            const maxY = Math.round(sh * 0.65);
+            const minX = Math.round(sw * 0.10);
+            const maxX = Math.round(sw * 0.90);
+
+            for (let y = minY; y < maxY; y++) {
+                for (let x = minX; x < maxX; x++) {
+                    const idx = (y * sw + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+
+                    // Standard YCbCr skin tone detection formula
+                    const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+                    const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+                    if (cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173) {
+                        if (r > g && r > b && (r - g) >= 10) {
+                            skinPoints.push({ x, y });
+                        }
+                    }
+                }
+            }
+
+            if (skinPoints.length > 20) {
+                // Find centroid of skin pixels
+                let sumX = 0, sumY = 0;
+                for (let i = 0; i < skinPoints.length; i++) {
+                    sumX += skinPoints[i].x;
+                    sumY += skinPoints[i].y;
+                }
+                const avgX = sumX / skinPoints.length;
+                const avgY = sumY / skinPoints.length;
+
+                // Keep points within radius to isolate the face cluster
+                const radius = Math.max(sw * 0.22, 24);
+                let clusterXSum = 0, clusterYSum = 0, count = 0;
+                let cMinX = sw, cMaxX = 0, cMinY = sh, cMaxY = 0;
+
+                for (let i = 0; i < skinPoints.length; i++) {
+                    const p = skinPoints[i];
+                    if (Math.hypot(p.x - avgX, p.y - avgY) <= radius) {
+                        clusterXSum += p.x;
+                        clusterYSum += p.y;
+                        count++;
+                        if (p.x < cMinX) cMinX = p.x;
+                        if (p.x > cMaxX) cMaxX = p.x;
+                        if (p.y < cMinY) cMinY = p.y;
+                        if (p.y > cMaxY) cMaxY = p.y;
+                    }
+                }
+
+                if (count > 15) {
+                    const faceCenterX = (clusterXSum / count) / scale;
+                    const faceCenterY = (clusterYSum / count) / scale;
+                    const faceWidth = Math.max((cMaxX - cMinX) / scale, origW * 0.10);
+                    const faceHeight = Math.max((cMaxY - cMinY) / scale, origH * 0.10);
+
+                    return {
+                        found: true,
+                        centerX: faceCenterX,
+                        centerY: faceCenterY,
+                        width: faceWidth,
+                        height: faceHeight
+                    };
+                }
+            }
+
+            return null;
+        },
+
+        // Intelligent Auto-Matcher Algorithm with Pasfoto Zoom
         async executeAutoMatch(image) {
             const origW = image.naturalWidth || image.width;
             const origH = image.naturalHeight || image.height;
             const targetRatio = 3 / 4; // 0.75
 
-            let cropX = 0;
-            let cropY = 0;
-            let cropW = origW;
-            let cropH = origH;
+            let faceCenterX = origW / 2;
+            let faceCenterY = origH * 0.38;
+            let faceWidth = origW * 0.25;
+            let faceHeight = origH * 0.25;
             let faceDetected = false;
 
-            // 1. Try Native Browser FaceDetector (Chromium / Chrome Android)
+            // 1. Try Native Browser FaceDetector (Chromium / Chrome Android if available)
             if ('FaceDetector' in window) {
                 try {
                     const detector = new window.FaceDetector({ maxDetectedFaces: 1, fastMode: true });
                     const faces = await detector.detect(image);
                     if (faces && faces.length > 0) {
                         const box = faces[0].boundingBox;
-                        const faceCenterX = box.x + (box.width / 2);
-                        const faceCenterY = box.y + (box.height / 2);
-
-                        // In standard 3:4 pasfoto, head should occupy ~45-55% of the frame
-                        cropH = Math.min(origH, Math.max(box.height * 2.8, (box.width * 2.8) / targetRatio));
-                        cropW = cropH * targetRatio;
-
-                        if (cropW > origW) {
-                            cropW = origW;
-                            cropH = cropW / targetRatio;
-                        }
-
-                        // Center crop horizontally on face
-                        cropX = faceCenterX - (cropW / 2);
-                        // Center eyes at ~38% from top of crop frame
-                        cropY = faceCenterY - (cropH * 0.38);
-
+                        faceCenterX = box.x + (box.width / 2);
+                        faceCenterY = box.y + (box.height / 2);
+                        faceWidth = box.width;
+                        faceHeight = box.height;
                         faceDetected = true;
                     }
-                } catch (err) {
-                    // Fallback to rule-based auto-framing
-                }
+                } catch (err) {}
             }
 
-            // 2. Rule-based Smart Auto-Framing
+            // 2. Fallback: Run Canvas Skin-Cluster Face Analysis
             if (!faceDetected) {
-                const imageRatio = origW / origH;
-                if (imageRatio > targetRatio) {
-                    // Wide / landscape image: fit full height, crop horizontal center
-                    cropH = origH;
-                    cropW = origH * targetRatio;
-                    cropX = (origW - cropW) / 2;
-                    cropY = 0;
-                } else {
-                    // Tall portrait image (e.g. 9:16 smartphone selfie):
-                    // Fit full width, crop height with head-bias (top 15% headroom)
-                    cropW = origW;
-                    cropH = origW / targetRatio;
-                    cropX = 0;
-                    // Preserve peci and upper head rather than cutting it off
-                    cropY = Math.max(0, Math.min(origH - cropH, (origH - cropH) * 0.15));
+                const detected = this.detectFaceAndHead(image);
+                if (detected && detected.found) {
+                    faceCenterX = detected.centerX;
+                    faceCenterY = detected.centerY;
+                    faceWidth = detected.width;
+                    faceHeight = detected.height;
+                    faceDetected = true;
                 }
             }
 
-            // Clamp crop coordinates strictly within original image bounds
+            // 3. Compute 3:4 Crop Dimensions with PASFOTO CLOSE-UP ZOOM
+            let cropH, cropW;
+
+            if (faceDetected) {
+                // In standard pasfoto 3:4:
+                // Head + neck takes ~55% of the vertical frame height.
+                // The face oval is ~65-75% of head height.
+                // So ideal crop height is approximately faceHeight * 2.7 (or faceWidth * 3.2 / 0.75)
+                const idealHFromHeight = faceHeight * 2.7;
+                const idealHFromWidth = (faceWidth * 3.2) / targetRatio;
+                const desiredH = Math.max(idealHFromHeight, idealHFromWidth);
+
+                // Zoom in so face is clear and close-up, but don't exceed image bounds
+                cropH = Math.min(origH, Math.max(origH * 0.35, desiredH));
+                cropW = cropH * targetRatio;
+
+                if (cropW > origW) {
+                    cropW = origW;
+                    cropH = cropW / targetRatio;
+                }
+            } else {
+                // Default Smart Zoom: If no face detected, zoom in on upper body (58% of height)
+                // NEVER leave the photo at 100% uncropped full-body!
+                cropH = Math.min(origH, origH * 0.58);
+                cropW = cropH * targetRatio;
+                if (cropW > origW) {
+                    cropW = origW;
+                    cropH = cropW / targetRatio;
+                }
+                faceCenterX = origW / 2;
+                faceCenterY = origH * 0.35;
+            }
+
+            // 4. Center crop on face, with eyes positioned at ~38% from top of the 3:4 frame
+            let cropX = faceCenterX - (cropW / 2);
+            let cropY = faceCenterY - (cropH * 0.38);
+
+            // Clamp coordinates within image bounds
             cropX = Math.max(0, Math.min(origW - cropW, cropX));
             cropY = Math.max(0, Math.min(origH - cropH, cropY));
 
-            // Render to high-definition 600 x 800 Canvas
+            // 5. Sync manual modal transformation so if user opens "Atur Manual",
+            // it starts from this zoomed-in, aligned position!
+            this.syncManualTransform(origW, origH, cropX, cropY, cropW, cropH);
+
+            // 6. Render to high-definition 600 x 800 Canvas
             const canvas = document.createElement('canvas');
             canvas.width = this.outputW;
             canvas.height = this.outputH;
@@ -450,6 +567,23 @@ document.addEventListener('alpine:init', () => {
             );
 
             this.commitCanvasToFile(canvas);
+        },
+
+        // Synchronize manual modal transforms to match the auto-matched crop
+        syncManualTransform(origW, origH, cropX, cropY, cropW, cropH) {
+            this.rotation = 0;
+            const zoomRatio = this.viewportW / cropW;
+            this.scale = Number(zoomRatio.toFixed(3));
+
+            const cropCenterX = cropX + (cropW / 2);
+            const cropCenterY = cropY + (cropH / 2);
+
+            this.centerX = (this.viewportW / 2) + ((origW / 2) - cropCenterX) * zoomRatio;
+            this.centerY = (this.viewportH / 2) + ((origH / 2) - cropCenterY) * zoomRatio;
+
+            const coverScale = Math.max(this.viewportW / origW, this.viewportH / origH);
+            this.minScale = Number((coverScale * 0.8).toFixed(3));
+            this.maxScale = Number((this.scale * 3.0).toFixed(3));
         },
 
         // Commit Canvas output to File Input and Preview

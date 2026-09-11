@@ -368,14 +368,17 @@ Pola berguna dari referensi:
     - Solusi & Alur Baru:
       1. **Otomatis Tanpa Modal Paksa**: Calon kader cukup memilih foto dari galeri/kamera HP. Sistem TIDAK memunculkan popup modal yang mengganggu alur pengisian form.
       2. **Indikator Loading & Scanning Elegan**: Saat foto dipilih, kotak pratinjau langsung menampilkan status pemindaian (*Laser Scan Effect*, cincin putar amber-cyan, dan label *"Auto Match: Menyelaraskan 3:4..."*) selama ~650ms untuk memberikan umpan balik visual yang meyakinkan.
-      3. **Algoritma Cerdas Auto-Framing 3:4**:
-         - Browser Face Detection: Memanfaatkan API peramban native `window.FaceDetector` jika tersedia (Chromium / Chrome Android) untuk mendeteksi koordinat wajah riil dan memosisikan kepala di sepertiga atas (tinggi mata ~38%).
-         - Heuristik Portrait Cerdas (Fallback): Jika foto berorientasi tegak (seperti selfie HP 9:16), sistem memotong dengan batas atas aman (*headroom bias* 15%) agar peci dan kepala tidak terpotong; jika foto melebar (landscape 4:3 / 16:9), sistem memotong bagian tengah secara seimbang.
+      3. **Algoritma Cerdas Auto-Framing 3:4 dengan Close-Up Zoom Wajah**:
+         - Masalah Sebelumnya: Foto tegak (3:4 portrait) dari kejauhan (setengah badan / memegang barang) tidak di-zoom sehingga wajah kader tetap kecil di kejauhan.
+         - Solusi: Ditambahkan `detectFaceAndHead()` berbasis analisis warna kulit YCbCr (`Cb [77..127], Cr [133..173]`) yang sangat cepat (< 5ms di Canvas) untuk mendeteksi centroid dan bounding box wajah/kepala.
+         - Close-Up Zoom Pasfoto: Sistem otomatis memperbesar (zoom in) frame 3:4 agar kepala dan jilbab/peci memenuhi ~50-55% tinggi pasfoto resmi, memotong badan/tangan/pagar yang tidak perlu, dan menempatkan mata di 38% dari puncak foto.
+         - Sinkronisasi Transformasi Manual: Jika pengguna membuka modal "Atur Manual (Opsional)", editor langsung berada pada posisi zoom dan sentral wajah yang sama dengan siluet panduan resmi.
          - Render otomatis ke HTML5 Canvas HD 600 × 800 pixel dan langsung disuntikkan ke berkas input formulir via `DataTransfer`.
       4. **Badge Keberhasilan & Opsi Fleksibel**:
          - Menampilkan badge hijau *"✓ Pasfoto 3:4 Otomatis Pas"*.
          - Menyediakan tombol sekunder ringkas *"Atur Manual (Opsional)"* jika kader ingin memperbesar/menggeser secara khusus, serta tombol *"Foto Asli"*.
       5. **Modal Manual Ultra-Responsif**: Jika dibuka, modal menggunakan kanvas kompak 195 × 260 pixel dengan `shrink-0` header dan footer serta `flex-1 min-h-0` body, dijamin 100% pas dan tidak pernah meluap di semua ukuran layar smartphone.
     - Seluruh 79 feature tests lulus 100% (241 assertions), Pint passed, Vite build sukses.
+
 
 

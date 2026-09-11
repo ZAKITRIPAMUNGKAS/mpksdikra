@@ -249,3 +249,7 @@ Pola berguna dari referensi:
       - Ketegasan Vektor (*Crisp Lines*): Ketebalan garis ditingkatkan dari `stroke-width="0.6"` menjadi `stroke-width="1.0"`, titik cecek batik diperbesar ke `r="1.35"` (`fill-opacity="0.95"`), dan kelopak sekunder diberi bayang `fill-opacity="0.14"`.
       - Kejelasan & Kelembutan Gradasi: Kurva radial mask diperlebar zona terangnya (`0% -> 1.0`, `35% -> 0.95`, `60% -> 0.75`, `80% -> 0.40`, `92% -> 0.12`, `100% -> 0.0`) dan opasitas kontainer di seluruh section landing page ditingkatkan ke rentang proporsional `0.26` - `0.36` sehingga motif tampak nyata (*kelihatan jelas*), mewah, dan tetap memudar halus ke latar belakang.
    5. Seluruh 63 unit/feature tests lulus 100% (200 assertions), Vite build sukses tanpa kendala.
+- 2026-09-11: Push Perdana Kode Proyek ke GitHub:
+   - Inisialisasi Git repository lokal, verifikasi `.gitignore` (file sensitif `.env`, `storage/*.key`, dan `vendor/` aman terisolasi).
+   - Commit perdana: `Initial release: Sistem Perkaderan Terpadu Baitul Arqam MPKSDI PDM Karanganyar`.
+   - Push berhasil ke remote repository: `https://github.com/ZAKITRIPAMUNGKAS/mpksdikra.git` pada branch `main`.

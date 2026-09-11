@@ -70,6 +70,7 @@ Pola berguna dari referensi:
   5. Form Profil Kader: Tabbed interface (Identitas, Keagamaan, Kemuhammadiyahan), foto avatar live preview, dan badge status verifikasi.
   6. Form Ujian CBT: Antarmuka CBT modern dengan sticky countdown timer, progress bar, grid navigator nomor soal interaktif (hijau/terisi vs abu-abu/kosong), dan modal konfirmasi pengumpulan.
   Semua 63 unit/feature tests lulus 100%, Pint lolos, build Vite berhasil.
+  Semua 63 unit/feature tests lulus 100%, Pint lolos, Vite build berhasil.
 - 2026-09-11: Implementasi Desain Landing Page Modern berdasarkan Referensi Platform Pelatihan Modern (Upskill):
   1. Navbar pill-style yang bersih dengan tombol outline 'Masuk Portal' dan solid pill 'Daftar Kader'.
   2. Hero Banner lengkung (`rounded-3xl`) dengan kontainer abu-abu lembut / aksen sky tint, breadcrumb navigasi, headline berbobot kuat, dan Quick Metrics Card pangkalan data resmi.
@@ -78,6 +79,11 @@ Pola berguna dari referensi:
   5. Section Program Perkaderan Baitul Arqam dalam kontainer sky-blue tint dengan 4 kartu pelatihan (Pimpinan, Guru AUM, Nakes PKU, TOT Instruktur) lengkap dengan rating bintang, durasi jam, dan badge level.
   6. Alur 4 Langkah Peserta (Pendaftaran, Verifikasi, Pelaksanaan BA, Kelulusan & RTL) berurutan dengan ikon ilustrasi modern.
   7. Sebaran 17 Cabang PCM Interaktif terintegrasi filter zona (Pusat & Barat, Lereng Lawu, Selatan).
+- 2026-09-11: Full-Page Continuous Scroll Animation Engine & Dynamic Progress Indicator:
+  1. Animasi scroll diperberat (*heavyweight & cinematic curve* `cubic-bezier(0.16, 1, 0.3, 1)` dengan translasi 42-46px) agar pergerakan terasa substansial dan premium.
+  2. Continuous Scroll Re-arm: IntersectionObserver tidak melepas listener (`unobserve`) melainkan melakukan re-arming otomatis ketika elemen keluar dari viewport, sehingga elemen terus beranimasi dinamis setiap kali di-scroll naik atau turun.
+  3. Cakupan penuh seluruh halaman: Hero Banner, 8 Pilar Kategori, Keunggulan 2x2 Grid & Kartu Tokoh, 4 Kursus Perkaderan, 4 Alur Tahapan, Peta & Direktori 17 Cabang, 5 Accordion FAQ, hingga 4 Kolom Footer.
+  4. Global Scroll Progress Indicator: Bar gradient fixed top (`#scroll-progress-bar`) yang mengisi proporsional seiring pergerakan scroll pengguna.
   8. FAQ Accordion interaktif (Alpine.js) dan Footer multi-kolom modern.
   Seluruh 63 tests lulus (100% green), Pint passed, Vite build sukses.
 - 2026-09-11: Integrasi Visual Gedung Dakwah PDM Karanganyar pada Hero Section:

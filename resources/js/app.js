@@ -6,9 +6,10 @@ window.Alpine = Alpine;
 window.L = L;
 Alpine.start();
 
-// Unified High-Performance Scroll Reveal Engine
+// Unified Dynamic Scroll Animation & Reveal Engine
 function initScrollReveal() {
-    const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+    const selector = '.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-pop, .reveal-top, .reveal-fade';
+    const revealElements = document.querySelectorAll(selector);
     if (!revealElements.length) return;
 
     if (!('IntersectionObserver' in window)) {
@@ -20,12 +21,17 @@ function initScrollReveal() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-revealed');
-                revealObserver.unobserve(entry.target);
+            } else {
+                // Re-arm element when scrolled out of view to re-animate on every scroll
+                const rect = entry.target.getBoundingClientRect();
+                if (rect.top > window.innerHeight * 0.92 || rect.bottom < -150) {
+                    entry.target.classList.remove('is-revealed');
+                }
             }
         });
     }, {
-        threshold: 0.08,
-        rootMargin: '0px 0px -40px 0px'
+        threshold: 0.04,
+        rootMargin: '10px 0px -20px 0px'
     });
 
     revealElements.forEach(el => {
@@ -33,9 +39,39 @@ function initScrollReveal() {
     });
 }
 
+// Global Scroll Progress Bar & Dynamic Header Elevation
+function initScrollProgress() {
+    const progressBar = document.getElementById('scroll-progress-bar');
+    const header = document.querySelector('header');
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        
+        if (progressBar && docHeight > 0) {
+            const progress = (scrollTop / docHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        if (header) {
+            if (scrollTop > 15) {
+                header.classList.add('shadow-sm', 'bg-white/95');
+                header.classList.remove('bg-white');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        }
+    }, { passive: true });
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initScrollReveal);
+    document.addEventListener('DOMContentLoaded', () => {
+        initScrollReveal();
+        initScrollProgress();
+    });
 } else {
     initScrollReveal();
+    initScrollProgress();
 }
+
 

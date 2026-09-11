@@ -49,6 +49,9 @@
 </head>
 <body class="antialiased bg-white text-slate-800 selection:bg-sky-500 selection:text-white">
 
+    {{-- Global Scroll Progress Indicator --}}
+    <div id="scroll-progress-bar" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-[#f8bb00] z-[999] transition-[width] duration-75 ease-out pointer-events-none" style="width: 0%;"></div>
+
     {{-- SECTION 1: Clean Minimalist Navbar --}}
     <header class="sticky top-0 z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100" x-data="{ mobileOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
@@ -437,7 +440,7 @@
 
         {{-- SECTION 5: Program Perkaderan / Course Cards (Sesuai Wadah Biru Langit Upskill) --}}
         <section id="program" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 space-y-8 relative overflow-hidden">
+            <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 space-y-8 relative overflow-hidden reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
                 <x-batik-corner position="top-right" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.36]" />

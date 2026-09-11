@@ -86,7 +86,7 @@ Pola berguna dari referensi:
      - Navbar: Brand (`reveal-left`), Nav Links (`reveal-top`), CTA Buttons (`reveal-right`).
      - Hero Section: Wadah, Motif Batik Pojok (`reveal-fade`), Gedung Dakwah (`reveal-right`), Headline & Subtitle (`reveal` stagger), Tombol CTA, dan Floating Info Badges.
      - 8 Pilar Kategori: 8 kartu micro-interactions dengan `reveal-scale` dan stagger delay harmonis (100ms - 450ms).
-     - Keunggulan Standar Mutu: Heading & Subtitle (`reveal-left`), 4 kartu fitur mutu (`reveal-left` stagger 100-400ms), dan Kartu Tokoh KH. Zainudin Alfandi (`reveal-right`).
+     - Keunggulan Standar Mutu: Live blinking radar badge (`reveal-pop`), Heading & Subtitle (`reveal-left` stagger 150-200ms), 4 kartu fitur mutu (`reveal-pop` stagger 200-500ms) dengan spring reaction badge `.feature-badge-icon`, indikator nomor (01-04), dan Kartu Tokoh KH. Zainudin Alfandi (`reveal-right`).
      - Program Perkaderan: Batik pojok (`reveal-fade`), Judul (`reveal-top`), 4 Course Cards tematik (`reveal-scale` stagger 100-400ms).
      - Alur Tahapan Peserta: Judul (`reveal-top`), Garis penghubung dashed (`reveal-fade`), 4 kartu tahapan langkah (`reveal-pop` stagger 100-400ms).
      - Sebaran 17 Cabang: Batik pojok (`reveal-fade`), Header judul & subtitle (`reveal-left`), Quick aggregate chips (`reveal-right`), Tab filter zona (`reveal-left`), Search input (`reveal-right`), Wadah Peta Leaflet (`reveal-left`), Panel Direktori & Selected Cabang Card (`reveal-right`).

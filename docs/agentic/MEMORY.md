@@ -298,3 +298,13 @@ Pola berguna dari referensi:
          - Kontrol Input: `rounded-xl border border-slate-200/90 bg-slate-50/60 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20`.
          - Tabel & Data Feed: `rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden bg-white card-lift-sm`.
     - Seluruh 63 unit & feature tests lulus 100% (200 assertions), build Vite clean tanpa warning.
+- 2026-09-11: Penyesuaian Formulir Pendaftaran Anggota & Profil Kader:
+    - Menghapus pertanyaan Harapan PCM dan Harapan BA dari formulir.
+    - Menambahkan 3 pertanyaan baru pada Tab 4 (Kemasyarakatan & Kemasjidan):
+      1. Aktifitas Jamaah di Masjid (`aktifitas_jamaah_masjid` - textarea).
+      2. Keaktifan sebagai Takmir Masjid (`keaktifan_takmir` [Tidak / Ya] & `jabatan_takmir` [input teks amanah/jabatan]).
+      3. Keaktifan di Kemasyarakatan (`keaktifan_kemasyarakatan` [RT/RW/BPD/Karang Taruna dll.] - textarea).
+    - Menambahkan migrasi database `2026_09_11_000001_add_kemasyarakatan_fields_to_anggota_table.php`.
+    - Menyelaraskan form pendaftaran (`anggota/register.blade.php`), form edit profil kader (`portal/profile.blade.php`), dan rincian verifikasi admin (`admin/anggota/show.blade.php`).
+    - Seluruh 64 feature tests lulus 100% (208 assertions).
+

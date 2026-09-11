@@ -105,6 +105,30 @@
             <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-100"><span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">Kecamatan:</span> <span class="font-bold text-slate-800 text-sm">{{ $anggota->kecamatan }}</span></div>
             <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-100"><span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">Kabupaten:</span> <span class="font-bold text-slate-800 text-sm">{{ $anggota->kabupaten }}</span></div>
             <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-100"><span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">No. WhatsApp:</span> <span class="font-mono font-bold text-slate-800 text-sm">{{ $anggota->no_wa }}</span></div>
+            
+            @if($anggota->aktifitas_jamaah_masjid)
+            <div class="sm:col-span-2 p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
+                <span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">Aktifitas Jamaah di Masjid:</span>
+                <span class="text-slate-800 text-xs leading-relaxed font-medium">{{ $anggota->aktifitas_jamaah_masjid }}</span>
+            </div>
+            @endif
+
+            <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
+                <span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">Keaktifan Takmir Masjid:</span>
+                <span class="font-bold text-slate-800 text-xs">
+                    {{ $anggota->keaktifan_takmir ?? 'Tidak' }}
+                    @if(($anggota->keaktifan_takmir === 'Ya' || strtolower($anggota->keaktifan_takmir ?? '') === 'ya') && $anggota->jabatan_takmir)
+                        &mdash; <span class="text-sky-700">({{ $anggota->jabatan_takmir }})</span>
+                    @endif
+                </span>
+            </div>
+
+            @if($anggota->keaktifan_kemasyarakatan)
+            <div class="sm:col-span-2 p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
+                <span class="font-bold text-slate-500 uppercase tracking-wider block mb-0.5 text-[10px]">Keaktifan di Kemasyarakatan (RT/RW/BPD/Karang Taruna):</span>
+                <span class="text-slate-800 text-xs leading-relaxed font-medium">{{ $anggota->keaktifan_kemasyarakatan }}</span>
+            </div>
+            @endif
         </div>
     </div>
 </div>

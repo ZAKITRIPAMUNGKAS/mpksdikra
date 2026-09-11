@@ -45,11 +45,12 @@ Sumber: daftar pertanyaan yang diberikan pengguna. Berlaku untuk pendaftaran man
 | Organisasi selain Muhammadiyah | Teks |
 | Struktur/organisasi anggota | Multi-relasi: PDM, PCM, PRM, AUM, ORTOM; satu anggota boleh banyak jabatan |
 
-## Tab Harapan
+## Tab Kemasyarakatan & Kemasjidan
 | Field | Catatan |
 |---|---|
-| Harapan tentang Pimpinan Cabang Muhammadiyah | Textarea |
-| Harapan yang didapat selama mengikuti BA | Textarea |
+| Aktifitas jamaah di masjid | Textarea (rutinitas jamaah di masjid) |
+| Keaktifan sebagai takmir masjid | Pilihan: Tidak / Ya (beserta input teks jabatan/amanah) |
+| Keaktifan di kemasyarakatan | Textarea: RT/RW/BPD/Karang Taruna dll. |
 
 ## Status akun
 `menunggu_verifikasi → aktif → nonaktif`. Hanya admin mengubah status verifikasi. Anggota aktif boleh memperbarui profil tanpa verifikasi ulang.

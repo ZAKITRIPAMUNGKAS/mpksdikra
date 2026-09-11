@@ -50,6 +50,10 @@ class Anggota extends Model
         'keaktifan_muhammadiyah',
         'keaktifan_ortom',
         'organisasi_lain',
+        'aktifitas_jamaah_masjid',
+        'keaktifan_takmir',
+        'jabatan_takmir',
+        'keaktifan_kemasyarakatan',
         'harapan_pcm',
         'harapan_ba',
     ];

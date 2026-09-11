@@ -79,7 +79,7 @@
                             ['key' => 'diri', 'no' => '1', 'title' => 'Identitas'],
                             ['key' => 'agama', 'no' => '2', 'title' => 'Keagamaan'],
                             ['key' => 'org', 'no' => '3', 'title' => 'Organisasi'],
-                            ['key' => 'harapan', 'no' => '4', 'title' => 'Harapan'],
+                            ['key' => 'kemasyarakatan', 'no' => '4', 'title' => 'Kemasyarakatan'],
                         ];
                     @endphp
                     @foreach($steps as $s)
@@ -422,30 +422,70 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
-                    <button type="button" @click="goTo('harapan')"
+                    <button type="button" @click="goTo('kemasyarakatan')"
                         class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center gap-2">
-                        <span>Lanjut: Harapan &amp; Pengiriman</span>
+                        <span>Lanjut: Kemasyarakatan &amp; Pengiriman</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
 
-            {{-- Tab 4: Harapan & Selesai --}}
-            <div x-show="tab==='harapan'" class="space-y-5" style="display: none;">
+            {{-- Tab 4: Kemasjidan, Kemasyarakatan & Selesai --}}
+            <div x-show="tab==='kemasyarakatan'" class="space-y-6" style="display: none;"
+                 x-data="{ isTakmir: '{{ old('keaktifan_takmir', 'Tidak') }}' }">
+                
+                {{-- 1. Aktivitas Jamaah di Masjid --}}
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Harapan terhadap Pimpinan Cabang Muhammadiyah (PCM)
+                        Aktifitas Jamaah di Masjid
                     </label>
-                    <textarea name="harapan_pcm" rows="3" placeholder="Tuliskan masukan atau harapan untuk kemajuan persyarikatan di tingkat cabang..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none">{{ old('harapan_pcm') }}</textarea>
+                    <textarea name="aktifitas_jamaah_masjid" rows="2" placeholder="Tuliskan rutinitas/aktifitas jamaah Anda di masjid (contoh: Sholat fardhu berjamaah 5 waktu, pengajian rutin subuh, tadarus, dll.)..."
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition">{{ old('aktifitas_jamaah_masjid') }}</textarea>
+                    @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Harapan selama Mengikuti Baitul Arqam (BA)
+                {{-- 2. Keaktifan sebagai Takmir Masjid --}}
+                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Keaktifan sebagai Takmir Masjid
                     </label>
-                    <textarea name="harapan_ba" rows="3" placeholder="Tuliskan target pengembangan diri atau pemahaman yang ingin dicapai..."
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none">{{ old('harapan_ba') }}</textarea>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs">
+                            <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir"
+                                class="text-sky-600 focus:ring-sky-500">
+                            <span>Tidak</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs">
+                            <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir"
+                                class="text-sky-600 focus:ring-sky-500">
+                            <span>Ya, sebagai Pengurus</span>
+                        </label>
+                    </div>
+
+                    {{-- Conditional Input: Sebagai... --}}
+                    <div x-show="isTakmir === 'Ya'" x-transition class="pt-2">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                            Sebagai (Amanah / Jabatan di Takmir):
+                        </label>
+                        <input type="text" name="jabatan_takmir" value="{{ old('jabatan_takmir') }}"
+                            placeholder="Contoh: Ketua Takmir / Sekretaris / Bendahara / Sie Ibadah & Dakwah / Marbot"
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                {{-- 3. Keaktifan di Kemasyarakatan --}}
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Keaktifan di Kemasyarakatan
+                        </label>
+                        <span class="text-[11px] text-slate-400 font-medium">RT / RW / BPD / Karang Taruna dll.</span>
+                    </div>
+                    <textarea name="keaktifan_kemasyarakatan" rows="3"
+                        placeholder="Sebutkan amanah/peran aktif di masyarakat (contoh: Ketua RT 02 / RW 04, Anggota BPD Desa, Pengurus Karang Taruna, Linmas, Relawan Posyandu, dll.)..."
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition">{{ old('keaktifan_kemasyarakatan') }}</textarea>
+                    @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-950">

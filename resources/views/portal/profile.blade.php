@@ -263,11 +263,12 @@
             </div>
         </div>
 
-        {{-- Tab 3: Kemuhammadiyahan & Pengabdian --}}
-        <div x-show="tab === 'kemuhammadiyahan'" class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6" style="display: none;">
+        {{-- Tab 3: Kemuhammadiyahan & Pengabdian Kemasyarakatan --}}
+        <div x-show="tab === 'kemuhammadiyahan'" class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6" style="display: none;"
+             x-data="{ isTakmir: '{{ old('keaktifan_takmir', $anggota->keaktifan_takmir ?? 'Tidak') }}' }">
             <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-base font-bold text-slate-900">Kiprah Kemuhammadiyahan &amp; Harapan</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Riwayat keaktifan di organisasi otonom dan harapan untuk kemajuan persyarikatan.</p>
+                <h2 class="text-base font-bold text-slate-900">Kiprah Kemuhammadiyahan, Kemasjidan &amp; Kemasyarakatan</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Riwayat keaktifan di persyarikatan, aktifitas kemasjidan, dan pengabdian sosial kemasyarakatan.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -293,16 +294,51 @@
                     class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
             </div>
 
+            {{-- 1. Aktivitas Jamaah di Masjid --}}
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Harapan terhadap Pimpinan Cabang Muhammadiyah (PCM)</label>
-                <textarea name="harapan_pcm" rows="2" placeholder="Masukan dan harapan untuk kemajuan persyarikatan di tingkat cabang..."
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none resize-none transition">{{ old('harapan_pcm', $anggota->harapan_pcm) }}</textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Aktifitas Jamaah di Masjid</label>
+                <textarea name="aktifitas_jamaah_masjid" rows="2" placeholder="Tuliskan rutinitas/aktifitas jamaah Anda di masjid (contoh: Sholat fardhu berjamaah 5 waktu, pengajian rutin subuh, tadarus, dll.)..."
+                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none resize-none transition">{{ old('aktifitas_jamaah_masjid', $anggota->aktifitas_jamaah_masjid) }}</textarea>
+                @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
+            {{-- 2. Keaktifan sebagai Takmir Masjid --}}
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Keaktifan sebagai Takmir Masjid</label>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs">
+                        <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir"
+                            class="text-sky-600 focus:ring-sky-500">
+                        <span>Tidak</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer text-xs font-bold transition shadow-2xs">
+                        <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir"
+                            class="text-sky-600 focus:ring-sky-500">
+                        <span>Ya, sebagai Pengurus</span>
+                    </label>
+                </div>
+
+                <div x-show="isTakmir === 'Ya'" x-transition class="pt-2">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                        Sebagai (Amanah / Jabatan di Takmir):
+                    </label>
+                    <input type="text" name="jabatan_takmir" value="{{ old('jabatan_takmir', $anggota->jabatan_takmir) }}"
+                        placeholder="Contoh: Ketua Takmir / Sekretaris / Bendahara / Sie Ibadah & Dakwah / Marbot"
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- 3. Keaktifan di Kemasyarakatan --}}
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Harapan Mengikuti Baitul Arqam (BA)</label>
-                <textarea name="harapan_ba" rows="2" placeholder="Target pengembangan diri dan pemahaman yang ingin dicapai..."
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none resize-none transition">{{ old('harapan_ba', $anggota->harapan_ba) }}</textarea>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Keaktifan di Kemasyarakatan</label>
+                    <span class="text-[11px] text-slate-400 font-medium">RT / RW / BPD / Karang Taruna dll.</span>
+                </div>
+                <textarea name="keaktifan_kemasyarakatan" rows="3"
+                    placeholder="Sebutkan amanah/peran aktif di masyarakat (contoh: Ketua RT 02 / RW 04, Anggota BPD Desa, Pengurus Karang Taruna, Linmas, Relawan Posyandu, dll.)..."
+                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none resize-none transition">{{ old('keaktifan_kemasyarakatan', $anggota->keaktifan_kemasyarakatan) }}</textarea>
+                @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="flex justify-between pt-4 border-t border-slate-100">

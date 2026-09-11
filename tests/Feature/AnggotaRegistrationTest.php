@@ -98,4 +98,28 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('6281234567890', NomorWaNormalizer::normalize('81234567890'));
         $this->assertNull(NomorWaNormalizer::normalize(null));
     }
+
+    public function test_registration_saves_kemasjidan_and_kemasyarakatan_fields(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'aktifitas_jamaah_masjid' => 'Sholat 5 waktu berjamaah & kajian subuh',
+            'keaktifan_takmir' => 'Ya',
+            'jabatan_takmir' => 'Ketua Takmir Masjid Al-Ikhlas',
+            'keaktifan_kemasyarakatan' => 'Ketua RT 02 / RW 05 dan Anggota BPD',
+        ]);
+
+        $this->post(route('anggota.register.store'), $payload)
+            ->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '1234567890123456')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('Sholat 5 waktu berjamaah & kajian subuh', $anggota->aktifitas_jamaah_masjid);
+        $this->assertSame('Ya', $anggota->keaktifan_takmir);
+        $this->assertSame('Ketua Takmir Masjid Al-Ikhlas', $anggota->jabatan_takmir);
+        $this->assertSame('Ketua RT 02 / RW 05 dan Anggota BPD', $anggota->keaktifan_kemasyarakatan);
+    }
 }
+

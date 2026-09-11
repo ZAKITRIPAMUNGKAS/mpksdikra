@@ -48,6 +48,10 @@ class AnggotaRegistrationRequest extends FormRequest
             'keaktifan_ortom' => ['nullable', 'array'],
             'keaktifan_ortom.*' => [Rule::in($o['keaktifan_ortom'])],
             'organisasi_lain' => ['nullable', 'string', 'max:255'],
+            'aktifitas_jamaah_masjid' => ['nullable', 'string', 'max:2000'],
+            'keaktifan_takmir' => ['nullable', 'string', 'max:20'],
+            'jabatan_takmir' => ['nullable', 'string', 'max:255'],
+            'keaktifan_kemasyarakatan' => ['nullable', 'string', 'max:2000'],
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
         ];

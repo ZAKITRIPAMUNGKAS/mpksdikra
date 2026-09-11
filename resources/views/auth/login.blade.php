@@ -7,38 +7,39 @@
     {{-- Top accent bar --}}
     <div class="h-1.5 bg-gradient-to-r from-sky-600 via-[#005c8a] to-[#f8bb00]"></div>
 
-    <div class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl border border-sky-100/80 overflow-hidden grid md:grid-cols-12 relative card-lift-sm">
+    <div class="flex-1 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+        <div class="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-sky-100/80 overflow-hidden grid md:grid-cols-12 relative card-lift-sm">
             
             {{-- Left Side: Branding & Institutional Context --}}
-            <div class="md:col-span-5 bg-gradient-to-br from-slate-950 via-[#003d5c] to-[#005c8a] p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-                <x-batik-corner position="top-left" class="w-48 h-48 text-sky-400 opacity-[0.25]" />
-                <x-batik-corner position="bottom-right" class="w-36 h-36 text-amber-400 opacity-[0.20]" />
+            <div class="md:col-span-5 bg-gradient-to-br from-slate-950 via-[#003d5c] to-[#005c8a] p-6 sm:p-8 md:p-10 text-white flex flex-col justify-between relative overflow-hidden">
+                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-48 sm:h-48 text-sky-400 opacity-[0.25]" />
+                <x-batik-corner position="bottom-right" class="w-28 h-28 sm:w-36 sm:h-36 text-amber-400 opacity-[0.20]" />
                 
                 <div class="relative z-10">
-                    <a href="/" class="inline-flex items-center gap-3 group mb-8">
-                        <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-12 w-auto drop-shadow-sm group-hover:scale-105 transition-transform duration-150">
+                    <a href="/" class="inline-flex items-center gap-2.5 sm:gap-3 group mb-4 sm:mb-6 md:mb-8">
+                        <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 sm:h-12 w-auto drop-shadow-sm group-hover:scale-105 transition-transform duration-150">
                         <div>
-                            <span class="font-extrabold text-white text-lg tracking-tight block">MPKSDI<span class="text-sky-400">.</span></span>
-                            <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">PDM Karanganyar</span>
+                            <span class="font-extrabold text-white text-base sm:text-lg tracking-tight block leading-none">MPKSDI<span class="text-sky-400">.</span></span>
+                            <span class="text-[9px] sm:text-[10px] text-amber-300 font-bold uppercase tracking-wider">PDM Karanganyar</span>
                         </div>
                     </a>
 
-                    <div class="space-y-3">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-amber-300 uppercase tracking-wider">
+                    <div class="space-y-2 sm:space-y-3">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/10 border border-white/15 text-[10px] sm:text-[11px] font-bold text-amber-300 uppercase tracking-wider">
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>
                             Pangkalan Data Terintegrasi
                         </span>
-                        <h2 class="text-xl sm:text-2xl font-extrabold text-white leading-snug">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-extrabold text-white leading-snug">
                             Portal Kader &amp; Perkaderan Baitul Arqam
                         </h2>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pt-0.5 sm:pt-1">
                             Akses terpusat untuk pimpinan persyarikatan, instruktur, fasilitator, dan kader Muhammadiyah Kabupaten Karanganyar.
                         </p>
                     </div>
                 </div>
 
-                <div class="relative z-10 pt-8 border-t border-white/10 mt-8 text-xs text-slate-300/80">
+                {{-- Institutional quote (hidden on mobile to keep form readily accessible) --}}
+                <div class="hidden md:block relative z-10 pt-6 md:pt-8 border-t border-white/10 mt-6 md:mt-8 text-xs text-slate-300/80">
                     <p class="italic leading-relaxed">
                         &ldquo;Membentuk kader persyarikatan yang berintegritas, berakhlak mulia, dan berwawasan berkemajuan.&rdquo;
                     </p>
@@ -46,11 +47,12 @@
             </div>
 
             {{-- Right Side: Login Form --}}
-            <div class="md:col-span-7 p-8 sm:p-12 flex flex-col justify-center bg-white relative">
-                <div class="mb-6">
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Masuk ke Portal</h1>
-                        <a href="/" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-semibold transition border border-slate-200/80">
+            <div class="md:col-span-7 p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center bg-white relative"
+                 x-data="{ showPass: false }">
+                <div class="mb-5 sm:mb-6">
+                    <div class="flex items-center justify-between gap-3 mb-1.5">
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Masuk ke Portal</h1>
+                        <a href="/" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-semibold transition border border-slate-200/80 shrink-0">
                             <span>Beranda</span>
                             <span>&rarr;</span>
                         </a>
@@ -75,7 +77,7 @@
                         </label>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
                             placeholder="nama@email.com"
-                            class="w-full px-4 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200/90 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
+                            class="w-full px-3.5 sm:px-4 py-2.5 text-sm bg-slate-50 border border-slate-200/90 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
                     </div>
 
                     <div>
@@ -84,19 +86,25 @@
                                 Kata Sandi (Password)
                             </label>
                         </div>
-                        <input id="password" name="password" type="password" required
-                            placeholder="••••••••"
-                            class="w-full px-4 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200/90 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
+                        <div class="relative">
+                            <input id="password" name="password" :type="showPass ? 'text' : 'password'" required
+                                placeholder="••••••••"
+                                class="w-full px-3.5 sm:px-4 py-2.5 pr-10 text-sm bg-slate-50 border border-slate-200/90 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
+                            <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
+                                <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
                         <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
                             <input type="checkbox" name="remember" value="1" class="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            Ingat saya di perangkat ini
+                            <span>Ingat saya di perangkat ini</span>
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full py-3 px-5 bg-sky-500 hover:bg-sky-600 active:scale-[0.99] text-white font-bold rounded-full shadow-xs transition duration-150 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                    <button type="submit" class="w-full py-3 px-5 bg-sky-500 hover:bg-sky-600 active:scale-[0.99] text-white font-bold rounded-full shadow-xs transition duration-150 flex items-center justify-center gap-2 text-sm">
                         <span>Masuk ke Portal</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -104,10 +112,10 @@
                     </button>
                 </form>
 
-                <div class="mt-8 pt-5 border-t border-slate-100 text-center">
+                <div class="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-slate-100 text-center">
                     <p class="text-xs text-slate-600">
                         Belum memiliki akun kader?
-                        <a href="{{ route('anggota.register') }}" class="font-bold text-sky-600 hover:text-sky-700 hover:underline">
+                        <a href="{{ route('anggota.register') }}" class="font-bold text-sky-600 hover:text-sky-700 hover:underline block sm:inline mt-1 sm:mt-0">
                             Daftar Anggota Baru &rarr;
                         </a>
                     </p>
@@ -117,8 +125,8 @@
     </div>
 
     {{-- Bottom simple footer --}}
-    <footer class="py-4 px-4 max-w-4xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-        <div class="flex items-center gap-2">
+    <footer class="py-4 px-4 max-w-4xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
+        <div class="flex items-center justify-center sm:justify-start gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>&copy; {{ date('Y') }} MPKSDI PDM Karanganyar &bull; Baitul Arqam</span>
         </div>

@@ -92,31 +92,11 @@
                 <p class="text-xs text-slate-500 mt-0.5">Informasi dasar kader untuk arsip administrasi resmi persyarikatan.</p>
             </div>
 
-            {{-- Pasfoto Upload & Preview --}}
-            <div x-data="{ photoPreview: null }" class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center gap-5">
-                <div class="shrink-0">
-                    <template x-if="photoPreview">
-                        <img :src="photoPreview" class="w-20 h-24 rounded-xl object-cover border-2 border-mpksdi-500 shadow-sm">
-                    </template>
-                    <template x-if="!photoPreview">
-                        @if($anggota->foto)
-                            <img src="{{ route('foto.anggota', $anggota) }}" class="w-20 h-24 rounded-xl object-cover border border-slate-300 shadow-2xs">
-                        @else
-                            <div class="w-20 h-24 rounded-xl bg-slate-200 border border-slate-300 flex flex-col items-center justify-center text-slate-400 text-xs">
-                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                <span>Pasfoto</span>
-                            </div>
-                        @endif
-                    </template>
-                </div>
-                <div class="flex-1 text-center sm:text-left">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Ganti Pasfoto Resmi</label>
-                    <p class="text-xs text-slate-500 mb-3">Format JPG/PNG, ukuran maksimal 2MB. Disarankan foto formal berpakaian rapi.</p>
-                    <input type="file" name="foto" accept="image/jpeg,image/png"
-                        @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { photoPreview = e.target.result; }; reader.readAsDataURL(file); }"
-                        class="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-mpksdi-600 file:text-white hover:file:bg-mpksdi-700 cursor-pointer">
-                </div>
-            </div>
+            {{-- Pasfoto Upload & Proportional Face Fitter --}}
+            <x-pasfoto-fitter name="foto" :required="false" inputId="foto-profile-input" :currentPhoto="$anggota->foto ? route('foto.anggota', $anggota) : null" label="Ganti Pasfoto Resmi" />
+            @error('foto')
+                <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
+            @enderror
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nama Lengkap (beserta gelar) <span class="text-red-500">*</span></label>

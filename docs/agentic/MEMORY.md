@@ -341,5 +341,25 @@ Pola berguna dari referensi:
       6. **Cek Status Pendaftaran Mandiri Publik (`/cek-status`)**:
          - Controller `CekStatusController` & View `resources/views/auth/cek-status.blade.php`.
          - Calon peserta cukup memasukkan NIK atau No WA untuk mengetahui status terkini (Aktif, Menunggu Verifikasi, Ditolak dengan catatan verifikator, atau Belum Terdaftar) tanpa perlu login.
-         - Terhubung di navbar utama dan mobile navigation landing page.
     - Seluruh 79 feature & unit tests lulus 100% (241 assertions), Laravel Pint lolos, Vite production build sukses.
+- 2026-09-12: Implementasi Sistem Penyesuai Posisi Pasfoto Wajah Proporsional (Pasfoto Face Fitter 3x4):
+    - Masalah: Foto unggahan pendaftar sering tidak proporsional (wajah terlalu jauh, terlalu dekat, miring, atau kepala terpotong) sehingga merusak kerapian ID Card fisik dan dokumen sertifikat resmi Baitul Arqam.
+    - Solusi: Komponen Blade interaktif `<x-pasfoto-fitter>` (`resources/views/components/pasfoto-fitter.blade.php`) berbasis Alpine.js dan HTML5 Canvas:
+      1. **Rasio Standar Pasfoto 3:4**: Viewport framing rasio 3:4 dengan kanvas pemotong beresolusi tinggi (600 × 800 pixel JPEG).
+      2. **Overlay Sketsa Panduan Wajah (Silhouette Face Guide)**:
+         - Garis oval kepala & peci/jilbab warna cyan berkilau lembut (`stroke="#01b0f5"`).
+         - Garis horizontal tinggi mata warna emas (`stroke="#f8bb00"`) berlabel `TINGGI MATA`.
+         - Garis batas puncak kepala / peci.
+         - Garis kurva bahu kiri & kanan berlabel `GARIS BAHU`.
+         - Titik silang tengah (crosshair).
+      3. **Kontrol Interaktif Ramah Kader Senior (Usia 40+)**:
+         - Sentuh & Geser (*Pointer Events Drag*): Foto bisa digeser langsung dengan mouse di desktop atau sentuhan jari di layar ponsel tanpa lag via `setPointerCapture`.
+         - Slider & Tombol Zoom: Pengatur ukuran wajah (`&minus;` dan `&#43;` serta slider halus) agar wajah pas di dalam oval.
+         - Putar 90° (*Rotate*): Mengatasi foto kamera HP yang terbalik atau miring.
+         - Reset Posisi: Mengembalikan foto ke titik tengah.
+      4. **Injeksi File Otomatis**:
+         - Hasil potongan di-render pada HTML5 Canvas dan dikonversi ke Blob JPEG beresolusi 600×800 px.
+         - Berkas JPEG baru disuntikkan langsung ke elemen `<input type="file" name="foto">` melalui API standar `DataTransfer()`, sehingga controller Laravel menerima berkas gambar 3:4 siap cetak tanpa perlu perubahan skema backend.
+         - Dilengkapi badge hijau *"✓ Wajah Pas & Proporsional (3:4)"* dan tombol *"Atur Posisi"* untuk penyesuaian ulang sewaktu-waktu.
+      5. **Cakupan**: Diterapkan secara seragam pada formulir pendaftaran mandiri kader (`anggota/register.blade.php`) dan form pembaruan profil kader (`portal/profile.blade.php`).
+    - Seluruh 79 unit & feature tests tetap 100% hijau, Vite build sukses.

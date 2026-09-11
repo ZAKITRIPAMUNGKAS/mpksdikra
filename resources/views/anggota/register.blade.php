@@ -63,7 +63,6 @@
               class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-4 sm:p-7 md:p-8 card-lift-sm"
               x-data="{ 
                   tab: 'diri',
-                  photoPreview: null,
                   showPass: false,
                   showConfirmPass: false,
                   goTo(newTab) {
@@ -218,35 +217,11 @@
                     </div>
                 </div>
 
-                {{-- Pasfoto Upload Component with Instant Preview --}}
-                <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Pasfoto Formal (Wajib untuk ID Card BA) <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-4">
-                        <div class="w-20 h-28 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-2xs self-center sm:self-auto">
-                            <template x-if="photoPreview">
-                                <img :src="photoPreview" class="w-full h-full object-cover">
-                            </template>
-                            <template x-if="!photoPreview">
-                                <span class="text-[10px] text-slate-400 text-center font-bold px-1">Foto 3x4</span>
-                            </template>
-                        </div>
-                        <div class="flex-1 w-full">
-                            <input type="file" name="foto" accept="image/*" required
-                                @change="
-                                    const file = $event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => { photoPreview = e.target.result; };
-                                        reader.readAsDataURL(file);
-                                    }
-                                "
-                                class="w-full text-xs text-slate-600 file:mr-2 sm:file:mr-3 file:py-2 file:px-3 sm:file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-50 file:text-sky-800 hover:file:bg-sky-100 cursor-pointer">
-                            <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">Maksimal 2 MB. Format JPG atau PNG. Gunakan foto resmi berlatar belakang polos.</p>
-                        </div>
-                    </div>
-                </div>
+                {{-- Pasfoto Upload Component with Instant Preview & Proportional Face Fitter --}}
+                <x-pasfoto-fitter name="foto" :required="true" inputId="foto-register-input" label="Pasfoto Formal (Wajib untuk ID Card BA)" />
+                @error('foto')
+                    <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
+                @enderror
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1">
                     <div>

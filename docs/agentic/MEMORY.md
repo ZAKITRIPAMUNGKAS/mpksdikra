@@ -36,7 +36,7 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (63 test hijau per 2026-09-11).
+- `php artisan test` — PHPUnit feature tests (64 test hijau per 2026-09-11).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
@@ -305,6 +305,11 @@ Pola berguna dari referensi:
       2. Keaktifan sebagai Takmir Masjid (`keaktifan_takmir` [Tidak / Ya] & `jabatan_takmir` [input teks amanah/jabatan]).
       3. Keaktifan di Kemasyarakatan (`keaktifan_kemasyarakatan` [RT/RW/BPD/Karang Taruna dll.] - textarea).
     - Menambahkan migrasi database `2026_09_11_000001_add_kemasyarakatan_fields_to_anggota_table.php`.
-    - Menyelaraskan form pendaftaran (`anggota/register.blade.php`), form edit profil kader (`portal/profile.blade.php`), dan rincian verifikasi admin (`admin/anggota/show.blade.php`).
-    - Seluruh 64 feature tests lulus 100% (208 assertions).
-
+- 2026-09-11: Optimasi UX Form Kemasjidan & Kemasyarakatan Ramah Usia 40+:
+    - Merombak formulir pertanyaan aktivitas masjid, takmir, dan kemasyarakatan agar ramah kader senior (usia 40 tahun ke atas) yang sering kesulitan mengetik panjang di layar ponsel:
+      1. Preset Chips Sekali Sentuh (*One-Tap Chips*): Pilihan cepat rutinitas masjid (*Sholat Berjamaah 5 Waktu, Subuh/Isya, Pengajian Rutin Subuh/Malam, Pengajian Ahad Pagi, Tadarus, Panitia PHBI*) dan peran kemasyarakatan (*Pengurus RT, RW, BPD Desa, Paguyuban Warga, Kader Posyandu, Linmas, Kelompok Tani, Rukun Kematian, Karang Taruna, Warga Masyarakat*).
+      2. Kartu Pilihan Visual 2-State: Kartu besar dengan kontras tegas untuk status Takmir (*Bukan Takmir* vs *Ya, Pengurus Takmir*) beserta tombol cepat jabatan takmir (*Ketua Takmir, Sekretaris, Bendahara, Sie Ibadah/Dakwah, Sarpras, Sie Remaja/TPA, Imam/Marbot*).
+      3. Sinkronisasi Otomatis 2 Arah: Sentuhan chip langsung mengisi textarea / input secara otomatis, namun kader tetap leluasa menambahkan rincian khusus secara manual (misal: nama masjid atau dusun).
+      4. Banner konfirmasi yang melegakan & tombol aksi ukuran sentuh besar (*touch-friendly*).
+    - Diterapkan secara identik pada formulir pendaftaran mandiri (`anggota/register.blade.php`) dan portal edit profil kader (`portal/profile.blade.php`).
+    - Seluruh 64 feature tests lulus 100% (208 assertions), Vite build sukses, committed & pushed ke GitHub `main`.

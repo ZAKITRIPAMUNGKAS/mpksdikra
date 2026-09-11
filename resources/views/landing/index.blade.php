@@ -124,8 +124,8 @@
             <div class="bg-[#f3f5f8] rounded-3xl p-7 sm:p-12 lg:p-14 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 min-h-[380px] reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.34]" />
-                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-sky-600 opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.34]" />
+                <x-batik-corner position="bottom-right" class="w-40 h-40 sm:w-60 sm:h-60 text-sky-600 opacity-[0.30]" />
                 
                 {{-- Background Visual: Foto Gedung Dakwah PDM Karanganyar dengan Siluet Fade dari Kanan ke Kiri --}}
                 <div class="absolute right-0 top-0 bottom-0 w-full lg:w-7/12 h-full overflow-hidden pointer-events-none select-none z-0 reveal-right reveal-delay-200">
@@ -389,8 +389,8 @@
                         <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-lg space-y-4 overflow-hidden relative">
                             
                             {{-- Batik Solo Surya Pattern Corners --}}
-                            <x-batik-corner position="top-right" class="w-32 h-32 text-sky-800 opacity-[0.28]" />
-                            <x-batik-corner position="bottom-left" class="w-28 h-28 text-sky-700 opacity-[0.25]" />
+                            <x-batik-corner position="top-right" class="w-40 h-40 text-sky-800 opacity-[0.28]" />
+                            <x-batik-corner position="bottom-left" class="w-40 h-40 text-sky-700 opacity-[0.25]" />
                             
                             {{-- Foto Tokoh KH Zainudin Alfandi --}}
                             <div class="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-b from-sky-50 via-slate-50 to-slate-100 border border-slate-100 shadow-inner">
@@ -440,8 +440,8 @@
             <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 space-y-8 relative overflow-hidden">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-right" class="w-44 h-44 sm:w-64 sm:h-64 text-[#005c8a] opacity-[0.36]" />
-                <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-sky-700 opacity-[0.32]" />
+                <x-batik-corner position="top-right" class="w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.36]" />
+                <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-60 sm:h-60 text-sky-700 opacity-[0.32]" />
                 
                 {{-- Title --}}
                 <div class="text-center max-w-xl mx-auto space-y-1.5 reveal">
@@ -970,8 +970,8 @@
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-9 space-y-6 relative overflow-hidden reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-sky-900 opacity-[0.32]" />
-                <x-batik-corner position="bottom-right" class="w-32 h-32 sm:w-48 sm:h-48 text-[#005c8a] opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-40 h-40 sm:w-60 sm:h-60 text-sky-900 opacity-[0.32]" />
+                <x-batik-corner position="bottom-right" class="w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.30]" />
                 
                 {{-- Header Section: Title, Stats Chips & Subtitle --}}
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-slate-100 pb-6 reveal reveal-delay-100">
@@ -1198,8 +1198,8 @@
         <section id="faq" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ active: 1 }">
             <div class="bg-[#ebf4fa] rounded-3xl p-6 sm:p-10 lg:p-12 border border-sky-100 relative overflow-hidden reveal">
                 {{-- Batik Solo Surya Pattern Corners --}}
-                <x-batik-corner position="top-left" class="w-44 h-44 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.34]" />
-                <x-batik-corner position="bottom-right" class="w-36 h-36 sm:w-52 sm:h-52 text-sky-600 opacity-[0.30]" />
+                <x-batik-corner position="top-left" class="w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.34]" />
+                <x-batik-corner position="bottom-right" class="w-40 h-40 sm:w-60 sm:h-60 text-sky-600 opacity-[0.30]" />
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start relative z-10">
                     
@@ -1424,8 +1424,8 @@
     {{-- SECTION 9: Multi-Column Themed Footer --}}
     <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-14 pb-20 lg:pb-10 text-slate-600 relative overflow-hidden">
         {{-- Batik Solo Surya Pattern Corners --}}
-        <x-batik-corner position="top-right" class="w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.28]" />
-        <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.26]" />
+        <x-batik-corner position="top-right" class="w-40 h-40 sm:w-60 sm:h-60 text-sky-900 opacity-[0.28]" />
+        <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.26]" />
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {{-- Main Themed Grid (12 Columns) --}}

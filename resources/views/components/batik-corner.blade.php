@@ -1,6 +1,6 @@
 @props([
     'position' => 'top-right',
-    'class'    => 'w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.30]',
+    'class'    => 'w-40 h-40 sm:w-60 sm:h-60 text-[#005c8a] opacity-[0.30]',
     'fade'     => true,
     'reveal'   => true,
 ])
@@ -15,13 +15,13 @@
     $uid = 'kw' . substr(md5(uniqid('', true)), 0, 6);
     $maskId = 'mask-' . $uid;
 
-    // SVG coordinate mirror so motif origin (0,0) is symmetrically anchored at the corner
-    $svgFlip = match($position) {
-        'top-left'     => '',
-        'top-right'    => '-scale-x-100',
-        'bottom-right' => '-scale-x-100 -scale-y-100',
-        'bottom-left'  => '-scale-y-100',
-        default        => '',
+    // Native radial gradient coordinates anchored to the exact corner
+    $radialCoords = match($position) {
+        'top-left'     => ['cx' => '0%',   'cy' => '0%'],
+        'top-right'    => ['cx' => '100%', 'cy' => '0%'],
+        'bottom-right' => ['cx' => '100%', 'cy' => '100%'],
+        'bottom-left'  => ['cx' => '0%',   'cy' => '100%'],
+        default        => ['cx' => '100%', 'cy' => '0%'],
     };
 
     $initialShift = match($position) {
@@ -32,7 +32,7 @@
         default        => 'translate-x-10 -translate-y-10 sm:translate-x-14 sm:-translate-y-14',
     };
 @endphp
-<div {{ $attributes->merge(['class' => "absolute {$posClass} pointer-events-none select-none z-0 {$class}"]) }} aria-hidden="true">
+<div {{ $attributes->merge(['class' => "absolute {$posClass} pointer-events-none select-none z-0 !m-0 !mt-0 !mb-0 !ml-0 !mr-0 {$class}"]) }} style="margin: 0 !important;" aria-hidden="true">
 @if($reveal)
   <div 
     x-data="{ revealed: false }" 
@@ -49,7 +49,7 @@
     class="w-full h-full transform-gpu transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
   >
 @endif
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="w-full h-full origin-center {{ $svgFlip }}">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="w-full h-full">
   <defs>
     <pattern id="{{ $uid }}" x="0" y="0" width="160.0" height="160.0" patternUnits="userSpaceOnUse">
     <circle cx="40" cy="40" r="40.0" fill="none" stroke="currentColor" stroke-opacity="0.65" stroke-width="1.0" />
@@ -195,7 +195,7 @@
     </pattern>
 
     @if($fade)
-    <radialGradient id="{{ $maskId }}" cx="0%" cy="0%" r="100%">
+    <radialGradient id="{{ $maskId }}" cx="{{ $radialCoords['cx'] }}" cy="{{ $radialCoords['cy'] }}" r="100%">
       <stop offset="0%" stop-color="#fff" stop-opacity="1" />
       <stop offset="35%" stop-color="#fff" stop-opacity="0.95" />
       <stop offset="60%" stop-color="#fff" stop-opacity="0.75" />

@@ -249,15 +249,15 @@
                 </div>
             </div>
 
-            <div class="flex justify-between pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                 <button type="button" @click="tab = 'identitas'"
-                    class="px-4 py-2 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition text-xs flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     <span>Kembali</span>
                 </button>
                 <button type="button" @click="tab = 'kemuhammadiyahan'"
-                    class="px-5 py-2 bg-mpksdi-600 hover:bg-mpksdi-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5">
-                    <span>Lanjut ke Kemuhammadiyahan</span>
+                    class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full transition flex items-center justify-center gap-2 whitespace-nowrap shadow-xs hover:scale-[1.01]">
+                    <span>Lanjut: Kemuhammadiyahan</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
@@ -537,9 +537,9 @@
                 </div>
             </div>
 
-            <div class="flex justify-between pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                 <button type="button" @click="tab = 'agama'"
-                    class="px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition text-xs flex items-center gap-1.5 shadow-2xs">
+                    class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     <span>Kembali</span>
                 </button>

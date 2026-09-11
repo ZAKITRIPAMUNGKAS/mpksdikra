@@ -273,9 +273,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row justify-end pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-end pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('agama')"
-                        class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2">
+                        class="w-full sm:w-auto h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
                         <span>Lanjut: Data Keagamaan</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -379,14 +379,14 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('diri')"
-                        class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs">
+                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('org')"
-                        class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2">
+                        class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
                         <span>Lanjut: Data Organisasi</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -440,15 +440,15 @@
                         class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
                 </div>
 
-                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('agama')"
-                        class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs">
+                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('kemasyarakatan')"
-                        class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2">
-                        <span>Lanjut: Kemasyarakatan &amp; Pengiriman</span>
+                        class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
+                        <span>Lanjut: Kemasyarakatan</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
@@ -712,15 +712,15 @@
                 </div>
 
                 {{-- Action Buttons --}}
-                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('org')"
-                        class="w-full sm:w-auto px-5 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs">
+                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="submit"
-                        class="w-full sm:w-auto px-8 py-3.5 sm:py-3 bg-[#f8bb00] hover:bg-amber-400 text-slate-950 font-black text-sm rounded-full border border-amber-400 shadow-md transition hover:scale-[1.01] flex items-center justify-center gap-2">
-                        <span>Kirim Pendaftaran Kader</span>
+                        class="h-11 px-6 sm:px-8 bg-[#f8bb00] hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm rounded-full border border-amber-400 shadow-md transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
+                        <span>Kirim Pendaftaran</span>
                         <span>&rarr;</span>
                     </button>
                 </div>

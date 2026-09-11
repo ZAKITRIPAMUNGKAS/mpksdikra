@@ -310,69 +310,85 @@
                 
                 {{-- Left: Text & 2x2 Feature Grid with Solid Blue Checkmarks --}}
                 <div class="lg:col-span-7 space-y-6">
-                    <div class="reveal-left">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-100 mb-2">
+                    <div class="space-y-2.5">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-100 mb-1 reveal-pop reveal-delay-100">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                            </span>
                             <span>Standardisasi Mutu Terakreditasi</span>
                         </div>
-                        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight reveal-left reveal-delay-150">
                             Keunggulan Standar Mutu <br>
-                            Perkaderan MPKSDI.
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-[#005c8a] to-slate-900">Perkaderan MPKSDI.</span>
                         </h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-2 max-w-lg leading-relaxed">
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 max-w-lg leading-relaxed reveal-left reveal-delay-200">
                             Penyelenggaraan Baitul Arqam di PDM Karanganyar menerapkan tata kelola modern berbasis kompetensi ideologis dan integrasi digital persyarikatan.
                         </p>
                     </div>
 
-                    {{-- 2x2 Grid Modern Cards --}}
+                    {{-- 2x2 Grid Modern Cards with Dynamic Reveal & Interactive Micro-Animations --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         
-                        {{-- 1 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-100 cursor-pointer">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
-                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        {{-- 1: Kurikulum Baku PP --}}
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-200 cursor-pointer relative overflow-hidden">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Kurikulum Baku PP</h3>
-                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-1">
+                                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all duration-200">Kurikulum Baku PP</h3>
+                                    <span class="text-[9px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors">01</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed group-hover:text-slate-700 transition-colors">
                                     Materi ideologi, manhaj tarjih, dan kepemimpinan selaras pedoman baku MPKSDI PP Muhammadiyah.
                                 </p>
                             </div>
                         </div>
 
-                        {{-- 2 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-200 cursor-pointer">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
-                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        {{-- 2: Penilaian 4 Format --}}
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-300 cursor-pointer relative overflow-hidden">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Penilaian 4 Format</h3>
-                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-1">
+                                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all duration-200">Penilaian 4 Format</h3>
+                                    <span class="text-[9px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors">02</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed group-hover:text-slate-700 transition-colors">
                                     Evaluasi terpadu: Kognitif CBT (40%), Praktik Ibadah (35%), Afektif (25%), dan Presensi 100%.
                                 </p>
                             </div>
                         </div>
 
-                        {{-- 3 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-300 cursor-pointer">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
-                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        {{-- 3: Instruktur Tersertifikasi --}}
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-400 cursor-pointer relative overflow-hidden">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">Instruktur Tersertifikasi</h3>
-                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-1">
+                                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all duration-200">Instruktur Tersertifikasi</h3>
+                                    <span class="text-[9px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors">03</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed group-hover:text-slate-700 transition-colors">
                                     Didampingi tim master of training dan instruktur ahli persyarikatan PDM Karanganyar.
                                 </p>
                             </div>
                         </div>
 
-                        {{-- 4 --}}
-                        <div class="group p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 card-lift-sm card-sheen hover:border-sky-400 hover:bg-white transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-left reveal-delay-400 cursor-pointer">
-                            <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-115 group-hover:bg-sky-600 transition-all duration-300">
-                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        {{-- 4: ID Card & E-Sertifikat QR --}}
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-500 cursor-pointer relative overflow-hidden">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
+                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-700 transition-colors">ID Card &amp; E-Sertifikat QR</h3>
-                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-1">
+                                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all duration-200">ID Card &amp; E-Sertifikat QR</h3>
+                                    <span class="text-[9px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors">04</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed group-hover:text-slate-700 transition-colors">
                                     Dokumen resmi digital dengan verifikasi QR Code instan terhubung database pimpinan.
                                 </p>
                             </div>

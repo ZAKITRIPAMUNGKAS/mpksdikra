@@ -5,47 +5,210 @@
 @section('body')
 <div class="min-h-screen py-6 sm:py-12 px-3 sm:px-4 bg-[#f8fafc] text-slate-800 selection:bg-sky-500 selection:text-white">
     <div class="max-w-3xl mx-auto">
-        {{-- Top Navigation & Brand Bar --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
-            <a href="/" class="inline-flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 hover:bg-sky-50 hover:border-sky-200 text-xs font-bold text-slate-600 hover:text-sky-700 transition shadow-2xs w-full sm:w-auto">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{-- Top Sleek Navigation Bar --}}
+        <div class="flex items-center justify-between gap-2 mb-3.5 px-1">
+            <a href="/" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-900 transition py-1">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-                <span>Kembali ke Beranda</span>
+                <span>Beranda</span>
             </a>
-            <div class="text-xs text-slate-600 text-center sm:text-right">
-                Sudah memiliki akun? <a href="{{ route('login') }}" class="font-bold text-sky-600 hover:text-sky-700 hover:underline">Masuk Portal &rarr;</a>
-            </div>
+            <a href="{{ route('login') }}" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/80 text-xs font-bold text-sky-700 hover:bg-sky-100 transition shadow-2xs">
+                <span>Masuk Portal</span>
+                <span>&rarr;</span>
+            </a>
         </div>
 
-        {{-- Form Header with MPKSDI Crest & Batik Corner --}}
-        <div class="bg-[#f3f5f8] rounded-2xl sm:rounded-3xl border border-sky-100/80 shadow-xs p-4 sm:p-7 md:p-8 mb-5 sm:mb-6 relative overflow-hidden">
-            <x-batik-corner position="top-right" class="w-32 h-32 sm:w-40 sm:h-40 text-[#005c8a] opacity-[0.24]" />
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-4 relative z-10">
-                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-12 sm:h-16 w-auto shrink-0 drop-shadow-xs self-start sm:self-center">
-                <div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[10px] sm:text-[11px] font-bold text-sky-800 uppercase tracking-wider mb-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
-                        Pangkalan Data Kader Persyarikatan
-                    </span>
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Daftar Anggota MPKSDI<span class="text-sky-500">.</span></h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">Lengkapi formulir pendaftaran anggota dan biodata diri secara akurat untuk verifikasi kepesertaan Baitul Arqam.</p>
+        @if(session('success') && !request()->has('baru'))
+            {{-- Post-Registration Success & Verification Status View --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-8 md:p-10 mb-6 relative overflow-hidden">
+                <x-batik-corner position="top-right" class="w-44 h-44 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.14]" />
+
+                {{-- Header Sukses dengan Logo MPKSDI --}}
+                <div class="relative z-10 text-center max-w-xl mx-auto mb-7">
+                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-14 sm:h-16 w-auto mx-auto mb-3 drop-shadow-xs">
+
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 uppercase tracking-wider mb-3">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Pendaftaran Selesai &amp; Tersimpan
+                    </div>
+
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Alhamdulillah, Anda Telah Berhasil Terdaftar!
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-normal">
+                        Data formulir pendaftaran dan berkas pasfoto Anda telah kami terima secara lengkap di pangkalan data MPKSDI PDM Karanganyar.
+                    </p>
+                </div>
+
+                {{-- Status Card Highlight: MENUNGGU VERIFIKASI DATA --}}
+                <div class="relative z-10 max-w-xl mx-auto rounded-2xl bg-amber-50/80 border border-amber-200/90 p-4 sm:p-5 mb-6 text-amber-950 shadow-2xs">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Status Akun Saat Ini:</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                    Menunggu Verifikasi Data
+                                </span>
+                            </div>
+                            <p class="text-xs text-amber-900/90 leading-relaxed">
+                                Berkas pendaftaran dan kesesuaian pasfoto Anda saat ini sedang dalam antrean verifikasi oleh tim sekretariat MPKSDI PDM Karanganyar. Notifikasi persetujuan akun akan disampaikan melalui WhatsApp.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Ringkasan Data Pendaftar --}}
+                @php
+                    $regData = session('registered_data', []);
+                @endphp
+                @if(!empty($regData))
+                <div class="relative z-10 max-w-xl mx-auto rounded-xl bg-slate-50 border border-slate-200/80 p-4 sm:p-5 mb-6">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span>Ringkasan Identitas Pendaftar</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">Nama Lengkap:</span>
+                            <span class="font-bold text-slate-800">{{ $regData['nama'] ?? '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">NIK KTP:</span>
+                            <span class="font-mono font-bold text-slate-800">
+                                @if(!empty($regData['nik']))
+                                    {{ substr($regData['nik'], 0, 6) }}******{{ substr($regData['nik'], -4) }}
+                                @else
+                                    -
+                                @endif
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">Nomor WhatsApp:</span>
+                            <span class="font-mono font-bold text-slate-800">{{ $regData['no_wa'] ?? '-' }}</span>
+                        </div>
+                        @if(!empty($regData['kecamatan']))
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">Cabang / Kecamatan:</span>
+                            <span class="font-bold text-slate-800">{{ $regData['kecamatan'] }}</span>
+                        </div>
+                        @endif
+                        @if(!empty($regData['email']))
+                        <div class="sm:col-span-2">
+                            <span class="text-slate-400 block text-[11px]">Alamat Email:</span>
+                            <span class="font-mono font-medium text-slate-700">{{ $regData['email'] }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                {{-- Timeline 3 Langkah Verifikasi --}}
+                <div class="relative z-10 max-w-xl mx-auto mb-8 border-t border-slate-100 pt-6">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 text-center">
+                        Tahapan Pendaftaran &amp; Verifikasi
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        {{-- Step 1 --}}
+                        <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950 flex flex-col items-center">
+                            <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs mb-1.5 shadow-2xs">
+                                ✓
+                            </div>
+                            <span class="text-xs font-extrabold text-emerald-900 block leading-tight">1. Pendaftaran</span>
+                            <span class="text-[10px] text-emerald-700 mt-0.5 font-medium">Selesai Dikirim</span>
+                        </div>
+
+                        {{-- Step 2 --}}
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col items-center ring-2 ring-amber-400/30">
+                            <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs mb-1.5 shadow-2xs animate-pulse">
+                                ⏳
+                            </div>
+                            <span class="text-xs font-extrabold text-amber-900 block leading-tight">2. Verifikasi Data</span>
+                            <span class="text-[10px] text-amber-700 mt-0.5 font-semibold">Sedang Berjalan</span>
+                        </div>
+
+                        {{-- Step 3 --}}
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 flex flex-col items-center">
+                            <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs mb-1.5">
+                                3
+                            </div>
+                            <span class="text-xs font-bold text-slate-600 block leading-tight">3. Akun Aktif</span>
+                            <span class="text-[10px] text-slate-400 mt-0.5">Portal Baitul Arqam</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Action Buttons --}}
+                <div class="relative z-10 max-w-xl mx-auto space-y-3">
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                        @php
+                            $searchIdentifier = $regData['nik'] ?? ($regData['no_wa'] ?? '');
+                        @endphp
+                        <a href="{{ route('cek-status', $searchIdentifier ? ['identifier' => $searchIdentifier] : []) }}"
+                           class="w-full sm:flex-1 py-2.5 px-4 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-2xs transition flex items-center justify-center gap-2 text-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Periksa Status Pendaftaran</span>
+                        </a>
+
+                        <a href="{{ route('login') }}"
+                           class="w-full sm:w-auto py-2.5 px-5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-xl shadow-2xs transition flex items-center justify-center gap-1.5">
+                            <span>Masuk Portal</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+                        <a href="{{ url('/') }}" class="inline-flex items-center gap-1 hover:text-slate-900 transition">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            <span>Kembali ke Beranda</span>
+                        </a>
+
+                        <a href="{{ route('anggota.register', ['baru' => 1]) }}"
+                           class="font-semibold text-sky-700 hover:text-sky-900 hover:underline transition">
+                            Ingin mendaftarkan kader lain? Formulir Baru &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Clean up draft in localStorage --}}
+                <script>
+                    try {
+                        localStorage.removeItem('mpksdi_register_draft_v1');
+                    } catch (e) {}
+                </script>
+            </div>
+        @else
+            {{-- Form Header with MPKSDI Crest & Batik Corner --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-7 md:p-8 mb-5 sm:mb-6 relative overflow-hidden">
+                <x-batik-corner position="top-right" class="w-32 h-32 sm:w-40 sm:h-40 text-[#005c8a] opacity-[0.18]" />
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-4 relative z-10">
+                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-12 sm:h-16 w-auto shrink-0 drop-shadow-xs self-start sm:self-center">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-200/80 text-xs font-semibold text-sky-800 uppercase tracking-wider mb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
+                            Pangkalan Data Kader Persyarikatan
+                        </span>
+                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Daftar Anggota MPKSDI</h1>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed font-normal">Lengkapi formulir pendaftaran anggota dan biodata diri secara akurat untuk verifikasi kepesertaan Baitul Arqam.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        @if(session('success'))
-            <div class="mb-5 sm:mb-6 px-4 py-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-950 text-sm flex items-start gap-2.5 shadow-xs">
-                <svg class="w-5 h-5 text-sky-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-        @endif
 
         @if($errors->any())
-            <div class="mb-5 sm:mb-6 px-4 py-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 text-sm shadow-xs">
-                <div class="font-bold mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider text-rose-900">
+            <div class="mb-5 sm:mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-950 text-sm shadow-2xs">
+                <div class="font-semibold mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider text-rose-900">
                     <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -59,29 +222,76 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('anggota.register.store') }}" enctype="multipart/form-data"
-              class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-4 sm:p-7 md:p-8 card-lift-sm"
-              x-data="{ 
-                  tab: 'diri',
-                  showPass: false,
-                  showConfirmPass: false,
-                  goTo(newTab) {
-                      this.tab = newTab;
-                      window.scrollTo({ top: 120, behavior: 'smooth' });
-                  }
-              }">
+        <form method="POST" action="{{ route('anggota.register.store') }}" enctype="multipart/form-data" novalidate
+              class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-7 md:p-8"
+              x-data="registrationForm()"
+              @input.debounce.400ms="saveDraft()"
+              @change="saveDraft()"
+              @submit.prevent="submitForm($event)">
             @csrf
+
+            {{-- Restored Draft Notification Banner --}}
+            <div x-show="draftRestored" x-cloak class="mb-5 px-4 py-3 rounded-xl bg-sky-50 border border-sky-200/90 text-sky-950 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="font-bold block text-sky-900 text-xs sm:text-sm">Draf formulir Anda otomatis dipulihkan</span>
+                        <span class="text-[11px] text-sky-700 font-normal">Isian formulir sebelumnya telah dimuat kembali dari memori browser ini.</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                    <button type="button" @click="clearDraft(true)" class="px-3 py-1.5 rounded-lg border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold transition shadow-2xs">
+                        Hapus Draf &amp; Ulangi
+                    </button>
+                    <button type="button" @click="draftRestored = false" class="text-sky-400 hover:text-sky-700 p-1 text-sm font-bold leading-none" title="Tutup">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            {{-- Dynamic Step Error Notification Banner --}}
+            <div x-show="stepErrorBanner" x-cloak class="mb-5 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs sm:text-sm flex items-start gap-2.5 shadow-2xs">
+                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div class="flex-1">
+                    <span class="font-bold block text-rose-900 mb-0.5">Perhatian: Isian Wajib Belum Lengkap</span>
+                    <span x-text="stepErrorBanner"></span>
+                </div>
+                <button type="button" @click="stepErrorBanner = null" class="text-rose-400 hover:text-rose-700 font-bold px-1 text-sm">&times;</button>
+            </div>
 
             {{-- Stepper Progress Header --}}
             <div class="mb-6 sm:mb-8 pb-4 sm:pb-5 border-b border-slate-200/80">
-                {{-- Active step title badge for mobile viewports --}}
-                <div class="sm:hidden mb-3 flex items-center justify-between bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200/80 text-xs">
-                    <span class="text-slate-500 font-medium">Langkah saat ini:</span>
-                    <span class="font-bold text-sky-700" x-text="
-                        tab === 'diri' ? '1/4: Identitas & Akun' :
-                        (tab === 'agama' ? '2/4: Keagamaan & Ibadah' :
-                        (tab === 'org' ? '3/4: Pengalaman Organisasi' : '4/4: Kemasyarakatan & Kirim'))
-                    "></span>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    {{-- Active step title badge for mobile viewports --}}
+                    <div class="sm:hidden flex items-center bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/80 text-xs">
+                        <span class="text-slate-500 font-medium mr-1.5">Langkah:</span>
+                        <span class="font-bold text-sky-700" x-text="
+                            tab === 'diri' ? '1/4: Identitas & Akun' :
+                            (tab === 'agama' ? '2/4: Keagamaan & Ibadah' :
+                            (tab === 'org' ? '3/4: Pengalaman Organisasi' : '4/4: Kemasyarakatan & Kirim'))
+                        "></span>
+                    </div>
+                    <div class="hidden sm:block"></div>
+
+                    {{-- Auto-save status indicator --}}
+                    <div class="flex items-center gap-2 text-[11px] font-medium ml-auto">
+                        <template x-if="hasSavedDraft">
+                            <div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span x-text="lastSavedText || 'Draf tersimpan'"></span>
+                                <span class="text-slate-300 mx-0.5">&bull;</span>
+                                <button type="button" @click="clearDraft(true)" class="text-slate-500 hover:text-rose-600 font-semibold underline transition">
+                                    Hapus Draf
+                                </button>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
@@ -121,8 +331,14 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                         Nama Lengkap (beserta gelar) <span class="text-red-500">*</span>
                     </label>
-                    <input name="nama_lengkap" value="{{ old('nama_lengkap') }}" required placeholder="Contoh: H. Agus Sulaiman, S.Pd"
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                    <input name="nama_lengkap" value="{{ old('nama_lengkap') }}" autocomplete="name" required placeholder="Contoh: H. Agus Sulaiman, S.Pd"
+                        @input="clearError('nama_lengkap')"
+                        :class="clientErrors.nama_lengkap ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('nama_lengkap') ? 'border-red-500' : 'border-slate-300' }}'"
+                        class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('nama_lengkap') ? 'true' : 'false' }}">
+                    <template x-if="clientErrors.nama_lengkap">
+                        <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.nama_lengkap"></p>
+                    </template>
+                    @error('nama_lengkap') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
@@ -130,19 +346,32 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             NIK KTP (16 digit) <span class="text-red-500">*</span>
                         </label>
-                        <input name="nik" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" required placeholder="3313xxxxxxxxxxxx"
-                            class="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input name="nik" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" autocomplete="off" required placeholder="3313xxxxxxxxxxxx"
+                            @input="clearError('nik')"
+                            :class="clientErrors.nik ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('nik') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm font-mono border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.nik">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.nik"></p>
+                        </template>
+                        @error('nik') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Jenis Kelamin <span class="text-red-500">*</span>
                         </label>
-                        <select name="jenis_kelamin" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <select name="jenis_kelamin" autocomplete="sex" required
+                            @change="clearError('jenis_kelamin')"
+                            :class="clientErrors.jenis_kelamin ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('jenis_kelamin') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('jenis_kelamin') ? 'true' : 'false' }}">
                             <option value="">Pilih Jenis Kelamin</option>
                             @foreach(config('arqam.opsi_form.jenis_kelamin') as $val => $label)
                             <option value="{{ $val }}" @selected(old('jenis_kelamin')===$val)>{{ $label }}</option>
                             @endforeach
                         </select>
+                        <template x-if="clientErrors.jenis_kelamin">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.jenis_kelamin"></p>
+                        </template>
+                        @error('jenis_kelamin') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -152,25 +381,44 @@
                             Tempat Lahir <span class="text-red-500">*</span>
                         </label>
                         <input name="tempat_lahir" value="{{ old('tempat_lahir') }}" required placeholder="Karanganyar"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                            @input="clearError('tempat_lahir')"
+                            :class="clientErrors.tempat_lahir ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('tempat_lahir') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('tempat_lahir') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.tempat_lahir">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.tempat_lahir"></p>
+                        </template>
+                        @error('tempat_lahir') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Tanggal Lahir <span class="text-red-500">*</span>
                         </label>
-                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" autocomplete="bday" required
+                            @change="clearError('tanggal_lahir')"
+                            :class="clientErrors.tanggal_lahir ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('tanggal_lahir') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('tanggal_lahir') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.tanggal_lahir">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.tanggal_lahir"></p>
+                        </template>
+                        @error('tanggal_lahir') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Status Pernikahan <span class="text-red-500">*</span>
                         </label>
-                        <select name="status_pernikahan" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <select name="status_pernikahan" required
+                            @change="clearError('status_pernikahan')"
+                            :class="clientErrors.status_pernikahan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('status_pernikahan') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('status_pernikahan') ? 'true' : 'false' }}">
                             <option value="">Pilih Status</option>
                             @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
                             <option value="{{ $v }}" @selected(old('status_pernikahan')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        <template x-if="clientErrors.status_pernikahan">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.status_pernikahan"></p>
+                        </template>
+                        @error('status_pernikahan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -178,25 +426,49 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                         Alamat Lengkap Rumah <span class="text-red-500">*</span>
                     </label>
-                    <textarea name="alamat_rumah" required rows="2" placeholder="Nama jalan, RT/RW, dukuh/perumahan"
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition">{{ old('alamat_rumah') }}</textarea>
+                    <textarea name="alamat_rumah" required rows="2" autocomplete="street-address" placeholder="Nama jalan, RT/RW, dukuh/perumahan"
+                        @input="clearError('alamat_rumah')"
+                        :class="clientErrors.alamat_rumah ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('alamat_rumah') ? 'border-red-500' : 'border-slate-300' }}'"
+                        class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition" aria-invalid="{{ $errors->has('alamat_rumah') ? 'true' : 'false' }}">{{ old('alamat_rumah') }}</textarea>
+                    <template x-if="clientErrors.alamat_rumah">
+                        <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.alamat_rumah"></p>
+                    </template>
+                    @error('alamat_rumah') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Desa/Kelurahan <span class="text-red-500">*</span></label>
-                        <input name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" required
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" autocomplete="address-level3" required
+                            @input="clearError('desa_kelurahan')"
+                            :class="clientErrors.desa_kelurahan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('desa_kelurahan') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.desa_kelurahan">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.desa_kelurahan"></p>
+                        </template>
+                        @error('desa_kelurahan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kecamatan (Cabang) <span class="text-red-500">*</span></label>
-                        <input name="kecamatan" value="{{ old('kecamatan') }}" required placeholder="Contoh: Karanganyar / Jaten"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input name="kecamatan" value="{{ old('kecamatan') }}" autocomplete="address-level2" required placeholder="Contoh: Karanganyar / Jaten"
+                            @input="clearError('kecamatan')"
+                            :class="clientErrors.kecamatan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('kecamatan') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('kecamatan') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.kecamatan">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.kecamatan"></p>
+                        </template>
+                        @error('kecamatan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kabupaten <span class="text-red-500">*</span></label>
-                        <input name="kabupaten" value="{{ old('kabupaten', 'Karanganyar') }}" required
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input name="kabupaten" value="{{ old('kabupaten', 'Karanganyar') }}" autocomplete="address-level1" required
+                            @input="clearError('kabupaten')"
+                            :class="clientErrors.kabupaten ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('kabupaten') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('kabupaten') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.kabupaten">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.kabupaten"></p>
+                        </template>
+                        @error('kabupaten') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -205,46 +477,70 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Nomor WhatsApp Aktif <span class="text-red-500">*</span>
                         </label>
-                        <input name="no_wa" value="{{ old('no_wa') }}" placeholder="08xxxxxxxxxx" required
-                            class="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input name="no_wa" value="{{ old('no_wa') }}" placeholder="08xxxxxxxxxx" autocomplete="tel" required
+                            @input="clearError('no_wa')"
+                            :class="clientErrors.no_wa ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('no_wa') ? 'border-red-500' : 'border-slate-300' }}'"
+                            class="w-full px-3.5 py-2.5 text-sm font-mono border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('no_wa') ? 'true' : 'false' }}">
+                        <template x-if="clientErrors.no_wa">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.no_wa"></p>
+                        </template>
+                        @error('no_wa') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                             Alamat Email (Login Portal)
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="kader@email.com"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="kader@email.com" autocomplete="email"
+                            class="w-full px-3.5 py-2.5 text-sm border {{ $errors->has('email') ? 'border-red-500' : 'border-slate-300' }} rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
+                        @error('email') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 {{-- Pasfoto Upload Component with Instant Preview & Proportional Face Fitter --}}
-                <x-pasfoto-fitter name="foto" :required="true" inputId="foto-register-input" label="Pasfoto Formal (Wajib untuk ID Card BA)" />
-                @error('foto')
-                    <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
-                @enderror
+                <div @change="clearError('foto')">
+                    <x-pasfoto-fitter name="foto" :required="true" inputId="foto-register-input" label="Pasfoto Formal (Wajib untuk ID Card BA)" />
+                    <template x-if="clientErrors.foto">
+                        <p class="text-xs text-rose-600 font-bold mt-1.5" x-text="clientErrors.foto"></p>
+                    </template>
+                    @error('foto')
+                        <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kata Sandi Akun <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <input :type="showPass ? 'text' : 'password'" name="password" required minlength="8" placeholder="Minimal 8 karakter"
-                                class="w-full px-3.5 py-2.5 pr-10 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                            <input :type="showPass ? 'text' : 'password'" name="password" autocomplete="new-password" required minlength="8" placeholder="Minimal 8 karakter"
+                                @input="clearError('password')"
+                                :class="clientErrors.password ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('password') ? 'border-red-500' : 'border-slate-300' }}'"
+                                class="w-full px-3.5 py-2.5 pr-10 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}">
                             <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
                                 <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <svg x-show="showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                             </button>
                         </div>
+                        <template x-if="clientErrors.password">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.password"></p>
+                        </template>
+                        @error('password') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Konfirmasi Sandi <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <input :type="showConfirmPass ? 'text' : 'password'" name="password_confirmation" required minlength="8" placeholder="Ketik ulang sandi"
-                                class="w-full px-3.5 py-2.5 pr-10 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                            <input :type="showConfirmPass ? 'text' : 'password'" name="password_confirmation" autocomplete="new-password" required minlength="8" placeholder="Ketik ulang sandi"
+                                @input="clearError('password_confirmation')"
+                                :class="clientErrors.password_confirmation ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('password_confirmation') ? 'border-red-500' : 'border-slate-300' }}'"
+                                class="w-full px-3.5 py-2.5 pr-10 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}">
                             <button type="button" @click="showConfirmPass = !showConfirmPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
                                 <svg x-show="!showConfirmPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <svg x-show="showConfirmPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                             </button>
                         </div>
+                        <template x-if="clientErrors.password_confirmation">
+                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.password_confirmation"></p>
+                        </template>
+                        @error('password_confirmation') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -432,10 +728,10 @@
             {{-- Tab 4: Kemasjidan, Kemasyarakatan & Selesai (Ramah Usia 40+) --}}
             <div x-show="tab==='kemasyarakatan'" class="space-y-6" style="display: none;"
                  x-data="{ 
-                     isTakmir: '{{ old('keaktifan_takmir', 'Tidak') }}',
-                     takmirRole: '{{ old('jabatan_takmir', '') }}',
-                     masjidText: '{{ addslashes(old('aktifitas_jamaah_masjid', '')) }}',
-                     masyarakatText: '{{ addslashes(old('keaktifan_kemasyarakatan', '')) }}',
+                     isTakmir: {{ \Illuminate\Support\Js::from(old('keaktifan_takmir', 'Tidak')) }},
+                     takmirRole: {{ \Illuminate\Support\Js::from(old('jabatan_takmir', '')) }},
+                     masjidText: {{ \Illuminate\Support\Js::from(old('aktifitas_jamaah_masjid', '')) }},
+                     masyarakatText: {{ \Illuminate\Support\Js::from(old('keaktifan_kemasyarakatan', '')) }},
                      
                      masjidPresets: [
                          'Sholat Berjamaah 5 Waktu',
@@ -476,6 +772,7 @@
                              list.push(item);
                          }
                          this.masjidText = list.join(', ');
+                         this.$dispatch('change');
                      },
                      hasMasjid(item) {
                          return this.masjidText && this.masjidText.includes(item);
@@ -487,6 +784,7 @@
                          } else {
                              this.takmirRole = role;
                          }
+                         this.$dispatch('change');
                      },
                      isTakmirRoleActive(role) {
                          if (!this.takmirRole) return false;
@@ -501,16 +799,24 @@
                              list.push(item);
                          }
                          this.masyarakatText = list.join(', ');
+                         this.$dispatch('change');
                      },
                      hasMasyarakat(item) {
                          return this.masyarakatText && this.masyarakatText.includes(item);
                      }
-                 }">
+                 }"
+                 @tab4-restore.window="if ($event.detail) {
+                     if ($event.detail.isTakmir !== undefined) isTakmir = $event.detail.isTakmir;
+                     if ($event.detail.takmirRole !== undefined) takmirRole = $event.detail.takmirRole;
+                     if ($event.detail.masjidText !== undefined) masjidText = $event.detail.masjidText;
+                     if ($event.detail.masyarakatText !== undefined) masyarakatText = $event.detail.masyarakatText;
+                 }"
+                 @tab4-clear.window="isTakmir = 'Tidak'; takmirRole = ''; masjidText = ''; masyarakatText = '';">
                 
                 {{-- Banner Ramah Informasi --}}
                 <div class="p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex items-start gap-3 text-sky-950">
                     <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-base">
-                        🕌
+                        <span aria-hidden="true">🕌</span>
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
@@ -577,7 +883,7 @@
                             <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir" class="sr-only">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
                                 :class="isTakmir === 'Tidak' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
-                                👤
+                                <span aria-hidden="true">👤</span>
                             </div>
                             <div>
                                 <span class="text-xs sm:text-sm font-bold block leading-tight">Bukan Takmir</span>
@@ -590,7 +896,7 @@
                             <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir" class="sr-only">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
                                 :class="isTakmir === 'Ya' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
-                                🕌
+                                <span aria-hidden="true">🕌</span>
                             </div>
                             <div>
                                 <span class="text-xs sm:text-sm font-bold block leading-tight">Ya, Pengurus</span>
@@ -605,7 +911,7 @@
                             <label class="text-xs font-bold text-slate-800">
                                 Pilih Jabatan / Amanah di Takmir:
                             </label>
-                            <span class="text-[10px] font-medium text-slate-400">Pilih salah satu</span>
+                            <span class="text-xs font-medium text-slate-400">Pilih salah satu</span>
                         </div>
                         
                         {{-- Structured 2-Column Grid (4 rows x 2 cols) --}}
@@ -689,18 +995,445 @@
                 {{-- Action Buttons --}}
                 <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <button type="button" @click="goTo('org')"
-                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
+                        class="h-10 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
-                    <button type="submit"
-                        class="h-11 px-6 sm:px-8 bg-[#f8bb00] hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm rounded-full border border-amber-400 shadow-md transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
-                        <span>Kirim Pendaftaran</span>
-                        <span>&rarr;</span>
+                    <button type="submit" :disabled="isSubmitting"
+                        class="h-10 px-5 sm:px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <template x-if="isSubmitting">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                <span>Mengirim Pendaftaran...</span>
+                            </span>
+                        </template>
+                        <template x-if="!isSubmitting">
+                            <span class="flex items-center gap-1.5">
+                                <span>Kirim Pendaftaran</span>
+                                <span>&rarr;</span>
+                            </span>
+                        </template>
                     </button>
                 </div>
             </div>
         </form>
+        @endif
+
+        {{-- Unified Bottom Nav & Institutional Footer (Mobile-First) --}}
+        <div class="mt-6 rounded-xl bg-white border border-slate-200/90 shadow-2xs p-4 sm:p-5 space-y-3.5">
+            <div class="flex items-center justify-between gap-3">
+                <div class="text-left">
+                    <p class="text-xs font-semibold text-slate-800 leading-tight">Sudah memiliki akun kader?</p>
+                    <p class="text-xs text-slate-500 font-normal mt-0.5">Masuk untuk melihat status atau profil.</p>
+                </div>
+                <a href="{{ route('login') }}" class="px-3.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 border border-sky-200/80 text-xs font-semibold transition whitespace-nowrap shadow-2xs flex items-center gap-1.5 shrink-0">
+                    <span>Masuk Portal</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-400">
+                <a href="/" class="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 transition font-normal">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span>Beranda Utama</span>
+                </a>
+
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>MPKSDI Karanganyar</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function registrationForm() {
+    return {
+        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_sd', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'keaktifan_muhammadiyah', 'keaktifan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
+        showPass: false,
+        showConfirmPass: false,
+        isSubmitting: false,
+        clientErrors: {},
+        stepErrorBanner: null,
+
+        // Form persistence state
+        draftKey: 'mpksdi_register_draft_v1',
+        draftRestored: false,
+        hasSavedDraft: false,
+        lastSavedText: null,
+        isRestoring: false,
+
+        init() {
+            @if(session('success'))
+                this.clearDraft(false);
+                return;
+            @endif
+
+            try {
+                const raw = localStorage.getItem(this.draftKey);
+                if (raw) {
+                    const draft = JSON.parse(raw);
+                    if (draft && typeof draft === 'object') {
+                        this.hasSavedDraft = true;
+                    }
+                }
+            } catch (e) {}
+
+            @if(!$errors->any())
+                this.$nextTick(() => {
+                    this.restoreDraft();
+                });
+            @endif
+        },
+
+        clearError(field) {
+            if (this.clientErrors && this.clientErrors[field]) {
+                delete this.clientErrors[field];
+            }
+            if (this.clientErrors && Object.keys(this.clientErrors).length === 0) {
+                this.stepErrorBanner = null;
+            }
+        },
+
+        goTo(newTab, validateCurrent = true) {
+            if (validateCurrent && this.tab === 'diri' && newTab !== 'diri') {
+                if (!this.validateStepDiri()) {
+                    return;
+                }
+            }
+            this.tab = newTab;
+            this.stepErrorBanner = null;
+            this.saveDraft();
+            window.scrollTo({ top: 120, behavior: 'smooth' });
+        },
+
+        serializeFormData(form) {
+            const data = {};
+            const elements = form.querySelectorAll('input, select, textarea');
+            elements.forEach(el => {
+                const name = el.name;
+                if (!name) return;
+                // SECURITY: Never save password fields or CSRF token in browser storage!
+                if (name === 'password' || name === 'password_confirmation' || name === '_token') return;
+                if (el.type === 'file') return;
+
+                if (el.type === 'checkbox') {
+                    if (name.endsWith('[]')) {
+                        if (!data[name]) data[name] = [];
+                        if (el.checked) {
+                            data[name].push(el.value);
+                        }
+                    } else {
+                        data[name] = el.checked;
+                    }
+                } else if (el.type === 'radio') {
+                    if (el.checked) {
+                        data[name] = el.value;
+                    }
+                } else {
+                    data[name] = el.value;
+                }
+            });
+
+            data._active_tab = this.tab;
+
+            const pasfotoImg = form.querySelector('img[alt="Preview Pasfoto"]');
+            if (pasfotoImg && pasfotoImg.src && pasfotoImg.src.startsWith('data:image')) {
+                data._pasfoto_data_url = pasfotoImg.src;
+            }
+
+            return data;
+        },
+
+        saveDraft() {
+            if (this.isRestoring) return;
+            const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+            if (!form) return;
+
+            try {
+                const draft = this.serializeFormData(form);
+                const hasContent = Object.keys(draft).some(k => {
+                    if (k.startsWith('_')) return false;
+                    const val = draft[k];
+                    if (Array.isArray(val)) return val.length > 0;
+                    return val !== '' && val !== null && val !== undefined;
+                });
+
+                if (!hasContent && !draft._pasfoto_data_url) {
+                    return;
+                }
+
+                draft._saved_at = Date.now();
+                localStorage.setItem(this.draftKey, JSON.stringify(draft));
+                this.hasSavedDraft = true;
+                this.lastSavedText = 'Draf tersimpan';
+            } catch (e) {
+                // Storage quota fallback: try saving without pasfoto data URL
+                try {
+                    const draft = this.serializeFormData(form);
+                    delete draft._pasfoto_data_url;
+                    draft._saved_at = Date.now();
+                    localStorage.setItem(this.draftKey, JSON.stringify(draft));
+                    this.hasSavedDraft = true;
+                    this.lastSavedText = 'Draf teks tersimpan';
+                } catch (innerErr) {
+                    console.warn('localStorage save failed:', innerErr);
+                }
+            }
+        },
+
+        restoreDraft() {
+            try {
+                const raw = localStorage.getItem(this.draftKey);
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                if (!draft || typeof draft !== 'object') return;
+
+                const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+                if (!form) return;
+
+                this.isRestoring = true;
+                let hasRestoredAny = false;
+
+                Object.keys(draft).forEach(key => {
+                    if (key.startsWith('_')) return;
+
+                    if (key.endsWith('[]')) {
+                        const values = Array.isArray(draft[key]) ? draft[key] : [];
+                        const checkboxes = form.querySelectorAll(`input[name="${key}"]`);
+                        if (checkboxes.length > 0) {
+                            checkboxes.forEach(cb => {
+                                if (values.includes(cb.value)) {
+                                    cb.checked = true;
+                                    hasRestoredAny = true;
+                                } else {
+                                    cb.checked = false;
+                                }
+                            });
+                        }
+                    } else {
+                        const el = form.querySelector(`[name="${key}"]`);
+                        if (!el) return;
+
+                        if (el.type === 'radio') {
+                            const radios = form.querySelectorAll(`input[name="${key}"]`);
+                            radios.forEach(r => {
+                                if (r.value === draft[key]) {
+                                    r.checked = true;
+                                    r.dispatchEvent(new Event('change', { bubbles: true }));
+                                    hasRestoredAny = true;
+                                }
+                            });
+                        } else if (el.type === 'checkbox') {
+                            el.checked = !!draft[key];
+                            hasRestoredAny = true;
+                        } else {
+                            if (draft[key] !== undefined && draft[key] !== null) {
+                                el.value = draft[key];
+                                el.dispatchEvent(new Event('input', { bubbles: true }));
+                                el.dispatchEvent(new Event('change', { bubbles: true }));
+                                if (draft[key] !== '') {
+                                    hasRestoredAny = true;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Restore Tab 4 specific reactive state
+                window.dispatchEvent(new CustomEvent('tab4-restore', {
+                    detail: {
+                        isTakmir: draft.keaktifan_takmir || 'Tidak',
+                        takmirRole: draft.jabatan_takmir || '',
+                        masjidText: draft.aktifitas_jamaah_masjid || '',
+                        masyarakatText: draft.keaktifan_kemasyarakatan || ''
+                    }
+                }));
+
+                // Restore pasfoto if present
+                if (draft._pasfoto_data_url) {
+                    window.dispatchEvent(new CustomEvent('pasfoto-restore', {
+                        detail: {
+                            inputId: 'foto-register-input',
+                            dataUrl: draft._pasfoto_data_url
+                        }
+                    }));
+                    hasRestoredAny = true;
+                }
+
+                // Restore active tab
+                if (draft._active_tab && ['diri', 'agama', 'org', 'kemasyarakatan'].includes(draft._active_tab)) {
+                    this.tab = draft._active_tab;
+                }
+
+                this.isRestoring = false;
+
+                if (hasRestoredAny) {
+                    this.draftRestored = true;
+                    this.hasSavedDraft = true;
+                    this.lastSavedText = 'Draf dipulihkan';
+                }
+            } catch (e) {
+                this.isRestoring = false;
+                console.warn('Gagal memulihkan draf formulir:', e);
+            }
+        },
+
+        clearDraft(confirmPrompt = true) {
+            if (confirmPrompt) {
+                if (!confirm('Apakah Anda yakin ingin menghapus draf dan mengosongkan seluruh formulir pendaftaran?')) {
+                    return;
+                }
+            }
+
+            try {
+                localStorage.removeItem(this.draftKey);
+            } catch (e) {}
+
+            const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+            if (form) {
+                form.reset();
+            }
+
+            this.tab = 'diri';
+            this.draftRestored = false;
+            this.hasSavedDraft = false;
+            this.lastSavedText = null;
+            this.clientErrors = {};
+            this.stepErrorBanner = null;
+
+            window.dispatchEvent(new CustomEvent('tab4-clear'));
+            window.dispatchEvent(new CustomEvent('pasfoto-clear', {
+                detail: { inputId: 'foto-register-input' }
+            }));
+
+            window.scrollTo({ top: 120, behavior: 'smooth' });
+        },
+
+        validateStepDiri() {
+            this.clientErrors = {};
+            const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+            if (!form) return true;
+
+            const getVal = (name) => {
+                const el = form.querySelector(`[name="${name}"]`);
+                return el ? el.value.trim() : '';
+            };
+
+            if (!getVal('nama_lengkap')) {
+                this.clientErrors.nama_lengkap = 'Nama lengkap beserta gelar wajib diisi.';
+            }
+
+            const nik = getVal('nik');
+            if (!nik) {
+                this.clientErrors.nik = 'NIK KTP wajib diisi.';
+            } else if (!/^\d{16}$/.test(nik)) {
+                this.clientErrors.nik = 'NIK KTP harus tepat 16 digit angka.';
+            }
+
+            if (!getVal('jenis_kelamin')) {
+                this.clientErrors.jenis_kelamin = 'Silakan pilih jenis kelamin.';
+            }
+
+            if (!getVal('tempat_lahir')) {
+                this.clientErrors.tempat_lahir = 'Tempat lahir wajib diisi.';
+            }
+
+            if (!getVal('tanggal_lahir')) {
+                this.clientErrors.tanggal_lahir = 'Tanggal lahir wajib diisi.';
+            }
+
+            if (!getVal('status_pernikahan')) {
+                this.clientErrors.status_pernikahan = 'Silakan pilih status pernikahan.';
+            }
+
+            if (!getVal('alamat_rumah')) {
+                this.clientErrors.alamat_rumah = 'Alamat lengkap rumah wajib diisi.';
+            }
+
+            if (!getVal('desa_kelurahan')) {
+                this.clientErrors.desa_kelurahan = 'Desa / Kelurahan wajib diisi.';
+            }
+
+            if (!getVal('kecamatan')) {
+                this.clientErrors.kecamatan = 'Kecamatan (Cabang) wajib diisi.';
+            }
+
+            if (!getVal('kabupaten')) {
+                this.clientErrors.kabupaten = 'Kabupaten wajib diisi.';
+            }
+
+            const rawWa = getVal('no_wa');
+            const noWa = rawWa.replace(/[\s\-\.]/g, '');
+            if (!noWa) {
+                this.clientErrors.no_wa = 'Nomor WhatsApp aktif wajib diisi.';
+            } else if (!/^(0|62|\+62)8[0-9]{6,13}$/.test(noWa)) {
+                this.clientErrors.no_wa = 'Format nomor WhatsApp tidak valid (contoh: 081234567890).';
+            }
+
+            const fotoInput = form.querySelector('input[name="foto"]');
+            if (!fotoInput || !fotoInput.files || fotoInput.files.length === 0) {
+                this.clientErrors.foto = 'Pasfoto 3:4 wajib diunggah untuk kelengkapan administrasi.';
+            }
+
+            const pass = getVal('password');
+            const confirmPass = getVal('password_confirmation');
+            if (!pass) {
+                this.clientErrors.password = 'Kata sandi akun wajib diisi.';
+            } else if (pass.length < 8) {
+                this.clientErrors.password = 'Kata sandi minimal 8 karakter.';
+            }
+
+            if (!confirmPass) {
+                this.clientErrors.password_confirmation = 'Konfirmasi kata sandi wajib diisi.';
+            } else if (pass !== confirmPass) {
+                this.clientErrors.password_confirmation = 'Konfirmasi kata sandi tidak cocok dengan kata sandi di atas.';
+            }
+
+            const errorKeys = Object.keys(this.clientErrors);
+            if (errorKeys.length > 0) {
+                this.stepErrorBanner = 'Mohon lengkapi isian wajib pada Data Identitas sebelum melanjutkan.';
+                this.$nextTick(() => {
+                    const firstErrKey = errorKeys[0];
+                    const firstEl = form.querySelector(`[name="${firstErrKey}"]`);
+                    if (firstEl) {
+                        firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstEl.focus();
+                    } else {
+                        window.scrollTo({ top: 120, behavior: 'smooth' });
+                    }
+                });
+                return false;
+            }
+
+            return true;
+        },
+
+        submitForm(e) {
+            if (this.isSubmitting) return;
+
+            const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+
+            if (!this.validateStepDiri()) {
+                this.tab = 'diri';
+                this.stepErrorBanner = 'Pendaftaran belum dapat dikirim. Mohon lengkapi seluruh isian wajib pada Data Identitas.';
+                window.scrollTo({ top: 120, behavior: 'smooth' });
+                return;
+            }
+
+            this.isSubmitting = true;
+            if (form) {
+                form.submit();
+            } else {
+                this.$el.submit();
+            }
+        }
+    };
+}
+</script>
 @endsection

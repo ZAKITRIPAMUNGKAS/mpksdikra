@@ -125,5 +125,21 @@ class AbsensiTest extends TestCase
 
         $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first();
         $this->assertSame('75.00', $p->nilai_kehadiran);
+        $this->assertSame('Lulus Bersyarat', $p->status_kelulusan);
+    }
+
+    public function test_full_attendance_yields_lulus_status_on_scan(): void
+    {
+        [$admin, $event, $anggota, $ep] = $this->setupEvent(2);
+        $qr = app(QrService::class)->payload($ep);
+
+        foreach ($event->sesi()->get() as $sesi) {
+            $this->actingAs($admin)->postJson(route('admin.events.absensi.process', $event), ['qr_code' => $qr, 'sesi_id' => $sesi->id])->assertOk();
+        }
+
+        // Tanpa membuka halaman ranking, status_kelulusan harus sudah ikut ter-update
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first();
+        $this->assertSame('100.00', $p->nilai_kehadiran);
+        $this->assertSame('Lulus', $p->status_kelulusan);
     }
 }

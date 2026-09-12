@@ -32,6 +32,8 @@ class PesertaController extends Controller
             ->limit(50)
             ->get();
 
+        $event->loadCount('pesertaAktif');
+
         return view('admin.events.enroll', compact('event', 'kandidat', 'query'));
     }
 

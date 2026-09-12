@@ -36,7 +36,7 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (79 test hijau per 2026-09-12).
+- `php artisan test` — PHPUnit feature tests (92 test hijau per 2026-09-12).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
@@ -62,6 +62,49 @@ Pola berguna dari referensi:
   5. Penolakan Verifikasi: Status 'ditolak' dengan catatan perbaikan yang muncul informatif saat kader mencoba login.
   6. Manajemen Staf: CRUD akun internal (Admin, Fasilitator, Executive) di panel admin dengan fitur toggle aktif/nonaktif.
   7. Pencarian Kader: Fitur cari berdasarkan nama, NIK, nbm, dan kecamatan di index admin anggota.
+- 2026-09-12: Migrasi Layout Dashboard dari horizontal navbar ke Collapsible Sidebar Navigation:
+  1. Sidebar Terintegrasi: Header sidebar menyatukan Logo Muhammadiyah dan Logo MPKSDI dalam satu lockup terpadu, navigasi bertingkat dengan ikon & badge role.
+  2. Fleksibilitas Desktop: Fitur collapse/expand lebar sidebar dengan penyimpanan state di localStorage.
+  3. Mobile-First: Off-canvas drawer navigasi dengan backdrop blur dan transisi halus Alpine.js.
+  4. Top Bar Ringkas: Breadcrumbs workstation, tanggal hari ini, avatar pengguna, dan tombol toggle.
+- 2026-09-12: Eliminasi Elemen "AI Slop" & Transformasi ke Desain Institusional Autentik:
+  1. Header Bar: Menghapus badge pills berlebih ('Admin Workstation', 'Pusat Operasional', 'Sistem Siap') dan sub-bar sekunder yang membuang ruang vertikal; menggantinya dengan breadcrumbs bersih ('MPKSDI PDM Karanganyar / Panel Administrasi') serta profil pengguna yang proporsional.
+  2. Sidebar: Menghilangkan garis gradien pelangi, menghapus widget role badge kapital di tengah navigasi, menyeragamkan item navigasi dengan border radius 'rounded-lg' dan kontras teks yang tajam, serta menetapkan background Midnight Navy (#001f30) yang solid.
+  3. Dashboard Admin: Mengganti banner gelembung raksasa ('rounded-3xl') menjadi header halaman administratif yang ringkas; mengganti 4 kartu metrik bergaya template SaaS dengan kartu metrik 'rounded-xl' yang tenang, terstruktur, dan memiliki hirarki tipografi tegas; menghapus efek 'card-lift-sm' dan 'card-sheen' agar tidak memantul-mantul saat disentuh kursor; menyajikan antrean verifikasi dan agenda perkaderan dengan tombol aksi cepat (Peringkat, Excel, PDF) yang fungsional.
+  4. Fixed Sidebar Layout: Menetapkan sidebar desktop sebagai elemen fixed viewport (`fixed inset-y-0 left-0 h-screen z-40`) dengan area menu yang scrollable mandiri (`overflow-y-auto`), dipadukan dengan offset dinamis konten utama (`lg:pl-64` saat expand, `lg:pl-20` saat collapsed) sehingga sidebar tetap terkunci di posisinya saat halaman panjang digulir.
+  5. Desain Linear Minimalist & Ergonomi Responsif:
+     - Merombak sidebar menjadi gaya terang bersih (*soft light minimal* `bg-white border-r border-slate-200/90`) yang menyatu dengan kanvas konten utama tanpa kontras gelap-terang yang melelahkan mata.
+     - Memperbaiki lockup logo Muhammadiyah & MPKSDI agar berpadu alami tanpa kotak putih artifisial.
+     - Menghadirkan *Actionable Operational Ribbon* di dashboard atas jika terdapat pendaftar pending untuk alur kerja cepat admin.
+     - Menyesuaikan responsivitas kartu agenda event di mobile (`sm:flex-row`, tombol aksi fleksibel tanpa *overflow/squishing*).
+     - Menghapus sisa-sisa efek mengambang `card-lift-sm` dan container `rounded-2xl` pada pesan alert.
+  6. Integrasi Pola Latar Belakang Subtle, Pusat Pembaruan & Panduan Sistem:
+     - Menghadirkan utility class `.bg-grid-subtle` dan aksen watermark sinar surya Muhammadiyah untuk memberi tekstur estetis berkelas pada kanvas kerja.
+     - Merilis halaman Pusat Informasi & Pembaruan Sistem (`/updates`) dengan riwayat rilis terstruktur (v1.0 s.d. v2.2) dan roadmap pengembangan.
+     - Merilis halaman Panduan & Tutorial Sistem (`/panduan`) interaktif multi-peran (Admin, Kader, Fasilitator, Executive) dengan Accordion FAQ teknis.
+     - Menambahkan rute dan grup menu sidebar terpadu "Bantuan & Panduan" serta tautan cepat di dashboard dan footer.
+     - Seluruh 92 unit & feature tests lulus 100% (green), Vite build terkompilasi sukses.
+  7. Penyeragaman Tipografi & Skala Visual Sidebar (Menu Utama, Bantuan & Panduan, Akses Publik):
+     - Mengatasi inkonsistensi ukuran tulisan ("besar kecilnya beda") dengan membungkus seluruh navigasi dalam `<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-4 text-xs font-semibold">`.
+     - Menyeragamkan seluruh tautan anchor (`<a>`) di ketiga grup menu ke `text-xs font-semibold`, padding `px-3 py-2.5`, dan dimensi ikon SVG seragam `w-5 h-5 shrink-0`.
+     - Mengeliminasi disparitas visual di mana tautan Bantuan & Panduan sebelumnya berada di luar `<nav>` tanpa deklarasi font, sehingga mewarisi ukuran browser reguler (16px), serta Akses Publik yang menggunakan font-normal tipis dan padding tidak seragam.
+     - 92/92 tests tetap 100% lulus dan Vite production build berhasil.
+  8. Optimalisasi Maksimal Antarmuka Sistem (Executive 2-Column Workstation & Ergonomi Form):
+     - Merombak halaman Enroll Peserta Kegiatan (`admin.events.enroll`) dari kartu sempit `max-w-2xl` menjadi Executive 2-Column Workstation: kolom kiri untuk daftar kandidat kader (pencarian, select-all cerdas via Alpine.js, live counter terpilih, kartu kader ergonomis beravatar inisial) dan kolom kanan sticky untuk widget kapasitas kuota event terisi, peringatan overflow kuota, serta tombol aksi dinamis.
+     - Menata ulang formulir Buat/Edit Event (`admin/events/form.blade.php`) dan Tambah Staf (`admin/users/create.blade.php`) menjadi layout 2-kolom dengan panel pendamping panduan (status event, tag sertifikat dinamis, dan matriks wewenang peran).
+     - Menghapus batasan artifisial `max-w-3xl` dan `max-w-4xl` pada modul Afektif, Angket, Keaktifan, RTL, dan Profil Anggota agar memanfaatkan kanvas kerja secara penuh dan seimbang di layar desktop/widescreen.
+     - Membersihkan seluruh sisa kelas warna non-standar `mpksdi-` di profil kader dan detail RTL ke standar resmi `#005c8a` dan `sky-500`.
+     - Seluruh 92 automated tests lulus 100%, Pint lolos, dan Vite production build sukses.
+  9. Perbaikan Alur Pendaftaran Anggota Mandiri & Validasi Multi-Step Cerdas (/daftar):
+     - Menyelesaikan akar masalah "gak bisa kirim pendaftaran": tombol submit di Tab 4 sebelumnya digugurkan secara diam-diam oleh browser (*silent abort*) karena terdapat 14 kolom `required` di Tab 1 yang berstatus tersembunyi (`display: none`).
+     - Menambahkan atribut `novalidate` pada form pendaftaran dan menggantikannya dengan sistem validasi per langkah (*step-by-step validation*) interaktif via Alpine.js `registrationForm()`.
+     - Mencegah pengguna melangkah ke Tab 2/3/4 jika isian wajib di Tab 1 belum lengkap, serta otomatis mengarahkan kursor dan menggulir (*auto-focus & smooth scroll*) ke kolom pertama yang bermasalah.
+     - Menambahkan status loading dan *anti double-submit* pada tombol kirim di Tab 4.
+     - Menambahkan sanitasi otomatis spasi, tanda hubung (`-`), dan titik (`.`) pada nomor WhatsApp di `AnggotaRegistrationRequest::prepareForValidation()`.
+     - Menambahkan aturan `unique:users,email` untuk mencegah kegagalan SQL (1062 Duplicate entry) saat alamat email yang sama dimasukkan.
+     - Memperbaiki penempatan sintaks error `<select>` pada `jenis_kelamin` dan menggunakan `Js::from()` untuk sanitasi variabel string pada Tab 4.
+     - Menambahkan fallback aman pada pasfoto fitter bila `DataTransfer` tidak didukung browser tertentu.
+     - Rangkaian pengujian otomatis bertambah menjadi 94 tests (293 assertions) dan 100% lulus (green).
 - 2026-09-11: Rombak Landing Page & Modernisasi Form sesuai identitas MPKSDI:
   1. Landing Page publik: Fokus awal pada profil resmi MPKSDI PDM Karanganyar, gedung dakwah, dan infografis 4 pilar Baitul Arqam.
   2. Display Sebaran Data: Pemetaan interaktif 17 PCM se-Kabupaten Karanganyar dengan filter zona (Pusat & Barat, Lereng Lawu & Utara, Wilayah Selatan) dan agregat kader riil.
@@ -379,6 +422,214 @@ Pola berguna dari referensi:
          - Menyediakan tombol sekunder ringkas *"Atur Manual (Opsional)"* jika kader ingin memperbesar/menggeser secara khusus, serta tombol *"Foto Asli"*.
       5. **Modal Manual Ultra-Responsif**: Jika dibuka, modal menggunakan kanvas kompak 195 × 260 pixel dengan `shrink-0` header dan footer serta `flex-1 min-h-0` body, dijamin 100% pas dan tidak pernah meluap di semua ukuran layar smartphone.
     - Seluruh 79 feature tests lulus 100% (241 assertions), Pint passed, Vite build sukses.
+- 2026-09-12: Penyempurnaan Auto-Crop Pasfoto Formal Setengah Badan (Half-Body 3:4) & Anti-Noise Pagar Bambu:
+    - Masalah: Pada foto pengguna yang diambil di luar ruangan (misal di depan pagar bambu/gedek dengan latar coklat kayu dan orang di samping), rumus warna kulit YCbCr lama menganggap pagar bambu sebagai "kulit" raksasa sehingga dimensi wajah membengkak (mencapai 60%+ lebar foto). Akibatnya, sistem menghitung `desiredH` melampaui tinggi foto dan membatalkan zoom (menampilkan 100% foto utuh dari kepala sampai tangan memegang kotak makanan, serta orang di samping).
+    - Solusi & Algoritma Baru:
+      1. **Filter Kulit Ketat & Anti-Bambu**: Menambahkan syarat saturasi hemoglobin `(r - b) >= 24` dan `(r - g) >= 12` yang membedakan kulit manusia dengan warna tan/kuning kayu pagar bambu.
+      2. **Multi-Scale Candidate Face Window Scanning**: Pemindaian kandidat oval wajah berukuran realistis (12% s/d 30% lebar kanvas) dengan pembobotan kepadatan kulit, kontras fitur mata (area mata lebih gelap dari pipi), kontras siluet luar (perbedaan tajam antara kulit wajah dengan jilbab/busana hijau tua di sekelilingnya), dan pembobotan letak sentral subjek.
+      3. **Framing Standar Pasfoto Setengah Badan (Half-Body Bust Framing)**:
+         - Menetapkan rasio standar pasfoto setengah badan: kepala & jilbab menempati ~38% - 42% tinggi frame, ruang atas kepala (headroom) ~10%, dan sisa 50% di bawah adalah bahu & dada (setengah badan).
+         - `cropH = Math.min(origH * 0.58, Math.max(origH * 0.28, faceHeight * 3.7))`.
+         - Menjamin tangan memegang barang di bawah, orang di samping, serta pagar bambu di tepi kiri/kanan otomatis terpotong (*cropped out*).
+         - Fallback cerdas jika wajah tidak terisolasi: otomatis mengambil 48% bagian atas terpusat (setengah badan), tidak pernah menyisakan 100% full-body.
+      4. **Pembaruan Label UI**: Badge *"✓ Pasfoto 3:4 Setengah Badan Pas"* dan panduan teks yang menegaskan pasfoto setengah badan seimbang untuk ID Card & Sertifikat.
+    - Seluruh 79 feature tests lulus 100% (241 assertions), Pint lolos, Vite build berhasil.
+- 2026-09-12: Redesain Ergonomis Navigasi Halaman Registrasi Anggota (`anggota/register.blade.php`):
+    - Masalah: Terdapat tombol oval putih raksasa bertuliskan "← Kembali ke Beranda" yang membentang 100% lebar layar pada tampilan mobile, bertumpuk di atas teks "Sudah memiliki akun? Masuk Portal". Hal ini membuat bagian atas halaman terasa penuh, canggung (*clumsy*), dan mendesak formulir utama ke bawah.
+    - Solusi & Perbaikan:
+      1. **Sleek Single-Line Mini Navbar**: Mengganti tombol blok raksasa dengan satu baris navigasi minimalis (`flex items-center justify-between`) yang tidak pernah membengkak/menumpuk pada layar smartphone.
+      2. **Tautan Ringkas & Responsif**: Sisi kiri berupa tautan panah halus `← Beranda` dan sisi kanan berupa akses cepat `Masuk Portal →`.
+      3. **Bottom Helper Navigation**: Menambahkan penunjuk navigasi cadangan di bagian bawah formulir (setelah tombol submit) untuk kader yang sudah selesai membaca/mengisi form.
+      4. Diselaraskan juga pada tautan kembali di `resources/views/auth/cek-status.blade.php`.
+    - Seluruh 79 feature tests lulus 100% (241 assertions), Pint lolos, Vite production build sukses.
+- 2026-09-12: Optimasi Presisi Mobile-First Footer & Navigasi Formulir Registrasi (`anggota/register.blade.php`):
+    - Masalah: Tampilan footer pada layar ponsel (handphone 360-390px) sempat terlalu tinggi, bertumpuk memanjang (kartu emoji kunci besar diikuti footer teks panjang berlipat-lipat), sehingga terlihat kurang rapi dan memakan ruang gulir.
+    - Solusi & Perbaikan:
+      1. **Unified Compact Bottom Card**: Menggabungkan bantuan akun dan identitas footer ke dalam satu wadah kartu putih ramping terpadu (`rounded-2xl bg-white border border-slate-200/80 shadow-2xs p-4`).
+      2. **Baris 1 (Aksi Akun)**: Menampilkan prompt *"Sudah memiliki akun kader?"* di kiri dan tombol pill kompak *"Masuk Portal →"* di kanan.
+      3. **Baris 2 (Navigasi & Identitas)**: Dipisahkan garis tipis `border-t border-slate-100 pt-3`, memuat tautan *"← Beranda Utama"* di kiri dan status *"● MPKSDI Karanganyar"* di kanan dalam 1 baris pas tanpa ada teks yang terpotong atau membengkak.
+      4. **Top Nav Mobile**: Penyelarasan bar atas menjadi tombol kapsul lembut *"Masuk Portal →"* yang seimbang di samping tautan *"← Beranda"*.
+    - Seluruh 79 feature tests lulus 100% (241 assertions), Pint lolos, Vite production build sukses.
+- 2026-09-12: Peningkatan Aksesibilitas (Screen Reader & Keyboard) & Menghapus Rating Palsu di Landing, Halaman Form, dan Portal yang Diautentikasi:
+    - Masalah: Situs sangat berat grafis (banyak emoji sebagai ikon, elemen `cursor-pointer` tanpa aksi, animasi reveal yang berulang) dan minim aksesibilitas (tanpa focus-visible, modal tanpa role/Esc, rating bintang palsu di kartu program meski tidak ada fitur rating, teks 8–10px terlalu kecil untuk audiens usia 40+).
+    - Solusi & Perbaikan:
+      1. **Focus Ring Global**: Blok `:where(...):focus-visible` ber-garis outline `#0284c7` di `resources/css/app.css`.
+      2. **Hapus Affordance Palsu**: Menghapus `cursor-pointer`/`card-sheen` dari elemen non-aksi di `landing/index.blade.php` (badge hero, tile kategori, kartu ketua, stepper). Tile "17 Cabang" diubah menjadi `<a href="#sebaran">`.
+      3. **Rating Palsu → Stat Asli**: Empat kartu program menukar garis bintang + "4.9/5.0" dengan ikon users SVG + jumlah asli dari LandingController (`number_format($totalKader/Aktif/Event/Lulus)`), pill durasi JP dipertahankan.
+      4. **Modal Dialog A11y**: Modal lupa sandi (`auth/login.blade.php`) dan modal atur manual pasfoto (`components/pasfoto-fitter.blade.php`) memperoleh `role="dialog"`, `aria-modal`, `aria-labelledby`, dan `@keydown.escape.window` untuk menutup.
+      5. **Semantik & Menandai**: `aria-current="page"` di link nav aktif (desktop+mobile) `layouts/app.blade.php`; hamburger `aria-expanded`/`aria-label` (app + landing); link skip-to-content + `id="main-content"` di `layouts/app.blade.php` dan landing; hapus `focus:outline-none` dari hamburger app.
+      6. **Emoji → aria-hidden**: Emoji dekoratif di modal login (🔑💬🔍), catatan landing (💡), register (🕌👤), dan tip pasfoto (👆) dibungkus/dihapus agar tidak dibaca screen reader.
+      7. **SVG Dekoratif aria-hidden**: Watermark & ilustrasi header empat kartu program landing.
+      8. **Sweep Teks Mikro**: `text-[8/9/9.5/10px]` → `text-xs` di landing, login, register, app, cek-status, pasfoto-fitter. Counter dekoratif "01–04" dibiarkan.
+      9. **Error Per-Field + Autocomplete**: 18 field register yang tervalidasi server memperoleh border merah/`aria-invalid`/pesan bawah (pola `@error` yang sama di tab 2/3); autocomplete `name/tel/email/bday/sex/street-address/address-level1-3/new-password`, `nik` → `off`.
+      10. **Performa Gambar**: Hero gedung `fetchpriority="high" decoding="async"` (kandidat LCP); portrait ketua `loading="lazy" decoding="async"`.
+      11. **Scroll-Spy + Reveal Satu-Kali**: `resources/js/app.js` scroll-spy nav desktop (IntersectionObserver `-30%/-60%`) dan satu-kali `revealObserver.unobserve` (tidak re-arm).
+    - Verifikasi: `npm run build` sukses; `php artisan view:cache` semua Blade ter-compile bersih.
+    - Catatan: Field nullable tab 2/3 (pendidikan, baca-quran) tanpa border per-field — ringkasan error atas menanganinya. Emoji di `admin/anggota/show.blade.php` dan `portal/profile.blade.php` di luar scope; hero jpg 582KB layak dikompres ke WebP terpisah.
+- 2026-09-12: Redesain Dashboard Admin MPKSDI Menampilkan Visual Grafik di Awal:
+    - Masalah: Dashboard admin sebelumnya langsung menyajikan kotak metrik angka statis ("Total Kader 0", "Menunggu Verifikasi 0") tanpa representasi analitik visual atau tren pertumbuhan perkaderan.
+    - Solusi & Arsitektur Baru:
+      1. **Controller Dedicated (`App\Http\Controllers\Admin\DashboardController`)**:
+         - Menghitung metrik tren pendaftaran kader per bulan (6 bulan terakhir) menggunakan data `created_at` Anggota.
+         - Menghitung proporsi status akun kader (aktif, menunggu verifikasi, ditolak, nonaktif).
+         - Mengambil data kegiatan Baitul Arqam terkini dan antrean verifikasi pendaftar baru.
+      2. **Integrasi Chart.js Engine**:
+         - Menginstal `chart.js` via npm dan mengeksposnya ke `window.Chart` pada `resources/js/app.js`.
+         - Dijalankan secara reaktif melalui Alpine.js (`growthChartData` dan `statusChartData`) dengan deteksi canvas context.
+      3. **Visualisasi Grafik di Atas (First-Fold Visual Analytics)**:
+         - **Grafik Tren Pendaftaran Kader Baru**: Smooth Area Line Chart bergradasi biru MPKSDI (`#005c8a`) dengan kurva halus (`tension: 0.38`), titik hover interaktif, tooltip gelap bernilai kader riil, dan kartu ringkasan di bawahnya.
+         - **Grafik Distribusi Status Pendaftaran**: Donut Chart 72% cutout yang menampilkan komposisi akun terverifikasi (sky), pending (amber), ditolak (rose), dan nonaktif (slate). Dilengkapi fallback visual bila data masih kosong.
+      4. **Tata Letak Dashboard Modern & Komprehensif**:
+         - Header Pusat Kendali MPKSDI dengan tombol cepat *"Buat Event BA Baru"*.
+         - First Section: Visual Charts Grid (Line Chart 8 kolom + Donut Chart 4 kolom).
+         - Second Section: 4 KPI Cards (Total Kader, Menunggu Verifikasi, Event Aktif, Total Terlaksana).
+         - Third Section: 2 Panel Operasional (Kegiatan Baitul Arqam Terkini + Kader Menunggu Verifikasi dengan tombol langsung *"Periksa"*).
+         - Fourth Section: Quick Action Cards (Verifikasi & Pangkalan Data Kader + Manajemen Baitul Arqam).
+    - Seluruh 79 feature tests lulus 100% (241 assertions), Pint lolos, Vite production build sukses.
 
-
+- 2026-09-12: Perbaikan Flow Sistem (Notifikasi WA, Keamanan Tes, Status Kelulusan, Sertifikat, Rate Limit) & Refactor Otorisasi EventPolicy:
+    - Masalah: Audit flow menemukan 5 celah fungsional + 1 utang arsitektur: (a) `pesanVerifikasiSukses`/`pesanPerbaikanDitolak` di `WhatsAppNotificationService` mati — tidak pernah dipanggil, admin chat manual setelah verify/reject; (b) `TesController::submit()` hanya cek `hasSubmitted`, tanpa cek `sesi_tes.status` maupun deadline server (`waktu_mulai + durasi_menit`) — timer client-side bisa dibypass; (c) `AbsensiService::recalculateAttendance` hanya update `nilai_kehadiran`, `status_kelulusan` cuma dihitung di `NilaiService::hitungNilaiAkhirDanRanking` — scan absensi tanpa buka halaman ranking → status basi; (d) sertifikat admin (`EventOutputController::certificate`) tanpa guard lulus/selesai padahal versi portal punya; (e) `/cek-status` publik tanpa throttle → enumerasi NIK/WA; (f) nol Policy/Gate, `ensureParticipant` diduplikasi byte-identical di 6 portal controller dan error 500 kalau user tanpa relasi anggota.
+    - Solusi & Perbaikan:
+      1. **Notifikasi WA verify/reject**: `Admin\AnggotaController::verify/reject` flash key `wa_url` via helper private `waUrl()` + `WhatsAppNotificationService::makeUrl()` (pola click-to-chat sama dengan `resetPassword`, tanpa HTTP client — cPanel tanpa queue/daemon). Blok `@if(session('wa_url'))` baru di `admin/anggota/show.blade.php` dengan tombol "Kirim Notifikasi ke WhatsApp Kader"; blok `wa_reset_url` lama tidak disentuh.
+      2. **Hardening tes submit**: `Portal\TesController::submit()` cek `SesiTes.status === 'aktif'` (403) + deadline server `PesertaTesMulai.waktu_mulai->addMinutes(durasi_menit)->isPast()` (403). Tes yang belum pernah dibuka (`$mulai` null) tetap boleh submit.
+      3. **Fix status_kelulusan basi**: satu baris di `AbsensiService::recalculateAttendance` — `updateOrCreate` kini ikut menulis `'status_kelulusan' => $this->statusKelulusan($persen)`. Tidak ada rekursi (`statusKelulusan` fungsi murni); jalur `hitungNilaiAkhirDanRanking` L156 idempoten.
+      4. **Guard sertifikat admin**: `Admin\EventOutputController::certificate()` mirror guard portal — `abort_unless($event->status === 'selesai')` + `abort_unless($nilai->status_kelulusan !== 'Tidak Lulus')`, keduanya 403.
+      5. **Rate limit cek-status**: `routes/web.php` POST `/cek-status` diberi `throttle:5,1` (5 request/menit/IP, middleware bawaan, tanpa provider baru).
+      6. **Refactor otorisasi**: `App\Policies\EventPolicy` baru (auto-discovered Laravel 12) dengan method `participate(User, Event): bool` — null-safe (`$user->anggota !== null`), 403 bukan 500. `App\Http\Controllers\Controller` dapat trait `AuthorizesRequests`. 4 controller portal (Afektif, Angket, Rtl, Tes) ganti `ensureParticipant` → `$this->authorize('participate', $event)`, method private dihapus; Kehadiran + Sertifikat (varian `firstOrFail`) dapat `authorize` di depan query agar 403 konsisten. `use EventPeserta` dibuang dari 3 file (TesController masih pakai di `index()`).
+      7. **Tests baru**: `TesSecurityTest` +2 (sesi inaktif → 403; deadline lewat → 403, status enum sesi_tes = `belum_buka|aktif|tutup`); `AdminAnggotaTest` +2 (verify/reject flash `wa_url`); `AbsensiTest` +1 (scan penuh → `status_kelulusan` = 'Lulus' tanpa buka ranking) + assertion status di test 75%; `CekStatusTest` +1 (request ke-6 → 429, `Cache::flush()` dulu); `AdminEventFlowTest` +2 (certificate 403 bila event belum selesai / peserta Tidak Lulus). `PortalEvaluationTest` cert test disesuaikan: `PenilaianAkhir` butuh `nilai_kehadiran => 100` (karena `report` panggil `hitungUlang` yang recompute status dari kehadiran) + event di-update ke `selesai` sebelum unduh sertifikat.
+    - Verifikasi: 87 feature tests lulus 100% (265 assertions), Pint lolos, `view:cache` compile bersih lalu `view:clear`.
+    - Catatan: Notifikasi WA tetap manual-klik (click-to-chat) karena deploy cPanel tanpa queue/daemon — jalur upgrade: tambah method `send()` di `WhatsAppNotificationService` bila ada API gateway WA (Fonnte/Wablas). Policy admin (`manage`) sengaja dilewati — middleware `role:admin` + `event_access` sudah cukup dan teruji.
+    - 2026-09-12: Isolasi Database Pengujian PHPUnit (`phpunit.xml`): Mengaktifkan koneksi `DB_CONNECTION=sqlite` dengan `DB_DATABASE=:memory:` pada `phpunit.xml`. Hal ini mencegah eksekusi test runner (yang menggunakan trait `RefreshDatabase`) menyentuh, mereset, atau mengosongkan tabel `users` pada database MySQL/MariaDB lokal pengembang. Akun admin dipastikan selalu persisten di database MySQL.
+- 2026-09-12: Redesain Navbar Minimalis Landing Page dengan Dropdown Menu (Opsi 1):
+    - Menyederhanakan 8 deretan link menu menjadi 4 item ringkas pada desktop navbar:
+      1. `Beranda` (link langsung).
+      2. `Perkaderan ▾` (dropdown popover Alpine.js: Program BA, Keunggulan Mutu, Alur Peserta).
+      3. `Peta 17 Cabang` (link langsung dengan dot badge).
+      4. `Pusat Informasi ▾` (dropdown popover Alpine.js: Cek Status Pendaftaran, Tanya Jawab FAQ, Kontak & Sekretariat).
+    - Desain dropdown kartu putih melayang (`rounded-2xl border border-slate-100 shadow-xl p-2`) dengan micro-interactions hover, ikon tematik bergradasi warna lembut, subteks deskriptif, dan transisi halus.
+    - Mobile menu diselaraskan menjadi hierarki berkategori dengan penanda visual (`border-l-2 border-sky-100`) agar ramah layar sentuh ponsel.
+    - Mobile Bottom Floating Nav Bar dirapikan: kontainer berbentuk rounded-full kapsul ramping dengan glassmorphism (`bg-white/92 backdrop-blur-xl`), tombol Dashboard/Daftar diselaraskan menjadi soft pill accent (`bg-sky-100/70 text-sky-700`) menggantikan blok gradien biru tebal yang timpang, indikator aktif diperhalus (`bg-sky-50 text-sky-600 rounded-full`), dan tipografi diperkecil proporsional (`text-[10px]`) agar simetris di layar HP.
+    - Hero Section Landing Page dioptimasi untuk Handphone: teks badge atas dicegah wrap ("Pangkalan Data Resmi MPKSDI" di layar kecil), judul dan tombol CTA responsif (`items-stretch sm:items-center`), dua kartu floating info box besar disembunyikan di mobile (`hidden lg:flex`) dan digantikan oleh sebaris micro-chips ringkas di bawah tombol CTA, sehingga hero banner tidak lagi memanjang berlebih dan tidak bertabrakan dengan floating bottom bar.
+    - Seluruh 87 feature & unit tests lulus 100% (265 assertions), Pint lolos, Vite production build sukses.
+- 2026-09-12: Perbaikan Bug Tombol Hamburger Mobile Menu Landing Page:
+    - Masalah: Tombol burger menu pada navbar mobile (`<header>`) tidak merespons klik/ketukan pengguna di smartphone.
+    - Penyebab: (1) SVG path menggunakan `x-show` dan `x-cloak` secara langsung pada elemen `<path>` SVG (`http://www.w3.org/2000/svg`). Di lingkungan peramban mobile touch (WebKit/Blink), manipulasi display/style pada path SVG saat touchstart/pointer event membatalkan event click sintetis dan memicu anomali rendering SVG; (2) Ikon SVG tanpa `pointer-events-none` menelan sentuhan/tap sebelum mencapai tombol induk; (3) Belum adanya event stopping (`@click.stop`) dan penutupan otomatis saat klik di luar area (`@click.outside`) atau tombol escape.
+    - Solusi:
+      1. Tombol hamburger menggunakan binding atribut path dinamis tunggal `:d="mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'"` dengan `pointer-events-none` pada SVG. Menghilangkan ketergantungan `x-show`/`x-cloak` pada elemen SVG internal sehingga transisi ikon hamburger ke tanda 'X' bersifat instan, native, dan bebas bug.
+      2. Menambahkan `@click.stop="mobileOpen = !mobileOpen"` serta penataan kelas interaksi sentuh: `relative z-10 p-2.5 cursor-pointer select-none active:bg-slate-200`.
+      3. Menambahkan `@click.outside="mobileOpen = false"` dan `@keydown.escape.window="mobileOpen = false"` pada elemen `<header>`.
+      4. Mobile dropdown menu dilengkapi transisi eksplisit (`opacity-0 -translate-y-2` ke `opacity-100 translate-y-0`), batas tinggi aman (`max-h-[calc(100vh-4.5rem)] overflow-y-auto`), dan padding bawah yang ergonomis (`pb-6`) agar seluruh menu tidak tertutup floating bottom bar pada layar ponsel pendek.
+    - Verifikasi: 87 feature & unit tests lulus 100% (265 assertions), Pint lolos, Vite production build sukses.
+- 2026-09-12: Peningkatan Menyeluruh Dashboard, Seeder Data Realistis, Audit Konfigurasi, dan Output Laporan Pelatihan PDF & Excel:
+    - **1. Perbaikan Dashboard Secara Menyeluruh (Admin & Executive)**:
+      - Admin Dashboard (`admin/dashboard.blade.php` & `DashboardController.php`):
+        - Metrik kelulusan perkaderan: Menambahkan metrik `$totalLulus`, `$totalPesertaAll`, dan `$persenKelulusan%` pada kartu KPI ke-4, menggantikan placeholder.
+        - Kartu Kegiatan Baitul Arqam Terkini: Dilengkapi tombol aksi 1-klik langsung (`Peringkat`, `Excel`, dan `PDF`) pada setiap kegiatan.
+      - Executive Dashboard (`admin/executive.blade.php` & `ExecutiveController.php`):
+        - Peningkatan grid metrik dari 3 kartu menjadi 4 kartu KPI komprehensif: Total Event BA, Total Peserta Terdaftar, Tingkat Kelulusan Kader (`$totalLulus` & `{{ $persenKelulusan }}%`), dan Rata-rata Nilai Akhir Perkaderan.
+        - Tombol unduh laporan Excel langsung disematkan pada baris tabel di samping PDF dan Peringkat.
+    - **2. Output Laporan Pelatihan Resmi (PDF & Excel)**:
+      - Laporan Resmi PDF (`resources/views/admin/events/report-pdf.blade.php`):
+        - Redesain total menjadi Dokumen Berkop Surat Resmi MPKSDI PDM Karanganyar dengan Logo MPKSDI dan Muhammadiyah.
+        - Dilengkapi Card Metadata Kegiatan, Ringkasan Eksekutif KPI (Total Peserta, Lulus, Lulus Bersyarat, Tidak Lulus, Rerata NA, Nilai Tertinggi, Nilai Terendah), Tabel Rekapitulasi Lengkap 14 Kolom (Ranking, NIK, NBM, Nama, Cabang/Ranting, Pretest, Posttest, N-Gain, Afektif, Psikomotor, Keaktifan, Kehadiran %, NA, Status Kelulusan), Catatan Rumus Baku Standar, serta Lembar Pengesahan Tanda Tangan Ketua MPKSDI dan Master of Training.
+      - Laporan Rekapitulasi Excel (`resources/views/exports/laporan-event.blade.php` & `app/Exports/LaporanEventExport.php`):
+        - Format spreadsheet standar MPKSDI dengan header styling rapi (`#002b40`), metadata event, format teks NIK/NBM (`mso-number-format`), dan struktur DOM yang 100% kompatibel dengan PhpSpreadsheet HTML parser.
+      - Hak Akses Rute: Rute `admin.events.exportExcel` disetarakan dengan laporan PDF di middleware `['role:admin,fasilitator,executive', 'event_access']`.
+      - Tombol Akses Cepat: Tersedia di halaman Peringkat Nilai (`admin.events.ranking`), Dashboard Eksekutif (`admin.executive`), dan Dashboard Admin (`admin.dashboard`).
+    - **3. Seeder Data Demo Realistis (`database/seeders/DemoDataSeeder.php`)**:
+      - Terdaftar di `DatabaseSeeder.php` dan bersifat idempoten (`updateOrCreate`).
+      - Pengguna terdaftar untuk semua peran: Admin (`admin@mpksdi.test`), Fasilitator 1 (`fasilitator@mpksdi.test` - Drs. H. Sriyanto, M.Pd.), Fasilitator 2 (`instruktur@mpksdi.test` - Ust. Ahmad Dahlan Al-Hafidz), dan Executive (`executive@mpksdi.test` - Dr. Muhammad Ihsan, M.Ag.).
+      - 24 Kader Muhammadiyah Karanganyar yang tersebar di berbagai PCM (Colomadu, Tasikmadu, Jaten, Karanganyar, Tawangmangu, Kebakkramat, Gondangrejo, Matesih, Jumapolo, dll.): 20 aktif terverifikasi, 3 menunggu verifikasi (tampil di widget dashboard pending), 1 ditolak dengan catatan perbaikan KTP luar daerah.
+      - 11 Entitas Organisasi (PDM, PCM, PRM, AUM RS PKU, AUM SMA Muh 1, Ortom Pemuda & Nasyiah).
+      - 3 Event Perkaderan Nyata:
+        1. Event Selesai: "Baitul Arqam Pimpinan PCM & PRM se-Kabupaten Karanganyar 2026" lengkap dengan 6 sesi, 3 kelompok outbound, rubrik afektif/psikomotor/RTL, soal CBT pretest & posttest, 14 peserta terdaftar, absensi lengkap, poin keaktifan, dan penilaian akhir matematis akurat (10 lulus, 2 lulus bersyarat, 2 tidak lulus) dengan ranking dan verification hash.
+        2. Event Berlangsung: "Baitul Arqam Guru & Karyawan AUM Karanganyar Angkatan IV" (6 peserta, sesi materi aktif).
+        3. Event Persiapan: "Baitul Arqam Tenaga Kesehatan RS PKU Muhammadiyah Karanganyar".
+    - **4. Audit & Penyelarasan Konfigurasi**:
+      - `config/app.php`: Set default timezone ke `Asia/Jakarta` (`APP_TIMEZONE`), default locale `id`, fallback locale `id`, faker locale `id_ID`.
+      - `.env.example`: Ditambahkan `APP_TIMEZONE=Asia/Jakarta`, `ADMIN_EMAIL=admin@mpksdi.test`, dan `ADMIN_PASSWORD=ubah-segera`.
+      - `.env`: Ditambahkan `APP_TIMEZONE=Asia/Jakarta`.
+    - **5. Hasil Pengujian & Kualitas**:
+      - Seluruh 88 unit & feature tests lulus 100% (270 assertions), Laravel Pint lolos rapi, dan Vite production build sukses.
+- 2026-09-12: Redesain Total Dashboard Admin (Kerapian Visual & Keselarasan Warna MPKSDI):
+    - **Masalah**: Screenshot pengguna menunjukkan ketidakharmonisan warna dan hierarki tampilan: header flat gray `#f3f5f8` tebal dan hampa, tombol biru neon terisolasi, 4 kartu KPI utama tenggelam di bawah grafik 300px+, warna donut chart acak (pink/magenta keras), subbar abu-abu bertabrakan dengan canvas, dan data sebaran kader per kecamatan belum ditampilkan.
+    - **Solusi & Implementasi**:
+      1. **Penyelarasan Warna (Color Harmony)**: Menghapus warna abu-abu kusam `#f3f5f8`. Mengadopsi palet otentik MPKSDI Karanganyar: Deep Ocean Blue (`#005c8a`), Midnight Navy (`#002b40`), Saffron Gold (`#f8bb00`), dan Emerald (`#059669`). Donut chart diselaraskan ke `#005c8a` (Aktif), `#f8bb00` (Menunggu), `#e11d48` (Ditolak), dan `#94a3b8` (Nonaktif). Subbar atas diselaraskan ke `bg-slate-50/90`.
+      2. **Hierarki Logis & Rapi**:
+         - **Header Banner**: Format kartu putih lengkung modern beraksen hairline, watermark batik halus (`opacity-[0.14]`), badge institusional, serta aksi ganda yang presisi (*Impor Excel* dan *Buat Event Baru* beraksen gold plus).
+         - **Row 1 (KPI Metrics First)**: 4 kartu metrik utama (Total Kader, Menunggu Verifikasi, Event Aktif, Kelulusan Perkaderan) dipindahkan langsung ke baris teratas di bawah banner agar administrator mendapat gambaran operasional seketika (*instant situational awareness*).
+         - **Row 2 (Visual Analytics Grid 8+4)**: Line chart pertumbuhan 6 bulan dengan gradient fill lembut (`#005c8a`), grid garis putus halus, serta Donut Chart dengan persentase dan legend bersih.
+         - **Row 3 (Operational Command Center 7+5)**: Rekap 6 agenda perkaderan terkini dengan 3 tombol cetak output 1-klik (`Peringkat`, `Excel`, `PDF`) bersanding dengan antrean kader menunggu verifikasi.
+         - **Row 4 (Sebaran Wilayah & Pusat Akses)**: Menampilkan sebaran kader per cabang (*Top PCM Karanganyar*) dengan bar progres proporsional serta jalan pintas modul data dan event.
+      3. **Verifikasi**: 88 feature tests lulus 100% (270 assertions), Pint passed, build Vite bersih (3.29s).
+- 2026-09-12: Integrasi Pola Latar Belakang Subtle, Halaman Pembaruan Sistem & Panduan Interaktif:
+    - Menghadirkan utility class `.bg-grid-subtle` pada kanvas kerja dashboard untuk memberi tekstur geometris institusional yang tenang dan tidak sepi/hampa.
+    - Menambahkan rute dan halaman `/updates` (`SystemHelpController::updates`) yang merinci changelog versi v1.0 s.d. v2.2, kartu sorotan rilis, serta roadmap fitur masa depan.
+    - Menambahkan rute dan halaman `/panduan` (`SystemHelpController::panduan`) berbasis tab interaktif Alpine.js 4 peran (Administrator, Kader/Peserta, Fasilitator, Executive) dilengkapi panduan tahapan teknis dan akordeon FAQ operasional.
+    - Menambahkan grup menu "Bantuan & Panduan" pada sidebar dan footer aplikasi.
+    - Suite test baru: `tests/Feature/SystemHelpPagesTest.php` (4 test baru, 92 tests lulus total).
+- 2026-09-12: Standarisasi Total Tipografi, Geometri Kontainer & Eliminasi Elemen "AI Slop" di Seluruh Sistem:
+    - **Masalah**: Inkonsistensi hierarki ukuran tulisan ("BESAR KECIL TULISANNYA TIDAK KONSISTEN"), penggunaan font mikro yang sulit dibaca (`text-[10px]`, `text-[11px]`), font weight ekstrem (`font-black` 900 vs `font-extrabold`), kontainer gelembung (`rounded-3xl`), tombol lonjong pil (`rounded-full`), serta animasi memantul template SaaS (`card-lift-sm`, `card-sheen`, `hover:scale-[1.01]`).
+    - **Solusi & Standarisasi Desain Sistem**:
+      1. **Standar Tipografi Baku**:
+         - Judul Halaman Utama: `text-xl sm:text-2xl font-bold tracking-tight text-slate-900`
+         - Sub-judul / Section Header: `text-base font-bold text-slate-900`
+         - Judul Kartu / Item: `text-sm font-bold text-slate-900`
+         - Teks Konten / Body: `text-sm text-slate-600`
+         - Metadata / Label / Badge: `text-xs font-semibold text-slate-700` atau `text-xs font-medium`
+         - Menghapus tuntas kelas mikro acak `text-[10px]` dan `text-[11px]` serta bobot berlebih `font-black` di seluruh form operasional.
+      2. **Standar Kontainer & Radius Geometris**:
+         - Kartu & Section Box: `rounded-xl border border-slate-200/90 shadow-2xs bg-white`
+         - Tombol Aksi Utama: `rounded-lg font-semibold text-xs px-3.5 py-2` (atau `px-4 py-2 text-sm` pada form submit panjang) dengan warna solid institusional (`bg-sky-600 hover:bg-sky-700 text-white`).
+         - Kontrol Input: `rounded-lg border border-slate-200/90 text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20`.
+         - Menghapus semua efek hover memantul `card-lift-sm`, `card-sheen`, dan `hover:scale-[1.01]`.
+      3. **Penyelarasan Komprehensif di 14+ File View**:
+         - `admin/events/outbound.blade.php`: Header, card pos kelompok, tombol aksi, dan badge.
+         - `admin/events/psikomotor.blade.php`: Header, rubric manager, scoring matrix table header, dan tombol simpan.
+         - `portal/dashboard.blade.php`: Welcome hero card, event cards, tombol detail, dan metadata event.
+         - `portal/kehadiran.blade.php`: Header, kartu ID pass digital, barcode container, timeline presensi.
+         - `portal/angket.blade.php`: Aspek evaluasi cards, rating 1-5 tiles, textarea box, dan sticky bottom bar.
+         - `portal/afektif.blade.php`: Sub-aspek cards, Likert option tiles, dan submit button.
+         - `portal/rtl.blade.php`: Question list cards, form textarea, file attachment inputs.
+         - `portal/tes/index.blade.php`: Kartu daftar tes pretest/posttest, badge status durasi, dan tombol mulai.
+         - `portal/tes/take.blade.php`: Sticky timer bar, soal CBT cards, radio option tiles, drawer navigator, submit modal.
+         - `portal/tes/closed.blade.php`: Kartu pemberitahuan ujian ditutup, tombol kembali ke portal.
+         - `portal/profile.blade.php`: Header identitas, live avatar box, field groups, dan bottom submit bar.
+         - `auth/login.blade.php`: Kotak card login, form inputs, modal bantuan lupa password.
+         - `auth/cek-status.blade.php`: Input pencarian NIK/WA, hasil penelusuran cards, dan alert catatan penolakan.
+         - `anggota/register.blade.php`: Stepper header, wrapper form 4-langkah, tombol submit, dan bottom helper navigation.
+         - `system/updates.blade.php`: Header, badge versi rilis resmi `Versi 2.2.0 Stable`, timeline cards, roadmap cards.
+         - `system/panduan.blade.php`: Role tabs, workflow steps, dan accordion FAQ.
+    - **Hasil Verifikasi**:
+      - 92 feature & unit tests lulus 100% (286 assertions).
+      - Vite production build sukses tanpa error (67 modules transformed).
+      - View cache compile bersih (`php artisan view:clear`).
+- 2026-09-12: Perapian Total Dashboard & Integrasi Pola Tradisional Batik Solo Kawung:
+    - **Identitas Kultural Batik Terpadu**:
+      - Mengganti latar belakang kanvas teknis `.bg-grid-subtle` dengan motif vektor autentik `.bg-batik-subtle` (Batik Kawung Solo 140×140 px seamless tile di `#005c8a` opasitas 4.5% dan aksen titik emas `#f8bb00`) pada master layout `layouts/app.blade.php`.
+      - Membungkus header dashboard menjadi **Header Hero Card** terstruktur (`rounded-xl border border-slate-200/90 shadow-2xs`) dilengkapi ornamen sudut `<x-batik-corner position="top-right">` resmi MPKSDI.
+      - Menambahkan ornamen batik corner `<x-batik-corner>` pada header modul admin lainnya (`admin/executive`, `admin/events/index`, `admin/anggota/index`, `admin/users/index`, `system/updates`, `system/panduan`).
+    - **Perapian Antarmuka Dashboard Administrasi**:
+      - **Kesimetrisan KPI Cards**: Menstandarisasi seluruh 4 kartu metrik ke bingkai putih border slate seragam (menghilangkan border kuning asimetris pada kartu verifikasi), dengan format nilai `[angka besar] [unit kecil]` dan footer metadata yang serasi.
+      - **Penyederhanaan Chart**: Menghapus 3 sub-kotak duplikat di bawah grafik garis dan menggantinya dengan analitik pertumbuhan 6 bulan, bulan berjalan, dan rerata kelulusan.
+      - **Kerapian Agenda Perkaderan**: Judul kegiatan tidak lagi terpotong dots karena tombol aksi dibuat cerdas/kondisional (event `persiapan` menampilkan tombol `Kelola Event`, sedangkan event `berlangsung/selesai` menampilkan `Peringkat/Excel/PDF`).
+    - **Verifikasi**: 92/92 feature & unit tests lulus 100% (286 assertions), Vite production build sukses.
+- 2026-09-12: Implementasi Form Persistence on Refresh (Penyimpanan Draf Otomatis /daftar):
+    - **Solusi Masalah Kehilangan Data Pengisian Form**:
+      - Pengguna yang mengisi formulir pendaftaran anggota mandiri (`/daftar`) tidak akan kehilangan data isian jika browser ter-refresh (F5), tab tertutup, atau jaringan terputus sebelum formulir terkirim.
+      - Data formulir disimpan secara instan dan debounced (400ms) ke `localStorage` dengan key `mpksdi_register_draft_v1` saat pengguna mengetik, memilih dropdown, mencentang checkbox, memilih radio, atau berpindah tab.
+    - **Keamanan Kredensial Pengguna**:
+      - Kolom sensitif kata sandi (`password` dan `password_confirmation`) serta CSRF token `_token` dikecualikan secara ketat (100% tidak pernah disimpan ke browser storage).
+    - **Dukungan Pasfoto & Pemulihan Reaktif**:
+      - Menyimpan preview pasfoto (Base64 JPEG 3:4) dan memulihkannya kembali via `DataTransfer` ke `<input type="file" name="foto">` dengan mekanisme fallback yang aman dari batas kuota storage.
+      - Menghubungkan custom event `@tab4-restore.window` dan `@tab4-clear.window` untuk menyinkronkan seluruh pilihan preset kemasjidan & kemasyarakatan di Tab 4.
+    - **Pembersihan Draf Otomatis & Kontrol Manual**:
+      - Begitu pendaftaran berhasil terkirim (`session('success')`), draf otomatis dibersihkan secara hening agar pendaftaran anggota berikutnya dimulai dari form bersih.
+      - Disediakan tombol *"Hapus Draf"* yang dilengkapi modal konfirmasi jika pengguna ingin mengosongkan seluruh formulir.
+      - Menambahkan banner informatif pemulihan draf dan indikator status draf tersimpan di sebelah stepper langkah.
+      - Menambahkan aturan CSS global `[x-cloak] { display: none !important; }` di `resources/css/app.css` untuk mencegah layout flicker pada inisialisasi Alpine.js.
+    - **Hasil Verifikasi**:
+      - 94 feature & unit tests lulus 100% (293 assertions).
+      - Laravel Pint lolos (0 issues).
+      - Vite production build sukses (assets terkompilasi dalam 2.77s).
 

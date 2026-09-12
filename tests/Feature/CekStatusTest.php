@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class CekStatusTest extends TestCase
@@ -70,5 +71,18 @@ class CekStatusTest extends TestCase
         $this->post(route('cek-status.check'), ['identifier' => '9999999999999999'])
             ->assertOk()
             ->assertSee('Data Pendaftaran Tidak Ditemukan');
+    }
+
+    public function test_cek_status_is_rate_limited(): void
+    {
+        Cache::flush();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('cek-status.check'), ['identifier' => "identifikator-{$i}123456789"])
+                ->assertStatus(200);
+        }
+
+        $this->post(route('cek-status.check'), ['identifier' => 'identifikator-6th-12345'])
+            ->assertStatus(429);
     }
 }

@@ -56,6 +56,35 @@ class AdminAnggotaTest extends TestCase
         $this->assertNotNull($a->user->fresh()->verified_at);
     }
 
+    public function test_verify_flashes_wa_notification_url(): void
+    {
+        $admin = $this->admin();
+        $a = $this->pendingAnggota();
+        $a->update(['no_wa' => '081234567890']);
+
+        $this->actingAs($admin)
+            ->post(route('admin.anggota.verify', $a))
+            ->assertRedirect(route('admin.anggota.show', $a))
+            ->assertSessionHas('wa_url');
+
+        $this->assertStringContainsString('api.whatsapp.com/send', session('wa_url'));
+    }
+
+    public function test_reject_flashes_wa_notification_url(): void
+    {
+        $admin = $this->admin();
+        $a = $this->pendingAnggota();
+        $a->update(['no_wa' => '081234567890']);
+
+        $this->actingAs($admin)
+            ->post(route('admin.anggota.reject', $a), ['catatan_verifikasi' => 'Berkas kurang lengkap.'])
+            ->assertRedirect(route('admin.anggota.show', $a))
+            ->assertSessionHas('wa_url')
+            ->assertSessionHas('success');
+
+        $this->assertStringContainsString('api.whatsapp.com/send', session('wa_url'));
+    }
+
     public function test_admin_can_deactivate_anggota(): void
     {
         $admin = $this->admin();

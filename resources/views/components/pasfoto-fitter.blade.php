@@ -10,6 +10,8 @@
         inputId: '{{ $inputId }}',
         currentPhoto: '{{ $currentPhoto ? addslashes($currentPhoto) : '' }}'
     })"
+    @pasfoto-restore.window="if (!$event.detail || !$event.detail.inputId || $event.detail.inputId === inputId) setFromDataUrl($event.detail.dataUrl)"
+    @pasfoto-clear.window="if (!$event.detail || !$event.detail.inputId || $event.detail.inputId === inputId) clearPhoto()"
     class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-2xs space-y-3">
 
     {{-- Label & Status --}}
@@ -27,7 +29,7 @@
                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
-                <span>Pasfoto 3:4 Otomatis Pas</span>
+                <span>Pasfoto 3:4 Setengah Badan Pas</span>
             </span>
         </template>
     </div>
@@ -49,7 +51,7 @@
                         </div>
                     </div>
                     <span class="text-[9.5px] font-extrabold text-sky-300 block leading-none">Auto Match</span>
-                    <span class="text-[8px] text-slate-400 block mt-1 leading-tight">Menyelaraskan 3:4...</span>
+                    <span class="text-[8px] text-slate-400 block mt-1 leading-tight">Menyelaraskan 3:4 setengah badan...</span>
                 </div>
             </template>
 
@@ -117,13 +119,13 @@
                     <svg class="w-4 h-4 animate-spin text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
-                    <span>Sedang memproses &amp; menyelaraskan posisi wajah otomatis (3:4)...</span>
+                    <span>Sedang memproses &amp; menyelaraskan pasfoto setengah badan (3:4)...</span>
                 </div>
             </template>
 
             <template x-if="!isProcessing">
                 <p class="text-[11px] text-slate-400 leading-relaxed font-medium">
-                    Sistem otomatis memindai dan menyesuaikan foto Anda ke rasio standar 3:4 resmi (posisi wajah &amp; bahu seimbang) untuk ID Card &amp; Sertifikat Baitul Arqam.
+                    Sistem otomatis memindai dan menyesuaikan foto Anda menjadi pasfoto setengah badan standar 3:4 resmi (posisi kepala &amp; dada seimbang) untuk ID Card &amp; Sertifikat Baitul Arqam.
                 </p>
             </template>
         </div>
@@ -139,8 +141,9 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
 
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xs sm:max-w-sm max-h-[92vh] flex flex-col overflow-hidden relative"
-             @click.outside="closeModal()"
+        <div role="dialog" aria-modal="true" aria-labelledby="pasfoto-title"
+             class="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xs sm:max-w-sm max-h-[92vh] flex flex-col overflow-hidden relative"
+             @click.outside="closeModal()" @keydown.escape.window="closeModal()"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="scale-95 opacity-0"
              x-transition:enter-end="scale-100 opacity-100">
@@ -155,7 +158,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">Sesuaikan Posisi Pasfoto</h3>
+                        <h3 id="pasfoto-title" class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">Sesuaikan Posisi Pasfoto</h3>
                         <p class="text-[10px] text-slate-500 font-medium">Garis panduan rasio resmi 3:4</p>
                     </div>
                 </div>
@@ -226,7 +229,7 @@
                     {{-- Floating Drag Tip --}}
                     <div class="absolute bottom-1.5 inset-x-2 text-center pointer-events-none">
                         <span class="inline-block px-2 py-0.5 rounded-full bg-slate-950/85 text-[9px] font-bold text-slate-200 border border-slate-700/80">
-                            👆 Geser foto untuk memposisikan
+                            <span aria-hidden="true">👆</span> Geser foto untuk memposisikan
                         </span>
                     </div>
                 </div>
@@ -367,16 +370,16 @@ document.addEventListener('alpine:init', () => {
             reader.readAsDataURL(file);
         },
 
-        // Detect Face and Head Region via Canvas Skin-Cluster Analysis
+        // Robust Multi-Scale Face & Head Localizer (Skin-Cluster, Eye Contrast & Silhouette Analysis)
         detectFaceAndHead(image) {
             const origW = image.naturalWidth || image.width;
             const origH = image.naturalHeight || image.height;
 
-            // Downsample to max 160px for instant analysis (< 5ms)
+            // Downsample to max 160px for instant analysis (< 8ms)
             const maxDim = 160;
             const scale = Math.min(1, maxDim / Math.max(origW, origH));
-            const sw = Math.max(10, Math.round(origW * scale));
-            const sh = Math.max(10, Math.round(origH * scale));
+            const sw = Math.max(20, Math.round(origW * scale));
+            const sh = Math.max(20, Math.round(origH * scale));
 
             const canvas = document.createElement('canvas');
             canvas.width = sw;
@@ -392,90 +395,186 @@ document.addEventListener('alpine:init', () => {
             }
 
             const data = imgData.data;
-            const skinPoints = [];
 
-            // Focus on upper 65% of the frame where heads normally reside
-            const minY = Math.round(sh * 0.05);
-            const maxY = Math.round(sh * 0.65);
-            const minX = Math.round(sw * 0.10);
-            const maxX = Math.round(sw * 0.90);
+            // Helper to get pixel RGB and luminance at (x, y)
+            const getPixel = (x, y) => {
+                if (x < 0 || x >= sw || y < 0 || y >= sh) return null;
+                const idx = (y * sw + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                return { r, g, b, lum };
+            };
 
-            for (let y = minY; y < maxY; y++) {
-                for (let x = minX; x < maxX; x++) {
-                    const idx = (y * sw + x) * 4;
-                    const r = data[idx];
-                    const g = data[idx + 1];
-                    const b = data[idx + 2];
+            // Strict skin test that firmly rejects wood, bamboo, and foliage
+            const isSkinPixel = (r, g, b) => {
+                // Human skin characteristics (melanin + hemoglobin)
+                if (r <= g || g <= b) return false;
+                if ((r - g) < 12 || (r - b) < 24) return false;
+                if (r < 65 || r > 245 || b < 20 || b > 190) return false;
 
-                    // Standard YCbCr skin tone detection formula
-                    const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-                    const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+                // Normalized RGB
+                const sum = r + g + b;
+                const rn = r / sum;
+                const gn = g / sum;
+                const bn = b / sum;
+                if (rn < 0.36 || rn > 0.58 || gn < 0.27 || gn > 0.38 || bn > 0.28) return false;
 
-                    if (cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173) {
-                        if (r > g && r > b && (r - g) >= 10) {
-                            skinPoints.push({ x, y });
+                // YCbCr skin range
+                const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+                const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+                return (cb >= 80 && cb <= 126 && cr >= 134 && cr <= 172);
+            };
+
+            // Pre-compute skin map for fast scanning
+            const skinMap = new Uint8Array(sw * sh);
+            for (let y = 0; y < sh; y++) {
+                for (let x = 0; x < sw; x++) {
+                    const p = getPixel(x, y);
+                    if (p && isSkinPixel(p.r, p.g, p.b)) {
+                        skinMap[y * sw + x] = 1;
+                    }
+                }
+            }
+
+            // Candidate Face Window Search (Multi-scale template scan)
+            // Realistic face width on portrait photos: 10% to 32% of width
+            const candidateWidths = [
+                Math.round(sw * 0.12),
+                Math.round(sw * 0.16),
+                Math.round(sw * 0.20),
+                Math.round(sw * 0.25),
+                Math.round(sw * 0.30)
+            ];
+
+            let bestBox = null;
+            let bestScore = -1;
+
+            const stepX = Math.max(2, Math.round(sw * 0.035));
+            const stepY = Math.max(2, Math.round(sh * 0.035));
+
+            const minY = Math.round(sh * 0.06);
+            const maxY = Math.round(sh * 0.52); // Heads are in upper half
+
+            for (const bw of candidateWidths) {
+                const bh = Math.round(bw * 1.30); // Face oval aspect ratio
+                const rx = bw * 0.38;
+                const ry = bh * 0.44;
+
+                for (let by = minY; by + bh <= maxY + Math.round(sh * 0.15); by += stepY) {
+                    for (let bx = Math.round(sw * 0.08); bx + bw <= Math.round(sw * 0.92); bx += stepX) {
+                        const cx = bx + (bw / 2);
+                        const cy = by + (bh / 2);
+
+                        // 1. Skin density inside face oval
+                        let totalOval = 0;
+                        let skinInOval = 0;
+                        let eyeLumSum = 0, eyeCount = 0;
+                        let cheekLumSum = 0, cheekCount = 0;
+
+                        const sampleStep = 2;
+                        for (let dy = -ry; dy <= ry; dy += sampleStep) {
+                            for (let dx = -rx; dx <= rx; dx += sampleStep) {
+                                if ((dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) <= 1.0) {
+                                    totalOval++;
+                                    const px = Math.round(cx + dx);
+                                    const py = Math.round(cy + dy);
+                                    if (px >= 0 && px < sw && py >= 0 && py < sh) {
+                                        if (skinMap[py * sw + px] === 1) {
+                                            skinInOval++;
+                                        }
+
+                                        const p = getPixel(px, py);
+                                        if (p) {
+                                            // Eye band (-0.35 to 0.0 of cy)
+                                            if (dy >= -ry * 0.40 && dy <= -ry * 0.05) {
+                                                eyeLumSum += p.lum;
+                                                eyeCount++;
+                                            }
+                                            // Cheek band (0.05 to 0.45 of cy)
+                                            else if (dy >= ry * 0.10 && dy <= ry * 0.55) {
+                                                cheekLumSum += p.lum;
+                                                cheekCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (totalOval === 0) continue;
+                        const skinDensity = skinInOval / totalOval;
+                        if (skinDensity < 0.30) continue; // Not a face oval
+
+                        // 2. Eye/Feature contrast score
+                        let eyeContrast = 0;
+                        if (eyeCount > 0 && cheekCount > 0) {
+                            const avgEye = eyeLumSum / eyeCount;
+                            const avgCheek = cheekLumSum / cheekCount;
+                            // Eyes/eyebrows are darker than cheeks
+                            if (avgEye < avgCheek) {
+                                eyeContrast = Math.min(25, avgCheek - avgEye);
+                            }
+                        }
+
+                        // 3. Border contrast (Contrast between face skin and surrounding jilbab/hair/clothes)
+                        let borderDiff = 0;
+                        let borderSamples = 0;
+                        const outerRx = bw * 0.58;
+                        const outerRy = bh * 0.58;
+                        for (let angle = 0; angle < Math.PI * 2; angle += 0.4) {
+                            const ox = Math.round(cx + outerRx * Math.cos(angle));
+                            const oy = Math.round(cy + outerRy * Math.sin(angle));
+                            const pOut = getPixel(ox, oy);
+                            if (pOut) {
+                                borderSamples++;
+                                // Border is distinct from face skin (e.g. dark green jilbab or dark hair)
+                                if (!isSkinPixel(pOut.r, pOut.g, pOut.b)) {
+                                    borderDiff += 1;
+                                }
+                            }
+                        }
+                        const borderScore = borderSamples > 0 ? (borderDiff / borderSamples) : 0;
+
+                        // 4. Centrality weighting (prefer centered person over edges)
+                        const distFromCenter = Math.abs(cx - (sw / 2)) / (sw / 2);
+                        const centerWeight = Math.max(0.4, 1.0 - (distFromCenter * 0.65));
+
+                        // 5. Composite candidate score
+                        const score = (skinDensity * 3.5) + (borderScore * 2.0) + (eyeContrast * 0.12) + (centerWeight * 1.8);
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestBox = { cx, cy, bw, bh };
                         }
                     }
                 }
             }
 
-            if (skinPoints.length > 20) {
-                // Find centroid of skin pixels
-                let sumX = 0, sumY = 0;
-                for (let i = 0; i < skinPoints.length; i++) {
-                    sumX += skinPoints[i].x;
-                    sumY += skinPoints[i].y;
-                }
-                const avgX = sumX / skinPoints.length;
-                const avgY = sumY / skinPoints.length;
-
-                // Keep points within radius to isolate the face cluster
-                const radius = Math.max(sw * 0.22, 24);
-                let clusterXSum = 0, clusterYSum = 0, count = 0;
-                let cMinX = sw, cMaxX = 0, cMinY = sh, cMaxY = 0;
-
-                for (let i = 0; i < skinPoints.length; i++) {
-                    const p = skinPoints[i];
-                    if (Math.hypot(p.x - avgX, p.y - avgY) <= radius) {
-                        clusterXSum += p.x;
-                        clusterYSum += p.y;
-                        count++;
-                        if (p.x < cMinX) cMinX = p.x;
-                        if (p.x > cMaxX) cMaxX = p.x;
-                        if (p.y < cMinY) cMinY = p.y;
-                        if (p.y > cMaxY) cMaxY = p.y;
-                    }
-                }
-
-                if (count > 15) {
-                    const faceCenterX = (clusterXSum / count) / scale;
-                    const faceCenterY = (clusterYSum / count) / scale;
-                    const faceWidth = Math.max((cMaxX - cMinX) / scale, origW * 0.10);
-                    const faceHeight = Math.max((cMaxY - cMinY) / scale, origH * 0.10);
-
-                    return {
-                        found: true,
-                        centerX: faceCenterX,
-                        centerY: faceCenterY,
-                        width: faceWidth,
-                        height: faceHeight
-                    };
-                }
+            if (bestBox && bestScore >= 2.5) {
+                return {
+                    found: true,
+                    centerX: bestBox.cx / scale,
+                    centerY: bestBox.cy / scale,
+                    width: bestBox.bw / scale,
+                    height: bestBox.bh / scale
+                };
             }
 
             return null;
         },
 
-        // Intelligent Auto-Matcher Algorithm with Pasfoto Zoom
+        // Intelligent Auto-Matcher Algorithm with Half-Body (Setengah Badan) 3:4 Framing
         async executeAutoMatch(image) {
             const origW = image.naturalWidth || image.width;
             const origH = image.naturalHeight || image.height;
             const targetRatio = 3 / 4; // 0.75
 
             let faceCenterX = origW / 2;
-            let faceCenterY = origH * 0.38;
-            let faceWidth = origW * 0.25;
-            let faceHeight = origH * 0.25;
+            let faceCenterY = origH * 0.35;
+            let faceWidth = origW * 0.20;
+            let faceHeight = origH * 0.22;
             let faceDetected = false;
 
             // 1. Try Native Browser FaceDetector (Chromium / Chrome Android if available)
@@ -494,7 +593,7 @@ document.addEventListener('alpine:init', () => {
                 } catch (err) {}
             }
 
-            // 2. Fallback: Run Canvas Skin-Cluster Face Analysis
+            // 2. Fallback: Run Robust Multi-Scale Face & Silhouette Analysis
             if (!faceDetected) {
                 const detected = this.detectFaceAndHead(image);
                 if (detected && detected.found) {
@@ -506,20 +605,21 @@ document.addEventListener('alpine:init', () => {
                 }
             }
 
-            // 3. Compute 3:4 Crop Dimensions with PASFOTO CLOSE-UP ZOOM
+            // 3. Compute 3:4 Crop Dimensions Specifically for "SETENGAH BADAN" (Half-Body Bust Portrait)
             let cropH, cropW;
 
             if (faceDetected) {
-                // In standard pasfoto 3:4:
-                // Head + neck takes ~55% of the vertical frame height.
-                // The face oval is ~65-75% of head height.
-                // So ideal crop height is approximately faceHeight * 2.7 (or faceWidth * 3.2 / 0.75)
-                const idealHFromHeight = faceHeight * 2.7;
-                const idealHFromWidth = (faceWidth * 3.2) / targetRatio;
-                const desiredH = Math.max(idealHFromHeight, idealHFromWidth);
+                // In standard formal pasfoto SETENGAH BADAN:
+                // - Head (puncak kepala/jilbab sampai dagu) occupies ~38% - 42% of frame height.
+                // - Dagu to dada/perut atas occupies ~50% of the lower frame.
+                // - Headroom above head occupies ~10%.
+                // - Therefore ideal crop height = faceHeight * 3.7 (or faceWidth * 4.4).
+                const desiredH = Math.max(faceHeight * 3.7, (faceWidth * 3.3) / targetRatio);
 
-                // Zoom in so face is clear and close-up, but don't exceed image bounds
-                cropH = Math.min(origH, Math.max(origH * 0.35, desiredH));
+                // Ensure it does NOT keep full-body (never exceed 60% of original height if photo was taken from afar)
+                // Minimum zoom: 28% of height (prevents extreme macro)
+                const maxAllowedH = Math.min(origH, Math.max(origH * 0.58, desiredH));
+                cropH = Math.min(maxAllowedH, Math.max(origH * 0.28, desiredH));
                 cropW = cropH * targetRatio;
 
                 if (cropW > origW) {
@@ -527,23 +627,23 @@ document.addEventListener('alpine:init', () => {
                     cropH = cropW / targetRatio;
                 }
             } else {
-                // Default Smart Zoom: If no face detected, zoom in on upper body (58% of height)
-                // NEVER leave the photo at 100% uncropped full-body!
-                cropH = Math.min(origH, origH * 0.58);
+                // Default Smart Zoom for Setengah Badan when face is not clearly isolated:
+                // Frame the upper 48% of the image (bust/half body) centered
+                cropH = Math.min(origH, origH * 0.48);
                 cropW = cropH * targetRatio;
                 if (cropW > origW) {
                     cropW = origW;
                     cropH = cropW / targetRatio;
                 }
                 faceCenterX = origW / 2;
-                faceCenterY = origH * 0.35;
+                faceCenterY = origH * 0.32;
             }
 
-            // 4. Center crop on face, with eyes positioned at ~38% from top of the 3:4 frame
+            // 4. Center crop on face/body horizontally; vertically position eyes/face at ~36% from top
             let cropX = faceCenterX - (cropW / 2);
-            let cropY = faceCenterY - (cropH * 0.38);
+            let cropY = faceCenterY - (cropH * 0.36);
 
-            // Clamp coordinates within image bounds
+            // Clamp coordinates strictly within image bounds
             cropX = Math.max(0, Math.min(origW - cropW, cropX));
             cropY = Math.max(0, Math.min(origH - cropH, cropY));
 
@@ -582,7 +682,7 @@ document.addEventListener('alpine:init', () => {
             this.centerY = (this.viewportH / 2) + ((origH / 2) - cropCenterY) * zoomRatio;
 
             const coverScale = Math.max(this.viewportW / origW, this.viewportH / origH);
-            this.minScale = Number((coverScale * 0.8).toFixed(3));
+            this.minScale = Number((coverScale * 0.6).toFixed(3));
             this.maxScale = Number((this.scale * 3.0).toFixed(3));
         },
 
@@ -597,13 +697,18 @@ document.addEventListener('alpine:init', () => {
                 if (!blob) return;
                 const fileInput = document.getElementById(this.inputId);
                 if (fileInput) {
-                    const croppedFile = new File([blob], 'pasfoto-3x4.jpg', {
-                        type: 'image/jpeg',
-                        lastModified: Date.now()
-                    });
-                    const dt = new DataTransfer();
-                    dt.items.add(croppedFile);
-                    fileInput.files = dt.files;
+                    try {
+                        const croppedFile = new File([blob], 'pasfoto-3x4.jpg', {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        const dt = new DataTransfer();
+                        dt.items.add(croppedFile);
+                        fileInput.files = dt.files;
+                    } catch (err) {
+                        console.warn('DataTransfer unsupported or restricted; preserving original file.', err);
+                    }
+                    fileInput.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             }, 'image/jpeg', 0.92);
         },
@@ -709,6 +814,51 @@ document.addEventListener('alpine:init', () => {
             this.photoPreview = this.rawImageSrc;
             this.isCropped = false;
             this.modalOpen = false;
+        },
+
+        setFromDataUrl(dataUrl) {
+            if (!dataUrl) return;
+            this.photoPreview = dataUrl;
+            this.rawImageSrc = dataUrl;
+            this.isCropped = true;
+
+            try {
+                const arr = dataUrl.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                const restoredFile = new File([u8arr], 'pasfoto-3x4.jpg', {
+                    type: mime,
+                    lastModified: Date.now()
+                });
+
+                const fileInput = document.getElementById(this.inputId);
+                if (fileInput && window.DataTransfer) {
+                    const dt = new DataTransfer();
+                    dt.items.add(restoredFile);
+                    fileInput.files = dt.files;
+                    fileInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            } catch (err) {
+                console.warn('DataTransfer or File reconstruction from dataUrl failed:', err);
+            }
+        },
+
+        clearPhoto() {
+            this.photoPreview = null;
+            this.rawImageSrc = null;
+            this.isCropped = false;
+            const fileInput = document.getElementById(this.inputId);
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.dispatchEvent(new Event('input', { bubbles: true }));
+                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
         }
     }));
 });

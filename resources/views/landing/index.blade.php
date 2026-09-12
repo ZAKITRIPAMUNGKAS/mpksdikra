@@ -49,11 +49,16 @@
 </head>
 <body class="antialiased bg-white text-slate-800 selection:bg-sky-500 selection:text-white">
 
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[1000] focus:px-4 focus:py-2 focus:bg-sky-600 focus:text-white focus:rounded-full focus:text-sm focus:font-bold">Lewati ke konten utama</a>
+
     {{-- Global Scroll Progress Indicator --}}
     <div id="scroll-progress-bar" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-[#f8bb00] z-[999] transition-[width] duration-75 ease-out pointer-events-none" style="width: 0%;"></div>
 
     {{-- SECTION 1: Clean Minimalist Navbar --}}
-    <header class="sticky top-0 z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100" x-data="{ mobileOpen: false }">
+    <header class="sticky top-0 z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100" 
+            x-data="{ mobileOpen: false }"
+            @click.outside="mobileOpen = false"
+            @keydown.escape.window="mobileOpen = false">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
             
             {{-- Logo Brand --}}
@@ -61,23 +66,143 @@
                 <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
                 <div class="flex flex-col">
                     <span class="font-extrabold text-lg tracking-tight text-slate-900 leading-none">MPKSDI<span class="text-sky-500">.</span></span>
-                    <span class="text-[10px] text-slate-400 font-medium tracking-wide uppercase mt-0.5">PDM Karanganyar</span>
+                    <span class="text-xs text-slate-400 font-medium tracking-wide uppercase mt-0.5">PDM Karanganyar</span>
                 </div>
             </a>
 
-            {{-- Center Navigation Links --}}
+            {{-- Center Navigation Links (Minimalist with Dropdown) --}}
             <nav class="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600 reveal-top reveal-delay-100">
                 <a href="#beranda" class="text-sky-600 hover:text-sky-700 transition">Beranda</a>
-                <a href="#program" class="hover:text-sky-600 transition">Program BA</a>
-                <a href="#keunggulan" class="hover:text-sky-600 transition">Keunggulan</a>
-                <a href="#tahapan" class="hover:text-sky-600 transition">Alur Peserta</a>
+
+                {{-- Dropdown Perkaderan --}}
+                <div class="relative py-2" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @click.outside="open = false" @keydown.escape.window="open = false">
+                    <button type="button" 
+                            @click="open = !open" 
+                            :aria-expanded="open" 
+                            aria-haspopup="true"
+                            class="flex items-center gap-1.5 hover:text-sky-600 transition focus:outline-hidden cursor-pointer"
+                            :class="open ? 'text-sky-600 font-bold' : ''">
+                        <span>Perkaderan</span>
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200 text-slate-400 pointer-events-none" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak 
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                         class="absolute top-full left-0 mt-0.5 w-64 rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/60 p-2 z-50 space-y-1">
+                        
+                        <a href="#program" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-sky-100/60 text-sky-600 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Program BA</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">4 jenjang pelatihan Baitul Arqam</span>
+                            </div>
+                        </a>
+
+                        <a href="#keunggulan" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100/60 text-amber-600 flex items-center justify-center shrink-0 group-hover:bg-[#f8bb00] group-hover:text-slate-950 transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Keunggulan Mutu</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Standar mutu & profil pimpinan</span>
+                            </div>
+                        </a>
+
+                        <a href="#tahapan" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100/60 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Alur Peserta</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">4 alur pendaftaran s/d lulus</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Direct Link Peta 17 Cabang --}}
                 <a href="#sebaran" class="hover:text-sky-600 transition flex items-center gap-1">
                     <span>Peta 17 Cabang</span>
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                 </a>
-                <a href="{{ route('cek-status') }}" class="hover:text-sky-600 transition">Cek Status</a>
-                <a href="#faq" class="hover:text-sky-600 transition">FAQ</a>
-                <a href="#kontak" class="hover:text-sky-600 transition">Kontak</a>
+
+                {{-- Dropdown Pusat Informasi --}}
+                <div class="relative py-2" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @click.outside="open = false" @keydown.escape.window="open = false">
+                    <button type="button" 
+                            @click="open = !open" 
+                            :aria-expanded="open" 
+                            aria-haspopup="true"
+                            class="flex items-center gap-1.5 hover:text-sky-600 transition focus:outline-hidden cursor-pointer"
+                            :class="open ? 'text-sky-600 font-bold' : ''">
+                        <span>Pusat Informasi</span>
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200 text-slate-400 pointer-events-none" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak 
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                         class="absolute top-full left-0 mt-0.5 w-64 rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/60 p-2 z-50 space-y-1">
+                        
+                        <a href="{{ route('cek-status') }}" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-sky-100/60 text-sky-600 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Cek Status Pendaftaran</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Cek verifikasi pendaftaran mandiri</span>
+                            </div>
+                        </a>
+
+                        <a href="#faq" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100/60 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Tanya Jawab (FAQ)</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Informasi & pertanyaan umum BA</span>
+                            </div>
+                        </a>
+
+                        <a href="#kontak" @click="open = false" class="group flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50/60 transition">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100/60 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-800 group-hover:text-sky-600 transition">Kontak & Sekretariat</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Helpdesk WhatsApp & Gedung PDM</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </nav>
 
             {{-- Right CTA Pill Buttons --}}
@@ -98,35 +223,72 @@
             </div>
 
             {{-- Mobile Hamburger Trigger --}}
-            <button type="button" @click="mobileOpen = !mobileOpen" class="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path x-show="!mobileOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    <path x-show="mobileOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <button type="button" 
+                    @click.stop="mobileOpen = !mobileOpen" 
+                    :aria-expanded="mobileOpen ? 'true' : 'false'" 
+                    aria-label="Buka menu navigasi" 
+                    class="lg:hidden relative z-10 p-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 transition focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer select-none">
+                <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          :d="mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'" />
                 </svg>
             </button>
         </div>
 
         {{-- Mobile Dropdown Menu --}}
-        <div x-show="mobileOpen" x-cloak x-transition class="lg:hidden border-t border-slate-100 bg-white px-5 py-4 space-y-2 text-xs font-semibold">
-            <a href="#beranda" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Beranda</a>
-            <a href="#program" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Program Perkaderan</a>
-            <a href="#keunggulan" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Keunggulan Mutu</a>
-            <a href="#tahapan" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Alur Peserta</a>
-            <a href="#sebaran" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">Peta 17 Cabang PCM</a>
-            <a href="{{ route('cek-status') }}" @click="mobileOpen = false" class="block py-2 text-sky-600 font-bold">Cek Status Pendaftaran</a>
-            <a href="#faq" @click="mobileOpen = false" class="block py-2 text-slate-700 hover:text-sky-600">FAQ</a>
-            <div class="pt-3 border-t border-slate-100 flex gap-2">
-                <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-full border border-slate-300 text-xs font-semibold text-slate-700">Masuk</a>
-                <a href="{{ route('anggota.register') }}" class="flex-1 text-center py-2 rounded-full bg-sky-500 text-xs font-bold text-white">Daftar</a>
+        <div x-show="mobileOpen" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             class="lg:hidden border-t border-slate-100 bg-white/98 backdrop-blur-xl px-5 py-4 space-y-3 text-xs font-semibold shadow-xl max-h-[calc(100vh-4.5rem)] overflow-y-auto">
+            <a href="#beranda" @click="mobileOpen = false" class="block py-1.5 text-slate-700 hover:text-sky-600">Beranda</a>
+            
+            <div class="pt-2 pb-1 border-t border-slate-100">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Perkaderan</span>
+                <div class="space-y-1 pl-2 border-l-2 border-sky-100">
+                    <a href="#program" @click="mobileOpen = false" class="block py-1 text-slate-600 hover:text-sky-600">Program BA</a>
+                    <a href="#keunggulan" @click="mobileOpen = false" class="block py-1 text-slate-600 hover:text-sky-600">Keunggulan Mutu</a>
+                    <a href="#tahapan" @click="mobileOpen = false" class="block py-1 text-slate-600 hover:text-sky-600">Alur Peserta</a>
+                </div>
+            </div>
+
+            <a href="#sebaran" @click="mobileOpen = false" class="flex items-center justify-between py-1.5 text-slate-700 hover:text-sky-600">
+                <span>Peta 17 Cabang PCM</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+            </a>
+
+            <div class="pt-2 pb-1 border-t border-slate-100">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Pusat Informasi</span>
+                <div class="space-y-1 pl-2 border-l-2 border-sky-100">
+                    <a href="{{ route('cek-status') }}" @click="mobileOpen = false" class="block py-1 text-sky-600 font-bold">Cek Status Pendaftaran</a>
+                    <a href="#faq" @click="mobileOpen = false" class="block py-1 text-slate-600 hover:text-sky-600">Tanya Jawab (FAQ)</a>
+                    <a href="#kontak" @click="mobileOpen = false" class="block py-1 text-slate-600 hover:text-sky-600">Kontak & Sekretariat</a>
+                </div>
+            </div>
+
+            <div class="pt-3 pb-6 border-t border-slate-100 flex gap-2">
+                @auth
+                    <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}"
+                       class="flex-1 text-center py-2.5 rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
+                        Buka Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-full border border-slate-300 text-xs font-semibold text-slate-700">Masuk</a>
+                    <a href="{{ route('anggota.register') }}" class="flex-1 text-center py-2 rounded-full bg-sky-500 text-xs font-bold text-white">Daftar</a>
+                @endauth
             </div>
         </div>
     </header>
 
-    <main class="space-y-16 sm:space-y-20 pb-20">
+    <main id="main-content" class="space-y-16 sm:space-y-20 pb-20">
 
         {{-- SECTION 2: Hero Banner Melengkung Proporsional dengan Foto Gedung Dakwah Siluet Kanan-ke-Kiri --}}
-        <section id="beranda" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8">
-            <div class="bg-[#f3f5f8] rounded-3xl p-7 sm:p-12 lg:p-14 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 min-h-[380px] reveal">
+        <section id="beranda" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8">
+            <div class="bg-[#f3f5f8] rounded-3xl p-5 sm:p-10 lg:p-14 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 min-h-[340px] sm:min-h-[380px] reveal">
                 
                 {{-- Batik Solo Surya Pattern Corners --}}
                 <x-batik-corner position="top-left" class="w-36 h-36 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.34] reveal-fade reveal-delay-100" />
@@ -134,8 +296,9 @@
                 
                 {{-- Background Visual: Foto Gedung Dakwah PDM Karanganyar dengan Siluet Fade dari Kanan ke Kiri --}}
                 <div class="absolute right-0 top-0 bottom-0 w-full lg:w-7/12 h-full overflow-hidden pointer-events-none select-none z-0 reveal-right reveal-delay-200">
-                    <img src="{{ asset('aset/gedung-dakwah-vector.jpg') }}" 
-                         alt="Gedung Dakwah PDM Karanganyar" 
+                    <img src="{{ asset('aset/gedung-dakwah-vector.jpg') }}"
+                         alt="Gedung Dakwah PDM Karanganyar"
+                         fetchpriority="high" decoding="async"
                          class="w-full h-full object-cover object-right">
                     {{-- Siluet Gradient: Kanan tajam, kiri memudar halus menyatu ke warna latar hero --}}
                     <div class="absolute inset-0 bg-gradient-to-r from-[#f3f5f8] via-[#f3f5f8]/80 via-35% to-transparent"></div>
@@ -145,11 +308,12 @@
                 {{-- Left Text Content --}}
                 <div class="max-w-xl z-10 space-y-4 text-left">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-slate-200/80 text-[11px] font-bold text-slate-700 shadow-2xs reveal reveal-delay-100">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>Pangkalan Data Resmi MPKSDI PDM Karanganyar</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                        <span class="sm:hidden">Pangkalan Data Resmi MPKSDI</span>
+                        <span class="hidden sm:inline">Pangkalan Data Resmi MPKSDI PDM Karanganyar</span>
                     </div>
 
-                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight drop-shadow-xs reveal reveal-delay-150">
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight drop-shadow-xs reveal reveal-delay-150">
                         Program Perkaderan <br class="hidden sm:inline">
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-sky-700 to-slate-900">Baitul Arqam</span>
                     </h1>
@@ -158,39 +322,51 @@
                         Pusat standardisasi pelatihan ideologis persyarikatan dan sistem pangkalan data kader resmi MPKSDI PDM Karanganyar. Terintegrasi di 17 Cabang se-Kabupaten Karanganyar.
                     </p>
 
-                    <div class="pt-2 flex flex-wrap items-center gap-3 reveal reveal-delay-250">
-                        <a href="{{ route('anggota.register') }}" class="px-6 py-2.5 rounded-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition flex items-center gap-2">
+                    <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 reveal reveal-delay-250">
+                        <a href="{{ route('anggota.register') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2">
                             <span>Daftar sebagai Kader</span>
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
-                        <a href="#sebaran" class="px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-slate-800 font-semibold text-xs border border-slate-200 transition shadow-2xs flex items-center gap-1.5">
+                        <a href="#sebaran" class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-slate-800 font-semibold text-xs border border-slate-200 transition shadow-2xs flex items-center justify-center gap-1.5">
                             <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <span>Jelajahi Peta 17 Cabang</span>
                         </a>
                     </div>
+
+                    {{-- Mobile Inline Micro-Chips (Ramping & Proporsional di Ponsel) --}}
+                    <div class="lg:hidden pt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold text-slate-700">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 border border-slate-200/80 shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            <span>Gedung Dakwah PDM</span>
+                        </div>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 border border-slate-200/80 shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span>{{ number_format($totalKader) }} Kader (17 Cabang)</span>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Right Floating Info Badges di atas Foto Gedung --}}
-                <div class="relative w-full lg:w-[380px] flex flex-col justify-end items-start lg:items-end gap-3 z-10 self-center lg:self-end mt-4 lg:mt-0 reveal-right reveal-delay-300">
+                {{-- Right Floating Info Badges di atas Foto Gedung (Tampil Khusus Layar Besar lg: ke atas) --}}
+                <div class="hidden lg:flex relative w-full lg:w-[380px] flex-col justify-end items-start lg:items-end gap-3 z-10 self-center lg:self-end mt-4 lg:mt-0 reveal-right reveal-delay-300">
                     
                     {{-- Badge 1: Gedung Dakwah PDM --}}
-                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float cursor-pointer hover:border-sky-300 hover:shadow-md transition-all">
+                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float hover:border-sky-300 hover:shadow-md transition-all">
                         <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         <div>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pusat Dakwah &amp; Perkaderan</span>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block leading-none">Pusat Dakwah &amp; Perkaderan</span>
                             <span class="text-xs font-black text-slate-900 leading-tight group-hover:text-sky-600 transition-colors">Gedung Dakwah PDM Karanganyar</span>
                         </div>
                     </div>
 
                     {{-- Badge 2: Pangkalan Data Terintegrasi --}}
-                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float-delayed cursor-pointer hover:border-amber-300 hover:shadow-md transition-all">
+                    <div class="group bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/80 flex items-center gap-3 card-lift-sm animate-card-float-delayed hover:border-amber-300 hover:shadow-md transition-all">
                         <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 shadow-2xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
                         <div>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pangkalan Data Terintegrasi</span>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block leading-none">Pangkalan Data Terintegrasi</span>
                             <span class="text-xs font-black text-slate-900 leading-tight group-hover:text-amber-600 transition-colors">{{ number_format($totalKader) }} Kader di 17 Cabang</span>
                         </div>
                     </div>
@@ -204,7 +380,7 @@
                 <div class="grid grid-cols-4 sm:grid-cols-8 gap-3 sm:gap-4 text-center">
                     
                     {{-- 1. Ideologi (Kitab Suci Al-Quran / Rehal Terbuka) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-100 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-100 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -215,7 +391,7 @@
                     </div>
 
                     {{-- 2. Ke-Muhammadiyahan (Matahari Bersinar 12 Sinar - Lambang Persyarikatan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-150 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-150 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-sky-50 group-hover:bg-sky-100 border border-sky-200/60 flex items-center justify-center text-sky-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="4.2" stroke-width="1.8"/>
@@ -227,7 +403,7 @@
                     </div>
 
                     {{-- 3. Kepemimpinan (Kompas Arah Kemajuan & Bintang Panduan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-200 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-200 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-indigo-50 group-hover:bg-indigo-100 border border-indigo-200/60 flex items-center justify-center text-indigo-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
@@ -239,7 +415,7 @@
                     </div>
 
                     {{-- 4. Fikih Ibadah (Kubah & Mihrab Shalat Sesuai Tarjih) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-250 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-250 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 border border-emerald-200/60 flex items-center justify-center text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v2m0 0C8.5 7.5 7 10 7 13v7h10v-7c0-3-1.5-5.5-5-8z"/>
@@ -252,7 +428,7 @@
                     </div>
 
                     {{-- 5. Ujian CBT (Layar Evaluasi Digital & Checklist Lembar Ujian) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-300 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-300 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-cyan-50 group-hover:bg-cyan-100 border border-cyan-200/60 flex items-center justify-center text-cyan-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <rect x="3" y="3" width="18" height="13" rx="2" stroke-width="1.8"/>
@@ -265,7 +441,7 @@
                     </div>
 
                     {{-- 6. Psikomotor (Target Keterampilan Praktis & Simulasi Lapangan) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-350 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-350 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-teal-50 group-hover:bg-teal-100 border border-teal-200/60 flex items-center justify-center text-teal-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
@@ -278,7 +454,7 @@
                     </div>
 
                     {{-- 7. Keteladanan (Perisai Integritas & Bintang Moralitas Akhlak) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-400 card-lift-sm p-1.5 rounded-2xl">
+                    <div class="group flex flex-col items-center reveal-scale reveal-delay-400 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-rose-50 group-hover:bg-rose-100 border border-rose-200/60 flex items-center justify-center text-rose-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2l7 3.5v6c0 5.25-3.5 10.15-7 11.5-3.5-1.35-7-6.25-7-11.5v-6L12 2z"/>
@@ -288,8 +464,8 @@
                         <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-rose-700 transition-colors">Keteladanan</span>
                     </div>
 
-                    {{-- 8. 17 Cabang (Peta Spasial Berjejaring PCM se-Karanganyar) --}}
-                    <div class="group flex flex-col items-center cursor-pointer reveal-scale reveal-delay-450 card-lift-sm p-1.5 rounded-2xl">
+                    {{-- 8. 17 Cabang (Peta Spasial Berjejaring PCM se-Karanganyar) — scroll ke peta --}}
+                    <a href="#sebaran" class="group flex flex-col items-center reveal-scale reveal-delay-450 p-1.5 rounded-2xl">
                         <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 border border-blue-200/60 flex items-center justify-center text-blue-600 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1 shadow-2xs group-hover:shadow-md">
                             <svg class="w-5 h-5 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -299,7 +475,7 @@
                             </svg>
                         </div>
                         <span class="text-[11px] sm:text-xs font-semibold text-slate-700 mt-2 group-hover:text-blue-700 transition-colors">17 Cabang</span>
-                    </div>
+                    </a>
 
                 </div>
             </div>
@@ -333,7 +509,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         
                         {{-- 1: Kurikulum Baku PP --}}
-                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-200 cursor-pointer relative overflow-hidden">
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-200">
                             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -349,7 +525,7 @@
                         </div>
 
                         {{-- 2: Penilaian 4 Format --}}
-                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-300 cursor-pointer relative overflow-hidden">
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-300">
                             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -365,7 +541,7 @@
                         </div>
 
                         {{-- 3: Instruktur Tersertifikasi --}}
-                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-400 cursor-pointer relative overflow-hidden">
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-400">
                             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -381,7 +557,7 @@
                         </div>
 
                         {{-- 4: ID Card & E-Sertifikat QR --}}
-                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm card-sheen hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-500 cursor-pointer relative overflow-hidden">
+                        <div class="group p-4 rounded-2xl bg-white border border-slate-200/80 card-lift-sm hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 flex items-start gap-3.5 shadow-2xs reveal-pop reveal-delay-500">
                             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-[#005c8a] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs feature-badge-icon">
                                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -407,7 +583,7 @@
                         <div class="absolute inset-0 bg-sky-200/50 rounded-3xl translate-x-2.5 translate-y-2.5 -z-10 blur-[1px]"></div>
                         
                         {{-- Foreground Content Card with Portrait --}}
-                        <div class="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-lg space-y-4 overflow-hidden relative card-lift card-sheen cursor-pointer hover:border-sky-300 transition-all duration-500">
+                        <div class="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-lg space-y-4 overflow-hidden relative card-lift hover:border-sky-300 transition-all duration-500">
                             
                             {{-- Batik Solo Surya Pattern Corners --}}
                             <x-batik-corner position="top-right" class="w-32 h-32 text-sky-800 opacity-[0.28]" />
@@ -415,8 +591,9 @@
                             
                             {{-- Foto Tokoh KH Zainudin Alfandi --}}
                             <div class="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-b from-sky-50 via-slate-50 to-slate-100 border border-slate-100 shadow-inner">
-                                <img src="{{ asset('aset/ketua-mpksdi-vector.jpg') }}" 
-                                     alt="KH. Zainudin Alfandi - Ketua MPKSDI Karanganyar" 
+                                <img src="{{ asset('aset/ketua-mpksdi-vector.jpg') }}"
+                                     alt="KH. Zainudin Alfandi - Ketua MPKSDI Karanganyar"
+                                     loading="lazy" decoding="async"
                                      class="w-full h-full object-cover object-top group-hover:scale-104 transition duration-500">
                                 
                                 {{-- Top Role Tag --}}
@@ -442,7 +619,7 @@
                                     </p>
                                 </div>
 
-                                <div class="flex items-center justify-center gap-1.5 text-[10px] font-semibold text-slate-400 pt-0.5">
+                                <div class="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 pt-0.5">
                                     <span>Periode 2023 &ndash; 2027</span>
                                     <span>&bull;</span>
                                     <span>PDM Karanganyar</span>
@@ -479,13 +656,13 @@
                             {{-- Visual Header with Thematic Leadership & Syura Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#003d5c] via-[#005c8a] to-[#01b0f5] p-4 flex flex-col justify-between overflow-hidden">
                                 {{-- Background Geometric Watermark --}}
-                                <svg class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:rotate-12 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
+                                <svg aria-hidden="true" class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:rotate-12 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
                                     <polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35" />
                                     <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3 3"/>
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Musyawarah Pimpinan & Strategi Cabang --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
+                                <div aria-hidden="true" class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Sinar Matahari 12 Radiasi --}}
                                         <g opacity="0.4" stroke="#f8bb00" stroke-width="2">
@@ -537,7 +714,7 @@
 
                                 {{-- Top Floating Tag with Glassmorphism --}}
                                 <div class="relative z-10 flex items-center justify-between">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-sky-300"></span>
                                         Tingkat Pimpinan
                                     </span>
@@ -545,7 +722,7 @@
 
                                 {{-- Bottom Title Overlay --}}
                                 <div class="relative z-10">
-                                    <span class="text-[10px] text-sky-200 font-bold tracking-wide uppercase block">Cabang &amp; Ranting</span>
+                                    <span class="text-xs text-sky-200 font-bold tracking-wide uppercase block">Cabang &amp; Ranting</span>
                                     <h3 class="font-extrabold text-sm sm:text-base leading-tight text-white drop-shadow-xs">Baitul Arqam Pimpinan</h3>
                                 </div>
 
@@ -567,17 +744,15 @@
 
                                 {{-- Competency Chips --}}
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 text-[10px] font-semibold border border-sky-100">Manhaj Tarjih</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-medium border border-slate-100">Manajemen PCM</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 text-xs font-semibold border border-sky-100">Manhaj Tarjih</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-xs font-medium border border-slate-100">Manajemen PCM</span>
                                 </div>
                                 
                                 {{-- Rating & Duration --}}
                                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                     <div class="flex items-center gap-1.5 text-xs">
-                                        <div class="flex text-amber-400">
-                                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                                        </div>
-                                        <span class="font-extrabold text-slate-800 text-xs">4.9</span>
+                                        <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span class="font-extrabold text-slate-800 text-xs">{{ number_format($totalLulus) }} <span class="text-slate-500 font-semibold">Lulus Tersertifikasi</span></span>
                                     </div>
                                     <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded-full">
                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -602,14 +777,14 @@
                             {{-- Visual Header with Thematic Islamic Education Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#853704] via-[#d97706] to-[#f59e0b] p-4 flex flex-col justify-between overflow-hidden">
                                 {{-- Background Octagram Islamic Geometric Watermark --}}
-                                <svg class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:rotate-45 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
+                                <svg aria-hidden="true" class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:rotate-45 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
                                     <rect x="25" y="25" width="50" height="50" rx="4" />
                                     <rect x="25" y="25" width="50" height="50" rx="4" transform="rotate(45 50 50)" />
                                     <circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" stroke-width="3"/>
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Kitab Al-Qur'an Rehal, Toga & Lentera Ilmu --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
+                                <div aria-hidden="true" class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Cahaya Pencerahan / Aura Kuning --}}
                                         <circle cx="85" cy="85" r="45" fill="#fef08a" opacity="0.25"/>
@@ -645,7 +820,7 @@
 
                                 {{-- Top Floating Tag with Glassmorphism --}}
                                 <div class="relative z-10 flex items-center justify-between">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-200"></span>
                                         Pendidik &amp; AUM
                                     </span>
@@ -653,7 +828,7 @@
 
                                 {{-- Bottom Title Overlay --}}
                                 <div class="relative z-10">
-                                    <span class="text-[10px] text-amber-100 font-bold tracking-wide uppercase block">Guru SD / SMP / SMA</span>
+                                    <span class="text-xs text-amber-100 font-bold tracking-wide uppercase block">Guru SD / SMP / SMA</span>
                                     <h3 class="font-extrabold text-sm sm:text-base leading-tight text-white drop-shadow-xs">Baitul Arqam Guru AUM</h3>
                                 </div>
 
@@ -674,17 +849,15 @@
 
                                 {{-- Competency Chips --}}
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[10px] font-semibold border border-amber-100">Filosofi ISMUBA</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-medium border border-slate-100">Etika Pendidik</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-100">Filosofi ISMUBA</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-xs font-medium border border-slate-100">Etika Pendidik</span>
                                 </div>
                                 
                                 {{-- Rating & Duration --}}
                                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                     <div class="flex items-center gap-1.5 text-xs">
-                                        <div class="flex text-amber-400">
-                                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                                        </div>
-                                        <span class="font-extrabold text-slate-800 text-xs">4.8</span>
+                                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span class="font-extrabold text-slate-800 text-xs">{{ number_format($totalAktif) }} <span class="text-slate-500 font-semibold">Kader Aktif</span></span>
                                     </div>
                                     <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded-full">
                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -709,13 +882,13 @@
                             {{-- Visual Header with Thematic Healthcare & PKU Crescent Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#064e3b] via-[#0d9488] to-[#10b981] p-4 flex flex-col justify-between overflow-hidden">
                                 {{-- Background Medical Cross Geometric Pattern --}}
-                                <svg class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:scale-110 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
+                                <svg aria-hidden="true" class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:scale-110 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="currentColor">
                                     <path d="M38 15H62V38H85V62H62V85H38V62H15V38H38V15Z" />
                                     <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="4 4"/>
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Bulan Sabit PKU, Stetoskop Hati & EKG --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
+                                <div aria-hidden="true" class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Garis Detak Jantung EKG Berkilau --}}
                                         <path d="M10 110L45 110L52 95L60 125L68 85L76 118L84 106L90 110L150 110" stroke="#a7f3d0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
@@ -744,7 +917,7 @@
 
                                 {{-- Top Floating Tag with Glassmorphism --}}
                                 <div class="relative z-10 flex items-center justify-between">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-teal-200"></span>
                                         Kesehatan PKU
                                     </span>
@@ -752,7 +925,7 @@
 
                                 {{-- Bottom Title Overlay --}}
                                 <div class="relative z-10">
-                                    <span class="text-[10px] text-teal-100 font-bold tracking-wide uppercase block">RS PKU Muhammadiyah</span>
+                                    <span class="text-xs text-teal-100 font-bold tracking-wide uppercase block">RS PKU Muhammadiyah</span>
                                     <h3 class="font-extrabold text-sm sm:text-base leading-tight text-white drop-shadow-xs">Baitul Arqam Nakes</h3>
                                 </div>
 
@@ -773,17 +946,15 @@
 
                                 {{-- Competency Chips --}}
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 text-[10px] font-semibold border border-teal-100">Fikih Pasien</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-medium border border-slate-100">Tanggap MDMC</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 text-xs font-semibold border border-teal-100">Fikih Pasien</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-xs font-medium border border-slate-100">Tanggap MDMC</span>
                                 </div>
                                 
                                 {{-- Rating & Duration --}}
                                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                     <div class="flex items-center gap-1.5 text-xs">
-                                        <div class="flex text-amber-400">
-                                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                                        </div>
-                                        <span class="font-extrabold text-slate-800 text-xs">4.9</span>
+                                        <svg class="w-3.5 h-3.5 text-teal-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span class="font-extrabold text-slate-800 text-xs">{{ number_format($totalEvent) }} <span class="text-slate-500 font-semibold">Event Terselenggara</span></span>
                                     </div>
                                     <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded-full">
                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -808,7 +979,7 @@
                             {{-- Visual Header with Thematic Master Trainer Podium & Soundwave Illustration --}}
                             <div class="h-44 sm:h-40 relative bg-gradient-to-br from-[#2e1065] via-[#4f46e5] to-[#7c3aed] p-4 flex flex-col justify-between overflow-hidden">
                                 {{-- Background Soundwave / Radar Geometric Watermark --}}
-                                <svg class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:scale-110 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                                <svg aria-hidden="true" class="absolute -right-8 -top-8 w-44 h-44 text-white/10 pointer-events-none group-hover:scale-110 transition-transform duration-700 ease-out" viewBox="0 0 100 100" fill="none" stroke="currentColor">
                                     <circle cx="50" cy="50" r="15" stroke-width="2"/>
                                     <circle cx="50" cy="50" r="28" stroke-width="2" stroke-dasharray="4 4"/>
                                     <circle cx="50" cy="50" r="40" stroke-width="2"/>
@@ -816,7 +987,7 @@
                                 </svg>
 
                                 {{-- Thematic Foreground Illustration: Podium Fasilitator, Dual Mic & Medali Instruktur --}}
-                                <div class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
+                                <div aria-hidden="true" class="absolute right-2 bottom-2 w-32 h-28 pointer-events-none group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 ease-out">
                                     <svg viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
                                         {{-- Sorot Cahaya Spotlight Panggung --}}
                                         <polygon points="40,10 130,10 150,130 20,130" fill="#a5b4fc" opacity="0.15"/>
@@ -859,7 +1030,7 @@
 
                                 {{-- Top Floating Tag with Glassmorphism --}}
                                 <div class="relative z-10 flex items-center justify-between">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 text-white backdrop-blur-md border border-white/25 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
                                         TOT Instruktur
                                     </span>
@@ -867,7 +1038,7 @@
 
                                 {{-- Bottom Title Overlay --}}
                                 <div class="relative z-10">
-                                    <span class="text-[10px] text-indigo-100 font-bold tracking-wide uppercase block">Korps Instruktur</span>
+                                    <span class="text-xs text-indigo-100 font-bold tracking-wide uppercase block">Korps Instruktur</span>
                                     <h3 class="font-extrabold text-sm sm:text-base leading-tight text-white drop-shadow-xs">Pelatihan Instruktur BA</h3>
                                 </div>
 
@@ -888,17 +1059,15 @@
 
                                 {{-- Competency Chips --}}
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-800 text-[10px] font-semibold border border-indigo-100">Andragogi Modern</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-[10px] font-medium border border-slate-100">Rubrik Asesmen</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-800 text-xs font-semibold border border-indigo-100">Andragogi Modern</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 text-xs font-medium border border-slate-100">Rubrik Asesmen</span>
                                 </div>
                                 
                                 {{-- Rating & Duration --}}
                                 <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                     <div class="flex items-center gap-1.5 text-xs">
-                                        <div class="flex text-amber-400">
-                                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                                        </div>
-                                        <span class="font-extrabold text-slate-800 text-xs">5.0</span>
+                                        <svg class="w-3.5 h-3.5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span class="font-extrabold text-slate-800 text-xs">{{ number_format($totalKader) }} <span class="text-slate-500 font-semibold">Kader Terdata</span></span>
                                     </div>
                                     <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100/80 px-2 py-0.5 rounded-full">
                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -934,7 +1103,7 @@
                 <div class="hidden lg:block absolute top-9 left-[14%] right-[14%] h-0.5 border-t-2 border-dashed border-slate-200 z-0 pointer-events-none reveal-fade reveal-delay-200"></div>
 
                 {{-- Step 1 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-100 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-sky-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-100 card-lift-sm p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-sky-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-sky-50 border-2 border-white shadow-sm flex items-center justify-center text-sky-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-sky-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">1</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -946,7 +1115,7 @@
                 </div>
 
                 {{-- Step 2 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-200 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-indigo-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-200 card-lift-sm p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-indigo-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-indigo-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">2</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -958,7 +1127,7 @@
                 </div>
 
                 {{-- Step 3 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-300 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-amber-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-300 card-lift-sm p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-amber-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-amber-50 border-2 border-white shadow-sm flex items-center justify-center text-amber-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">3</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -970,7 +1139,7 @@
                 </div>
 
                 {{-- Step 4 --}}
-                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-400 card-lift-sm cursor-pointer p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-emerald-100 transition-all duration-300">
+                <div class="group relative z-10 text-center space-y-3 reveal-pop reveal-delay-400 card-lift-sm p-3 sm:p-4 rounded-3xl hover:bg-white hover:shadow-md hover:border hover:border-emerald-100 transition-all duration-300">
                     <div class="w-18 h-18 mx-auto rounded-2xl bg-emerald-50 border-2 border-white shadow-sm flex items-center justify-center text-emerald-600 relative group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                         <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-xs group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300">4</span>
                         <svg class="w-8 h-8 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
@@ -1083,23 +1252,23 @@
                             <div class="absolute bottom-0 inset-x-0 z-[400] bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-3.5 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[11px] font-semibold text-slate-700 shadow-xs">
                                 {{-- Left: Zona Wilayah Legend --}}
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Zona:</span>
-                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-[10px]">
+                                    <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Zona:</span>
+                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-xs">
                                         <span class="w-2 h-2 rounded-full bg-[#005c8a] border border-[#f8bb00] shrink-0"></span>
                                         <span>Pusat &amp; Barat <span class="text-slate-400 font-normal">(6)</span></span>
                                     </div>
-                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-[10px]">
+                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-xs">
                                         <span class="w-2 h-2 rounded-full bg-[#0284c7] border border-[#f8bb00] shrink-0"></span>
                                         <span>Lereng Lawu <span class="text-slate-400 font-normal">(7)</span></span>
                                     </div>
-                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-[10px]">
+                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/70 text-xs">
                                         <span class="w-2 h-2 rounded-full bg-[#d97706] border border-[#f8bb00] shrink-0"></span>
                                         <span>Selatan <span class="text-slate-400 font-normal">(4)</span></span>
                                     </div>
                                 </div>
 
                                 {{-- Right: GIS Attribution --}}
-                                <div class="flex items-center gap-2 text-[10px] text-slate-400 shrink-0">
+                                <div class="flex items-center gap-2 text-xs text-slate-400 shrink-0">
                                     <span class="inline-flex items-center gap-1 font-medium text-slate-500">
                                         <svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                         GIS 17 PCM
@@ -1117,11 +1286,11 @@
                     <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-3.5 h-full reveal-right reveal-delay-250">
                         
                         {{-- Active / Selected Cabang Details Card (Compact) --}}
-                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm space-y-2.5 relative overflow-hidden shrink-0 card-lift card-sheen hover:border hover:border-sky-500/50 hover:shadow-xl transition-all duration-300"
+                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm space-y-2.5 relative overflow-hidden shrink-0 card-lift hover:border hover:border-sky-500/50 hover:shadow-xl transition-all duration-300"
                              x-show="selectedCabang">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/10 text-sky-300 border border-white/10 uppercase tracking-wider mb-0.5"
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-white/10 text-sky-300 border border-white/10 uppercase tracking-wider mb-0.5"
                                           x-text="selectedCabang?.zona"></span>
                                     <h3 class="text-base font-black text-white" x-text="'PCM ' + selectedCabang?.nama"></h3>
                                     <p class="text-[11px] text-slate-300 flex items-center gap-1 mt-0.5" x-text="selectedCabang?.alamat"></p>
@@ -1134,15 +1303,15 @@
 
                             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
                                 <div class="bg-white/5 rounded-xl p-2">
-                                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Kader Terdaftar</span>
+                                    <span class="text-xs text-slate-400 uppercase font-bold block">Kader Terdaftar</span>
                                     <span class="text-lg font-extrabold text-white" x-text="selectedCabang?.total"></span>
-                                    <span class="text-[9px] text-sky-400 block font-medium"
+                                    <span class="text-xs text-sky-400 block font-medium"
                                           x-text="totalKaderKabupaten > 0 ? (Math.round((selectedCabang?.total / totalKaderKabupaten) * 100) + '% dari total') : '0%'"></span>
                                 </div>
                                 <div class="bg-white/5 rounded-xl p-2">
-                                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Ranting PRM</span>
+                                    <span class="text-xs text-slate-400 uppercase font-bold block">Ranting PRM</span>
                                     <span class="text-lg font-extrabold text-amber-300" x-text="selectedCabang?.ranting"></span>
-                                    <span class="text-[9px] text-slate-400 block font-medium">Binaan Cabang</span>
+                                    <span class="text-xs text-slate-400 block font-medium">Binaan Cabang</span>
                                 </div>
                             </div>
 
@@ -1164,9 +1333,9 @@
                             <div class="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700 shrink-0">
                                 <div class="flex items-center gap-2">
                                     <span>Daftar Cabang</span>
-                                    <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-700 font-bold" x-text="filteredCabang.length"></span>
+                                    <span class="text-xs px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-700 font-bold" x-text="filteredCabang.length"></span>
                                 </div>
-                                <span class="text-[10px] text-slate-400 font-normal">Klik untuk zoom di peta</span>
+                                <span class="text-xs text-slate-400 font-normal">Klik untuk zoom di peta</span>
                             </div>
                             
                             {{-- Exactly 5 Items Visible Window (h-[235px]) with smooth scrolling --}}
@@ -1179,29 +1348,29 @@
                                         <div class="min-w-0 flex-1">
                                             <div class="flex items-center gap-1.5">
                                                 <h4 class="font-bold text-slate-900 text-xs truncate" x-text="'PCM ' + cabang.nama"></h4>
-                                                <span class="text-[8px] px-1.5 py-0.2 rounded font-semibold bg-slate-100 text-slate-500" x-text="cabang.zona.split(' ')[0]"></span>
+                                                <span class="text-xs px-1.5 py-0.2 rounded font-semibold bg-slate-100 text-slate-500" x-text="cabang.zona.split(' ')[0]"></span>
                                             </div>
                                             <div class="flex items-center gap-2 mt-0.5">
                                                 <div class="w-20 bg-slate-200 rounded-full h-1 overflow-hidden">
                                                     <div class="bg-sky-500 h-1 rounded-full"
                                                          :style="'width: ' + Math.max(6, Math.round((cabang.total / maxKaderCabang) * 100)) + '%'"></div>
                                                 </div>
-                                                <span class="text-[10px] text-slate-400" x-text="cabang.ranting + ' PRM'"></span>
+                                                <span class="text-xs text-slate-400" x-text="cabang.ranting + ' PRM'"></span>
                                             </div>
                                         </div>
 
                                         <div class="text-right shrink-0">
                                             <span class="text-xs font-black text-slate-800" x-text="cabang.total"></span>
-                                            <span class="text-[9px] text-slate-400 block leading-none">Kader</span>
+                                            <span class="text-xs text-slate-400 block leading-none">Kader</span>
                                         </div>
                                     </button>
                                 </template>
                             </div>
 
                             {{-- Footer Indicator for Scroll Down --}}
-                            <div class="px-3.5 py-2 bg-slate-50/90 border-t border-slate-200/70 text-[10px] text-slate-500 flex items-center justify-between font-medium shrink-0">
+                            <div class="px-3.5 py-2 bg-slate-50/90 border-t border-slate-200/70 text-xs text-slate-500 flex items-center justify-between font-medium shrink-0">
                                 <span class="text-slate-400">Menampilkan 5 dari <span class="font-bold text-slate-700" x-text="filteredCabang.length"></span> cabang</span>
-                                <span class="inline-flex items-center gap-1 text-[10px] text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200/60">
+                                <span class="inline-flex items-center gap-1 text-xs text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200/60">
                                     <span>Scroll ke bawah</span>
                                     <svg class="w-3 h-3 text-sky-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                                 </span>
@@ -1240,7 +1409,7 @@
                         </div>
 
                         {{-- Helpdesk Card --}}
-                        <div class="group p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4 card-lift-sm card-sheen hover:border-sky-300 hover:shadow-md transition-all duration-300 reveal-left reveal-delay-200">
+                        <div class="group p-5 sm:p-6 rounded-2xl bg-white border border-sky-200/80 shadow-xs space-y-4 card-lift-sm hover:border-sky-300 hover:shadow-md transition-all duration-300 reveal-left reveal-delay-200">
                             <div class="flex items-center gap-3.5">
                                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#005c8a] to-[#01b0f5] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -1290,7 +1459,7 @@
                                     Baitul Arqam wajib diikuti oleh seluruh pimpinan persyarikatan di semua jenjang (PDM, 17 Cabang PCM, dan Ranting PRM), pimpinan Organisasi Otonom (Ortom), serta guru, dosen, tenaga medis, dan karyawan Amal Usaha Muhammadiyah (AUM) se-Kabupaten Karanganyar.
                                 </p>
                                 <p class="text-slate-500 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                    💡 <strong>Catatan:</strong> Pelatihan ini merupakan prasyarat pembinaan ideologis, komitmen manhaj persyarikatan, serta standardisasi kepemimpinan berkemajuan.
+                                    <span aria-hidden="true">💡</span> <strong>Catatan:</strong> Pelatihan ini merupakan prasyarat pembinaan ideologis, komitmen manhaj persyarikatan, serta standardisasi kepemimpinan berkemajuan.
                                 </p>
                             </div>
                         </div>
@@ -1458,7 +1627,7 @@
                         <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
                         <div class="flex flex-col">
                             <span class="font-extrabold text-xl text-slate-900 tracking-tight leading-none">MPKSDI<span class="text-sky-500">.</span></span>
-                            <span class="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-1">PDM Kabupaten Karanganyar</span>
+                            <span class="text-xs text-slate-400 font-bold tracking-wider uppercase mt-1">PDM Kabupaten Karanganyar</span>
                         </div>
                     </div>
 
@@ -1476,7 +1645,7 @@
                                 </svg>
                             </div>
                             <div class="text-left">
-                                <span class="text-[9px] text-slate-400 uppercase font-bold block leading-none">WhatsApp</span>
+                                <span class="text-xs text-slate-400 uppercase font-bold block leading-none">WhatsApp</span>
                                 <span class="font-bold text-slate-800 group-hover:text-emerald-700 text-xs">0812-2630-9576</span>
                             </div>
                         </a>
@@ -1489,7 +1658,7 @@
                                 </svg>
                             </div>
                             <div class="text-left">
-                                <span class="text-[9px] text-slate-400 uppercase font-bold block leading-none">Email</span>
+                                <span class="text-xs text-slate-400 uppercase font-bold block leading-none">Email</span>
                                 <span class="font-bold text-slate-800 group-hover:text-sky-700 text-xs">mpksdi@pdmkaranganyar.org</span>
                             </div>
                         </a>
@@ -1574,7 +1743,7 @@
                     {{-- Developed by gemala.dev (href to Instagram) --}}
                     <a href="https://instagram.com/gemala.dev" target="_blank" rel="noopener noreferrer"
                        class="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 transition-all text-slate-600 hover:text-sky-700 shadow-2xs">
-                        <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">Developed by</span>
+                        <span class="text-xs text-slate-400 font-medium whitespace-nowrap">Developed by</span>
                         <div class="flex items-center gap-1 font-bold text-[11px] text-slate-800 group-hover:text-sky-600 whitespace-nowrap">
                             <img src="{{ asset('aset/logo-gemaladev.png') }}" alt="Logo gemala.dev" class="h-3.5 w-3.5 object-contain group-hover:scale-110 transition-transform">
                             <span>gemala.dev</span>
@@ -1584,7 +1753,7 @@
                     {{-- Back to Top Button --}}
                     <button type="button" 
                             onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" 
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 font-semibold transition cursor-pointer border border-slate-200/80 shadow-2xs shrink-0 text-[10px]">
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 font-semibold transition border border-slate-200/80 shadow-2xs shrink-0 text-xs">
                         <span>Ke Atas</span>
                         <svg class="w-3 h-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
@@ -1660,7 +1829,7 @@
                                             ${cabang.total}
                                         </div>
                                         <div class="w-2 h-2 mx-auto rotate-45 -mt-1 shadow-xs" style="background-color: ${color};"></div>
-                                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-900/95 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-900/95 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50">
                                             PCM ${cabang.nama}
                                         </div>
                                     </div>
@@ -1678,7 +1847,7 @@
                                 
                                 const popupContent = `
                                     <div class="p-1 min-w-[190px] font-sans">
-                                        <div class="text-[10px] font-bold uppercase text-sky-600 tracking-wider">${cabang.zona}</div>
+                                        <div class="text-xs font-bold uppercase text-sky-600 tracking-wider">${cabang.zona}</div>
                                         <div class="font-extrabold text-sm text-slate-900 leading-tight">PCM ${cabang.nama}</div>
                                         <div class="text-[11px] text-slate-500 mt-1">${cabang.alamat}</div>
                                         <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
@@ -1784,71 +1953,71 @@
                  window.addEventListener('scroll', onScroll, { passive: true });
                  onScroll();
              }
-         }"
-         class="lg:hidden fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-sm sm:max-w-md z-[100] bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.18),0_2px_8px_-2px_rgba(15,23,42,0.06)] p-1.5 transition-all">
+          }"
+         class="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[340px] sm:max-w-sm z-[100] bg-white/92 backdrop-blur-xl rounded-full border border-slate-200/80 shadow-[0_10px_28px_-6px_rgba(15,23,42,0.12),0_2px_8px_-2px_rgba(15,23,42,0.04)] p-1.5 transition-all">
         
         <div class="grid {{ auth()->check() ? 'grid-cols-4' : 'grid-cols-5' }} items-center gap-1">
             
             {{-- 1. Beranda --}}
             <a href="#beranda"
                @click="activeSection = 'beranda'"
-               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
-               :class="activeSection === 'beranda' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
-                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'beranda' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full transition-all duration-200 group"
+               :class="activeSection === 'beranda' ? 'text-sky-600 font-bold bg-sky-50' : 'text-slate-500 hover:text-slate-800 font-medium'">
+                <svg class="w-4.5 h-4.5 transition-transform group-active:scale-90" :class="activeSection === 'beranda' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
-                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Beranda</span>
+                <span class="text-[10px] leading-none mt-1 tracking-tight">Beranda</span>
             </a>
 
             {{-- 2. Program --}}
             <a href="#program"
                @click="activeSection = 'program'"
-               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
-               :class="activeSection === 'program' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
-                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'program' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full transition-all duration-200 group"
+               :class="activeSection === 'program' ? 'text-sky-600 font-bold bg-sky-50' : 'text-slate-500 hover:text-slate-800 font-medium'">
+                <svg class="w-4.5 h-4.5 transition-transform group-active:scale-90" :class="activeSection === 'program' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Program</span>
+                <span class="text-[10px] leading-none mt-1 tracking-tight">Program</span>
             </a>
 
             {{-- 3. Peta Cabang --}}
             <a href="#sebaran"
                @click="activeSection = 'sebaran'"
-               class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all duration-200 group"
-               :class="activeSection === 'sebaran' ? 'text-sky-600 font-bold bg-sky-50/80' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium'">
-                <svg class="w-5 h-5 transition-transform group-active:scale-90" :class="activeSection === 'sebaran' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full transition-all duration-200 group"
+               :class="activeSection === 'sebaran' ? 'text-sky-600 font-bold bg-sky-50' : 'text-slate-500 hover:text-slate-800 font-medium'">
+                <svg class="w-4.5 h-4.5 transition-transform group-active:scale-90" :class="activeSection === 'sebaran' ? 'text-sky-600 stroke-[2.2]' : 'text-slate-500 stroke-[1.8]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Peta PCM</span>
+                <span class="text-[10px] leading-none mt-1 tracking-tight">Peta PCM</span>
             </a>
 
             @auth
-                {{-- 4. Dashboard (Logged in) --}}
+                {{-- 4. Dashboard (Logged in - Harmonious Pill Accent) --}}
                 <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-600 text-white font-bold shadow-xs shadow-sky-500/25 transition-all duration-200 group active:scale-95">
-                    <svg class="w-5 h-5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-sky-700 bg-sky-100/70 hover:bg-sky-100 font-bold transition-all duration-200 group active:scale-95">
+                    <svg class="w-4.5 h-4.5 text-sky-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
-                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Dashboard</span>
+                    <span class="text-[10px] leading-none mt-1 tracking-tight">Dashboard</span>
                 </a>
             @else
                 {{-- 4. Masuk --}}
                 <a href="{{ route('login') }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium transition-all duration-200 group active:scale-95">
-                    <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-800 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium transition-all duration-200 group active:scale-95">
+                    <svg class="w-4.5 h-4.5 text-slate-500 group-hover:text-slate-800 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
-                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Masuk</span>
+                    <span class="text-[10px] leading-none mt-1 tracking-tight">Masuk</span>
                 </a>
 
-                {{-- 5. Daftar (Primary Action - Proporsional dengan Ikon & Label) --}}
+                {{-- 5. Daftar (Primary Action - Harmonious Pill Accent) --}}
                 <a href="{{ route('anggota.register') }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-600 text-white font-bold shadow-xs shadow-sky-500/25 hover:brightness-105 transition-all duration-200 group active:scale-95">
-                    <svg class="w-5 h-5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-sky-700 bg-sky-100/70 hover:bg-sky-100 font-bold transition-all duration-200 group active:scale-95">
+                    <svg class="w-4.5 h-4.5 text-sky-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
-                    <span class="text-[10px] leading-tight mt-1 tracking-tight truncate max-w-full">Daftar</span>
+                    <span class="text-[10px] leading-none mt-1 tracking-tight">Daftar</span>
                 </a>
             @endauth
 

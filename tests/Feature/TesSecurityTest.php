@@ -6,11 +6,13 @@ use App\Models\Anggota;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use App\Models\PilihanJawaban;
 use App\Models\SesiTes;
 use App\Models\Soal;
 use App\Models\User;
 use App\Services\QrService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -71,5 +73,65 @@ class TesSecurityTest extends TestCase
         // Score must remain 100
         $p->refresh();
         $this->assertSame('100.00', $p->nilai_posttest);
+    }
+
+    public function test_submit_rejected_when_session_inactive(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'BA Inaktif',
+            'tanggal_mulai' => '2026-09-01',
+            'tanggal_selesai' => '2026-09-02',
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+
+        SesiTes::create(['event_id' => $event->id, 'tipe' => 'posttest', 'status' => 'tutup', 'durasi_menit' => 30]);
+
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $user->id]);
+        EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'qr_token' => app(QrService::class)->generateToken(),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('portal.tes.submit', [$event, 'posttest']), ['answers' => []])
+            ->assertForbidden();
+    }
+
+    public function test_submit_rejected_after_server_side_deadline(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'BA Deadline',
+            'tanggal_mulai' => '2026-09-01',
+            'tanggal_selesai' => '2026-09-02',
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+
+        $sesi = SesiTes::create(['event_id' => $event->id, 'tipe' => 'posttest', 'status' => 'aktif', 'durasi_menit' => 30]);
+
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $user->id]);
+        EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'qr_token' => app(QrService::class)->generateToken(),
+        ]);
+
+        // Mulai tes lama sekali (deadline lewat)
+        PesertaTesMulai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => Carbon::now()->subMinutes($sesi->durasi_menit + 1),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('portal.tes.submit', [$event, 'posttest']), ['answers' => []])
+            ->assertForbidden();
     }
 }

@@ -65,7 +65,8 @@ class AnggotaController extends Controller
 
         return redirect()
             ->route('admin.anggota.show', $anggota)
-            ->with('success', 'Anggota diverifikasi dan diaktifkan.');
+            ->with('success', 'Anggota diverifikasi dan diaktifkan.')
+            ->with('wa_url', $this->waUrl($anggota, WhatsAppNotificationService::pesanVerifikasiSukses($anggota)));
     }
 
     public function reject(Request $request, Anggota $anggota): RedirectResponse
@@ -81,7 +82,8 @@ class AnggotaController extends Controller
 
         return redirect()
             ->route('admin.anggota.show', $anggota)
-            ->with('success', 'Pendaftaran anggota telah ditolak dengan catatan.');
+            ->with('success', 'Pendaftaran anggota telah ditolak dengan catatan.')
+            ->with('wa_url', $this->waUrl($anggota, WhatsAppNotificationService::pesanPerbaikanDitolak($anggota)));
     }
 
     public function deactivate(Anggota $anggota): RedirectResponse
@@ -114,5 +116,12 @@ class AnggotaController extends Controller
             ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword}")
             ->with('wa_reset_url', $waUrl)
             ->with('reset_password_value', $defaultPassword);
+    }
+
+    private function waUrl(Anggota $anggota, string $pesan): ?string
+    {
+        return $anggota->no_wa
+            ? WhatsAppNotificationService::makeUrl($anggota->no_wa, $pesan)
+            : null;
     }
 }

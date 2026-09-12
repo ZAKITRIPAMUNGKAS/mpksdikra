@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AfektifController;
 use App\Http\Controllers\Admin\AnggotaController as AdminAnggotaController;
 use App\Http\Controllers\Admin\AnggotaImportController;
 use App\Http\Controllers\Admin\AngketController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventOutputController;
 use App\Http\Controllers\Admin\ExecutiveController;
@@ -31,11 +32,12 @@ use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\Portal\RtlController as PortalRtlController;
 use App\Http\Controllers\Portal\SertifikatController;
 use App\Http\Controllers\Portal\TesController as PortalTesController;
+use App\Http\Controllers\SystemHelpController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/cek-status', [CekStatusController::class, 'index'])->name('cek-status');
-Route::post('/cek-status', [CekStatusController::class, 'check'])->name('cek-status.check');
+Route::post('/cek-status', [CekStatusController::class, 'check'])->middleware('throttle:5,1')->name('cek-status.check');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -50,10 +52,13 @@ Route::get('/foto/anggota/{anggota}', [FotoController::class, 'show'])
     ->middleware('auth')
     ->name('foto.anggota');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/panduan', [SystemHelpController::class, 'panduan'])->name('panduan');
+    Route::get('/updates', [SystemHelpController::class, 'updates'])->name('updates');
+});
+
 Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', fn () => auth()->user()->isExecutive()
-        ? redirect()->route('admin.executive')
-        : view('admin.dashboard'))->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Executive: read-only overview
     Route::middleware('role:executive')->group(function () {
@@ -66,6 +71,7 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
         Route::get('/events/{event}', [EventController::class, 'show'])->middleware('event_access')->name('events.show');
         Route::get('/events/{event}/ranking', [EventOutputController::class, 'ranking'])->middleware('event_access')->name('events.ranking');
         Route::get('/events/{event}/report', [EventOutputController::class, 'report'])->middleware('event_access')->name('events.report');
+        Route::get('/events/{event}/export-excel', [EventOutputController::class, 'exportExcel'])->middleware('event_access')->name('events.exportExcel');
         Route::get('/events/{event}/outbound', [OutboundKelompokController::class, 'index'])->middleware('event_access')->name('events.outbound.index');
     });
 
@@ -130,7 +136,6 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
         Route::get('/events/{event}/rtl/{rtl}/bukti/{jawabanId}', [RtlAdminController::class, 'downloadBukti'])->name('events.rtl.bukti');
 
         Route::get('/events/{event}/peserta/{peserta}/certificate', [EventOutputController::class, 'certificate'])->name('events.certificate');
-        Route::get('/events/{event}/export-excel', [EventOutputController::class, 'exportExcel'])->name('events.exportExcel');
     });
 
     // Operational routes: admin + assigned facilitator (event_access)

@@ -23,10 +23,9 @@ class AnggotaRegistrationController extends Controller
     {
         $data = $request->validated();
         $fotoPath = $request->file('foto')->store('anggota/foto', 'local');
+        $noWa = NomorWaNormalizer::normalize($data['no_wa']);
 
-        DB::transaction(function () use ($data, $fotoPath) {
-            $noWa = NomorWaNormalizer::normalize($data['no_wa']);
-
+        DB::transaction(function () use ($data, $fotoPath, $noWa) {
             $user = User::create([
                 'name' => $data['nama_lengkap'],
                 'email' => $data['email'] ?? ('anggota+'.$data['nik'].'@placeholder.test'),
@@ -46,6 +45,13 @@ class AnggotaRegistrationController extends Controller
         });
 
         return redirect()->route('anggota.register')
-            ->with('success', 'Pendaftaran terkirim. Akun menunggu verifikasi admin.');
+            ->with('success', 'Pendaftaran berhasil dikirim. Anda telah terdaftar dan akun menunggu verifikasi data oleh tim admin MPKSDI.')
+            ->with('registered_data', [
+                'nama' => $data['nama_lengkap'],
+                'nik' => $data['nik'],
+                'no_wa' => $noWa,
+                'email' => $data['email'] ?? null,
+                'kecamatan' => $data['kecamatan'] ?? null,
+            ]);
     }
 }

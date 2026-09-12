@@ -109,7 +109,7 @@ class AbsensiService
 
         PenilaianAkhir::updateOrCreate(
             ['event_id' => $eventId, 'anggota_id' => $anggotaId],
-            ['nilai_kehadiran' => $persen]
+            ['nilai_kehadiran' => $persen, 'status_kelulusan' => $this->statusKelulusan($persen)]
         );
 
         return $persen;

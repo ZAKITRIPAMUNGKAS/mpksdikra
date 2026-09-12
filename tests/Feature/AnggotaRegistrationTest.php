@@ -121,4 +121,51 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('Ketua Takmir Masjid Al-Ikhlas', $anggota->jabatan_takmir);
         $this->assertSame('Ketua RT 02 / RW 05 dan Anggota BPD', $anggota->keaktifan_kemasyarakatan);
     }
+
+    public function test_wa_with_spaces_and_hyphens_is_sanitized_and_accepted(): void
+    {
+        Storage::fake('local');
+
+        $this->post(route('anggota.register.store'), $this->payload([
+            'no_wa' => '0812-3456-7890',
+        ]))
+            ->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $user = User::where('email', 'budi@example.test')->first();
+        $this->assertNotNull($user);
+        $this->assertSame('6281234567890', $user->no_wa);
+    }
+
+    public function test_duplicate_email_rejected(): void
+    {
+        Storage::fake('local');
+        User::factory()->create(['email' => 'budi@example.test']);
+
+        $this->post(route('anggota.register.store'), $this->payload())
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_registration_redirect_renders_waiting_verification_status_card(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->post(route('anggota.register.store'), $this->payload([
+            'nama_lengkap' => 'Kader Ahmad Dahlan, S.Kom.',
+            'nik' => '3313010101990001',
+            'no_wa' => '081234567899',
+            'kecamatan' => 'Karanganyar',
+        ]));
+
+        $response->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success')
+            ->assertSessionHas('registered_data');
+
+        $follow = $this->followRedirects($response);
+        $follow->assertOk()
+            ->assertSee('Alhamdulillah, Anda Telah Berhasil Terdaftar!')
+            ->assertSee('Menunggu Verifikasi Data')
+            ->assertSee('Kader Ahmad Dahlan, S.Kom.')
+            ->assertSee('Periksa Status Pendaftaran');
+    }
 }

@@ -12,6 +12,7 @@ class SertifikatController extends Controller
 {
     public function download(Event $event)
     {
+        $this->authorize('participate', $event);
         $ep = EventPeserta::where('event_id', $event->id)
             ->where('anggota_id', auth()->user()->anggota->id)
             ->where('status_aktif', true)

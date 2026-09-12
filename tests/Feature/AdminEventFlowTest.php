@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Anggota;
 use App\Models\Event;
 use App\Models\EventPeserta;
+use App\Models\PenilaianAkhir;
 use App\Models\User;
+use App\Services\QrService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -118,5 +120,53 @@ class AdminEventFlowTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertSame('selesai', $event->fresh()->status);
+    }
+
+    public function test_admin_certificate_forbidden_when_event_not_finished(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload(['status' => 'berlangsung']) + ['created_by' => $admin->id]);
+
+        $anggotaUser = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $anggotaUser->id]);
+        $peserta = EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'qr_token' => app(QrService::class)->generateToken(),
+        ]);
+        PenilaianAkhir::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'nilai_kehadiran' => 100,
+            'status_kelulusan' => 'Lulus',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.events.certificate', [$event, $peserta]))
+            ->assertForbidden();
+    }
+
+    public function test_admin_certificate_forbidden_when_not_lulus(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload(['status' => 'selesai']) + ['created_by' => $admin->id]);
+
+        $anggotaUser = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $anggotaUser->id]);
+        $peserta = EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'qr_token' => app(QrService::class)->generateToken(),
+        ]);
+        PenilaianAkhir::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'nilai_kehadiran' => 50,
+            'status_kelulusan' => 'Tidak Lulus',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.events.certificate', [$event, $peserta]))
+            ->assertForbidden();
     }
 }

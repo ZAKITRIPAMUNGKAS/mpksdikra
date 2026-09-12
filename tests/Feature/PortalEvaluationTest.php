@@ -144,16 +144,46 @@ class PortalEvaluationTest extends TestCase
         PenilaianAkhir::firstOrCreate([
             'event_id' => $event->id,
             'anggota_id' => $this->ctx['anggota']->id,
-        ], ['nilai_posttest' => 80, 'nilai_akhir' => 80, 'status_kelulusan' => 'Lulus']);
+        ], ['nilai_posttest' => 80, 'nilai_akhir' => 80, 'nilai_kehadiran' => 100, 'status_kelulusan' => 'Lulus']);
 
         $this->actingAs($this->ctx['admin'])
             ->get(route('admin.events.report', $event))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
 
+        // Guard sertifikat admin butuh event selesai + peserta lulus
+        $event->update(['status' => 'selesai']);
+
         $this->actingAs($this->ctx['admin'])
             ->get(route('admin.events.certificate', [$event, $this->ctx['ep']]))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_admin_and_executive_can_download_excel_report(): void
+    {
+        $event = $this->ctx['event'];
+        PenilaianAkhir::firstOrCreate([
+            'event_id' => $event->id,
+            'anggota_id' => $this->ctx['anggota']->id,
+        ], ['nilai_posttest' => 85, 'nilai_akhir' => 85, 'nilai_kehadiran' => 100, 'status_kelulusan' => 'Lulus']);
+
+        // Admin downloads Excel
+        $responseAdmin = $this->actingAs($this->ctx['admin'])
+            ->get(route('admin.events.exportExcel', $event));
+        $responseAdmin->assertOk();
+        $this->assertStringContainsString('spreadsheetml', $responseAdmin->headers->get('content-type') ?? '');
+
+        // Executive downloads Excel
+        $executiveUser = User::factory()->create(['role' => 'executive', 'status' => 'aktif']);
+        $responseExec = $this->actingAs($executiveUser)
+            ->get(route('admin.events.exportExcel', $event));
+        $responseExec->assertOk();
+
+        // Executive dashboard view
+        $this->actingAs($executiveUser)
+            ->get(route('admin.executive'))
+            ->assertOk()
+            ->assertSee('Tingkat Kelulusan');
     }
 }

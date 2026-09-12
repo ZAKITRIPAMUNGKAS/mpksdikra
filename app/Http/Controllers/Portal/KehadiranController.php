@@ -18,6 +18,7 @@ class KehadiranController extends Controller
 
     public function index(Event $event): View
     {
+        $this->authorize('participate', $event);
         $ep = $this->participantOf($event);
 
         $sesi = EventSesi::where('event_id', $event->id)->orderBy('urutan')->get();
@@ -33,6 +34,7 @@ class KehadiranController extends Controller
 
     public function idCard(Event $event)
     {
+        $this->authorize('participate', $event);
         $ep = $this->participantOf($event);
         $ep->load('anggota');
 

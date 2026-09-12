@@ -7,7 +7,6 @@ use App\Models\AngketItem;
 use App\Models\AngketJawaban;
 use App\Models\AngketKomentar;
 use App\Models\Event;
-use App\Models\EventPeserta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +16,7 @@ class AngketController extends Controller
 {
     public function index(Event $event): View
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $items = AngketItem::where('event_id', $event->id)->orderBy('urutan')->get()->groupBy('kategori');
 
         return view('portal.angket', compact('event', 'items'));
@@ -25,7 +24,7 @@ class AngketController extends Controller
 
     public function save(Request $request, Event $event): RedirectResponse
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $data = $request->validate([
             'jawaban' => ['required', 'array'],
             'jawaban.*' => ['required', 'integer', 'min:1', 'max:5'],
@@ -46,10 +45,5 @@ class AngketController extends Controller
         });
 
         return back()->with('success', 'Angket tersimpan.');
-    }
-
-    private function ensureParticipant(Event $event): void
-    {
-        abort_unless(EventPeserta::where('event_id', $event->id)->where('anggota_id', auth()->user()->anggota->id)->where('status_aktif', true)->exists(), 403);
     }
 }

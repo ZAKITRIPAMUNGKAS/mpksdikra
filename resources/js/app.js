@@ -1,9 +1,11 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 import L from 'leaflet';
+import Chart from 'chart.js/auto';
 
 window.Alpine = Alpine;
 window.L = L;
+window.Chart = Chart;
 Alpine.start();
 
 // Unified Dynamic Scroll Animation & Reveal Engine
@@ -21,12 +23,7 @@ function initScrollReveal() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-revealed');
-            } else {
-                // Re-arm element when scrolled out of view to re-animate on every scroll
-                const rect = entry.target.getBoundingClientRect();
-                if (rect.top > window.innerHeight * 0.92 || rect.bottom < -150) {
-                    entry.target.classList.remove('is-revealed');
-                }
+                revealObserver.unobserve(entry.target);
             }
         });
     }, {
@@ -64,14 +61,46 @@ function initScrollProgress() {
     }, { passive: true });
 }
 
+// Desktop nav scroll-spy: highlight section link as it enters view
+function initScrollSpy() {
+    const links = document.querySelectorAll('header nav a[href^="#"]');
+    if (!links.length) return;
+
+    const map = new Map();
+    links.forEach(a => {
+        const el = document.querySelector(a.getAttribute('href'));
+        if (el) map.set(el, a);
+    });
+    if (!map.size) return;
+
+    const activate = (a) => {
+        links.forEach(l => {
+            const active = l === a;
+            l.classList.toggle('text-sky-600', active);
+            l.classList.toggle('font-bold', active);
+            l.setAttribute('aria-current', active ? 'true' : 'false');
+        });
+    };
+
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) activate(map.get(e.target));
+        });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    map.forEach((_, el) => obs.observe(el));
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initScrollReveal();
         initScrollProgress();
+        initScrollSpy();
     });
 } else {
     initScrollReveal();
     initScrollProgress();
+    initScrollSpy();
 }
 
 

@@ -31,7 +31,7 @@ class TesController extends Controller
 
     public function show(Event $event, string $tipe): View|RedirectResponse
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
 
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
@@ -59,10 +59,24 @@ class TesController extends Controller
 
     public function submit(Request $request, Event $event, string $tipe): RedirectResponse
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
 
         $anggotaId = auth()->user()->anggota->id;
+
+        $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
+        abort_unless($sesi && $sesi->status === 'aktif', 403, 'Sesi tes tidak aktif.');
+
+        $mulai = PesertaTesMulai::where('event_id', $event->id)
+            ->where('anggota_id', $anggotaId)
+            ->where('tipe', $tipe)
+            ->first();
+        abort_if(
+            $mulai && $mulai->waktu_mulai->copy()->addMinutes($sesi->durasi_menit)->isPast(),
+            403,
+            'Waktu tes telah habis.'
+        );
+
         if ($this->tes->hasSubmitted($event, $anggotaId, $tipe)) {
             return redirect()->route('portal.tes.index')->with('warning', 'Tes ini sudah diserahkan sebelumnya.');
         }
@@ -71,12 +85,5 @@ class TesController extends Controller
         $score = $this->tes->submitAnswers($event, $anggotaId, $tipe, $data['answers'] ?? []);
 
         return redirect()->route('portal.tes.index')->with('success', "Tes selesai. Nilai: {$score}");
-    }
-
-    private function ensureParticipant(Event $event): void
-    {
-        abort_unless(EventPeserta::where('event_id', $event->id)
-            ->where('anggota_id', auth()->user()->anggota->id)
-            ->where('status_aktif', true)->exists(), 403);
     }
 }

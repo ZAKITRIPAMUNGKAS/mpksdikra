@@ -22,7 +22,20 @@ class LaporanEventExport implements FromView
             ->get();
 
         $event = Event::findOrFail($this->eventId);
+        $totalPeserta = $ranking->count();
+        $totalLulus = $ranking->where('status_kelulusan', 'Lulus')->count();
+        $totalBersyarat = $ranking->where('status_kelulusan', 'Lulus Bersyarat')->count();
+        $totalTidakLulus = $ranking->where('status_kelulusan', 'Tidak Lulus')->count();
+        $rerataNA = $ranking->avg('nilai_akhir') ?? 0;
 
-        return view('exports.laporan-event', compact('ranking', 'event'));
+        return view('exports.laporan-event', compact(
+            'ranking',
+            'event',
+            'totalPeserta',
+            'totalLulus',
+            'totalBersyarat',
+            'totalTidakLulus',
+            'rerataNA'
+        ));
     }
 }

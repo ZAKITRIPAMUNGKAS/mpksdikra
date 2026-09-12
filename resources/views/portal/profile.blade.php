@@ -5,27 +5,27 @@
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6" x-data="{ tab: 'identitas' }">
     {{-- Header Banner with Avatar & Status --}}
-    <div class="bg-[#f3f5f8] rounded-3xl border border-sky-100/80 p-6 sm:p-8 shadow-xs relative overflow-hidden card-lift-sm">
-        <x-batik-corner position="top-right" class="w-40 h-40 text-[#005c8a] opacity-[0.22]" />
+    <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs relative overflow-hidden">
+        <x-batik-corner position="top-right" class="w-36 h-36 text-[#005c8a] opacity-[0.18]" />
 
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
             <div class="flex items-center gap-4">
                 @if($anggota?->foto)
-                    <img src="{{ route('foto.anggota', $anggota) }}" alt="{{ $anggota->nama_lengkap }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-sky-500 shadow-xs shrink-0">
+                    <img src="{{ route('foto.anggota', $anggota) }}" alt="{{ $anggota->nama_lengkap }}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-sky-400/80 shadow-2xs shrink-0">
                 @else
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-950 to-[#005c8a] border-2 border-sky-400 flex items-center justify-center text-[#f8bb00] text-2xl font-black shrink-0 shadow-xs">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-slate-950 to-[#005c8a] border border-sky-400/80 flex items-center justify-center text-[#f8bb00] text-xl font-bold shrink-0 shadow-2xs">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                 @endif
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">{{ $anggota?->nama_lengkap ?? auth()->user()->name }}</h1>
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $anggota?->nama_lengkap ?? auth()->user()->name }}</h1>
                         @if($anggota?->catatan_verifikasi)
-                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-300/80">
                                 Catatan Verifikasi
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300/80">
                                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 Terdaftar di MPKSDI
                             </span>
@@ -101,23 +101,23 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nama Lengkap (beserta gelar) <span class="text-red-500">*</span></label>
                 <input name="nama_lengkap" value="{{ old('nama_lengkap', $anggota->nama_lengkap) }}" required
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tempat Lahir <span class="text-red-500">*</span></label>
                     <input name="tempat_lahir" value="{{ old('tempat_lahir', $anggota->tempat_lahir) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Lahir <span class="text-red-500">*</span></label>
                     <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $anggota->tanggal_lahir?->format('Y-m-d')) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Status Pernikahan <span class="text-red-500">*</span></label>
-                    <select name="status_pernikahan" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="status_pernikahan" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
                         <option value="{{ $v }}" @selected(old('status_pernikahan', $anggota->status_pernikahan)===$v)>{{ $v }}</option>
                         @endforeach
@@ -128,24 +128,24 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alamat Lengkap Domisili <span class="text-red-500">*</span></label>
                 <textarea name="alamat_rumah" required rows="2"
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none resize-none transition">{{ old('alamat_rumah', $anggota->alamat_rumah) }}</textarea>
+                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none resize-none transition">{{ old('alamat_rumah', $anggota->alamat_rumah) }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Desa / Kelurahan <span class="text-red-500">*</span></label>
                     <input name="desa_kelurahan" value="{{ old('desa_kelurahan', $anggota->desa_kelurahan) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kecamatan <span class="text-red-500">*</span></label>
                     <input name="kecamatan" value="{{ old('kecamatan', $anggota->kecamatan) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kabupaten <span class="text-red-500">*</span></label>
                     <input name="kabupaten" value="{{ old('kabupaten', $anggota->kabupaten) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
             </div>
 
@@ -153,18 +153,18 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Amanah / Jabatan di AUM</label>
                     <input name="jabatan_aum" value="{{ old('jabatan_aum', $anggota->jabatan_aum) }}" placeholder="Contoh: Guru SMK Muhammadiyah 1 Karanganyar"
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendidikan Terakhir</label>
                     <input name="pendidikan_sd" value="{{ old('pendidikan_sd', $anggota->pendidikan_sd) }}" placeholder="Contoh: S1 Pendidikan Agama Islam"
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                 </div>
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex justify-end">
                 <button type="button" @click="tab = 'agama'"
-                    class="px-5 py-2 bg-mpksdi-600 hover:bg-mpksdi-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5">
+                    class="px-5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-2xs">
                     <span>Lanjut ke Data Keagamaan</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -181,7 +181,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kemampuan Baca Al-Qur'an</label>
-                    <select name="kemampuan_baca_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="kemampuan_baca_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         <option value="">-- Pilih Kemampuan --</option>
                         @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
                         <option value="{{ $v }}" @selected(old('kemampuan_baca_quran', $anggota->kemampuan_baca_quran)===$v)>{{ $v }}</option>
@@ -190,7 +190,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hafalan Al-Qur'an</label>
-                    <select name="hafalan_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="hafalan_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         <option value="">-- Pilih Capaian Hafalan --</option>
                         @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
                         <option value="{{ $v }}" @selected(old('hafalan_quran', $anggota->hafalan_quran)===$v)>{{ $v }}</option>
@@ -202,7 +202,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Sholat Berjamaah di Masjid</label>
-                    <select name="aktivitas_sholat_masjid" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="aktivitas_sholat_masjid" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         <option value="">-- Frekuensi --</option>
                         @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid', $anggota->aktivitas_sholat_masjid)===$v)>{{ $v }}</option>
@@ -211,7 +211,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kehadiran Kajian Keagamaan</label>
-                    <select name="aktivitas_kajian_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="aktivitas_kajian_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         <option value="">-- Frekuensi --</option>
                         @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama', $anggota->aktivitas_kajian_agama)===$v)>{{ $v }}</option>
@@ -220,7 +220,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Koleksi Buku Agama di Rumah</label>
-                    <select name="jumlah_buku_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-mpksdi-600 focus:ring-2 focus:ring-mpksdi-600/20 outline-none transition">
+                    <select name="jumlah_buku_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
                         <option value="">-- Jumlah Buku --</option>
                         @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
                         <option value="{{ $v }}" @selected(old('jumlah_buku_agama', $anggota->jumlah_buku_agama)===$v)>{{ $v }}</option>
@@ -527,12 +527,12 @@
         </div>
 
         {{-- Submission Bar --}}
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-sky-100 shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 card-lift-sm">
+        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="text-xs text-slate-500 text-center sm:text-left flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Perubahan data profil akan langsung tersimpan di pangkalan data MPKSDI PDM Karanganyar.</span>
             </div>
-            <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-[#f8bb00] hover:bg-amber-400 active:scale-[0.99] text-slate-950 font-black text-sm rounded-full border border-amber-400 shadow-md transition hover:scale-[1.02]">
+            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
                 Simpan Seluruh Perubahan Profil &rarr;
             </button>
         </div>

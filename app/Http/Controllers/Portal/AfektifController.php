@@ -7,7 +7,6 @@ use App\Models\AfektifButir;
 use App\Models\AfektifJawaban;
 use App\Models\AfektifSubAspek;
 use App\Models\Event;
-use App\Models\EventPeserta;
 use App\Services\NilaiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class AfektifController extends Controller
 
     public function index(Event $event): View
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $subAspek = AfektifSubAspek::where('event_id', $event->id)->where('aktif', true)->with('butir')->orderBy('urutan')->get();
 
         $existing = AfektifJawaban::where('event_id', $event->id)
@@ -32,7 +31,7 @@ class AfektifController extends Controller
 
     public function save(Request $request, Event $event): RedirectResponse
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $data = $request->validate(['jawaban' => ['required', 'array'], 'jawaban.*' => ['required', 'integer', 'min:1', 'max:4']]);
         $anggota = auth()->user()->anggota;
 
@@ -50,10 +49,5 @@ class AfektifController extends Controller
         });
 
         return back()->with('success', 'Afektif tersimpan.');
-    }
-
-    private function ensureParticipant(Event $event): void
-    {
-        abort_unless(EventPeserta::where('event_id', $event->id)->where('anggota_id', auth()->user()->anggota->id)->where('status_aktif', true)->exists(), 403);
     }
 }

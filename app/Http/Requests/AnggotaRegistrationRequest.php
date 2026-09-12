@@ -7,6 +7,14 @@ use Illuminate\Validation\Rule;
 
 class AnggotaRegistrationRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('no_wa')) {
+            $sanitized = preg_replace('/[\s\-\.]/', '', (string) $this->input('no_wa'));
+            $this->merge(['no_wa' => $sanitized]);
+        }
+    }
+
     public function rules(): array
     {
         $o = config('arqam.opsi_form');
@@ -25,7 +33,7 @@ class AnggotaRegistrationRequest extends FormRequest
             'kecamatan' => ['required', 'string', 'max:255'],
             'kabupaten' => ['required', 'string', 'max:255'],
             'no_wa' => ['required', 'string', 'regex:/^(0|62|\+62)8[0-9]{6,13}$/'],
-            'email' => ['nullable', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'foto' => ['required', 'image', 'max:2048'],
             'pendidikan_sd' => ['nullable', 'string', 'max:255'],
@@ -60,8 +68,17 @@ class AnggotaRegistrationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'no_wa.regex' => 'Nomor WhatsApp tidak valid.',
-            'nik.digits' => 'NIK harus 16 digit.',
+            'no_wa.regex' => 'Nomor WhatsApp tidak valid (contoh: 081234567890).',
+            'no_wa.required' => 'Nomor WhatsApp wajib diisi.',
+            'nik.digits' => 'NIK harus tepat 16 digit angka.',
+            'nik.unique' => 'NIK ini sudah terdaftar di pangkalan data.',
+            'email.unique' => 'Alamat email ini sudah terdaftar sebagai akun.',
+            'email.email' => 'Format email tidak valid.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'foto.required' => 'Pasfoto 3:4 wajib diunggah untuk kelengkapan administrasi.',
+            'foto.image' => 'Berkas pasfoto harus berupa format gambar (JPG, PNG, atau WebP).',
+            'foto.max' => 'Ukuran berkas pasfoto maksimal 2MB.',
         ];
     }
 }

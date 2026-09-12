@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\EventPeserta;
 use App\Models\Rtl;
 use App\Models\RtlJawaban;
 use App\Models\RtlSoal;
@@ -17,7 +16,7 @@ class RtlController extends Controller
 {
     public function index(Event $event): View
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $soal = RtlSoal::where('event_id', $event->id)->orderBy('urutan')->get();
         $anggota = auth()->user()->anggota;
         $rtl = Rtl::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first();
@@ -28,7 +27,7 @@ class RtlController extends Controller
 
     public function submit(Request $request, Event $event): RedirectResponse
     {
-        $this->ensureParticipant($event);
+        $this->authorize('participate', $event);
         $anggota = auth()->user()->anggota;
         $rtl = Rtl::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first();
 
@@ -75,10 +74,5 @@ class RtlController extends Controller
         });
 
         return back()->with('success', 'RTL terkirim.');
-    }
-
-    private function ensureParticipant(Event $event): void
-    {
-        abort_unless(EventPeserta::where('event_id', $event->id)->where('anggota_id', auth()->user()->anggota->id)->where('status_aktif', true)->exists(), 403);
     }
 }

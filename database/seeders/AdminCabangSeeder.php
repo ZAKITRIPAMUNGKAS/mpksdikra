@@ -28,10 +28,10 @@ use Illuminate\Support\Facades\Hash;
  */
 class AdminCabangSeeder extends Seeder
 {
-    /** Password default admin cabang — wajib diganti setelah deploy */
-    private const PASS_CABANG = 'CabangKra25';
+    /** Password default admin cabang — mudah diingat */
+    private const PASS_CABANG = 'cabangjra';
 
-    /** Password admin daerah — wajib diganti setelah deploy */
+    /** Password admin daerah — PDM Karanganyar */
     private const PASS_DAERAH = 'AdminPDM@25';
 
     /** Domain email */
@@ -39,6 +39,9 @@ class AdminCabangSeeder extends Seeder
 
     public function run(): void
     {
+        // Bersihkan format email lama jika ada
+        User::where('email', 'like', 'cabang.%@' . self::DOMAIN)->delete();
+
         // ── 1. Admin Daerah (PDM) ─────────────────────────────────────
         User::updateOrCreate(
             ['email' => 'admin@' . self::DOMAIN],
@@ -76,7 +79,7 @@ class AdminCabangSeeder extends Seeder
 
         foreach ($cabangList as $cabang) {
             $slug  = strtolower(str_replace(' ', '', $cabang['pcm']));
-            $email = "cabang.{$slug}@" . self::DOMAIN;
+            $email = "{$slug}@" . self::DOMAIN;
 
             User::updateOrCreate(
                 ['email' => $email],
@@ -92,15 +95,16 @@ class AdminCabangSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅  Admin Daerah (1) dan Admin Cabang (17) berhasil dibuat.');
+        $this->command->info('✅  Admin Daerah (1) dan Admin Cabang (17) berhasil diperbarui.');
         $this->command->newLine();
         $this->command->table(
-            ['Role', 'Email', 'Password', 'PCM'],
+            ['Role', 'Login / Username', 'Email Sistem', 'Password', 'Wilayah PCM'],
             array_merge(
-                [['Admin Daerah', 'admin@' . self::DOMAIN, self::PASS_DAERAH, '(semua)']],
+                [['Admin Daerah', 'admin', 'admin@' . self::DOMAIN, self::PASS_DAERAH, 'Semua Cabang (PDM)']],
                 array_map(fn($c) => [
                     'Admin Cabang',
-                    'cabang.' . strtolower(str_replace(' ', '', $c['pcm'])) . '@' . self::DOMAIN,
+                    strtolower(str_replace(' ', '', $c['pcm'])),
+                    strtolower(str_replace(' ', '', $c['pcm'])) . '@' . self::DOMAIN,
                     self::PASS_CABANG,
                     $c['pcm'],
                 ], $cabangList)

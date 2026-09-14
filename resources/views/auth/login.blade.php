@@ -57,7 +57,7 @@
                             <span>&rarr;</span>
                         </a>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500 font-normal">Masukkan alamat email dan kata sandi akun Anda.</p>
+                    <p class="text-xs sm:text-sm text-slate-500 font-normal">Masuk dengan Nomor WhatsApp/HP dan kata sandi (tanggal &amp; tahun lahir) Anda.</p>
                 </div>
 
                 {{-- Session Errors --}}
@@ -75,56 +75,61 @@
                 </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-5">
                     @csrf
                     <div>
-                        <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Alamat Email
+                        <label for="login" class="block text-sm sm:text-base font-black text-slate-900 mb-1.5">
+                            Nomor WhatsApp / HP <span class="text-xs sm:text-sm font-bold text-slate-500">(Username)</span>
                         </label>
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                            placeholder="kader@email.com"
-                            class="w-full px-3.5 sm:px-4 py-2 text-sm bg-slate-50 border border-slate-200/90 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
+                        <input id="login" type="text" name="login" value="{{ old('login', old('email')) }}" required autofocus
+                            placeholder="Contoh: 081234567890 (atau email)"
+                            autocomplete="username tel"
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 bg-white transition outline-none font-medium min-h-[52px] text-slate-900 placeholder:text-slate-400">
+                        <span class="text-xs sm:text-sm text-slate-600 mt-1.5 block font-medium">Kader masuk menggunakan nomor WhatsApp/HP. Admin/Fasilitator dapat menggunakan email.</span>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-700">
-                                Kata Sandi (Password)
+                            <label for="password" class="block text-sm sm:text-base font-black text-slate-900">
+                                Kata Sandi <span class="text-xs sm:text-sm font-bold text-slate-500">(Tgl Lahir)</span>
                             </label>
-                            <button type="button" @click="showForgotModal = true" class="text-xs font-semibold text-sky-600 hover:text-sky-700 hover:underline">
-                                Lupa kata sandi?
+                            <button type="button" @click="showForgotModal = true" class="text-xs sm:text-sm font-bold text-sky-700 hover:text-sky-900 underline">
+                                Bantuan Sandi?
                             </button>
                         </div>
                         <div class="relative">
                             <input id="password" name="password" :type="showPass ? 'text' : 'password'" required
-                                placeholder="••••••••"
-                                class="w-full px-3.5 sm:px-4 py-2 pr-10 text-sm bg-slate-50 border border-slate-200/90 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition outline-none">
-                            <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
-                                <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <svg x-show="showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                placeholder="Format: DDMMYYYY (contoh: 17081985)"
+                                class="w-full px-4 py-3.5 pr-12 text-base font-mono border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 bg-white transition outline-none font-semibold min-h-[52px] text-slate-900 placeholder:text-slate-400">
+                            <button type="button" @click="showPass = !showPass" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 focus:outline-none p-2 rounded-xl" title="Tampilkan/Sembunyikan Sandi">
+                                <svg x-show="!showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                             </button>
+                        </div>
+                        <div class="mt-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-950 font-medium">
+                            💡 Ketik 8 angka tanggal lahir Anda: <strong>DDMMYYYY</strong>.<br class="hidden sm:inline"> Contoh jika lahir <strong>17 Agustus 1985</strong>, ketik <strong class="text-amber-900 font-black">17081985</strong>.
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
-                            <input type="checkbox" name="remember" value="1" class="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <span>Ingat saya di perangkat ini</span>
+                        <label class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 cursor-pointer select-none font-semibold">
+                            <input type="checkbox" name="remember" value="1" class="w-5 h-5 rounded-lg border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                            <span>Ingat saya di perangkat HP ini</span>
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full py-2.5 px-5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold rounded-lg shadow-2xs transition flex items-center justify-center gap-2 text-sm">
+                    <button type="submit" class="w-full min-h-[54px] sm:min-h-[56px] px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 text-base sm:text-lg">
                         <span>Masuk ke Portal</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
                     </button>
                 </form>
 
-                <div class="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-slate-100 text-center">
-                    <p class="text-xs text-slate-600 font-normal">
+                <div class="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-slate-200 text-center">
+                    <p class="text-sm sm:text-base text-slate-700 font-medium">
                         Belum memiliki akun kader?
-                        <a href="{{ route('anggota.register') }}" class="font-semibold text-sky-600 hover:text-sky-700 hover:underline block sm:inline mt-1 sm:mt-0">
+                        <a href="{{ route('anggota.register') }}" class="font-extrabold text-sky-700 hover:text-sky-900 underline block sm:inline mt-1 sm:mt-0">
                             Daftar Anggota Baru &rarr;
                         </a>
                     </p>
@@ -132,28 +137,32 @@
 
                 {{-- Modal Bantuan Lupa Sandi --}}
                 <div x-show="showForgotModal" @keydown.escape.window="showForgotModal = false" role="dialog" aria-modal="true" aria-labelledby="forgot-title" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
-                    <div @click.away="showForgotModal = false" class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 sm:p-7 border border-slate-200 text-center">
-                        <div class="w-11 h-11 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-4 text-lg">
+                    <div @click.away="showForgotModal = false" class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-7 border-2 border-slate-200 text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center mx-auto mb-4 text-xl">
                             <span aria-hidden="true">🔑</span>
                         </div>
-                        <h3 id="forgot-title" class="text-lg font-bold text-slate-900 mb-1 tracking-tight">Bantuan Kata Sandi Akun</h3>
-                        <p class="text-xs text-slate-500 mb-5 leading-relaxed font-normal">
-                            Untuk menjaga keamanan pangkalan data kader, reset kata sandi dapat dibantu secara cepat oleh tim Helpdesk Sekretariat MPKSDI PDM Karanganyar via WhatsApp.
+                        <h3 id="forgot-title" class="text-lg sm:text-xl font-black text-slate-900 mb-1 tracking-tight">Panduan Masuk &amp; Kata Sandi Akun</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed">
+                            Untuk memudahkan seluruh kader Muhammadiyah (termasuk pimpinan senior), akses masuk ke portal menggunakan:
                         </p>
+                        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-left text-xs sm:text-sm space-y-2 mb-5">
+                            <div>👤 <strong class="text-slate-900">Username:</strong> Nomor WhatsApp / HP aktif yang Anda daftarkan</div>
+                            <div>🔑 <strong class="text-slate-900">Kata Sandi:</strong> Tanggal &amp; tahun lahir Anda (8 digit: <code>DDMMYYYY</code>, contoh lahir 17 Agustus 1985 ketik <code>17081985</code>)</div>
+                        </div>
                         
-                        <div class="space-y-2.5">
+                        <div class="space-y-3">
                             <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}"
                                target="_blank" rel="noopener noreferrer"
-                               class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-2xs transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                               class="w-full min-h-[50px] px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold rounded-2xl shadow-sm transition flex items-center justify-center gap-2 text-sm sm:text-base">
                                 <span>Chat Helpdesk via WhatsApp</span>
                                 <span>&rarr;</span>
                             </a>
                             <a href="{{ route('cek-status') }}"
-                               class="w-full py-2 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition flex items-center justify-center gap-1.5">
+                               class="w-full min-h-[48px] px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl border border-slate-300 text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
                                 <span>Cek Status Verifikasi Pendaftaran</span>
                             </a>
                             <button type="button" @click="showForgotModal = false"
-                                class="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 transition">
+                                class="w-full py-2.5 text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-800 transition">
                                 Tutup
                             </button>
                         </div>

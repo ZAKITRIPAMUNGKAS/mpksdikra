@@ -65,40 +65,40 @@
                 @csrf
 
                 @foreach($questions as $i => $s)
-                <div id="soal-card-{{ $i + 1 }}" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 transition-all duration-150 scroll-mt-36 hover:border-sky-300">
+                <div id="soal-card-{{ $i + 1 }}" class="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-5 sm:p-7 transition-all duration-150 scroll-mt-36 hover:border-sky-400">
                     <div class="flex items-start gap-3.5 mb-5">
-                        <span class="w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs transition-colors"
-                            :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border border-sky-700' : 'bg-slate-100 text-slate-700 border border-slate-200'">
+                        <span class="w-9 h-9 rounded-xl font-black text-sm flex items-center justify-center shrink-0 shadow-xs transition-colors"
+                            :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border-2 border-sky-700' : 'bg-slate-100 text-slate-800 border-2 border-slate-300'">
                             {{ $i + 1 }}
                         </span>
                         <div class="flex-1">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Butir Pertanyaan #{{ $i + 1 }}</span>
-                            <p class="font-bold text-slate-900 text-base leading-relaxed">{{ $s->teks_soal }}</p>
+                            <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 block mb-1">Butir Soal #{{ $i + 1 }}</span>
+                            <p class="font-extrabold text-slate-900 text-base sm:text-lg leading-relaxed">{{ $s->teks_soal }}</p>
                         </div>
                     </div>
 
                     <input type="hidden" name="answers[{{ $s->id }}][soal_id]" value="{{ $s->id }}">
 
-                    <div class="space-y-2.5 pl-0 sm:pl-11">
+                    <div class="space-y-3 pl-0 sm:pl-12">
                         @foreach($s->pilihan as $p)
-                        <label class="group relative flex items-start gap-3 p-3.5 rounded-xl border border-slate-200/90 bg-white hover:border-sky-300 hover:bg-sky-50/20 cursor-pointer transition-all duration-150 shadow-2xs"
-                            :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'border-sky-500 bg-sky-50/60 ring-2 ring-sky-500/20' : ''">
+                        <label class="group relative flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-400 hover:bg-sky-50/40 cursor-pointer transition-all duration-150 shadow-xs min-h-[56px]"
+                            :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'border-sky-600 bg-sky-50 text-sky-950 ring-2 ring-sky-400/30' : ''">
                             
                             {{-- Radio Option Indicator --}}
-                            <div class="pt-0.5">
+                            <div class="pt-1 shrink-0">
                                 <input type="radio" name="answers[{{ $s->id }}][pilihan_id]" value="{{ $p->id }}"
                                     @change="registerAnswer('{{ $s->id }}', '{{ $p->id }}')"
-                                    class="w-4 h-4 border-slate-300 text-sky-600 focus:ring-sky-500 mt-0.5">
+                                    class="w-5 h-5 border-2 border-slate-300 text-sky-600 focus:ring-sky-500 mt-0.5">
                             </div>
 
                             {{-- Option Badge Letter --}}
-                            <span class="w-6 h-6 rounded-md text-xs font-bold flex items-center justify-center shrink-0 transition-colors"
-                                :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200 group-hover:bg-sky-100 group-hover:text-sky-900'">
+                            <span class="w-8 h-8 rounded-xl text-sm font-black flex items-center justify-center shrink-0 transition-colors"
+                                :class="answers['{{ $s->id }}'] == '{{ $p->id }}' ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-800 border-2 border-slate-300 group-hover:bg-sky-100 group-hover:text-sky-900'">
                                 {{ $p->label }}
                             </span>
 
                             {{-- Option Text --}}
-                            <span class="text-sm font-medium text-slate-800 group-hover:text-slate-900 leading-relaxed flex-1">
+                            <span class="text-base sm:text-lg font-semibold text-slate-900 group-hover:text-black leading-relaxed flex-1 pt-0.5">
                                 {{ $p->teks }}
                             </span>
                         </label>
@@ -108,13 +108,13 @@
                 @endforeach
 
                 {{-- Bottom Mobile Submit Button --}}
-                <div class="lg:hidden p-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs flex items-center justify-between gap-4">
-                    <div class="text-xs text-slate-500">
-                        Terjawab: <strong class="text-slate-900"><span x-text="answeredCount"></span> / {{ $questions->count() }}</strong>
+                <div class="lg:hidden p-5 bg-white rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-between gap-4">
+                    <div class="text-xs sm:text-sm text-slate-600 font-medium">
+                        Terjawab: <strong class="text-slate-900 text-base"><span x-text="answeredCount"></span> / {{ $questions->count() }}</strong>
                     </div>
                     <button type="button" @click="confirmSubmit()"
-                        class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
-                        Kumpulkan Ujian
+                        class="min-h-[50px] px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-sm sm:text-base rounded-2xl shadow-sm transition">
+                        Kumpulkan Ujian &rarr;
                     </button>
                 </div>
             </form>
@@ -122,47 +122,47 @@
 
         {{-- Right: Desktop Sticky Question Navigator --}}
         <div class="hidden lg:block lg:col-span-4 sticky top-44 space-y-4">
-            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <div class="bg-white rounded-2xl border-2 border-slate-200 shadow-md p-6">
+                <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100 mb-4">
+                    <h2 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         <span>Navigator Soal</span>
                     </h2>
-                    <span class="text-xs font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200/80">
+                    <span class="text-xs sm:text-sm font-bold text-sky-800 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
                         <span x-text="answeredCount"></span>/<span x-text="total"></span>
                     </span>
                 </div>
 
                 {{-- Navigator Grid --}}
-                <div class="grid grid-cols-5 gap-2">
+                <div class="grid grid-cols-5 gap-2.5">
                     @foreach($questions as $i => $s)
                     <button type="button" @click="scrollToSoal({{ $i + 1 }})"
-                        class="h-9 rounded-lg text-xs font-semibold transition flex flex-col items-center justify-center border shadow-2xs"
-                        :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border-sky-700 shadow-2xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-200'">
+                        class="h-10 rounded-xl text-xs sm:text-sm font-black transition flex flex-col items-center justify-center border-2 shadow-xs"
+                        :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border-sky-700 shadow-xs' : 'bg-slate-50 text-slate-800 border-slate-300 hover:bg-sky-50 hover:border-sky-300'">
                         <span>{{ $i + 1 }}</span>
                     </button>
                     @endforeach
                 </div>
 
                 {{-- Legend --}}
-                <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-md bg-sky-600"></span>
+                <div class="pt-4 mt-4 border-t-2 border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-600 font-medium">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-md bg-sky-600"></span>
                         <span>Sudah Diisi</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-md bg-slate-100 border border-slate-300"></span>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-md bg-slate-100 border-2 border-slate-300"></span>
                         <span>Belum Diisi</span>
                     </div>
                 </div>
 
                 {{-- Submit Action --}}
-                <div class="mt-5 pt-4 border-t border-slate-100">
+                <div class="mt-5 pt-4 border-t-2 border-slate-100">
                     <button type="button" @click="confirmSubmit()"
-                        class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
+                        class="w-full min-h-[52px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition">
                         Kumpulkan Jawaban &rarr;
                     </button>
-                    <p class="text-xs text-slate-400 text-center mt-2">Pastikan semua butir telah terjawab sebelum mengumpulkan.</p>
+                    <p class="text-xs text-slate-500 text-center mt-2 font-medium">Pastikan semua butir telah terjawab sebelum mengumpulkan.</p>
                 </div>
             </div>
         </div>
@@ -170,28 +170,28 @@
 
     {{-- Mobile Bottom Drawer Navigator Modal --}}
     <div x-show="mobileNavOpen" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end justify-center p-0 sm:p-4 lg:hidden" style="display: none;">
-        <div @click.away="mobileNavOpen = false" class="w-full max-w-lg bg-white rounded-t-2xl sm:rounded-xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 class="text-base font-bold text-slate-900">Daftar Nomor Soal</h3>
-                <button type="button" @click="mobileNavOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div @click.away="mobileNavOpen = false" class="w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto border-t-2 sm:border-2 border-slate-200">
+            <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100">
+                <h3 class="text-lg font-black text-slate-900">Daftar Nomor Soal</h3>
+                <button type="button" @click="mobileNavOpen = false" class="p-2 rounded-xl text-slate-500 hover:text-slate-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
-            <div class="grid grid-cols-5 gap-2">
+            <div class="grid grid-cols-5 gap-2.5">
                 @foreach($questions as $i => $s)
                 <button type="button" @click="scrollToSoal({{ $i + 1 }}); mobileNavOpen = false"
-                    class="h-9 rounded-lg text-xs font-semibold transition flex items-center justify-center border shadow-2xs"
-                    :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border-sky-700' : 'bg-slate-50 text-slate-700 border-slate-200'">
+                    class="h-10 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center border-2 shadow-xs"
+                    :class="answers['{{ $s->id }}'] ? 'bg-sky-600 text-white border-sky-700' : 'bg-slate-50 text-slate-800 border-slate-300'">
                     <span>{{ $i + 1 }}</span>
                 </button>
                 @endforeach
             </div>
 
-            <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
-                <span>Terisi: <strong class="text-slate-900" x-text="answeredCount"></strong> dari {{ $questions->count() }} soal</span>
-                <button type="button" @click="mobileNavOpen = false; confirmSubmit()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg text-xs">
-                    Kumpulkan
+            <div class="pt-4 border-t-2 border-slate-100 flex justify-between items-center text-xs sm:text-sm text-slate-600">
+                <span>Terisi: <strong class="text-slate-900 text-base" x-text="answeredCount"></strong> dari {{ $questions->count() }} soal</span>
+                <button type="button" @click="mobileNavOpen = false; confirmSubmit()" class="min-h-[46px] px-5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-sm">
+                    Kumpulkan &rarr;
                 </button>
             </div>
         </div>
@@ -199,16 +199,16 @@
 
     {{-- Confirmation Modal before Submit --}}
     <div x-show="showConfirmModal" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="showConfirmModal = false" class="w-full max-w-md bg-white rounded-xl p-6 shadow-xl space-y-4 border border-slate-200">
-            <div class="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
+        <div @click.away="showConfirmModal = false" class="w-full max-w-md bg-white rounded-2xl p-6 sm:p-7 shadow-2xl space-y-4 border-2 border-slate-200">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                 :class="unansweredCount > 0 ? 'bg-amber-100 text-amber-600' : 'bg-sky-100 text-sky-700'">
-                <svg x-show="unansweredCount > 0" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                <svg x-show="unansweredCount === 0" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg x-show="unansweredCount > 0" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <svg x-show="unansweredCount === 0" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
 
             <div>
-                <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight" x-text="unansweredCount > 0 ? 'Masih Ada Soal Kosong!' : 'Konfirmasi Kumpulkan Jawaban'"></h3>
-                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight" x-text="unansweredCount > 0 ? 'Masih Ada Soal Kosong!' : 'Konfirmasi Kumpulkan Jawaban'"></h3>
+                <p class="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed font-medium">
                     <template x-if="unansweredCount > 0">
                         <span>Anda telah menjawab <strong class="text-slate-900" x-text="answeredCount"></strong> soal, namun masih ada <strong class="text-amber-700" x-text="unansweredCount"></strong> butir soal yang belum terjawab. Yakin ingin mengumpulkan sekarang?</span>
                     </template>
@@ -218,13 +218,13 @@
                 </p>
             </div>
 
-            <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-end gap-3 pt-5 border-t-2 border-slate-100">
                 <button type="button" @click="showConfirmModal = false"
-                    class="px-3.5 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition">
+                    class="min-h-[48px] px-5 rounded-2xl border-2 border-slate-300 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-100 transition">
                     Periksa Kembali
                 </button>
                 <button type="button" @click="submitFinal()"
-                    class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-2xs transition">
+                    class="min-h-[48px] px-5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs sm:text-sm shadow-sm transition">
                     Ya, Kumpulkan Sekarang
                 </button>
             </div>

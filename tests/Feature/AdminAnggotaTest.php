@@ -97,4 +97,29 @@ class AdminAnggotaTest extends TestCase
 
         $this->assertSame('nonaktif', $user->fresh()->status);
     }
+
+    public function test_admin_can_view_anggota_detail_with_pcm_prm_and_organizations(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'pcm' => 'Karanganyar',
+            'prm' => 'PRM Lalung',
+            'pekerjaan' => 'Guru SMA Muhammadiyah 1',
+            'keaktifan_muhammadiyah' => ['Pimpinan Daerah Muhammadiyah'],
+            'jabatan_muhammadiyah' => ['Pimpinan Daerah Muhammadiyah' => 'Ketua Majelis'],
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'jabatan_ortom' => ['Pemuda Muhammadiyah' => 'Sekretaris'],
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.anggota.show', $a))
+            ->assertOk()
+            ->assertSee('PCM Karanganyar')
+            ->assertSee('PRM Lalung')
+            ->assertSee('Guru SMA Muhammadiyah 1')
+            ->assertSee('Ketua Majelis')
+            ->assertSee('Sekretaris');
+    }
 }

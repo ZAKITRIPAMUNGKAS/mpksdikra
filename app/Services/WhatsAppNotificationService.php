@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Anggota;
 use App\Models\Event;
+use Carbon\Carbon;
 
 class WhatsAppNotificationService
 {
@@ -32,14 +33,20 @@ class WhatsAppNotificationService
     public static function pesanVerifikasiSukses(Anggota $anggota): string
     {
         $nama = $anggota->nama_lengkap;
+        $noWa = $anggota->no_wa ?: '-';
         $portalUrl = route('login');
+        $sandi = $anggota->tanggal_lahir
+            ? Carbon::parse($anggota->tanggal_lahir)->format('dmY')
+            : 'Tanggal Lahir Anda (DDMMYYYY)';
 
         return "Assalamu'alaikum Wr. Wb.\n\n"
             ."Yth. Bapak/Ibu *{$nama}*,\n\n"
             ."Alhamdulillah, berkas pendaftaran kader Anda di *MPKSDI PDM Karanganyar* telah *DIVERIFIKASI & DISETUJUI*.\n\n"
             ."Anda kini dapat masuk ke Portal Kader melalui tautan berikut:\n"
             ."🔗 {$portalUrl}\n\n"
-            ."Gunakan alamat email dan kata sandi yang telah Anda daftarkan.\n\n"
+            ."Detail Masuk Portal:\n"
+            ."👤 Username: *{$noWa}* (Nomor HP/WhatsApp)\n"
+            ."🔑 Kata Sandi: *{$sandi}* (Tanggal & Tahun Lahir DDMMYYYY)\n\n"
             ."Nashrun Minallah wa Fathun Qarib.\n"
             ."Wassalamu'alaikum Wr. Wb.\n\n"
             .'— *Sekretariat MPKSDI PDM Karanganyar*';
@@ -95,18 +102,18 @@ class WhatsAppNotificationService
     public static function pesanResetPassword(Anggota $anggota, string $passwordBaru): string
     {
         $nama = $anggota->nama_lengkap;
-        $email = $anggota->user?->email ?: '-';
+        $noWa = $anggota->no_wa ?: ($anggota->user?->no_wa ?: '-');
         $portalUrl = route('login');
 
         return "Assalamu'alaikum Wr. Wb.\n\n"
             ."Yth. Bapak/Ibu *{$nama}*,\n\n"
             ."Kata sandi akun Portal Kader MPKSDI PDM Karanganyar Anda telah di-reset oleh Admin.\n\n"
-            ."Detail Akun Baru Anda:\n"
-            ."📧 Email: *{$email}*\n"
-            ."🔑 Sandi Baru: *{$passwordBaru}*\n\n"
+            ."Detail Akun Masuk Portal:\n"
+            ."👤 Username: *{$noWa}* (Nomor HP/WhatsApp)\n"
+            ."🔑 Sandi Baru: *{$passwordBaru}* (Tanggal & Tahun Lahir DDMMYYYY)\n\n"
             ."Silakan masuk ke portal melalui tautan berikut:\n"
             ."🔗 {$portalUrl}\n\n"
-            ."Setelah berhasil masuk, Anda dapat memperbarui kata sandi di menu profil.\n\n"
+            ."Setelah berhasil masuk, Anda dapat memperbarui kata sandi di menu profil bila diinginkan.\n\n"
             ."Wassalamu'alaikum Wr. Wb.\n\n"
             .'— *Admin MPKSDI PDM Karanganyar*';
     }

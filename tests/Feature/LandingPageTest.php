@@ -15,7 +15,8 @@ class LandingPageTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('MPKSDI')
-            ->assertSee('Daftar sebagai Kader');
+            ->assertSee('Daftar sebagai Kader')
+            ->assertSee('H. Zainudin Ahpandi, S.E');
     }
 
     public function test_landing_shows_dashboard_link_for_authed_user(): void

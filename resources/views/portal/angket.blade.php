@@ -37,22 +37,27 @@
     <form method="POST" action="{{ route('portal.angket.save', $event) }}" class="space-y-6">
         @csrf
         @forelse($items as $kategori => $list)
-        <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
-            <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                <span class="w-2 h-2 rounded-full bg-[#005c8a]"></span>
-                <h2 class="font-bold text-slate-900 text-base tracking-tight">Aspek {{ $kategori }}</h2>
+        <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm">
+            <div class="flex items-center gap-2 mb-4 pb-3 border-b-2 border-slate-100">
+                <span class="w-3 h-3 rounded-full bg-sky-600"></span>
+                <h2 class="font-black text-slate-900 text-lg tracking-tight">Aspek {{ $kategori }}</h2>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 sm:space-y-5">
                 @foreach($list as $item)
-                <div class="p-4 rounded-lg bg-slate-50/70 border border-slate-200/90 hover:bg-white hover:border-sky-200 transition">
-                    <p class="text-sm font-semibold text-slate-900 mb-3">{{ $item->teks_item }}</p>
-                    <div class="grid grid-cols-5 gap-2">
+                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border-2 border-slate-200 hover:bg-white hover:border-sky-300 transition">
+                    <p class="text-base sm:text-lg font-bold text-slate-900 mb-3.5 leading-snug">{{ $item->teks_item }}</p>
+                    <div class="grid grid-cols-5 gap-2 sm:gap-3">
                         @foreach([1, 2, 3, 4, 5] as $val)
                         <label class="cursor-pointer select-none">
                             <input type="radio" name="jawaban[{{ $item->id }}]" value="{{ $val }}" required class="peer sr-only">
-                            <span class="block text-center py-2 rounded-lg border border-slate-200/90 bg-white text-xs sm:text-sm font-semibold text-slate-700 peer-checked:bg-sky-600 peer-checked:border-sky-600 peer-checked:text-white peer-checked:shadow-2xs shadow-2xs hover:bg-sky-50/50 hover:border-sky-300 transition duration-150">
-                                {{ $val }}
+                            <span class="flex flex-col items-center justify-center min-h-[52px] sm:min-h-[56px] py-2.5 rounded-2xl border-2 border-slate-300 bg-white text-base sm:text-lg font-black text-slate-800 peer-checked:bg-sky-600 peer-checked:border-sky-600 peer-checked:text-white peer-checked:ring-2 peer-checked:ring-sky-300 shadow-xs hover:bg-sky-50 hover:border-sky-400 transition active:scale-[0.98]">
+                                <span>{{ $val }}</span>
+                                @if($val === 1)
+                                    <span class="text-[10px] font-bold opacity-80 hidden sm:block">Kurang</span>
+                                @elseif($val === 5)
+                                    <span class="text-[10px] font-bold opacity-80 hidden sm:block">Sangat Baik</span>
+                                @endif
                             </span>
                         </label>
                         @endforeach
@@ -62,23 +67,24 @@
             </div>
         </div>
         @empty
-        <div class="bg-white rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-400 text-sm shadow-2xs">
+        <div class="bg-white rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center text-slate-500 text-base shadow-xs">
             Angket belum disiapkan panitia.
         </div>
         @endforelse
 
         @if($items->count())
-        <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
-            <label class="block text-sm font-bold text-slate-900 mb-1">Komentar, Saran, &amp; Kritik Konstruktif</label>
-            <p class="text-xs text-slate-500 mb-3 font-normal">Tuliskan masukan Anda untuk panitia dan pimpinan MPKSDI Karanganyar.</p>
+        <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm">
+            <label class="block text-base sm:text-lg font-black text-slate-900 mb-1">Komentar, Saran, &amp; Kritik Konstruktif</label>
+            <p class="text-xs sm:text-sm text-slate-600 mb-3 font-medium">Tuliskan masukan Anda untuk panitia dan pimpinan MPKSDI Karanganyar.</p>
             <textarea name="komentar" rows="4" placeholder="Tuliskan masukan Anda di sini..."
-                class="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-lg outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition resize-none text-sm bg-white"></textarea>
+                class="w-full px-4 py-3.5 border-2 border-slate-300 rounded-2xl outline-none focus:border-sky-600 focus:ring-4 focus:ring-sky-100 transition resize-none text-base bg-white font-medium placeholder:text-slate-400"></textarea>
         </div>
 
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 rounded-xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs text-slate-500 font-medium">Angket ini bersifat anonim untuk evaluasi perkaderan.</p>
-            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
-                Kirim Angket Evaluasi
+        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border-2 border-slate-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs sm:text-sm text-slate-600 font-semibold">Angket ini bersifat anonim untuk evaluasi perkaderan.</p>
+            <button type="submit" class="w-full sm:w-auto min-h-[52px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                <span>Kirim Angket Evaluasi</span>
+                <span class="text-lg leading-none">&rarr;</span>
             </button>
         </div>
         @endif

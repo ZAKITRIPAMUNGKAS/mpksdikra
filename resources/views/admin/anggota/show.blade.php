@@ -180,7 +180,50 @@
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Desa / Kelurahan:</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->desa_kelurahan }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Kecamatan:</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->kecamatan }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Kabupaten:</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->kabupaten }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Cabang (PCM):</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->pcm ? 'PCM ' . $anggota->pcm : '-' }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Ranting (PRM):</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->prm ?? '-' }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Pekerjaan / Profesi:</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->pekerjaan ?? ($anggota->jabatan_aum ?? '-') }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Nomor Baku Muh (NBM):</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->nbm ?? '-' }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">No. WhatsApp:</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->no_wa }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Email:</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->email ?? '-' }}</span></div>
+
+            @if(!empty($anggota->keaktifan_muhammadiyah))
+            <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">
+                <span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1.5 text-xs">Keaktifan Pimpinan Muhammadiyah:</span>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($anggota->keaktifan_muhammadiyah as $item)
+                        @php
+                            $jab = $anggota->jabatan_muhammadiyah[$item] ?? null;
+                        @endphp
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-800">
+                            <strong>{{ $item }}</strong>
+                            @if($jab)
+                                &mdash; <span class="text-sky-700 font-semibold">{{ $jab }}</span>
+                            @endif
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            @if(!empty($anggota->keaktifan_ortom))
+            <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">
+                <span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1.5 text-xs">Keaktifan di ORTOM:</span>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($anggota->keaktifan_ortom as $item)
+                        @php
+                            $jab = $anggota->jabatan_ortom[$item] ?? null;
+                        @endphp
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-800">
+                            <strong>{{ $item }}</strong>
+                            @if($jab)
+                                &mdash; <span class="text-sky-700 font-semibold">{{ $jab }}</span>
+                            @endif
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+            @endif
             
             @if($anggota->aktifitas_jamaah_masjid)
             <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">

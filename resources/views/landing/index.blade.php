@@ -482,7 +482,7 @@
 
         </section>
 
-        {{-- SECTION 4: Keunggulan Standar Mutu & Second Card (Tokoh KH Zainudin Alfandi) --}}
+        {{-- SECTION 4: Keunggulan Standar Mutu & Second Card (Tokoh H. Zainudin Ahpandi, S.E) --}}
         <section id="keunggulan" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 
@@ -575,7 +575,7 @@
                     </div>
                 </div>
 
-                {{-- Right: Visual Tokoh KH Zainudin Alfandi (Elegan, Proporsional & Presisi) --}}
+                {{-- Right: Visual Tokoh H. Zainudin Ahpandi, S.E (Elegan, Proporsional & Presisi) --}}
                 <div class="lg:col-span-5 flex justify-center reveal-right reveal-delay-200">
                     <div class="relative w-full max-w-[340px] sm:max-w-[380px]">
                         
@@ -589,10 +589,10 @@
                             <x-batik-corner position="top-right" class="w-32 h-32 text-sky-800 opacity-[0.28]" />
                             <x-batik-corner position="bottom-left" class="w-28 h-28 text-sky-700 opacity-[0.25]" />
                             
-                            {{-- Foto Tokoh KH Zainudin Alfandi --}}
+                            {{-- Foto Tokoh H. Zainudin Ahpandi, S.E --}}
                             <div class="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-b from-sky-50 via-slate-50 to-slate-100 border border-slate-100 shadow-inner">
                                 <img src="{{ asset('aset/ketua-mpksdi-vector.jpg') }}"
-                                     alt="KH. Zainudin Alfandi - Ketua MPKSDI Karanganyar"
+                                     alt="H. Zainudin Ahpandi, S.E - Ketua MPKSDI Karanganyar"
                                      loading="lazy" decoding="async"
                                      class="w-full h-full object-cover object-top group-hover:scale-104 transition duration-500">
                                 
@@ -608,7 +608,7 @@
                             {{-- Identity & Official Quote --}}
                             <div class="text-center space-y-2 pt-1">
                                 <div>
-                                    <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl leading-tight group-hover:text-sky-700 transition-colors">KH. Zainudin Alfandi</h3>
+                                    <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl leading-tight group-hover:text-sky-700 transition-colors">H. Zainudin Ahpandi, S.E</h3>
                                     <p class="text-xs font-bold text-sky-600 uppercase tracking-wide mt-1">Ketua MPKSDI PDM Karanganyar</p>
                                 </div>
 

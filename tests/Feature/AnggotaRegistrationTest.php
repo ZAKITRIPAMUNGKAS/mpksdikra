@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\NomorWaNormalizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -167,5 +168,69 @@ class AnggotaRegistrationTest extends TestCase
             ->assertSee('Menunggu Verifikasi Data')
             ->assertSee('Kader Ahmad Dahlan, S.Kom.')
             ->assertSee('Periksa Status Pendaftaran');
+    }
+
+    public function test_pendaftaran_url_alias_redirects_to_daftar(): void
+    {
+        $response = $this->get('/pendaftaran');
+        $response->assertRedirect(route('anggota.register'));
+    }
+
+    public function test_registration_saves_pcm_prm_pekerjaan_and_jabatan(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'kecamatan' => 'Karanganyar',
+            'pcm' => 'Karanganyar',
+            'prm' => 'PRM Lalung',
+            'pekerjaan' => 'Guru SMA Muhammadiyah 1',
+            'keaktifan_muhammadiyah' => ['Pimpinan Daerah Muhammadiyah', 'Amal Usaha Muhammadiyah'],
+            'jabatan_muhammadiyah' => [
+                'Pimpinan Daerah Muhammadiyah' => 'Anggota Majelis Dikdasmen',
+                'Amal Usaha Muhammadiyah' => 'Wakil Kepala Sekolah',
+            ],
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Pemuda Muhammadiyah' => 'Ketua Bidang Perkaderan',
+            ],
+        ]);
+
+        $response = $this->post(route('anggota.register.store'), $payload);
+        $response->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '1234567890123456')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('Karanganyar', $anggota->kecamatan);
+        $this->assertSame('Karanganyar', $anggota->pcm);
+        $this->assertSame('PRM Lalung', $anggota->prm);
+        $this->assertSame('Guru SMA Muhammadiyah 1', $anggota->pekerjaan);
+        $this->assertSame('Wakil Kepala Sekolah', $anggota->jabatan_aum); // mirrored
+        $this->assertEquals(['Pimpinan Daerah Muhammadiyah', 'Amal Usaha Muhammadiyah'], $anggota->keaktifan_muhammadiyah);
+        $this->assertSame('Anggota Majelis Dikdasmen', $anggota->jabatan_muhammadiyah['Pimpinan Daerah Muhammadiyah']);
+        $this->assertSame('Ketua Bidang Perkaderan', $anggota->jabatan_ortom['Pemuda Muhammadiyah']);
+    }
+
+    public function test_registration_auto_generates_password_from_birthdate_when_empty(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313010101850001',
+            'no_wa' => '081226001099',
+            'email' => 'kader85@example.test',
+            'tanggal_lahir' => '1985-08-17',
+        ]);
+        unset($payload['password'], $payload['password_confirmation']);
+
+        $this->post(route('anggota.register.store'), $payload)
+            ->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $user = User::where('email', 'kader85@example.test')->first();
+        $this->assertNotNull($user);
+        // Tanggal lahir 1985-08-17 -> Password 17081985
+        $this->assertTrue(Hash::check('17081985', $user->password));
     }
 }

@@ -442,7 +442,7 @@
                     Karanganyar, {{ now()->translatedFormat('d F Y') }}<br>
                     Ketua MPKSDI PDM Karanganyar
                 </div>
-                <div class="sign-name">Dr. Muhammad Ihsan, M.Ag.</div>
+                <div class="sign-name">H. Zainudin Ahpandi, S.E</div>
                 <div class="sign-nip">NBM. 719.340 / Pimpinan Daerah Muhammadiyah</div>
             </td>
         </tr>

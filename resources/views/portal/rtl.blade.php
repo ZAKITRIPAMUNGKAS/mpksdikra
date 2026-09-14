@@ -46,7 +46,7 @@
     @endif
 
     @if($soal->isEmpty())
-        <div class="bg-white rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-400 text-sm shadow-2xs">
+        <div class="bg-white rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center text-slate-500 text-base shadow-xs">
             Pertanyaan Rencana Tindak Lanjut (RTL) belum disiapkan panitia.
         </div>
     @else
@@ -54,9 +54,9 @@
         @csrf
         @foreach($soal as $i => $s)
         @php $prev = $jawaban->get($s->id); $locked = $rtl && $rtl->status === 'terkirim'; @endphp
-        <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
-            <label class="block text-sm font-semibold text-slate-900 mb-3 leading-snug">
-                <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-sky-50 text-sky-900 border border-sky-200/80 text-xs font-semibold mr-2 shadow-2xs">
+        <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm">
+            <label class="block text-base sm:text-lg font-bold text-slate-900 mb-3.5 leading-snug">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-sky-100 text-sky-900 border border-sky-300 text-sm font-black mr-2 shadow-xs">
                     {{ $i + 1 }}
                 </span>
                 {{ $s->pertanyaan }}
@@ -65,35 +65,36 @@
             @if($s->tipe === 'essay')
                 <textarea name="jawaban[{{ $s->id }}]" rows="5" @disabled($locked) required
                     placeholder="Tuliskan rencana dan komitmen tindak lanjut Anda..."
-                    class="w-full px-3.5 py-2.5 border border-slate-200/90 rounded-lg outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition resize-none disabled:bg-slate-50 disabled:text-slate-500 text-sm bg-white">{{ old('jawaban.' . $s->id, $prev?->jawaban) }}</textarea>
+                    class="w-full px-4 py-3.5 border-2 border-slate-300 rounded-2xl outline-none focus:border-sky-600 focus:ring-4 focus:ring-sky-100 transition resize-none disabled:bg-slate-100 disabled:text-slate-500 text-base bg-white font-medium placeholder:text-slate-400 leading-relaxed">{{ old('jawaban.' . $s->id, $prev?->jawaban) }}</textarea>
             @else
-                <div class="p-4 rounded-lg bg-slate-50/70 border border-slate-200/90">
+                <div class="p-5 rounded-2xl bg-slate-50 border-2 border-slate-200">
                     @if($prev?->file_bukti)
-                        <div class="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200/80 text-xs font-semibold text-sky-900">
-                            <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        <div class="flex items-center gap-2 mb-3.5 px-4 py-2 rounded-xl bg-sky-100 border border-sky-200 text-xs sm:text-sm font-bold text-sky-900">
+                            <svg class="w-5 h-5 text-sky-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                             </svg>
                             <span>Berkas bukti telah diunggah sebelumnya.</span>
                         </div>
                     @endif
                     <input type="file" name="jawaban[{{ $s->id }}]" accept=".pdf,.jpg,.jpeg,.png" @required(! $prev?->file_bukti) @disabled($locked)
-                        class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-900 hover:file:bg-sky-100 cursor-pointer disabled:opacity-50 transition">
-                    <p class="text-xs text-slate-400 mt-2">Format yang didukung: PDF, JPG, PNG (maksimal 2 MB).</p>
+                        class="w-full text-sm text-slate-600 file:mr-3.5 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-extrabold file:bg-sky-600 file:text-white hover:file:bg-sky-700 cursor-pointer disabled:opacity-50 transition">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-2.5 font-medium">Format yang didukung: PDF, JPG, PNG (maksimal 2 MB).</p>
                 </div>
             @endif
         </div>
         @endforeach
 
         @if(! ($rtl && $rtl->status === 'terkirim'))
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 rounded-xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs text-slate-500 font-medium">RTL yang telah dikirim akan dikunci untuk ditinjau panitia.</p>
+        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border-2 border-slate-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs sm:text-sm text-slate-600 font-semibold">RTL yang telah dikirim akan dikunci untuk ditinjau panitia.</p>
             <button type="submit" onclick="return confirm('Kirimkan RTL? Jawaban akan dikunci setelah pengiriman.')"
-                class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
-                Kirim Dokumen RTL
+                class="w-full sm:w-auto min-h-[52px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                <span>Kirim Dokumen RTL</span>
+                <span class="text-lg leading-none">&rarr;</span>
             </button>
         </div>
         @else
-        <div class="p-4 rounded-xl bg-sky-50 border border-sky-200/80 text-sky-950 text-sm text-center font-semibold shadow-2xs">
+        <div class="p-5 rounded-2xl bg-sky-50 border-2 border-sky-300 text-sky-950 text-sm sm:text-base text-center font-bold shadow-xs">
             RTL telah berhasil dikirim dan tersimpan. Terima kasih atas komitmen dakwah dan perkaderan Anda.
         </div>
         @endif

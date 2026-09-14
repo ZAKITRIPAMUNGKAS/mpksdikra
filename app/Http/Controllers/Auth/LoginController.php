@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\NomorWaNormalizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -16,19 +19,60 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $loginInput = trim((string) ($request->input('login') ?? $request->input('email') ?? ''));
+        $password = (string) $request->input('password', '');
 
-        if (! Auth::attempt($data, $request->boolean('remember'))) {
+        if ($loginInput === '' || $password === '') {
             throw ValidationException::withMessages([
-                'email' => 'Email atau password salah.',
+                'login' => 'Nomor HP / Email dan kata sandi wajib diisi.',
+                'email' => 'Nomor HP / Email dan kata sandi wajib diisi.',
             ]);
         }
 
+        $normalizedWa = NomorWaNormalizer::normalize($loginInput);
+        $digits = preg_replace('/\D/', '', $loginInput);
+
+        $user = User::where(function ($q) use ($loginInput, $normalizedWa, $digits) {
+            $q->where('email', strtolower($loginInput));
+            if ($normalizedWa) {
+                $q->orWhere('no_wa', $normalizedWa);
+            }
+            if ($digits && strlen($digits) >= 8) {
+                $q->orWhere('no_wa', $digits)
+                    ->orWhere('no_wa', 'like', "%{$digits}%")
+                    ->orWhereHas('anggota', function ($sub) use ($normalizedWa, $digits) {
+                        $sub->where('no_wa', $normalizedWa)->orWhere('no_wa', $digits);
+                    });
+            }
+        })->first();
+
+        $authenticated = false;
+        if ($user) {
+            if (Hash::check($password, $user->password)) {
+                $authenticated = true;
+            } else {
+                $cleanPass = preg_replace('/\D/', '', $password);
+                if (! empty($cleanPass) && Hash::check($cleanPass, $user->password)) {
+                    $authenticated = true;
+                } elseif ($user->anggota?->tanggal_lahir) {
+                    $tglLahirDmY = $user->anggota->tanggal_lahir->format('dmY');
+                    if ($cleanPass === $tglLahirDmY || $password === $tglLahirDmY) {
+                        $authenticated = true;
+                        $user->update(['password' => Hash::make($tglLahirDmY)]);
+                    }
+                }
+            }
+        }
+
+        if (! $authenticated || ! $user) {
+            throw ValidationException::withMessages([
+                'login' => 'Nomor HP / Email atau kata sandi tidak cocok.',
+                'email' => 'Nomor HP / Email atau kata sandi tidak cocok.',
+            ]);
+        }
+
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
-        $user = $request->user();
 
         if (! $user->isAktif()) {
             $msg = match ($user->status) {
@@ -39,6 +83,7 @@ class LoginController extends Controller
 
             Auth::logout();
             throw ValidationException::withMessages([
+                'login' => $msg,
                 'email' => $msg,
             ]);
         }

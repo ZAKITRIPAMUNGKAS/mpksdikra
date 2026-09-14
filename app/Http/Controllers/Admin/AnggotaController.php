@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\User;
 use App\Services\WhatsAppNotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -97,9 +98,9 @@ class AnggotaController extends Controller
 
     public function resetPassword(Anggota $anggota): RedirectResponse
     {
-        $defaultPassword = strlen($anggota->nik) >= 6
-            ? substr($anggota->nik, -6)
-            : 'mpksdi'.rand(1000, 9999);
+        $defaultPassword = $anggota->tanggal_lahir
+            ? Carbon::parse($anggota->tanggal_lahir)->format('dmY')
+            : (strlen($anggota->nik) >= 6 ? substr($anggota->nik, -6) : '12345678');
 
         $anggota->user->update([
             'password' => Hash::make($defaultPassword),
@@ -113,7 +114,7 @@ class AnggotaController extends Controller
 
         return redirect()
             ->route('admin.anggota.show', $anggota)
-            ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword}")
+            ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword} (Tanggal Lahir)")
             ->with('wa_reset_url', $waUrl)
             ->with('reset_password_value', $defaultPassword);
     }

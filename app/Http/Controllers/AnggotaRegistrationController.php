@@ -24,12 +24,15 @@ class AnggotaRegistrationController extends Controller
         $data = $request->validated();
         $fotoPath = $request->file('foto')->store('anggota/foto', 'local');
         $noWa = NomorWaNormalizer::normalize($data['no_wa']);
+        $rawPassword = ! empty($data['password'])
+            ? $data['password']
+            : Carbon::parse($data['tanggal_lahir'])->format('dmY');
 
-        DB::transaction(function () use ($data, $fotoPath, $noWa) {
+        DB::transaction(function () use ($data, $fotoPath, $noWa, $rawPassword) {
             $user = User::create([
                 'name' => $data['nama_lengkap'],
                 'email' => $data['email'] ?? ('anggota+'.$data['nik'].'@placeholder.test'),
-                'password' => Hash::make($data['password']),
+                'password' => Hash::make($rawPassword),
                 'role' => 'anggota',
                 'status' => 'menunggu_verifikasi',
                 'no_wa' => $noWa,
@@ -40,6 +43,10 @@ class AnggotaRegistrationController extends Controller
             $anggotaData['no_wa'] = $noWa;
             $anggotaData['foto'] = $fotoPath;
             $anggotaData['umur'] = Carbon::parse($data['tanggal_lahir'])->age;
+
+            if (empty($anggotaData['jabatan_aum']) && ! empty($anggotaData['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
+                $anggotaData['jabatan_aum'] = $anggotaData['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'];
+            }
 
             Anggota::create($anggotaData);
         });
@@ -52,6 +59,10 @@ class AnggotaRegistrationController extends Controller
                 'no_wa' => $noWa,
                 'email' => $data['email'] ?? null,
                 'kecamatan' => $data['kecamatan'] ?? null,
+                'pcm' => $data['pcm'] ?? null,
+                'prm' => $data['prm'] ?? null,
+                'username' => $noWa,
+                'password_default' => Carbon::parse($data['tanggal_lahir'])->format('dmY'),
             ]);
     }
 }

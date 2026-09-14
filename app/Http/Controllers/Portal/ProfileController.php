@@ -32,6 +32,10 @@ class ProfileController extends Controller
             'desa_kelurahan' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:255'],
             'kabupaten' => ['required', 'string', 'max:255'],
+            'nbm' => ['nullable', 'string', 'max:50'],
+            'pekerjaan' => ['nullable', 'string', 'max:255'],
+            'pcm' => ['nullable', 'string', 'max:255'],
+            'prm' => ['nullable', 'string', 'max:255'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'jabatan_aum' => ['nullable', 'string', 'max:255'],
             'pendidikan_sd' => ['nullable', 'string', 'max:255'],
@@ -47,7 +51,11 @@ class ProfileController extends Controller
             'tokoh_berpengaruh' => ['nullable', 'string', 'max:255'],
             'alasan_pilih_tokoh' => ['nullable', 'string', 'max:2000'],
             'keaktifan_muhammadiyah' => ['nullable', 'array'],
+            'jabatan_muhammadiyah' => ['nullable', 'array'],
+            'jabatan_muhammadiyah.*' => ['nullable', 'string', 'max:255'],
             'keaktifan_ortom' => ['nullable', 'array'],
+            'jabatan_ortom' => ['nullable', 'array'],
+            'jabatan_ortom.*' => ['nullable', 'string', 'max:255'],
             'organisasi_lain' => ['nullable', 'string', 'max:255'],
             'aktifitas_jamaah_masjid' => ['nullable', 'string', 'max:2000'],
             'keaktifan_takmir' => ['nullable', 'string', 'max:20'],
@@ -56,6 +64,12 @@ class ProfileController extends Controller
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        if (empty($data['jabatan_aum']) && ! empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
+            $data['jabatan_aum'] = $data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'];
+        } elseif (! empty($data['jabatan_aum']) && empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
+            $data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'] = $data['jabatan_aum'];
+        }
 
         $data['umur'] = Carbon::parse($data['tanggal_lahir'])->age;
 

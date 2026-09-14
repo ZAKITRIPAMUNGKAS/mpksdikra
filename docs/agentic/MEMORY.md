@@ -36,12 +36,71 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (92 test hijau per 2026-09-12).
+- `php artisan test` — PHPUnit feature tests (102 test hijau per 2026-09-14).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-14: Perombakan Komprehensif UI/UX Seluruh Formulir untuk Kader Senior / Lansia (Usia 40–70+):
+  1. Standar Desain Aksesibilitas Lansia:
+     - Seluruh input teks, dropdown, radio, dan tombol form ditingkatkan ke ukuran minimum ergonomis (`min-h-[50px]` hingga `min-h-[56px]`, `py-3.5` hingga `py-4`, `px-4`).
+     - Ukuran font input distandarisasi ke `text-base` (16px) untuk mencegah auto-zoom di browser smartphone yang sering membingungkan pengguna usia lanjut.
+     - Batas elemen menggunakan `border-2` berkontras tinggi (`border-slate-300` / `border-sky-600`) agar jelas terlihat pada layar HP dengan brightness rendah atau keterbatasan penglihatan (presbiopia/rabun dekat).
+     - Seluruh label input diubah menjadi tebal berkontras tinggi (`font-black`/`font-bold text-slate-900`) tanpa kapitalisasi sempit (menghilangkan `uppercase tracking-wider` yang sulit dibaca mata tua).
+     - Contoh isian konkret dihadirkan langsung pada microcopy dan placeholder.
+  2. Formulir Pendaftaran Kader Mandiri (`register.blade.php`):
+     - Stepper & bar progres navigasi diperbesar dengan indikator langkah aktif yang jelas di layar HP.
+     - Tab 1–4 ditingkatkan penuh: kartu pilihan cepat (checkbox/preset) untuk bahasa, lembaga ZIS, organisasi Muhammadiyah, ORTOM, aktivitas masjid, takmir, dan peran kemasyarakatan diubah menjadi kartu sentuh lebar (`min-h-[50px]`+) dengan centang besar.
+     - Komponen Pasfoto (`pasfoto-fitter.blade.php`) dilengkapi tombol aksi sentuh besar ("Pilih Foto dari Galeri / Kamera HP") dan panduan foto setengah badan otomatis.
+     - Tombol "Kirim Pendaftaran" dibuat sangat menonjol (`min-h-[56px]`, `text-lg font-black`, warna emerald mencolok).
+  3. Halaman Masuk / Login (`login.blade.php`):
+     - Kolom Nomor WhatsApp dan Kata Sandi Tanggal Lahir (DDMMYYYY) berukuran besar dengan kartu petunjuk format tanggal lahir berlatar kuning lembut (`amber-50`).
+     - Tombol toggle mata lihat/sembunyikan sandi diperbesar sentuhannya.
+  4. Halaman Cek Status Berkas (`cek-status.blade.php`):
+     - Input NIK/WhatsApp dan kartu hasil verifikasi (disetujui, ditolak, menunggu) diperbesar dengan tipografi tebal dan tombol aksi yang nyaman ditekan.
+  5. Portal Profil Kader (`portal/profile.blade.php`):
+     - Seluruh tab (Identitas, Keagamaan, Kemuhammadiyahan) diselaraskan ke ukuran kontrol ramah lansia, memudahkan pimpinan/kader senior memperbarui data dari smartphone.
+  6. CBT Ujian Kognitif (`portal/tes/take.blade.php`):
+     - Butir pertanyaan diperbesar (`text-base sm:text-lg font-bold`), kartu pilihan jawaban A–E diperlebar menjadi card besar (`min-h-[56px] p-4 sm:p-5 border-2`) yang nyaman disentuh dengan jempol.
+  7. Angket Evaluasi (`portal/angket.blade.php`) & RTL (`portal/rtl.blade.php`):
+     - Skala tombol nilai 1–5 diubah menjadi kotak sentuh besar (`min-h-[52px]` - `min-h-[56px] font-black text-lg`), dan textarea RTL diperluas dengan font 16px.
+  8. Verifikasi: Seluruh 102 automated tests lulus 100%, Pint lolos, Vite production build sukses.
+- 2026-09-14: Transformasi Kredensial Masuk Portal (Username = Nomor HP, Password = Tanggal & Tahun Lahir):
+  1. Login Portal (`LoginController` & `login.blade.php`):
+     - Username login kader menggunakan Nomor WhatsApp/HP aktif (`no_wa`), dinormalisasi otomatis (mendukung awalan 08, 628, +628, maupun spasi/tanda hubung). Admin/staf tetap dapat menggunakan email.
+     - Kata sandi login menggunakan Tanggal & Tahun Lahir kader (format 8 digit: `DDMMYYYY`, misal 17 Agustus 1985 -> `17081985`). Sistem toleran terhadap variasi tanda pemisah (`17-08-1985` atau `17/08/1985`).
+  2. Formulir Pendaftaran Kader (`register.blade.php` & `AnggotaRegistrationController`):
+     - Kader senior tidak lagi dibebani membuat kata sandi baru secara manual; kolom password dan konfirmasi password dihilangkan dari form pendaftaran dan digantikan dengan kartu informasi pembuatan akun otomatis yang ramah lansia.
+     - Sistem secara otomatis membuatkan kata sandi dari tanggal lahir kader (`Carbon::parse($tanggal_lahir)->format('dmY')`).
+     - Ringkasan pendaftaran pasca-submit menampilkan Username (No WA) dan Kata Sandi (Tanggal Lahir DDMMYYYY).
+  3. Notifikasi WhatsApp & Reset Kata Sandi:
+     - Pesan WhatsApp verifikasi disetujui & pesan reset password admin (`WhatsAppNotificationService`) menginformasikan kredensial masuk: Username = Nomor HP/WA, Password = Tanggal Lahir (DDMMYYYY).
+     - Admin reset password kader (`AnggotaController::resetPassword`) kini me-reset kata sandi langsung ke tanggal lahir kader.
+  4. Impor Data Anggota (`AnggotaImport`):
+     - Kata sandi default akun hasil impor diatur ke tanggal tahun lahir (`dmY`).
+  5. Seluruh 102 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
+- 2026-09-14: Penyempurnaan Formulir Pendaftaran Mandiri (/daftar), Profil Anggota, dan Penyesuaian Tokoh Resmi:
+  1. Tab 1 Formulir Pendaftaran: Label `Kecamatan (Cabang)` disederhanakan menjadi `Kecamatan` saja.
+  2. Tab 3 Kemuhammadiyahan:
+     - Keaktifan di Pimpinan Muhammadiyah (PDM, PCM, PRM, AUM): saat dicentang, langsung memunculkan kolom isian nama jabatan/posisi (`jabatan_muhammadiyah[...]`).
+     - Pimpinan Cabang & Ranting: ditempatkan terstruktur sebelum ORTOM:
+       - Dropdown `Pimpinan Cabang Muhammadiyah (PCM)` (17 Cabang resmi se-Karanganyar + opsi lainnya).
+       - Input teks `Pimpinan Ranting Muhammadiyah (PRM)` (isian mandiri bebas untuk mengakomodasi ranting berbasis masjid/dusun/desa).
+     - Keaktifan di ORTOM (Pemuda Muhammadiyah, NA, Aisyiyah, IPM, HW, TS): saat dicentang, langsung memunculkan kolom isian nama jabatan/posisi (`jabatan_ortom[...]`).
+     - Penggantian kolom `Amanah di AUM` menjadi `Pekerjaan / Profesi Utama` (`pekerjaan`).
+  3. Aksesibilitas & Ramah Senior (Usia 40+):
+     - Rute alias `/pendaftaran` otomatis redirect ke `route('anggota.register')`.
+     - Header banner form dibuat lebih ringkas dan langsung fokus ke formulir pendaftaran.
+     - Auto-scroll mulus ke `#form-pendaftaran` saat halaman diakses.
+  4. Portal Profil Kader (`/portal/profile`):
+     - Memperbarui `ProfileController` dan `portal/profile.blade.php` sehingga kader aktif dapat melihat & memperbarui data `PCM`, `PRM`, `pekerjaan`, `NBM`, `jabatan_muhammadiyah`, dan `jabatan_ortom`.
+  5. Penyelarasan Ekspor & Seeder:
+     - `DemoDataSeeder` dan `AnggotaImport` kini menyertakan field `pcm`, `prm`, `pekerjaan`, dan jabatan organisasi.
+     - Ekspor Excel laporan kelulusan (`exports.laporan-event`) mengutamakan kolom `pcm` dan `prm`.
+  6. Koreksi Nama Resmi Tokoh:
+     - Nama Ketua MPKSDI PDM Karanganyar dikoreksi di seluruh sistem (Landing Page, PDF Laporan & Tanda Tangan) menjadi **H. Zainudin Ahpandi, S.E**.
+  7. Seluruh 99 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
 - 2026-09-10: Dokumen fondasi agent dibuat dari BA.DOC dan sistem referensi.
 - 2026-09-10: AHP-SAW dihapus dari scope permanen. Ranking pakai urutan nilai akhir tertinggi ke terendah.
 - 2026-09-10: Materi, soal, rubrik diambil dari Arqam Apps referensi dan disesuaikan.

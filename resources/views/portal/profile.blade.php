@@ -34,7 +34,11 @@
                     <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2">
                         <span>NBM: <strong class="text-slate-700 font-mono">{{ $anggota?->nbm ?: 'Belum diisi' }}</strong></span>
                         <span class="text-slate-300">&bull;</span>
-                        <span>Cabang: <strong class="text-slate-700">{{ $anggota?->kecamatan ?: '-' }}</strong></span>
+                        <span>Cabang: <strong class="text-slate-700">{{ $anggota?->pcm ?: ($anggota?->kecamatan ?: '-') }}</strong></span>
+                        @if($anggota?->prm)
+                            <span class="text-slate-300">&bull;</span>
+                            <span>Ranting: <strong class="text-slate-700">{{ $anggota->prm }}</strong></span>
+                        @endif
                         <span class="text-slate-300">&bull;</span>
                         <span>Status: <strong class="text-sky-700 font-semibold">{{ $anggota?->status_pernikahan ?: '-' }}</strong></span>
                     </p>
@@ -59,23 +63,23 @@
 
     @if($anggota)
     {{-- Tab Selector --}}
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-1.5 flex gap-1.5 shadow-xs">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-2 flex gap-2 shadow-xs">
         <button type="button" @click="tab = 'identitas'"
-            :class="tab === 'identitas' ? 'bg-sky-500 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-            class="flex-1 py-2.5 px-3 text-xs sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            :class="tab === 'identitas' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
+            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             <span>1. Identitas &amp; Domisili</span>
         </button>
         <button type="button" @click="tab = 'agama'"
-            :class="tab === 'agama' ? 'bg-sky-500 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-            class="flex-1 py-2.5 px-3 text-xs sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            :class="tab === 'agama' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
+            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             <span>2. Ibadah &amp; Keagamaan</span>
         </button>
         <button type="button" @click="tab = 'kemuhammadiyahan'"
-            :class="tab === 'kemuhammadiyahan' ? 'bg-sky-500 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-            class="flex-1 py-2.5 px-3 text-xs sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            :class="tab === 'kemuhammadiyahan' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
+            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             <span>3. Kemuhammadiyahan</span>
         </button>
     </div>
@@ -86,38 +90,38 @@
         @method('PUT')
 
         {{-- Tab 1: Identitas & Domisili --}}
-        <div x-show="tab === 'identitas'" class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-base font-bold text-slate-900">Identitas Pribadi &amp; Kontak</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Informasi dasar kader untuk arsip administrasi resmi persyarikatan.</p>
+        <div x-show="tab === 'identitas'" class="bg-white rounded-2xl border-2 border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="border-b-2 border-slate-100 pb-4">
+                <h2 class="text-lg sm:text-xl font-black text-slate-900">Identitas Pribadi &amp; Kontak</h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium">Informasi dasar kader untuk arsip administrasi resmi persyarikatan.</p>
             </div>
 
             {{-- Pasfoto Upload & Proportional Face Fitter --}}
             <x-pasfoto-fitter name="foto" :required="false" inputId="foto-profile-input" :currentPhoto="$anggota->foto ? route('foto.anggota', $anggota) : null" label="Ganti Pasfoto Resmi" />
             @error('foto')
-                <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
+                <p class="text-xs sm:text-sm text-red-600 font-bold mt-1">{{ $message }}</p>
             @enderror
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nama Lengkap (beserta gelar) <span class="text-red-500">*</span></label>
+                <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nama Lengkap (beserta gelar) <span class="text-red-500">*</span></label>
                 <input name="nama_lengkap" value="{{ old('nama_lengkap', $anggota->nama_lengkap) }}" required
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tempat Lahir <span class="text-red-500">*</span></label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
                     <input name="tempat_lahir" value="{{ old('tempat_lahir', $anggota->tempat_lahir) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Lahir <span class="text-red-500">*</span></label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
                     <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $anggota->tanggal_lahir?->format('Y-m-d')) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Status Pernikahan <span class="text-red-500">*</span></label>
-                    <select name="status_pernikahan" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Status Pernikahan <span class="text-red-500">*</span></label>
+                    <select name="status_pernikahan" required class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
                         <option value="{{ $v }}" @selected(old('status_pernikahan', $anggota->status_pernikahan)===$v)>{{ $v }}</option>
                         @endforeach
@@ -126,62 +130,67 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alamat Lengkap Domisili <span class="text-red-500">*</span></label>
-                <textarea name="alamat_rumah" required rows="2"
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none resize-none transition">{{ old('alamat_rumah', $anggota->alamat_rumah) }}</textarea>
+                <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Alamat Lengkap Domisili <span class="text-red-500">*</span></label>
+                <textarea name="alamat_rumah" required rows="3"
+                    class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none resize-none transition font-medium leading-relaxed">{{ old('alamat_rumah', $anggota->alamat_rumah) }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Desa / Kelurahan <span class="text-red-500">*</span></label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Desa / Kelurahan <span class="text-red-500">*</span></label>
                     <input name="desa_kelurahan" value="{{ old('desa_kelurahan', $anggota->desa_kelurahan) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kecamatan <span class="text-red-500">*</span></label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kecamatan <span class="text-red-500">*</span></label>
                     <input name="kecamatan" value="{{ old('kecamatan', $anggota->kecamatan) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kabupaten <span class="text-red-500">*</span></label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kabupaten <span class="text-red-500">*</span></label>
                     <input name="kabupaten" value="{{ old('kabupaten', $anggota->kabupaten) }}" required
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Amanah / Jabatan di AUM</label>
-                    <input name="jabatan_aum" value="{{ old('jabatan_aum', $anggota->jabatan_aum) }}" placeholder="Contoh: Guru SMK Muhammadiyah 1 Karanganyar"
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Pekerjaan / Profesi Utama</label>
+                    <input name="pekerjaan" value="{{ old('pekerjaan', $anggota->pekerjaan ?: $anggota->jabatan_aum) }}" placeholder="Contoh: Guru / PNS / Wiraswasta / Karyawan"
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendidikan Terakhir</label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nomor Baku Muhammadiyah (NBM)</label>
+                    <input name="nbm" value="{{ old('nbm', $anggota->nbm) }}" placeholder="Contoh: 1084201"
+                        class="w-full px-4 py-3.5 text-base font-mono bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
+                </div>
+                <div>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Pendidikan Terakhir</label>
                     <input name="pendidikan_sd" value="{{ old('pendidikan_sd', $anggota->pendidikan_sd) }}" placeholder="Contoh: S1 Pendidikan Agama Islam"
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex justify-end">
+            <div class="pt-5 border-t-2 border-slate-100 flex justify-end">
                 <button type="button" @click="tab = 'agama'"
-                    class="px-5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-2xs">
+                    class="min-h-[50px] px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-sm sm:text-base rounded-2xl transition flex items-center gap-2 shadow-sm">
                     <span>Lanjut ke Data Keagamaan</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
 
         {{-- Tab 2: Ibadah & Pemahaman Agama --}}
-        <div x-show="tab === 'agama'" class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6" style="display: none;">
-            <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-base font-bold text-slate-900">Pembiasaan Ibadah &amp; Pemahaman Keagamaan</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Pemetaan kompetensi keislaman untuk standarisasi kurikulum Baitul Arqam.</p>
+        <div x-show="tab === 'agama'" class="bg-white rounded-2xl border-2 border-slate-200 p-6 sm:p-8 shadow-sm space-y-6" style="display: none;">
+            <div class="border-b-2 border-slate-100 pb-4">
+                <h2 class="text-lg sm:text-xl font-black text-slate-900">Pembiasaan Ibadah &amp; Pemahaman Keagamaan</h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium">Pemetaan kompetensi keislaman untuk standarisasi kurikulum Baitul Arqam.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kemampuan Baca Al-Qur'an</label>
-                    <select name="kemampuan_baca_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kemampuan Baca Al-Qur'an</label>
+                    <select name="kemampuan_baca_quran" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Pilih Kemampuan --</option>
                         @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
                         <option value="{{ $v }}" @selected(old('kemampuan_baca_quran', $anggota->kemampuan_baca_quran)===$v)>{{ $v }}</option>
@@ -189,8 +198,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hafalan Al-Qur'an</label>
-                    <select name="hafalan_quran" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Hafalan Al-Qur'an</label>
+                    <select name="hafalan_quran" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Pilih Capaian Hafalan --</option>
                         @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
                         <option value="{{ $v }}" @selected(old('hafalan_quran', $anggota->hafalan_quran)===$v)>{{ $v }}</option>
@@ -201,8 +210,8 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Sholat Berjamaah di Masjid</label>
-                    <select name="aktivitas_sholat_masjid" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Sholat Berjamaah di Masjid</label>
+                    <select name="aktivitas_sholat_masjid" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Frekuensi --</option>
                         @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid', $anggota->aktivitas_sholat_masjid)===$v)>{{ $v }}</option>
@@ -210,8 +219,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kehadiran Kajian Keagamaan</label>
-                    <select name="aktivitas_kajian_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kehadiran Kajian Keagamaan</label>
+                    <select name="aktivitas_kajian_agama" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Frekuensi --</option>
                         @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama', $anggota->aktivitas_kajian_agama)===$v)>{{ $v }}</option>
@@ -219,8 +228,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Koleksi Buku Agama di Rumah</label>
-                    <select name="jumlah_buku_agama" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Koleksi Buku Agama di Rumah</label>
+                    <select name="jumlah_buku_agama" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Jumlah Buku --</option>
                         @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
                         <option value="{{ $v }}" @selected(old('jumlah_buku_agama', $anggota->jumlah_buku_agama)===$v)>{{ $v }}</option>
@@ -229,16 +238,16 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between gap-3 pt-5 border-t-2 border-slate-100">
                 <button type="button" @click="tab = 'identitas'"
-                    class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    class="min-h-[50px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition text-sm sm:text-base flex items-center justify-center gap-2 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     <span>Kembali</span>
                 </button>
                 <button type="button" @click="tab = 'kemuhammadiyahan'"
-                    class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full transition flex items-center justify-center gap-2 whitespace-nowrap shadow-xs hover:scale-[1.01]">
+                    class="min-h-[50px] px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-sm sm:text-base rounded-2xl transition flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
                     <span>Lanjut: Kemuhammadiyahan</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
@@ -251,6 +260,31 @@
                  takmirRole: '{{ addslashes(old('jabatan_takmir', $anggota->jabatan_takmir ?? '')) }}',
                  masjidText: '{{ addslashes(old('aktifitas_jamaah_masjid', $anggota->aktifitas_jamaah_masjid ?? '')) }}',
                  masyarakatText: '{{ addslashes(old('keaktifan_kemasyarakatan', $anggota->keaktifan_kemasyarakatan ?? '')) }}',
+                 checkedMuhammadiyah: {{ json_encode(old('keaktifan_muhammadiyah', $anggota->keaktifan_muhammadiyah ?? [])) }},
+                 checkedOrtom: {{ json_encode(old('keaktifan_ortom', $anggota->keaktifan_ortom ?? [])) }},
+
+                 isMuhammadiyahChecked(val) {
+                     return Array.isArray(this.checkedMuhammadiyah) && this.checkedMuhammadiyah.includes(val);
+                 },
+                 toggleMuhammadiyah(val, isChecked) {
+                     if (!Array.isArray(this.checkedMuhammadiyah)) this.checkedMuhammadiyah = [];
+                     if (isChecked) {
+                         if (!this.checkedMuhammadiyah.includes(val)) this.checkedMuhammadiyah.push(val);
+                     } else {
+                         this.checkedMuhammadiyah = this.checkedMuhammadiyah.filter(x => x !== val);
+                     }
+                 },
+                 isOrtomChecked(val) {
+                     return Array.isArray(this.checkedOrtom) && this.checkedOrtom.includes(val);
+                 },
+                 toggleOrtom(val, isChecked) {
+                     if (!Array.isArray(this.checkedOrtom)) this.checkedOrtom = [];
+                     if (isChecked) {
+                         if (!this.checkedOrtom.includes(val)) this.checkedOrtom.push(val);
+                     } else {
+                         this.checkedOrtom = this.checkedOrtom.filter(x => x !== val);
+                     }
+                 },
                  
                  masjidPresets: [
                      'Sholat Berjamaah 5 Waktu',
@@ -321,15 +355,131 @@
                      return this.masyarakatText && this.masyarakatText.includes(item);
                  }
              }">
-            <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-base font-bold text-slate-900">Kiprah Kemuhammadiyahan, Kemasjidan &amp; Kemasyarakatan</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Riwayat keaktifan di persyarikatan, aktifitas kemasjidan, dan pengabdian sosial kemasyarakatan.</p>
+            <div class="border-b-2 border-slate-100 pb-4">
+                <h2 class="text-lg sm:text-xl font-black text-slate-900">Kiprah Kemuhammadiyahan, Kemasjidan &amp; Kemasyarakatan</h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium">Riwayat keaktifan di persyarikatan, aktifitas kemasjidan, dan pengabdian sosial kemasyarakatan.</p>
+            </div>
+
+            {{-- 1. Keaktifan di Pimpinan Muhammadiyah --}}
+            <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <label class="block text-sm sm:text-base font-black text-slate-900">
+                        1. Keaktifan di Pimpinan Muhammadiyah
+                    </label>
+                    <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 font-medium">Centang tingkatan pimpinan tempat Anda aktif dan isikan amanah/jabatan Anda:</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    @foreach(config('arqam.opsi_form.keaktifan_muhammadiyah') as $v)
+                    <div class="p-3.5 sm:p-4 rounded-2xl border-2 transition-all"
+                         :class="isMuhammadiyahChecked('{{ $v }}') ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-300' : 'bg-white border-slate-300 hover:border-slate-400 hover:bg-slate-50'">
+                        <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                            <input type="checkbox" name="keaktifan_muhammadiyah[]" value="{{ $v }}"
+                                @checked(in_array($v, old('keaktifan_muhammadiyah', $anggota->keaktifan_muhammadiyah ?? [])))
+                                @change="toggleMuhammadiyah('{{ $v }}', $el.checked)"
+                                class="w-5 h-5 rounded-lg border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                            <span>{{ $v }}</span>
+                        </label>
+
+                        @if($v !== 'Tidak aktif')
+                        <div x-show="isMuhammadiyahChecked('{{ $v }}')" x-cloak x-transition
+                             class="mt-3 pt-3 border-t-2 border-sky-200 space-y-1.5">
+                            <label class="block text-xs sm:text-sm font-extrabold text-slate-800">
+                                Jabatan / Amanah di {{ $v }}:
+                            </label>
+                            <input type="text" name="jabatan_muhammadiyah[{{ $v }}]"
+                                   value="{{ old('jabatan_muhammadiyah.'.$v, $anggota->jabatan_muhammadiyah[$v] ?? ($v === 'Amal Usaha Muhammadiyah' ? $anggota->jabatan_aum : '')) }}"
+                                   placeholder="Contoh: Ketua / Sekretaris / Anggota Majelis"
+                                   class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[46px]">
+                        </div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- 2. Pimpinan Cabang (PCM) & Pimpinan Ranting (PRM) Domisili --}}
+            <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
+                <div>
+                    <h3 class="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <span>2. Cabang &amp; Ranting Domisili / Basis Kader</span>
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium leading-relaxed">
+                        Pilih Pimpinan Cabang tempat Anda berdomisili atau beraktivitas dan ketikkan nama Ranting (PRM) asal Anda.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                            Pimpinan Cabang Muhammadiyah (PCM)
+                        </label>
+                        <select name="pcm" class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[50px]">
+                            <option value="">-- Pilih Cabang / Kecamatan --</option>
+                            @foreach(config('arqam.opsi_form.cabang_pcm') as $cabang)
+                                <option value="{{ $cabang }}" @selected(old('pcm', $anggota->pcm ?: $anggota->kecamatan) === $cabang)>PCM {{ $cabang }}</option>
+                            @endforeach
+                            <option value="Lainnya" @selected(old('pcm', $anggota->pcm) === 'Lainnya')>Lainnya (Luar Karanganyar)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                            Pimpinan Ranting Muhammadiyah (PRM)
+                        </label>
+                        <input name="prm" value="{{ old('prm', $anggota->prm) }}" placeholder="Contoh: PRM Lalung / PRM Papahan"
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[50px]">
+                        <span class="text-xs text-slate-500 mt-1.5 block font-medium">Dapat berupa nama desa, kelurahan, atau dusun/masjid basis ranting.</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- 3. Keaktifan di Organisasi Otonom (ORTOM) --}}
+            <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <label class="block text-sm sm:text-base font-black text-slate-900">
+                        3. Keaktifan di Organisasi Otonom (ORTOM)
+                    </label>
+                    <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 font-medium">Centang ortom tempat Anda berkiprah dan isikan jabatan/posisi Anda:</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    @foreach(config('arqam.opsi_form.keaktifan_ortom') as $v)
+                    <div class="p-3.5 sm:p-4 rounded-2xl border-2 transition-all"
+                         :class="isOrtomChecked('{{ $v }}') ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-300' : 'bg-white border-slate-300 hover:border-slate-400 hover:bg-slate-50'">
+                        <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                            <input type="checkbox" name="keaktifan_ortom[]" value="{{ $v }}"
+                                @checked(in_array($v, old('keaktifan_ortom', $anggota->keaktifan_ortom ?? [])))
+                                @change="toggleOrtom('{{ $v }}', $el.checked)"
+                                class="w-5 h-5 rounded-lg border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                            <span>{{ $v }}</span>
+                        </label>
+
+                        @if($v !== 'Tidak aktif')
+                        <div x-show="isOrtomChecked('{{ $v }}')" x-cloak x-transition
+                             class="mt-3 pt-3 border-t-2 border-sky-200 space-y-1.5">
+                            <label class="block text-xs sm:text-sm font-extrabold text-slate-800">
+                                Jabatan / Posisi di {{ $v }}:
+                            </label>
+                            <input type="text" name="jabatan_ortom[{{ $v }}]"
+                                   value="{{ old('jabatan_ortom.'.$v, $anggota->jabatan_ortom[$v] ?? '') }}"
+                                   placeholder="Contoh: Ketua / Sekretaris / Anggota Bidang"
+                                   class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[46px]">
+                        </div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Langganan Majalah Suara Muhammadiyah</label>
-                    <select name="langganan_suara_muhammadiyah" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Langganan Majalah Suara Muhammadiyah</label>
+                    <select name="langganan_suara_muhammadiyah" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Status Langganan --</option>
                         @foreach(config('arqam.opsi_form.langganan_suara_muhammadiyah') as $v)
                         <option value="{{ $v }}" @selected(old('langganan_suara_muhammadiyah', $anggota->langganan_suara_muhammadiyah)===$v)>{{ $v }}</option>
@@ -337,54 +487,54 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tokoh Muhammadiyah Panutan</label>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Tokoh Muhammadiyah Panutan</label>
                     <input name="tokoh_berpengaruh" value="{{ old('tokoh_berpengaruh', $anggota->tokoh_berpengaruh) }}" placeholder="Contoh: K.H. Ahmad Dahlan, Buya Hamka"
-                        class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Organisasi Lain di Luar Muhammadiyah</label>
+                <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Organisasi Lain di Luar Muhammadiyah</label>
                 <input name="organisasi_lain" value="{{ old('organisasi_lain', $anggota->organisasi_lain) }}" placeholder="Sebutkan jika ada (opsional)"
-                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition">
+                    class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
             </div>
 
             {{-- Banner Ramah Usia 40+ --}}
-            <div class="p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex items-start gap-3 text-sky-950">
-                <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-base">
+            <div class="p-4 sm:p-5 rounded-2xl bg-sky-50 border-2 border-sky-200 flex items-start gap-3.5 text-sky-950">
+                <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-lg">
                     🕌
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
-                    <p class="text-xs text-sky-800/90 mt-0.5 leading-relaxed">
+                    <h3 class="text-sm sm:text-base font-black text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
+                    <p class="text-xs sm:text-sm text-sky-800 mt-1 leading-relaxed">
                         Sentuh pilihan cepat di bawah ini sesuai rutinitas sehari-hari Bapak/Ibu. Boleh memilih lebih dari satu tanpa perlu mengetik panjang.
                     </p>
                 </div>
             </div>
 
             {{-- 1. Aktivitas Jamaah di Masjid --}}
-            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+            <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                 <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                             1. Rutinitas Jamaah di Masjid Lingkungan Sekitar
                         </label>
-                        <span class="text-xs text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 self-start sm:self-auto">Boleh pilih lebih dari 1</span>
+                        <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">Boleh pilih lebih dari 1</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
                 </div>
 
                 {{-- Structured 2-Column Grid --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <template x-for="item in masjidPresets" :key="item">
                         <button type="button" @click="toggleMasjid(item)"
-                            class="px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between border shadow-2xs active:scale-[0.98] text-left min-h-[44px]"
+                            class="px-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold transition-all flex items-center justify-between border-2 shadow-xs active:scale-[0.98] text-left min-h-[52px]"
                             :class="hasMasjid(item) 
-                                ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                             <span class="leading-snug" x-text="item"></span>
-                            <div class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 ml-2 transition-colors"
-                                :class="hasMasjid(item) ? 'bg-white text-sky-600 font-black text-xs' : 'border border-slate-300 text-transparent'">
+                            <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ml-2.5 transition-colors"
+                                :class="hasMasjid(item) ? 'bg-white text-sky-600 font-black text-sm' : 'border-2 border-slate-300 text-transparent'">
                                 ✓
                             </div>
                         </button>
@@ -392,113 +542,113 @@
                 </div>
 
                 {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
-                <div class="pt-1">
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                <div class="pt-2">
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                         Rincian / Catatan Tambahan &amp; Nama Masjid:
                     </label>
-                    <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="2"
+                    <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="3"
                         placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik nama masjid atau kegiatan lain (contoh: Masjid Al-Falah Jetis)..."
-                        class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400"></textarea>
-                    @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                    @error('aktifitas_jamaah_masjid') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             {{-- 2. Keaktifan sebagai Takmir Masjid --}}
-            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+            <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                 <div>
-                    <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                    <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                         2. Amanah sebagai Pengurus / Takmir Masjid
                     </label>
-                    <p class="text-xs text-slate-500 mt-1">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
                 </div>
 
                 {{-- Symmetrical Side-by-Side Cards on Mobile & Desktop --}}
-                <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
-                    <label class="p-3 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2 bg-white shadow-2xs active:scale-[0.98]"
-                        :class="isTakmir === 'Tidak' ? 'border-sky-500 bg-sky-50/80 text-sky-950 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50/50'">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                    <label class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2.5 bg-white shadow-xs active:scale-[0.98]"
+                        :class="isTakmir === 'Tidak' ? 'border-sky-600 bg-sky-50 text-sky-950 ring-2 ring-sky-400/30' : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50'">
                         <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir" class="sr-only">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
-                            :class="isTakmir === 'Tidak' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 transition-colors"
+                            :class="isTakmir === 'Tidak' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'">
                             👤
                         </div>
                         <div>
-                            <span class="text-xs sm:text-sm font-bold block leading-tight">Bukan Takmir</span>
-                            <span class="text-[11px] text-slate-500 block mt-0.5">Sebagai Jamaah</span>
+                            <span class="text-sm sm:text-base font-extrabold block leading-tight">Bukan Takmir</span>
+                            <span class="text-xs sm:text-sm text-slate-500 font-medium block mt-1">Sebagai Jamaah</span>
                         </div>
                     </label>
 
-                    <label class="p-3 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2 bg-white shadow-2xs active:scale-[0.98]"
-                        :class="isTakmir === 'Ya' ? 'border-sky-500 bg-sky-50/80 text-sky-950 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50/50'">
+                    <label class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2.5 bg-white shadow-xs active:scale-[0.98]"
+                        :class="isTakmir === 'Ya' ? 'border-sky-600 bg-sky-50 text-sky-950 ring-2 ring-sky-400/30' : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50'">
                         <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir" class="sr-only">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
-                            :class="isTakmir === 'Ya' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 transition-colors"
+                            :class="isTakmir === 'Ya' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'">
                             🕌
                         </div>
                         <div>
-                            <span class="text-xs sm:text-sm font-bold block leading-tight">Ya, Pengurus</span>
-                            <span class="text-[11px] text-slate-500 block mt-0.5">Takmir Masjid</span>
+                            <span class="text-sm sm:text-base font-extrabold block leading-tight">Ya, Pengurus</span>
+                            <span class="text-xs sm:text-sm text-slate-500 font-medium block mt-1">Takmir Masjid</span>
                         </div>
                     </label>
                 </div>
 
                 {{-- Conditional Role Picker if "Ya" --}}
-                <div x-show="isTakmir === 'Ya'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="pt-3.5 border-t border-slate-200/80 space-y-3">
+                <div x-show="isTakmir === 'Ya'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="pt-4 border-t-2 border-slate-200 space-y-3.5">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-slate-800">
+                        <label class="text-xs sm:text-sm font-extrabold text-slate-900">
                             Pilih Jabatan / Amanah di Takmir:
                         </label>
-                        <span class="text-[10px] font-medium text-slate-400">Pilih salah satu</span>
+                        <span class="text-xs sm:text-sm font-semibold text-slate-500">Pilih salah satu</span>
                     </div>
                     
                     {{-- Structured 2-Column Grid (4 rows x 2 cols) --}}
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-2.5">
                         <template x-for="role in takmirPresets" :key="role">
                             <button type="button" @click="selectTakmirRole(role)"
-                                class="px-3 py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold transition-all border shadow-2xs flex items-center justify-between text-left active:scale-[0.98]"
+                                class="px-3.5 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-bold transition-all border-2 shadow-xs flex items-center justify-between text-left active:scale-[0.98] min-h-[48px] sm:min-h-[52px]"
                                 :class="isTakmirRoleActive(role) 
-                                    ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                    : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                    : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                                 <span class="truncate leading-tight" x-text="role"></span>
-                                <span x-show="isTakmirRoleActive(role)" class="text-white font-black text-xs shrink-0 ml-1">✓</span>
+                                <span x-show="isTakmirRoleActive(role)" class="text-white font-black text-sm shrink-0 ml-1">✓</span>
                             </button>
                         </template>
                     </div>
 
-                    <div class="pt-1">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    <div class="pt-2">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                             Nama Masjid &amp; Keterangan Tambahan:
                         </label>
                         <input type="text" name="jabatan_takmir" x-model="takmirRole"
                             placeholder="Contoh: Masjid Al-Falah Jetis / Sie Dakwah..."
-                            class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition placeholder:text-slate-400">
-                        @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition placeholder:text-slate-400 font-medium min-h-[50px]">
+                        @error('jabatan_takmir') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
 
             {{-- 3. Keaktifan di Kemasyarakatan --}}
-            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+            <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                 <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                             3. Keaktifan di Lingkungan Kemasyarakatan
                         </label>
-                        <span class="text-xs text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
+                        <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
                 </div>
 
                 {{-- Structured 2-Column Grid (5 rows x 2 cols) --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <template x-for="item in masyarakatPresets" :key="item">
                         <button type="button" @click="toggleMasyarakat(item)"
-                            class="px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between border shadow-2xs active:scale-[0.98] text-left min-h-[44px]"
+                            class="px-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold transition-all flex items-center justify-between border-2 shadow-xs active:scale-[0.98] text-left min-h-[52px]"
                             :class="hasMasyarakat(item) 
-                                ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                             <span class="leading-snug" x-text="item"></span>
-                            <div class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 ml-2 transition-colors"
-                                :class="hasMasyarakat(item) ? 'bg-white text-sky-600 font-black text-xs' : 'border border-slate-300 text-transparent'">
+                            <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ml-2.5 transition-colors"
+                                :class="hasMasyarakat(item) ? 'bg-white text-sky-600 font-black text-sm' : 'border-2 border-slate-300 text-transparent'">
                                 ✓
                             </div>
                         </button>
@@ -506,34 +656,35 @@
                 </div>
 
                 {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
-                <div class="pt-1">
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                <div class="pt-2">
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                         Rincian Peran &amp; Nama Dusun/Wilayah:
                     </label>
-                    <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="2"
+                    <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="3"
                         placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik rincian RT/RW/Desa (contoh: Ketua RT 02 RW 04 Dusun Dagen)..."
-                        class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400"></textarea>
-                    @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                    @error('keaktifan_kemasyarakatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between pt-5 border-t-2 border-slate-100">
                 <button type="button" @click="tab = 'agama'"
-                    class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    class="min-h-[50px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition text-sm sm:text-base flex items-center justify-center gap-2 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     <span>Kembali</span>
                 </button>
             </div>
         </div>
 
         {{-- Submission Bar --}}
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="text-xs text-slate-500 text-center sm:text-left flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border-2 border-slate-300 shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-xs sm:text-sm text-slate-700 text-center sm:text-left flex items-center gap-2.5 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                 <span>Perubahan data profil akan langsung tersimpan di pangkalan data MPKSDI PDM Karanganyar.</span>
             </div>
-            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition">
-                Simpan Seluruh Perubahan Profil &rarr;
+            <button type="submit" class="w-full sm:w-auto min-h-[52px] sm:min-h-[54px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2 shrink-0">
+                <span>Simpan Seluruh Perubahan Profil</span>
+                <span class="text-lg leading-none">&rarr;</span>
             </button>
         </div>
     </form>

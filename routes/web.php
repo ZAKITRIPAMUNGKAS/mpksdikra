@@ -43,6 +43,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
     Route::get('/daftar', [AnggotaRegistrationController::class, 'show'])->name('anggota.register');
+    Route::get('/pendaftaran', fn () => redirect()->route('anggota.register'));
     Route::post('/daftar', [AnggotaRegistrationController::class, 'store'])->name('anggota.register.store');
 });
 

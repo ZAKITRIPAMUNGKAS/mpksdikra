@@ -64,9 +64,6 @@ class AnggotaImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 $email = 'kader.'.$nik.'.'.rand(10, 99).'@mpksdi.test';
             }
 
-            // Password default: 6 digit terakhir NIK
-            $defaultPassword = substr($nik, -6);
-
             // Tanggal lahir & umur
             $tanggalLahirRaw = $row['tanggal_lahir'] ?? '1980-01-01';
             try {
@@ -76,6 +73,9 @@ class AnggotaImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 $tanggalLahir = '1980-01-01';
                 $umur = 40;
             }
+
+            // Password default: tanggal & tahun lahir (DDMMYYYY)
+            $defaultPassword = Carbon::parse($tanggalLahir)->format('dmY');
 
             $jk = strtoupper(trim((string) ($row['jenis_kelamin'] ?? 'L')));
             if (! in_array($jk, ['L', 'P'])) {
@@ -102,6 +102,9 @@ class AnggotaImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'nik' => $nik,
                     'nbm' => ! empty($row['nbm']) ? (string) $row['nbm'] : null,
                     'jabatan_aum' => ! empty($row['pekerjaan']) ? (string) $row['pekerjaan'] : null,
+                    'pekerjaan' => ! empty($row['pekerjaan']) ? (string) $row['pekerjaan'] : null,
+                    'pcm' => $row['pcm'] ?? $row['kecamatan'] ?? 'Karanganyar',
+                    'prm' => $row['prm'] ?? ($row['desa_kelurahan'] ?? null),
                     'tempat_lahir' => $row['tempat_lahir'] ?? 'Karanganyar',
                     'tanggal_lahir' => $tanggalLahir,
                     'umur' => $umur,

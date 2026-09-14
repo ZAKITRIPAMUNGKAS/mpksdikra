@@ -97,8 +97,20 @@
                         </div>
                         @if(!empty($regData['kecamatan']))
                         <div>
-                            <span class="text-slate-400 block text-[11px]">Cabang / Kecamatan:</span>
+                            <span class="text-slate-400 block text-[11px]">Kecamatan:</span>
                             <span class="font-bold text-slate-800">{{ $regData['kecamatan'] }}</span>
+                        </div>
+                        @endif
+                        @if(!empty($regData['pcm']))
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">Cabang (PCM):</span>
+                            <span class="font-bold text-slate-800">PCM {{ $regData['pcm'] }}</span>
+                        </div>
+                        @endif
+                        @if(!empty($regData['prm']))
+                        <div>
+                            <span class="text-slate-400 block text-[11px]">Ranting (PRM):</span>
+                            <span class="font-bold text-slate-800">{{ $regData['prm'] }}</span>
                         </div>
                         @endif
                         @if(!empty($regData['email']))
@@ -107,6 +119,26 @@
                             <span class="font-mono font-medium text-slate-700">{{ $regData['email'] }}</span>
                         </div>
                         @endif
+                    </div>
+
+                    {{-- Informasi Akun Login Kader --}}
+                    <div class="mt-4 p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-xl text-xs space-y-1 text-left">
+                        <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                            <span aria-hidden="true">🔑</span>
+                            <span>Akses Masuk Portal Kader (Setelah Diverifikasi Admin):</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 pt-1">
+                            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/80">
+                                <span class="text-slate-500 block text-[10px]">Username:</span>
+                                <strong class="font-mono text-slate-900 text-xs">{{ $regData['username'] ?? ($regData['no_wa'] ?? '-') }}</strong>
+                                <span class="text-[10px] text-slate-400 block mt-0.5">(Nomor WhatsApp)</span>
+                            </div>
+                            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/80">
+                                <span class="text-slate-500 block text-[10px]">Kata Sandi:</span>
+                                <strong class="font-mono text-slate-900 text-xs">{{ $regData['password_default'] ?? 'Tanggal Lahir Anda' }}</strong>
+                                <span class="text-[10px] text-slate-400 block mt-0.5">(Format: DDMMYYYY)</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 @endif
@@ -190,24 +222,24 @@
                 </script>
             </div>
         @else
-            {{-- Form Header with MPKSDI Crest & Batik Corner --}}
-            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-7 md:p-8 mb-5 sm:mb-6 relative overflow-hidden">
-                <x-batik-corner position="top-right" class="w-32 h-32 sm:w-40 sm:h-40 text-[#005c8a] opacity-[0.18]" />
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-4 relative z-10">
-                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-12 sm:h-16 w-auto shrink-0 drop-shadow-xs self-start sm:self-center">
+            {{-- Form Header with MPKSDI Crest & Batik Corner (Compact & Senior-Friendly) --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-6 mb-3.5 sm:mb-5 relative overflow-hidden">
+                <x-batik-corner position="top-right" class="w-28 h-28 sm:w-40 sm:h-40 text-[#005c8a] opacity-[0.18]" />
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 sm:h-14 w-auto shrink-0 drop-shadow-xs self-start sm:self-center">
                     <div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-200/80 text-xs font-semibold text-sky-800 uppercase tracking-wider mb-1">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-200/80 text-[11px] sm:text-xs font-semibold text-sky-800 uppercase tracking-wider mb-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
                             Pangkalan Data Kader Persyarikatan
                         </span>
-                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Daftar Anggota MPKSDI</h1>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed font-normal">Lengkapi formulir pendaftaran anggota dan biodata diri secara akurat untuk verifikasi kepesertaan Baitul Arqam.</p>
+                        <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Daftar Anggota MPKSDI</h1>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5 leading-relaxed font-normal">Lengkapi biodata kader secara akurat untuk verifikasi dan kepesertaan Baitul Arqam.</p>
                     </div>
                 </div>
             </div>
 
         @if($errors->any())
-            <div class="mb-5 sm:mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-950 text-sm shadow-2xs">
+            <div class="mb-4 sm:mb-5 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-950 text-sm shadow-2xs">
                 <div class="font-semibold mb-1 flex items-center gap-1.5 text-xs uppercase tracking-wider text-rose-900">
                     <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -223,6 +255,7 @@
         @endif
 
         <form method="POST" action="{{ route('anggota.register.store') }}" enctype="multipart/form-data" novalidate
+              id="form-pendaftaran"
               class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-7 md:p-8"
               x-data="registrationForm()"
               @input.debounce.400ms="saveDraft()"
@@ -265,28 +298,35 @@
                 <button type="button" @click="stepErrorBanner = null" class="text-rose-400 hover:text-rose-700 font-bold px-1 text-sm">&times;</button>
             </div>
 
-            {{-- Stepper Progress Header --}}
-            <div class="mb-6 sm:mb-8 pb-4 sm:pb-5 border-b border-slate-200/80">
-                <div class="flex items-center justify-between gap-2 mb-3">
-                    {{-- Active step title badge for mobile viewports --}}
-                    <div class="sm:hidden flex items-center bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/80 text-xs">
-                        <span class="text-slate-500 font-medium mr-1.5">Langkah:</span>
-                        <span class="font-bold text-sky-700" x-text="
-                            tab === 'diri' ? '1/4: Identitas & Akun' :
-                            (tab === 'agama' ? '2/4: Keagamaan & Ibadah' :
-                            (tab === 'org' ? '3/4: Pengalaman Organisasi' : '4/4: Kemasyarakatan & Kirim'))
-                        "></span>
+            {{-- Stepper Progress Header (High Contrast, Large Tap Target for Seniors) --}}
+            <div class="mb-6 sm:mb-8 pb-5 border-b border-slate-200">
+                {{-- Mobile Active Step Indicator --}}
+                <div class="sm:hidden mb-3.5 p-3.5 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-between shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs"
+                              x-text="tab === 'diri' ? '1' : (tab === 'agama' ? '2' : (tab === 'org' ? '3' : '4'))"></span>
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-800 block leading-none">Langkah Formulir:</span>
+                            <span class="text-sm font-extrabold text-slate-900"
+                                  x-text="tab === 'diri' ? '1. Identitas & Pasfoto' : (tab === 'agama' ? '2. Keagamaan & Ibadah' : (tab === 'org' ? '3. Data Organisasi' : '4. Kemasyarakatan'))"></span>
+                        </div>
                     </div>
-                    <div class="hidden sm:block"></div>
+                    <span class="text-xs font-bold text-sky-800 bg-white px-2.5 py-1 rounded-lg border border-sky-200 shadow-2xs"
+                          x-text="tab === 'diri' ? '1 dari 4' : (tab === 'agama' ? '2 dari 4' : (tab === 'org' ? '3 dari 4' : '4 dari 4'))"></span>
+                </div>
 
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <span class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Tahapan Pengisian Formulir:
+                    </span>
                     {{-- Auto-save status indicator --}}
-                    <div class="flex items-center gap-2 text-[11px] font-medium ml-auto">
+                    <div class="flex items-center gap-2 text-xs font-medium ml-auto">
                         <template x-if="hasSavedDraft">
-                            <div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full shadow-2xs">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span x-text="lastSavedText || 'Draf tersimpan'"></span>
+                            <div class="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-full shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="font-bold" x-text="lastSavedText || 'Draf tersimpan'"></span>
                                 <span class="text-slate-300 mx-0.5">&bull;</span>
-                                <button type="button" @click="clearDraft(true)" class="text-slate-500 hover:text-rose-600 font-semibold underline transition">
+                                <button type="button" @click="clearDraft(true)" class="text-slate-600 hover:text-rose-600 font-bold underline transition">
                                     Hapus Draf
                                 </button>
                             </div>
@@ -294,7 +334,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
+                <div class="grid grid-cols-4 gap-2 sm:gap-3">
                     @php
                         $steps = [
                             ['key' => 'diri', 'no' => '1', 'title' => 'Identitas'],
@@ -305,18 +345,19 @@
                     @endphp
                     @foreach($steps as $s)
                     <button type="button" @click="goTo('{{ $s['key'] }}')"
-                        class="text-left group focus:outline-none transition">
-                        <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5">
-                            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg text-xs font-bold flex items-center justify-center transition-all duration-150 shrink-0"
-                                :class="tab==='{{ $s['key'] }}' ? 'bg-sky-500 text-white font-extrabold shadow-2xs' : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'">
+                        class="text-left group focus:outline-none transition p-1.5 sm:p-2 rounded-2xl hover:bg-slate-50"
+                        :class="tab==='{{ $s['key'] }}' ? 'bg-sky-50/70 border border-sky-200' : ''">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center transition-all duration-150 shrink-0"
+                                :class="tab==='{{ $s['key'] }}' ? 'bg-sky-600 text-white font-black shadow-xs ring-2 ring-sky-300' : 'bg-slate-100 text-slate-700 group-hover:bg-slate-200'">
                                 {{ $s['no'] }}
                             </span>
-                            <span class="text-xs font-bold hidden sm:inline truncate"
-                                :class="tab==='{{ $s['key'] }}' ? 'text-sky-700' : 'text-slate-500 group-hover:text-slate-800'">
+                            <span class="text-xs sm:text-sm font-bold hidden sm:inline truncate"
+                                :class="tab==='{{ $s['key'] }}' ? 'text-sky-900 font-extrabold' : 'text-slate-600 group-hover:text-slate-900'">
                                 {{ $s['title'] }}
                             </span>
                         </div>
-                        <div class="w-full h-1 sm:h-1.5 rounded-full overflow-hidden bg-slate-100">
+                        <div class="w-full h-1.5 sm:h-2 rounded-full overflow-hidden bg-slate-200">
                             <div class="h-full transition-all duration-200"
                                 :class="tab==='{{ $s['key'] }}' ? 'bg-amber-400 w-full' : 'bg-transparent w-0'"></div>
                         </div>
@@ -325,174 +366,177 @@
                 </div>
             </div>
 
-            {{-- Tab 1: Data Diri & Akun --}}
-            <div x-show="tab==='diri'" class="space-y-4 sm:space-y-5">
+            {{-- Tab 1: Data Diri & Akun (Desain Ramah Lansia / 40+ Tahun) --}}
+            <div x-show="tab==='diri'" class="space-y-5 sm:space-y-6">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Nama Lengkap (beserta gelar) <span class="text-red-500">*</span>
+                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                        Nama Lengkap (beserta gelar) <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                     </label>
                     <input name="nama_lengkap" value="{{ old('nama_lengkap') }}" autocomplete="name" required placeholder="Contoh: H. Agus Sulaiman, S.Pd"
                         @input="clearError('nama_lengkap')"
-                        :class="clientErrors.nama_lengkap ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('nama_lengkap') ? 'border-red-500' : 'border-slate-300' }}'"
-                        class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('nama_lengkap') ? 'true' : 'false' }}">
+                        :class="clientErrors.nama_lengkap ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nama_lengkap') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('nama_lengkap') ? 'true' : 'false' }}">
                     <template x-if="clientErrors.nama_lengkap">
-                        <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.nama_lengkap"></p>
+                        <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nama_lengkap"></p>
                     </template>
-                    @error('nama_lengkap') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    @error('nama_lengkap') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            NIK KTP (16 digit) <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            NIK KTP (16 digit angka) <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
                         <input name="nik" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" autocomplete="off" required placeholder="3313xxxxxxxxxxxx"
                             @input="clearError('nik')"
-                            :class="clientErrors.nik ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('nik') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm font-mono border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}">
+                            :class="clientErrors.nik ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nik') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-mono text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}">
+                        <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Nomor Induk Kependudukan sesuai KTP (16 digit angka).</span>
                         <template x-if="clientErrors.nik">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.nik"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nik"></p>
                         </template>
-                        @error('nik') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('nik') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Jenis Kelamin <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Jenis Kelamin <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
                         <select name="jenis_kelamin" autocomplete="sex" required
                             @change="clearError('jenis_kelamin')"
-                            :class="clientErrors.jenis_kelamin ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('jenis_kelamin') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('jenis_kelamin') ? 'true' : 'false' }}">
-                            <option value="">Pilih Jenis Kelamin</option>
+                            :class="clientErrors.jenis_kelamin ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('jenis_kelamin') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('jenis_kelamin') ? 'true' : 'false' }}">
+                            <option value="">-- Pilih Jenis Kelamin --</option>
                             @foreach(config('arqam.opsi_form.jenis_kelamin') as $val => $label)
                             <option value="{{ $val }}" @selected(old('jenis_kelamin')===$val)>{{ $label }}</option>
                             @endforeach
                         </select>
                         <template x-if="clientErrors.jenis_kelamin">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.jenis_kelamin"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.jenis_kelamin"></p>
                         </template>
-                        @error('jenis_kelamin') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('jenis_kelamin') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Tempat Lahir <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Tempat Lahir <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
-                        <input name="tempat_lahir" value="{{ old('tempat_lahir') }}" required placeholder="Karanganyar"
+                        <input name="tempat_lahir" value="{{ old('tempat_lahir') }}" required placeholder="Contoh: Karanganyar"
                             @input="clearError('tempat_lahir')"
-                            :class="clientErrors.tempat_lahir ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('tempat_lahir') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('tempat_lahir') ? 'true' : 'false' }}">
+                            :class="clientErrors.tempat_lahir ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('tempat_lahir') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('tempat_lahir') ? 'true' : 'false' }}">
                         <template x-if="clientErrors.tempat_lahir">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.tempat_lahir"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.tempat_lahir"></p>
                         </template>
-                        @error('tempat_lahir') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('tempat_lahir') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Tanggal Lahir <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Tanggal Lahir <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
                         <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" autocomplete="bday" required
                             @change="clearError('tanggal_lahir')"
-                            :class="clientErrors.tanggal_lahir ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('tanggal_lahir') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('tanggal_lahir') ? 'true' : 'false' }}">
+                            :class="clientErrors.tanggal_lahir ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('tanggal_lahir') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('tanggal_lahir') ? 'true' : 'false' }}">
                         <template x-if="clientErrors.tanggal_lahir">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.tanggal_lahir"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.tanggal_lahir"></p>
                         </template>
-                        @error('tanggal_lahir') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('tanggal_lahir') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Status Pernikahan <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Status Pernikahan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
                         <select name="status_pernikahan" required
                             @change="clearError('status_pernikahan')"
-                            :class="clientErrors.status_pernikahan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('status_pernikahan') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('status_pernikahan') ? 'true' : 'false' }}">
-                            <option value="">Pilih Status</option>
+                            :class="clientErrors.status_pernikahan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('status_pernikahan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('status_pernikahan') ? 'true' : 'false' }}">
+                            <option value="">-- Pilih Status --</option>
                             @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
                             <option value="{{ $v }}" @selected(old('status_pernikahan')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
                         <template x-if="clientErrors.status_pernikahan">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.status_pernikahan"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.status_pernikahan"></p>
                         </template>
-                        @error('status_pernikahan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('status_pernikahan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Alamat Lengkap Rumah <span class="text-red-500">*</span>
+                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                        Alamat Lengkap Rumah <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                     </label>
-                    <textarea name="alamat_rumah" required rows="2" autocomplete="street-address" placeholder="Nama jalan, RT/RW, dukuh/perumahan"
+                    <textarea name="alamat_rumah" required rows="2" autocomplete="street-address" placeholder="Nama jalan, RT/RW, dukuh/perumahan tempat tinggal"
                         @input="clearError('alamat_rumah')"
-                        :class="clientErrors.alamat_rumah ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('alamat_rumah') ? 'border-red-500' : 'border-slate-300' }}'"
-                        class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition" aria-invalid="{{ $errors->has('alamat_rumah') ? 'true' : 'false' }}">{{ old('alamat_rumah') }}</textarea>
+                        :class="clientErrors.alamat_rumah ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('alamat_rumah') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white resize-none transition" aria-invalid="{{ $errors->has('alamat_rumah') ? 'true' : 'false' }}">{{ old('alamat_rumah') }}</textarea>
                     <template x-if="clientErrors.alamat_rumah">
-                        <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.alamat_rumah"></p>
+                        <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.alamat_rumah"></p>
                     </template>
-                    @error('alamat_rumah') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    @error('alamat_rumah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Desa/Kelurahan <span class="text-red-500">*</span></label>
-                        <input name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" autocomplete="address-level3" required
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Desa / Kelurahan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
+                        <input name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" autocomplete="address-level3" required placeholder="Contoh: Papahan"
                             @input="clearError('desa_kelurahan')"
-                            :class="clientErrors.desa_kelurahan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('desa_kelurahan') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
+                            :class="clientErrors.desa_kelurahan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('desa_kelurahan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
                         <template x-if="clientErrors.desa_kelurahan">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.desa_kelurahan"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.desa_kelurahan"></p>
                         </template>
-                        @error('desa_kelurahan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('desa_kelurahan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kecamatan (Cabang) <span class="text-red-500">*</span></label>
-                        <input name="kecamatan" value="{{ old('kecamatan') }}" autocomplete="address-level2" required placeholder="Contoh: Karanganyar / Jaten"
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kecamatan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
+                        <input name="kecamatan" value="{{ old('kecamatan') }}" autocomplete="address-level2" required placeholder="Contoh: Tasikmadu / Jaten"
                             @input="clearError('kecamatan')"
-                            :class="clientErrors.kecamatan ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('kecamatan') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('kecamatan') ? 'true' : 'false' }}">
+                            :class="clientErrors.kecamatan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('kecamatan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('kecamatan') ? 'true' : 'false' }}">
                         <template x-if="clientErrors.kecamatan">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.kecamatan"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.kecamatan"></p>
                         </template>
-                        @error('kecamatan') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('kecamatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kabupaten <span class="text-red-500">*</span></label>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kabupaten <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
                         <input name="kabupaten" value="{{ old('kabupaten', 'Karanganyar') }}" autocomplete="address-level1" required
                             @input="clearError('kabupaten')"
-                            :class="clientErrors.kabupaten ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('kabupaten') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('kabupaten') ? 'true' : 'false' }}">
+                            :class="clientErrors.kabupaten ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('kabupaten') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('kabupaten') ? 'true' : 'false' }}">
                         <template x-if="clientErrors.kabupaten">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.kabupaten"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.kabupaten"></p>
                         </template>
-                        @error('kabupaten') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('kabupaten') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Nomor WhatsApp Aktif <span class="text-red-500">*</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Nomor WhatsApp / HP Aktif <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
-                        <input name="no_wa" value="{{ old('no_wa') }}" placeholder="08xxxxxxxxxx" autocomplete="tel" required
+                        <input name="no_wa" value="{{ old('no_wa') }}" placeholder="Contoh: 081234567890" autocomplete="tel" required
                             @input="clearError('no_wa')"
-                            :class="clientErrors.no_wa ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('no_wa') ? 'border-red-500' : 'border-slate-300' }}'"
-                            class="w-full px-3.5 py-2.5 text-sm font-mono border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('no_wa') ? 'true' : 'false' }}">
+                            :class="clientErrors.no_wa ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('no_wa') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-mono text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('no_wa') ? 'true' : 'false' }}">
+                        <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Digunakan untuk Username login dan notifikasi WhatsApp.</span>
                         <template x-if="clientErrors.no_wa">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.no_wa"></p>
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.no_wa"></p>
                         </template>
-                        @error('no_wa') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        @error('no_wa') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Alamat Email (Login Portal)
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Alamat Email (Opsional)
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="kader@email.com" autocomplete="email"
-                            class="w-full px-3.5 py-2.5 text-sm border {{ $errors->has('email') ? 'border-red-500' : 'border-slate-300' }} rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
-                        @error('email') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Contoh: kader@gmail.com" autocomplete="email"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('email') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
+                        <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Boleh dikosongkan jika tidak memiliki alamat email.</span>
+                        @error('email') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -500,94 +544,89 @@
                 <div @change="clearError('foto')">
                     <x-pasfoto-fitter name="foto" :required="true" inputId="foto-register-input" label="Pasfoto Formal (Wajib untuk ID Card BA)" />
                     <template x-if="clientErrors.foto">
-                        <p class="text-xs text-rose-600 font-bold mt-1.5" x-text="clientErrors.foto"></p>
+                        <p class="text-xs sm:text-sm text-rose-600 font-bold mt-2 flex items-center gap-1" x-text="clientErrors.foto"></p>
                     </template>
                     @error('foto')
-                        <p class="text-xs text-red-600 font-bold mt-1">{{ $message }}</p>
+                        <p class="text-xs sm:text-sm text-rose-600 font-bold mt-2">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kata Sandi Akun <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <input :type="showPass ? 'text' : 'password'" name="password" autocomplete="new-password" required minlength="8" placeholder="Minimal 8 karakter"
-                                @input="clearError('password')"
-                                :class="clientErrors.password ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('password') ? 'border-red-500' : 'border-slate-300' }}'"
-                                class="w-full px-3.5 py-2.5 pr-10 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}">
-                            <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
-                                <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <svg x-show="showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                            </button>
-                        </div>
-                        <template x-if="clientErrors.password">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.password"></p>
-                        </template>
-                        @error('password') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                {{-- Informasi Pembuatan Akun Otomatis (Sangat Ramah Kader Senior) --}}
+                <div class="p-5 sm:p-6 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold text-2xl shadow-xs">
+                        <span aria-hidden="true">🔑</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Konfirmasi Sandi <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <input :type="showConfirmPass ? 'text' : 'password'" name="password_confirmation" autocomplete="new-password" required minlength="8" placeholder="Ketik ulang sandi"
-                                @input="clearError('password_confirmation')"
-                                :class="clientErrors.password_confirmation ? 'border-rose-500 ring-2 ring-rose-200' : '{{ $errors->has('password_confirmation') ? 'border-red-500' : 'border-slate-300' }}'"
-                                class="w-full px-3.5 py-2.5 pr-10 text-sm border rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition" aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}">
-                            <button type="button" @click="showConfirmPass = !showConfirmPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1" title="Tampilkan/Sembunyikan Sandi">
-                                <svg x-show="!showConfirmPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <svg x-show="showConfirmPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                            </button>
+                    <div class="space-y-2 flex-1">
+                        <h4 class="text-base sm:text-lg font-extrabold text-amber-950 tracking-tight">Akun Masuk Portal Dibuat Otomatis</h4>
+                        <p class="text-xs sm:text-sm text-amber-900 leading-relaxed font-normal">
+                            Bapak/Ibu <strong>tidak perlu membuat kata sandi baru</strong>. Setelah pendaftaran disetujui admin, akses masuk portal kader adalah:
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
+                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Username:</span>
+                                <strong class="text-slate-900 font-mono text-sm sm:text-base block mt-0.5">Nomor WhatsApp / HP</strong>
+                                <span class="text-xs text-slate-500 block mt-0.5">Sesuai nomor yang diisikan di atas</span>
+                            </div>
+                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
+                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Kata Sandi (Password):</span>
+                                <strong class="text-slate-900 text-sm sm:text-base block mt-0.5">Tanggal Lahir Anda</strong>
+                                <span class="text-xs text-slate-500 block mt-0.5">8 Digit Angka: DDMMYYYY</span>
+                            </div>
                         </div>
-                        <template x-if="clientErrors.password_confirmation">
-                            <p class="text-rose-600 text-xs mt-1 font-semibold" x-text="clientErrors.password_confirmation"></p>
-                        </template>
-                        @error('password_confirmation') <p class="text-red-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        <p class="text-xs sm:text-sm text-amber-900/90 font-medium pt-1">
+                            💡 <em>Contoh: Jika tanggal lahir Bapak/Ibu <strong>17 Agustus 1985</strong>, kata sandi login adalah <strong>17081985</strong>.</em>
+                        </p>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-end pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
-                        class="w-full sm:w-auto h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
+                        class="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] px-8 sm:px-10 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-3">
                         <span>Lanjut: Data Keagamaan</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
 
-            {{-- Tab 2: Keagamaan --}}
-            <div x-show="tab==='agama'" class="space-y-4 sm:space-y-5" style="display: none;">
+            {{-- Tab 2: Keagamaan (Desain Nyaman & Mudah Disentuh) --}}
+            <div x-show="tab==='agama'" class="space-y-6" style="display: none;">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Pendidikan SD / Sederajat</label>
+                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Pendidikan SD / Sederajat (Opsional)</label>
                     <input name="pendidikan_sd" value="{{ old('pendidikan_sd') }}" placeholder="Contoh: MIM Karanganyar / SDN 1 Karanganyar"
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Bahasa yang Dikuasai</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900">Bahasa yang Dikuasai</label>
+                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mb-2.5">Sentuh bahasa yang biasa Bapak/Ibu gunakan sehari-hari:</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         @foreach(config('arqam.opsi_form.bahasa_dikuasai') as $v)
-                        <label class="flex items-center gap-2 text-xs text-slate-700 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer active:scale-[0.98] transition">
+                        <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-slate-800 p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40 bg-white cursor-pointer select-none transition min-h-[50px] shadow-2xs">
                             <input type="checkbox" name="bahasa_dikuasai[]" value="{{ $v }}"
-                                @checked(in_array($v, old('bahasa_dikuasai', []))) class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                @checked(in_array($v, old('bahasa_dikuasai', []))) class="w-5 h-5 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
                             <span>{{ $v }}</span>
                         </label>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kemampuan Baca Al-Qur'an</label>
-                        <select name="kemampuan_baca_quran" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kemampuan Baca Al-Qur'an</label>
+                        <select name="kemampuan_baca_quran" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Kemampuan --</option>
                             @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
                             <option value="{{ $v }}" @selected(old('kemampuan_baca_quran')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Hafalan Al-Qur'an</label>
-                        <select name="hafalan_quran" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Hafalan Al-Qur'an</label>
+                        <select name="hafalan_quran" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Jumlah Hafalan --</option>
                             @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
                             <option value="{{ $v }}" @selected(old('hafalan_quran')===$v)>{{ $v }}</option>
                             @endforeach
@@ -595,20 +634,20 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Aktivitas Sholat Berjamaah di Masjid</label>
-                        <select name="aktivitas_sholat_masjid" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Aktivitas Sholat Berjamaah di Masjid</label>
+                        <select name="aktivitas_sholat_masjid" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Frekuensi Sholat --</option>
                             @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Aktivitas Mengikuti Kajian</label>
-                        <select name="aktivitas_kajian_agama" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Aktivitas Mengikuti Kajian</label>
+                        <select name="aktivitas_kajian_agama" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Frekuensi Kajian --</option>
                             @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama')===$v)>{{ $v }}</option>
                             @endforeach
@@ -616,20 +655,20 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Koleksi Buku Agama</label>
-                        <select name="jumlah_buku_agama" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Koleksi Buku Agama di Rumah</label>
+                        <select name="jumlah_buku_agama" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Jumlah Buku --</option>
                             @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
                             <option value="{{ $v }}" @selected(old('jumlah_buku_agama')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Langganan Majalah Suara Muhammadiyah</label>
-                        <select name="langganan_suara_muhammadiyah" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
-                            <option value="">Pilih</option>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Langganan Majalah Suara Muhammadiyah</label>
+                        <select name="langganan_suara_muhammadiyah" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- Pilih Status Berlangganan --</option>
                             @foreach(config('arqam.opsi_form.langganan_suara_muhammadiyah') as $v)
                             <option value="{{ $v }}" @selected(old('langganan_suara_muhammadiyah')===$v)>{{ $v }}</option>
                             @endforeach
@@ -638,89 +677,186 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Penyaluran ZIS (Zakat, Infaq, Shodaqoh)</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900">Penyaluran ZIS (Zakat, Infaq, Shodaqoh)</label>
+                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mb-2.5">Sentuh lembaga ZIS tempat biasa Bapak/Ibu menyalurkan zakat/infaq:</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         @foreach(config('arqam.opsi_form.lembaga_zis') as $v)
-                        <label class="flex items-center gap-2 text-xs text-slate-700 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer active:scale-[0.98] transition">
+                        <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-slate-800 p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40 bg-white cursor-pointer select-none transition min-h-[50px] shadow-2xs">
                             <input type="checkbox" name="lembaga_zis[]" value="{{ $v }}"
-                                @checked(in_array($v, old('lembaga_zis', []))) class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                @checked(in_array($v, old('lembaga_zis', []))) class="w-5 h-5 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
                             <span>{{ $v }}</span>
                         </label>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-4 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('diri')"
-                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        class="min-h-[50px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('org')"
-                        class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
+                        class="min-h-[50px] sm:min-h-[54px] px-7 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
                         <span>Lanjut: Data Organisasi</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
 
-            {{-- Tab 3: Organisasi & Kemuhammadiyahan --}}
-            <div x-show="tab==='org'" class="space-y-4 sm:space-y-5" style="display: none;">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Keaktifan di Pimpinan Muhammadiyah</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {{-- Tab 3: Organisasi & Kemuhammadiyahan (Desain Jelas & Nyaman) --}}
+            <div x-show="tab==='org'" class="space-y-6 sm:space-y-7" style="display: none;">
+                {{-- 1. Keaktifan di Pimpinan Muhammadiyah --}}
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900">
+                            1. Keaktifan di Pimpinan Muhammadiyah
+                        </label>
+                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500">Centang tingkatan pimpinan tempat Bapak/Ibu aktif dan isikan amanah/jabatannya:</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(config('arqam.opsi_form.keaktifan_muhammadiyah') as $v)
-                        <label class="flex items-center gap-2 text-xs text-slate-700 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer active:scale-[0.98] transition">
-                            <input type="checkbox" name="keaktifan_muhammadiyah[]" value="{{ $v }}"
-                                @checked(in_array($v, old('keaktifan_muhammadiyah', []))) class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <span>{{ $v }}</span>
-                        </label>
+                        <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
+                             :class="isMuhammadiyahChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
+                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                                <input type="checkbox" name="keaktifan_muhammadiyah[]" value="{{ $v }}"
+                                    @checked(in_array($v, old('keaktifan_muhammadiyah', [])))
+                                    @change="toggleMuhammadiyah('{{ $v }}', $el.checked)"
+                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                                <span>{{ $v }}</span>
+                            </label>
+
+                            @if($v !== 'Tidak aktif')
+                            <div x-show="isMuhammadiyahChecked('{{ $v }}')" x-cloak x-transition
+                                 class="mt-3 pt-3 border-t border-sky-200/80">
+                                <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1">
+                                    Jabatan / Amanah di {{ $v }}:
+                                </label>
+                                <input type="text" name="jabatan_muhammadiyah[{{ $v }}]"
+                                       value="{{ old('jabatan_muhammadiyah.'.$v) }}"
+                                       placeholder="Contoh: Ketua / Sekretaris / Anggota Majelis"
+                                       class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            </div>
+                            @endif
+                        </div>
                         @endforeach
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Keaktifan di Organisasi Otonom (ORTOM)</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {{-- 2. Pimpinan Cabang (PCM) & Pimpinan Ranting (PRM) Domisili --}}
+                <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200/90 space-y-4 shadow-2xs">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span>2. Cabang &amp; Ranting Domisili / Basis Kader</span>
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                            Pilih Cabang (Kecamatan) tempat Bapak/Ibu berdomisili/aktif dan ketikkan nama Ranting (PRM) asal Anda:
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                        <div>
+                            <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                                Pimpinan Cabang Muhammadiyah (PCM)
+                            </label>
+                            <select name="pcm" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                                <option value="">-- Pilih Cabang / Kecamatan --</option>
+                                @foreach(config('arqam.opsi_form.cabang_pcm') as $cabang)
+                                    <option value="{{ $cabang }}" @selected(old('pcm') === $cabang)>PCM {{ $cabang }}</option>
+                                @endforeach
+                                <option value="Lainnya" @selected(old('pcm') === 'Lainnya')>Lainnya (Luar Karanganyar)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                                Pimpinan Ranting Muhammadiyah (PRM)
+                            </label>
+                            <input name="prm" value="{{ old('prm') }}" placeholder="Contoh: PRM Lalung / PRM Papahan"
+                                class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <span class="text-xs text-slate-500 mt-1 block">Dapat berupa nama desa, kelurahan, atau dusun/masjid basis ranting.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 3. Keaktifan di Organisasi Otonom (ORTOM) --}}
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900">
+                            3. Keaktifan di Organisasi Otonom (ORTOM)
+                        </label>
+                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500">Centang ortom tempat Bapak/Ibu berkiprah dan isikan jabatan/posisi Anda:</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(config('arqam.opsi_form.keaktifan_ortom') as $v)
-                        <label class="flex items-center gap-2 text-xs text-slate-700 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer active:scale-[0.98] transition">
-                            <input type="checkbox" name="keaktifan_ortom[]" value="{{ $v }}"
-                                @checked(in_array($v, old('keaktifan_ortom', []))) class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <span>{{ $v }}</span>
-                        </label>
+                        <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
+                             :class="isOrtomChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
+                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                                <input type="checkbox" name="keaktifan_ortom[]" value="{{ $v }}"
+                                    @checked(in_array($v, old('keaktifan_ortom', [])))
+                                    @change="toggleOrtom('{{ $v }}', $el.checked)"
+                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                                <span>{{ $v }}</span>
+                            </label>
+
+                            @if($v !== 'Tidak aktif')
+                            <div x-show="isOrtomChecked('{{ $v }}')" x-cloak x-transition
+                                 class="mt-3 pt-3 border-t border-sky-200/80">
+                                <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1">
+                                    Jabatan / Posisi di {{ $v }}:
+                                </label>
+                                <input type="text" name="jabatan_ortom[{{ $v }}]"
+                                       value="{{ old('jabatan_ortom.'.$v) }}"
+                                       placeholder="Contoh: Ketua / Sekretaris / Anggota Bidang"
+                                       class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            </div>
+                            @endif
+                        </div>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                {{-- 4. NBM & Pekerjaan Utama --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 pt-1">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Nomor Baku Muhammadiyah (NBM)</label>
-                        <input name="nbm" value="{{ old('nbm') }}" placeholder="Bila sudah memiliki NBM"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Nomor Baku Muhammadiyah (NBM)</label>
+                        <input name="nbm" value="{{ old('nbm') }}" placeholder="Contoh: 1234567 (Bila sudah ber-NBM)"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <span class="text-xs text-slate-500 mt-1 block">Kosongkan bila belum memiliki kartu NBM.</span>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Amanah / Jabatan di AUM</label>
-                        <input name="jabatan_aum" value="{{ old('jabatan_aum') }}" placeholder="Contoh: Guru SMA Muh 1 / Perawat PKU"
-                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Pekerjaan / Profesi Utama</label>
+                        <input name="pekerjaan" value="{{ old('pekerjaan') }}" placeholder="Contoh: Guru / PNS / Wiraswasta / Karyawan / Nakes"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                     </div>
                 </div>
 
+                {{-- 5. Organisasi Lain di Luar Muhammadiyah --}}
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Organisasi Lain di Luar Muhammadiyah</label>
-                    <input name="organisasi_lain" value="{{ old('organisasi_lain') }}" placeholder="Sebutkan jika ada (opsional)"
-                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition">
+                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Organisasi Lain di Luar Muhammadiyah (Opsional)</label>
+                    <input name="organisasi_lain" value="{{ old('organisasi_lain') }}" placeholder="Contoh: PGRI, IDI, Karang Taruna dll. (kosongkan bila tidak ada)"
+                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                 </div>
 
-                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-4 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
-                        class="h-11 px-5 border border-slate-300 text-slate-700 font-bold rounded-full hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        class="min-h-[50px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('kemasyarakatan')"
-                        class="h-11 px-6 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition hover:scale-[1.01] flex items-center justify-center gap-2 whitespace-nowrap">
+                        class="min-h-[50px] sm:min-h-[54px] px-7 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
                         <span>Lanjut: Kemasyarakatan</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
@@ -814,41 +950,41 @@
                  @tab4-clear.window="isTakmir = 'Tidak'; takmirRole = ''; masjidText = ''; masyarakatText = '';">
                 
                 {{-- Banner Ramah Informasi --}}
-                <div class="p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 flex items-start gap-3 text-sky-950">
-                    <div class="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-base">
+                <div class="p-4 sm:p-5 rounded-2xl bg-sky-50 border-2 border-sky-200 flex items-start gap-3.5 text-sky-950">
+                    <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-lg">
                         <span aria-hidden="true">🕌</span>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
-                        <p class="text-xs text-sky-800/90 mt-0.5 leading-relaxed">
+                        <h3 class="text-sm sm:text-base font-black text-sky-900 leading-snug">Kiprah Dakwah Jamaah &amp; Sosial Kemasyarakatan</h3>
+                        <p class="text-xs sm:text-sm text-sky-800 mt-1 leading-relaxed">
                             Sentuh pilihan cepat di bawah ini sesuai rutinitas sehari-hari Bapak/Ibu. Boleh memilih lebih dari satu tanpa perlu mengetik panjang.
                         </p>
                     </div>
                 </div>
 
                 {{-- 1. Aktivitas Jamaah di Masjid --}}
-                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                            <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                                 1. Rutinitas Jamaah di Masjid Lingkungan Sekitar
                             </label>
-                            <span class="text-xs text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 self-start sm:self-auto">Boleh pilih lebih dari 1</span>
+                            <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">Boleh pilih lebih dari 1</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
                     </div>
 
                     {{-- Structured 2-Column Grid --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <template x-for="item in masjidPresets" :key="item">
                             <button type="button" @click="toggleMasjid(item)"
-                                class="px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between border shadow-2xs active:scale-[0.98] text-left min-h-[44px]"
+                                class="px-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold transition-all flex items-center justify-between border-2 shadow-xs active:scale-[0.98] text-left min-h-[52px]"
                                 :class="hasMasjid(item) 
-                                    ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                    : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                    : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                                 <span class="leading-snug" x-text="item"></span>
-                                <div class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 ml-2 transition-colors"
-                                    :class="hasMasjid(item) ? 'bg-white text-sky-600 font-black text-xs' : 'border border-slate-300 text-transparent'">
+                                <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ml-2.5 transition-colors"
+                                    :class="hasMasjid(item) ? 'bg-white text-sky-600 font-black text-sm' : 'border-2 border-slate-300 text-transparent'">
                                     ✓
                                 </div>
                             </button>
@@ -856,113 +992,113 @@
                     </div>
 
                     {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
-                    <div class="pt-1">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    <div class="pt-2">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                             Rincian / Catatan Tambahan &amp; Nama Masjid:
                         </label>
-                        <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="2"
+                        <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="3"
                             placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik nama masjid atau kegiatan lain (contoh: Masjid Al-Falah Jetis)..."
-                            class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400"></textarea>
-                        @error('aktifitas_jamaah_masjid') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                        @error('aktifitas_jamaah_masjid') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 {{-- 2. Keaktifan sebagai Takmir Masjid --}}
-                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
-                        <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                        <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                             2. Amanah sebagai Pengurus / Takmir Masjid
                         </label>
-                        <p class="text-xs text-slate-500 mt-1">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
                     </div>
 
                     {{-- Symmetrical Side-by-Side Cards on Mobile & Desktop --}}
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
-                        <label class="p-3 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2 bg-white shadow-2xs active:scale-[0.98]"
-                            :class="isTakmir === 'Tidak' ? 'border-sky-500 bg-sky-50/80 text-sky-950 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50/50'">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <label class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2.5 bg-white shadow-xs active:scale-[0.98]"
+                            :class="isTakmir === 'Tidak' ? 'border-sky-600 bg-sky-50 text-sky-950 ring-2 ring-sky-400/30' : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50'">
                             <input type="radio" name="keaktifan_takmir" value="Tidak" x-model="isTakmir" class="sr-only">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
-                                :class="isTakmir === 'Tidak' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 transition-colors"
+                                :class="isTakmir === 'Tidak' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'">
                                 <span aria-hidden="true">👤</span>
                             </div>
                             <div>
-                                <span class="text-xs sm:text-sm font-bold block leading-tight">Bukan Takmir</span>
-                                <span class="text-[11px] text-slate-500 block mt-0.5">Sebagai Jamaah</span>
+                                <span class="text-sm sm:text-base font-extrabold block leading-tight">Bukan Takmir</span>
+                                <span class="text-xs sm:text-sm text-slate-500 font-medium block mt-1">Sebagai Jamaah</span>
                             </div>
                         </label>
 
-                        <label class="p-3 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2 bg-white shadow-2xs active:scale-[0.98]"
-                            :class="isTakmir === 'Ya' ? 'border-sky-500 bg-sky-50/80 text-sky-950 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50/50'">
+                        <label class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-2.5 bg-white shadow-xs active:scale-[0.98]"
+                            :class="isTakmir === 'Ya' ? 'border-sky-600 bg-sky-50 text-sky-950 ring-2 ring-sky-400/30' : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50'">
                             <input type="radio" name="keaktifan_takmir" value="Ya" x-model="isTakmir" class="sr-only">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors"
-                                :class="isTakmir === 'Ya' ? 'bg-sky-500 text-white shadow-xs' : 'bg-slate-100 text-slate-500'">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 transition-colors"
+                                :class="isTakmir === 'Ya' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'">
                                 <span aria-hidden="true">🕌</span>
                             </div>
                             <div>
-                                <span class="text-xs sm:text-sm font-bold block leading-tight">Ya, Pengurus</span>
-                                <span class="text-[11px] text-slate-500 block mt-0.5">Takmir Masjid</span>
+                                <span class="text-sm sm:text-base font-extrabold block leading-tight">Ya, Pengurus</span>
+                                <span class="text-xs sm:text-sm text-slate-500 font-medium block mt-1">Takmir Masjid</span>
                             </div>
                         </label>
                     </div>
 
                     {{-- Conditional Role Picker if "Ya" --}}
-                    <div x-show="isTakmir === 'Ya'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="pt-3.5 border-t border-slate-200/80 space-y-3">
+                    <div x-show="isTakmir === 'Ya'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="pt-4 border-t-2 border-slate-200 space-y-3.5">
                         <div class="flex items-center justify-between">
-                            <label class="text-xs font-bold text-slate-800">
+                            <label class="text-xs sm:text-sm font-extrabold text-slate-900">
                                 Pilih Jabatan / Amanah di Takmir:
                             </label>
-                            <span class="text-xs font-medium text-slate-400">Pilih salah satu</span>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-500">Pilih salah satu</span>
                         </div>
                         
                         {{-- Structured 2-Column Grid (4 rows x 2 cols) --}}
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-2 gap-2.5">
                             <template x-for="role in takmirPresets" :key="role">
                                 <button type="button" @click="selectTakmirRole(role)"
-                                    class="px-3 py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold transition-all border shadow-2xs flex items-center justify-between text-left active:scale-[0.98]"
+                                    class="px-3.5 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-bold transition-all border-2 shadow-xs flex items-center justify-between text-left active:scale-[0.98] min-h-[48px] sm:min-h-[52px]"
                                     :class="isTakmirRoleActive(role) 
-                                        ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                        : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                        : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                                     <span class="truncate leading-tight" x-text="role"></span>
-                                    <span x-show="isTakmirRoleActive(role)" class="text-white font-black text-xs shrink-0 ml-1">✓</span>
+                                    <span x-show="isTakmirRoleActive(role)" class="text-white font-black text-sm shrink-0 ml-1">✓</span>
                                 </button>
                             </template>
                         </div>
 
-                        <div class="pt-1">
-                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                        <div class="pt-2">
+                            <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                                 Nama Masjid &amp; Keterangan Tambahan:
                             </label>
                             <input type="text" name="jabatan_takmir" x-model="takmirRole"
                                 placeholder="Contoh: Masjid Al-Falah Jetis / Sie Dakwah..."
-                                class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white transition placeholder:text-slate-400">
-                            @error('jabatan_takmir') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                                class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition placeholder:text-slate-400 font-medium min-h-[50px]">
+                            @error('jabatan_takmir') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>
 
                 {{-- 3. Keaktifan di Kemasyarakatan --}}
-                <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3.5">
+                <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                            <label class="block text-sm font-extrabold text-slate-900 leading-tight">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
                                 3. Keaktifan di Lingkungan Kemasyarakatan
                             </label>
-                            <span class="text-xs text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
+                            <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
                     </div>
 
                     {{-- Structured 2-Column Grid (5 rows x 2 cols) --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <template x-for="item in masyarakatPresets" :key="item">
                             <button type="button" @click="toggleMasyarakat(item)"
-                                class="px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between border shadow-2xs active:scale-[0.98] text-left min-h-[44px]"
+                                class="px-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold transition-all flex items-center justify-between border-2 shadow-xs active:scale-[0.98] text-left min-h-[52px]"
                                 :class="hasMasyarakat(item) 
-                                    ? 'bg-sky-500 text-white border-sky-600 shadow-sm font-bold ring-1 ring-sky-500' 
-                                    : 'bg-white text-slate-700 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40'">
+                                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-extrabold ring-2 ring-sky-300' 
+                                    : 'bg-white text-slate-800 border-slate-300 hover:border-sky-400 hover:bg-sky-50/40'">
                                 <span class="leading-snug" x-text="item"></span>
-                                <div class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 ml-2 transition-colors"
-                                    :class="hasMasyarakat(item) ? 'bg-white text-sky-600 font-black text-xs' : 'border border-slate-300 text-transparent'">
+                                <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ml-2.5 transition-colors"
+                                    :class="hasMasyarakat(item) ? 'bg-white text-sky-600 font-black text-sm' : 'border-2 border-slate-300 text-transparent'">
                                     ✓
                                 </div>
                             </button>
@@ -970,49 +1106,49 @@
                     </div>
 
                     {{-- Textarea Sinkronisasi & Catatan Tambahan --}}
-                    <div class="pt-1">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    <div class="pt-2">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
                             Rincian Peran &amp; Nama Dusun/Wilayah:
                         </label>
-                        <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="2"
+                        <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="3"
                             placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik rincian RT/RW/Desa (contoh: Ketua RT 02 RW 04 Dusun Dagen)..."
-                            class="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400"></textarea>
-                        @error('keaktifan_kemasyarakatan') <p class="text-rose-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                        @error('keaktifan_kemasyarakatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 {{-- Kotak Konfirmasi Pengiriman --}}
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-xs text-emerald-950 flex items-start gap-3">
-                    <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
+                <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 flex items-start gap-3.5">
+                    <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 font-black text-sm">
                         ✓
                     </div>
                     <div class="leading-relaxed">
-                        <span class="font-bold block text-emerald-900 text-xs sm:text-sm mb-0.5">Alhamdulillah, Seluruh Data Formulir Telah Lengkap!</span>
-                        Silakan periksa kembali sebelum mengirim. Setelah menekan tombol kirim di bawah, pendaftaran Bapak/Ibu akan diverifikasi oleh tim sekretariat MPKSDI PDM Karanganyar.
+                        <span class="font-extrabold block text-emerald-900 text-sm sm:text-base mb-1">Alhamdulillah, Seluruh Data Formulir Telah Lengkap!</span>
+                        <p class="text-xs sm:text-sm text-emerald-800">Silakan periksa kembali sebelum mengirim. Setelah menekan tombol kirim di bawah, pendaftaran Bapak/Ibu akan diverifikasi oleh tim sekretariat MPKSDI PDM Karanganyar.</p>
                     </div>
                 </div>
 
                 {{-- Action Buttons --}}
-                <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between gap-3 pt-5 border-t-2 border-slate-200">
                     <button type="button" @click="goTo('org')"
-                        class="h-10 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        class="min-h-[52px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="submit" :disabled="isSubmitting"
-                        class="h-10 px-5 sm:px-6 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-sm rounded-lg shadow-2xs transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        class="min-h-[54px] sm:min-h-[58px] px-8 sm:px-10 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
                         <template x-if="isSubmitting">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            <span class="flex items-center gap-2.5">
+                                <svg class="w-5 h-5 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                 </svg>
                                 <span>Mengirim Pendaftaran...</span>
                             </span>
                         </template>
                         <template x-if="!isSubmitting">
-                            <span class="flex items-center gap-1.5">
+                            <span class="flex items-center gap-2">
                                 <span>Kirim Pendaftaran</span>
-                                <span>&rarr;</span>
+                                <span class="text-xl leading-none">&rarr;</span>
                             </span>
                         </template>
                     </button>
@@ -1054,12 +1190,78 @@
 <script>
 function registrationForm() {
     return {
-        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_sd', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'keaktifan_muhammadiyah', 'keaktifan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
+        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_sd', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'pekerjaan', 'pcm', 'prm', 'keaktifan_muhammadiyah', 'jabatan_muhammadiyah', 'keaktifan_ortom', 'jabatan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
         showPass: false,
         showConfirmPass: false,
         isSubmitting: false,
         clientErrors: {},
         stepErrorBanner: null,
+
+        // Reactive selections for Muhammadiyah & Ortom
+        checkedMuhammadiyah: {{ \Illuminate\Support\Js::from(old('keaktifan_muhammadiyah', [])) }},
+        checkedOrtom: {{ \Illuminate\Support\Js::from(old('keaktifan_ortom', [])) }},
+
+        toggleMuhammadiyah(val, isChecked) {
+            if (val === 'Tidak aktif') {
+                this.checkedMuhammadiyah = isChecked ? ['Tidak aktif'] : [];
+                const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+                if (form) {
+                    const cbs = form.querySelectorAll('input[name="keaktifan_muhammadiyah[]"]');
+                    cbs.forEach(cb => {
+                        if (cb.value !== 'Tidak aktif') cb.checked = false;
+                    });
+                }
+                this.saveDraft();
+                return;
+            }
+            if (isChecked) {
+                this.checkedMuhammadiyah = this.checkedMuhammadiyah.filter(x => x !== 'Tidak aktif');
+                if (!this.checkedMuhammadiyah.includes(val)) this.checkedMuhammadiyah.push(val);
+                const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+                if (form) {
+                    const tidakAktifCb = form.querySelector('input[name="keaktifan_muhammadiyah[]"][value="Tidak aktif"]');
+                    if (tidakAktifCb) tidakAktifCb.checked = false;
+                }
+            } else {
+                this.checkedMuhammadiyah = this.checkedMuhammadiyah.filter(x => x !== val);
+            }
+            this.saveDraft();
+        },
+
+        isMuhammadiyahChecked(val) {
+            return Array.isArray(this.checkedMuhammadiyah) && this.checkedMuhammadiyah.includes(val);
+        },
+
+        toggleOrtom(val, isChecked) {
+            if (val === 'Tidak aktif') {
+                this.checkedOrtom = isChecked ? ['Tidak aktif'] : [];
+                const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+                if (form) {
+                    const cbs = form.querySelectorAll('input[name="keaktifan_ortom[]"]');
+                    cbs.forEach(cb => {
+                        if (cb.value !== 'Tidak aktif') cb.checked = false;
+                    });
+                }
+                this.saveDraft();
+                return;
+            }
+            if (isChecked) {
+                this.checkedOrtom = this.checkedOrtom.filter(x => x !== 'Tidak aktif');
+                if (!this.checkedOrtom.includes(val)) this.checkedOrtom.push(val);
+                const form = this.$el.tagName === 'FORM' ? this.$el : this.$el.closest('form');
+                if (form) {
+                    const tidakAktifCb = form.querySelector('input[name="keaktifan_ortom[]"][value="Tidak aktif"]');
+                    if (tidakAktifCb) tidakAktifCb.checked = false;
+                }
+            } else {
+                this.checkedOrtom = this.checkedOrtom.filter(x => x !== val);
+            }
+            this.saveDraft();
+        },
+
+        isOrtomChecked(val) {
+            return Array.isArray(this.checkedOrtom) && this.checkedOrtom.includes(val);
+        },
 
         // Form persistence state
         draftKey: 'mpksdi_register_draft_v1',
@@ -1089,6 +1291,16 @@ function registrationForm() {
                     this.restoreDraft();
                 });
             @endif
+
+            // Senior-friendly auto-scroll when requested via hash or mobile
+            this.$nextTick(() => {
+                if (window.location.hash === '#form-pendaftaran' || window.location.hash === '#daftar') {
+                    const formEl = document.getElementById('form-pendaftaran');
+                    if (formEl) {
+                        formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
         },
 
         clearError(field) {
@@ -1255,6 +1467,14 @@ function registrationForm() {
                     }
                 }));
 
+                // Restore reactive checkbox arrays for Tab 3
+                if (draft['keaktifan_muhammadiyah[]']) {
+                    this.checkedMuhammadiyah = Array.isArray(draft['keaktifan_muhammadiyah[]']) ? draft['keaktifan_muhammadiyah[]'] : [];
+                }
+                if (draft['keaktifan_ortom[]']) {
+                    this.checkedOrtom = Array.isArray(draft['keaktifan_ortom[]']) ? draft['keaktifan_ortom[]'] : [];
+                }
+
                 // Restore pasfoto if present
                 if (draft._pasfoto_data_url) {
                     window.dispatchEvent(new CustomEvent('pasfoto-restore', {
@@ -1301,6 +1521,8 @@ function registrationForm() {
             }
 
             this.tab = 'diri';
+            this.checkedMuhammadiyah = [];
+            this.checkedOrtom = [];
             this.draftRestored = false;
             this.hasSavedDraft = false;
             this.lastSavedText = null;
@@ -1361,7 +1583,7 @@ function registrationForm() {
             }
 
             if (!getVal('kecamatan')) {
-                this.clientErrors.kecamatan = 'Kecamatan (Cabang) wajib diisi.';
+                this.clientErrors.kecamatan = 'Kecamatan wajib diisi.';
             }
 
             if (!getVal('kabupaten')) {
@@ -1383,16 +1605,15 @@ function registrationForm() {
 
             const pass = getVal('password');
             const confirmPass = getVal('password_confirmation');
-            if (!pass) {
-                this.clientErrors.password = 'Kata sandi akun wajib diisi.';
-            } else if (pass.length < 8) {
-                this.clientErrors.password = 'Kata sandi minimal 8 karakter.';
-            }
-
-            if (!confirmPass) {
-                this.clientErrors.password_confirmation = 'Konfirmasi kata sandi wajib diisi.';
-            } else if (pass !== confirmPass) {
-                this.clientErrors.password_confirmation = 'Konfirmasi kata sandi tidak cocok dengan kata sandi di atas.';
+            if (pass) {
+                if (pass.length < 6) {
+                    this.clientErrors.password = 'Kata sandi minimal 6 karakter.';
+                }
+                if (!confirmPass) {
+                    this.clientErrors.password_confirmation = 'Konfirmasi kata sandi wajib diisi.';
+                } else if (pass !== confirmPass) {
+                    this.clientErrors.password_confirmation = 'Konfirmasi kata sandi tidak cocok.';
+                }
             }
 
             const errorKeys = Object.keys(this.clientErrors);

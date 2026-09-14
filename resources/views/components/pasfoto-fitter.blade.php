@@ -16,42 +16,42 @@
 
     {{-- Label & Status --}}
     <div class="flex items-center justify-between flex-wrap gap-2">
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+        <label class="block text-sm sm:text-base font-bold text-slate-900">
             {{ $label }}
             @if($required)
-                <span class="text-red-500">*</span>
+                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
             @endif
         </label>
 
         {{-- Success Auto-Match Badge --}}
         <template x-if="isCropped && !isProcessing">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
-                <span>Pasfoto 3:4 Setengah Badan Pas</span>
+                <span>Pasfoto 3:4 Siap Digunakan</span>
             </span>
         </template>
     </div>
 
     {{-- Preview & Upload Trigger Row --}}
-    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
         {{-- 3:4 Box Preview --}}
-        <div class="relative w-24 h-32 border-2 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center shrink-0 shadow-xs self-center sm:self-auto transition duration-200"
-             :class="isProcessing ? 'border-sky-400 ring-4 ring-sky-100' : (isCropped ? 'border-emerald-400 ring-2 ring-emerald-100' : (photoPreview ? 'border-sky-400' : 'border-dashed border-slate-300 bg-white'))">
+        <div class="relative w-28 h-36 border-2 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center shrink-0 shadow-xs self-center sm:self-auto transition duration-200"
+             :class="isProcessing ? 'border-sky-400 ring-4 ring-sky-100' : (isCropped ? 'border-emerald-500 ring-4 ring-emerald-100' : (photoPreview ? 'border-sky-500' : 'border-dashed border-slate-300 bg-white'))">
 
             {{-- 1. Loading / Auto-Scanning State --}}
             <template x-if="isProcessing">
                 <div class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-2 text-center select-none z-30">
                     {{-- Pulse Loader --}}
-                    <div class="relative w-9 h-9 mb-1.5">
-                        <div class="w-9 h-9 rounded-full border-2 border-slate-700 border-t-[#f8bb00] animate-spin"></div>
+                    <div class="relative w-10 h-10 mb-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-700 border-t-[#f8bb00] animate-spin"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></div>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-extrabold text-sky-300 block leading-none">Auto Match</span>
-                    <span class="text-[8px] text-slate-400 block mt-1 leading-tight">Menyelaraskan 3:4 setengah badan...</span>
+                    <span class="text-xs font-extrabold text-sky-300 block leading-none">Menyelaraskan Foto...</span>
+                    <span class="text-[10px] text-slate-300 block mt-1 leading-tight">Menyesuaikan rasio 3:4 setengah badan</span>
                 </div>
             </template>
 
@@ -63,10 +63,11 @@
             {{-- 3. Empty Placeholder --}}
             <template x-if="!photoPreview && !isProcessing">
                 <div class="text-center p-2 text-slate-400">
-                    <svg class="w-8 h-8 mx-auto mb-1 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-10 h-10 mx-auto mb-1 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                    <span class="text-[10px] font-bold block leading-none">Rasio 3x4</span>
+                    <span class="text-xs font-bold block leading-tight text-slate-500">Pasfoto 3x4</span>
+                    <span class="text-[10px] text-slate-400">Formal</span>
                 </div>
             </template>
 
@@ -75,39 +76,48 @@
                 <button type="button" @click="openModal()"
                     title="Sesuaikan Ulang Posisi Wajah"
                     class="absolute inset-0 bg-slate-950/40 hover:bg-slate-950/60 text-white flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition duration-150 backdrop-blur-[1px]">
-                    <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                     </svg>
-                    <span class="text-[8.5px] font-bold uppercase tracking-wider">Atur Posisi</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Atur Posisi</span>
                 </button>
             </template>
         </div>
 
         {{-- Controls and Input --}}
-        <div class="flex-1 w-full space-y-2">
-            <div class="flex flex-wrap items-center gap-2">
+        <div class="flex-1 w-full space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+                <label for="{{ $inputId }}"
+                    class="cursor-pointer inline-flex items-center gap-2.5 px-5 py-3 sm:py-3.5 rounded-2xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base shadow-sm transition select-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span x-text="photoPreview ? 'Ganti Foto / Kamera HP' : 'Pilih Foto dari Galeri / Kamera HP'"></span>
+                </label>
+
                 <input type="file"
                     id="{{ $inputId }}"
                     name="{{ $name }}"
                     accept="image/jpeg,image/png,image/webp,image/jpg"
                     @if($required && !$currentPhoto) required @endif
                     @change="handleFileSelect($event)"
-                    class="block w-full sm:w-auto text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-50 file:text-sky-800 hover:file:bg-sky-100 cursor-pointer transition">
+                    class="sr-only">
 
                 {{-- Action options once photo is ready --}}
                 <template x-if="rawImageSrc && !isProcessing">
                     <div class="flex items-center gap-2 flex-wrap">
                         <button type="button" @click="openModal()"
-                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-sky-200 bg-sky-50/80 hover:bg-sky-100 text-sky-800 text-xs font-bold transition shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-sky-300 bg-white hover:bg-sky-50 text-sky-800 text-xs sm:text-sm font-bold transition shadow-2xs">
+                            <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
                             </svg>
-                            <span>Atur Manual (Opsional)</span>
+                            <span>Atur Ulang Posisi (Opsional)</span>
                         </button>
 
                         <button type="button" @click="useOriginal()"
-                            class="text-xs text-slate-500 hover:text-slate-700 font-medium underline px-1 py-1">
-                            Foto Asli
+                            class="text-xs sm:text-sm text-slate-600 hover:text-slate-900 font-semibold underline px-2 py-1">
+                            Gunakan Foto Asli
                         </button>
                     </div>
                 </template>
@@ -115,7 +125,7 @@
 
             {{-- Dynamic guidance or processing status --}}
             <template x-if="isProcessing">
-                <div class="flex items-center gap-2 text-xs font-bold text-sky-700 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-200/80">
+                <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-sky-800 bg-sky-50 px-3.5 py-2 rounded-xl border border-sky-200">
                     <svg class="w-4 h-4 animate-spin text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
@@ -124,10 +134,12 @@
             </template>
 
             <template x-if="!isProcessing">
-                <p class="text-[11px] text-slate-400 leading-relaxed font-medium">
-                    Sistem otomatis memindai dan menyesuaikan foto Anda menjadi pasfoto setengah badan standar 3:4 resmi (posisi kepala &amp; dada seimbang) untuk ID Card &amp; Sertifikat Baitul Arqam.
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                    Bapak/Ibu dapat memotret langsung dengan kamera HP atau memilih foto yang ada di galeri. Sistem kami akan otomatis merapikan posisi kepala dan pundak untuk ID Card dan Sertifikat Baitul Arqam.
                 </p>
             </template>
+        </div>
+    </div>
         </div>
     </div>
 

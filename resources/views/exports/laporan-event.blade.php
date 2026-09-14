@@ -80,8 +80,8 @@
             <td style="text-align: center; mso-number-format:'\@';">{{ $p->anggota->nbm ?? '-' }}</td>
             <td>{{ $p->anggota->nama_lengkap }}</td>
             <td style="text-align: center;">{{ $p->anggota->jenis_kelamin ?? '-' }}</td>
-            <td>{{ $p->anggota->kecamatan ? 'PCM ' . $p->anggota->kecamatan : '-' }}</td>
-            <td>{{ $p->anggota->desa_kelurahan ?? ($p->anggota->aum_tempat_tugas ?? '-') }}</td>
+            <td>{{ $p->anggota->pcm ? 'PCM ' . $p->anggota->pcm : ($p->anggota->kecamatan ? 'PCM ' . $p->anggota->kecamatan : '-') }}</td>
+            <td>{{ $p->anggota->prm ?: ($p->anggota->desa_kelurahan ?? ($p->anggota->aum_tempat_tugas ?? '-')) }}</td>
             <td style="text-align: center;">{{ number_format($p->nilai_pretest, 1) }}</td>
             <td style="text-align: center;">{{ number_format($p->nilai_posttest, 1) }}</td>
             <td style="text-align: center;">{{ number_format($ng, 2) }}</td>

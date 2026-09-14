@@ -19,7 +19,7 @@ class AdminWhatsAppAndResetTest extends TestCase
         return User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
     }
 
-    public function test_admin_can_reset_password_to_nik_suffix(): void
+    public function test_admin_can_reset_password_to_birthdate(): void
     {
         $admin = $this->admin();
         $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif', 'password' => Hash::make('password-lama')]);
@@ -27,6 +27,7 @@ class AdminWhatsAppAndResetTest extends TestCase
             'user_id' => $user->id,
             'nik' => '3313010101900077',
             'no_wa' => '081234567890',
+            'tanggal_lahir' => '1990-01-15',
         ]);
 
         $response = $this->actingAs($admin)
@@ -34,10 +35,10 @@ class AdminWhatsAppAndResetTest extends TestCase
 
         $response->assertRedirect(route('admin.anggota.show', $anggota));
         $response->assertSessionHas('success');
-        $response->assertSessionHas('reset_password_value', '900077');
+        $response->assertSessionHas('reset_password_value', '15011990');
 
         // Verifikasi password baru bisa digunakan
-        $this->assertTrue(Hash::check('900077', $user->fresh()->password));
+        $this->assertTrue(Hash::check('15011990', $user->fresh()->password));
     }
 
     public function test_whatsapp_notification_service_builds_correct_url(): void

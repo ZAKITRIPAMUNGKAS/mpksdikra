@@ -19,45 +19,45 @@
 
     {{-- Main Container Card --}}
     <div class="max-w-xl mx-auto w-full">
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden relative p-5 sm:p-8">
+        <div class="bg-white rounded-2xl border-2 border-slate-200 shadow-md overflow-hidden relative p-6 sm:p-8">
             <x-batik-corner position="top-right" class="w-36 h-36 text-[#005c8a] opacity-[0.18]" />
 
             {{-- Logo & Heading --}}
             <div class="text-center relative z-10 mb-6">
-                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="w-14 h-14 mx-auto mb-3 drop-shadow-xs">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200/80">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="w-16 h-16 mx-auto mb-3 drop-shadow-xs">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                    <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
                     Layanan Mandiri Kader
                 </span>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-2">Cek Status Pendaftaran</h1>
-                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto font-normal">
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2.5">Cek Status Pendaftaran</h1>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-md mx-auto font-medium">
                     Ketahui status verifikasi berkas pendaftaran kader Anda tanpa harus login terlebih dahulu.
                 </p>
             </div>
 
             {{-- Search Form --}}
-            <form action="{{ route('cek-status.check') }}" method="POST" class="space-y-4 relative z-10">
+            <form action="{{ route('cek-status.check') }}" method="POST" class="space-y-4 sm:space-y-5 relative z-10">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                        Masukkan NIK (16 Digit) atau Nomor WhatsApp
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                        Masukkan NIK (16 Angka) atau Nomor WhatsApp
                     </label>
                     <div class="relative">
                         <input type="text" name="identifier" value="{{ old('identifier', request('identifier', $identifier ?? '')) }}"
                             required autofocus placeholder="Contoh: 331301... atau 08123456..."
-                            class="w-full px-4 py-2.5 pl-11 bg-slate-50/60 border border-slate-200/90 rounded-lg text-sm font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition shadow-2xs">
-                        <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="w-full px-4 py-3.5 pl-12 bg-white border-2 border-slate-300 rounded-2xl text-base font-medium text-slate-900 focus:ring-4 focus:ring-sky-100 focus:border-sky-600 outline-none transition min-h-[52px]">
+                        <svg class="w-5 h-5 text-slate-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
                     @error('identifier')
-                        <p class="text-xs text-red-600 font-semibold mt-1.5">{{ $message }}</p>
+                        <p class="text-xs sm:text-sm text-red-600 font-bold mt-1.5">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs rounded-lg shadow-2xs transition flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <button type="submit" class="w-full min-h-[52px] sm:min-h-[54px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>Periksa Status Berkas</span>
                 </button>
@@ -65,88 +65,86 @@
 
             {{-- Result Area --}}
             @if(isset($searched))
-                <div class="mt-8 pt-6 border-t border-slate-100 relative z-10">
+                <div class="mt-8 pt-6 border-t-2 border-slate-200 relative z-10">
                     @if($anggota)
-                        <div class="rounded-xl p-5 border {{ $anggota->user->status === 'aktif' ? 'bg-emerald-50/70 border-emerald-200/80' : ($anggota->user->status === 'ditolak' ? 'bg-red-50/70 border-red-200/80' : 'bg-amber-50/70 border-amber-200/80') }}">
-                            <div class="flex items-start gap-3.5">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ $anggota->user->status === 'aktif' ? 'bg-emerald-100 text-emerald-700' : ($anggota->user->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                        <div class="rounded-2xl p-5 sm:p-6 border-2 {{ $anggota->user->status === 'aktif' ? 'bg-emerald-50 border-emerald-300' : ($anggota->user->status === 'ditolak' ? 'bg-rose-50 border-rose-300' : 'bg-amber-50 border-amber-300') }}">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 {{ $anggota->user->status === 'aktif' ? 'bg-emerald-600 text-white shadow-sm' : ($anggota->user->status === 'ditolak' ? 'bg-rose-600 text-white shadow-sm' : 'bg-amber-500 text-white shadow-sm') }}">
                                     @if($anggota->user->status === 'aktif')
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                         </svg>
                                     @elseif($anggota->user->status === 'ditolak')
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                         </svg>
                                     @else
-                                        <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-7 h-7 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-xs font-semibold uppercase tracking-wider {{ $anggota->user->status === 'aktif' ? 'text-emerald-800' : ($anggota->user->status === 'ditolak' ? 'text-red-800' : 'text-amber-800') }}">
+                                    <div class="text-xs sm:text-sm font-black uppercase tracking-wider {{ $anggota->user->status === 'aktif' ? 'text-emerald-900' : ($anggota->user->status === 'ditolak' ? 'text-rose-900' : 'text-amber-900') }}">
                                         Status Pendaftaran
                                     </div>
-                                    <h3 class="text-base font-bold text-slate-900 mt-0.5 truncate">{{ $anggota->nama_lengkap }}</h3>
-                                    <p class="text-xs text-slate-600 font-mono mt-0.5">
+                                    <h3 class="text-lg sm:text-xl font-black text-slate-900 mt-1 truncate">{{ $anggota->nama_lengkap }}</h3>
+                                    <p class="text-xs sm:text-sm text-slate-600 font-mono mt-0.5">
                                         NIK: {{ substr($anggota->nik, 0, 6) }}******{{ substr($anggota->nik, -4) }} &bull; Cabang: {{ $anggota->kecamatan }}
                                     </p>
 
                                     @if($anggota->user->status === 'aktif')
-                                        <div class="mt-3 text-xs text-emerald-800 space-y-1">
-                                            <p class="font-semibold">Alhamdulillah, berkas pendaftaran Anda telah DISETUJUI &amp; AKTIF.</p>
-                                            <p class="text-emerald-700">Anda sudah dapat masuk ke Portal Kader untuk melihat penugasan kegiatan Baitul Arqam.</p>
+                                        <div class="mt-3.5 text-xs sm:text-sm text-emerald-950 space-y-1">
+                                            <p class="font-bold">Alhamdulillah, berkas pendaftaran Anda telah DISETUJUI &amp; AKTIF.</p>
+                                            <p class="text-emerald-900">Anda sudah dapat masuk ke Portal Kader untuk melihat penugasan kegiatan Baitul Arqam.</p>
                                         </div>
                                         <div class="mt-4">
-                                            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-2xs transition">
+                                            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black text-sm sm:text-base shadow-sm transition">
                                                 <span>Masuk ke Portal Kader</span>
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                                 </svg>
                                             </a>
                                         </div>
                                     @elseif($anggota->user->status === 'ditolak')
-                                        <div class="mt-3 text-xs text-red-800 space-y-1.5">
-                                            <p class="font-semibold">Berkas pendaftaran Anda memerlukan perbaikan:</p>
-                                            <div class="p-3 bg-white rounded-lg border border-red-200 text-red-900 italic font-medium">
+                                        <div class="mt-3.5 text-xs sm:text-sm text-rose-950 space-y-1.5">
+                                            <p class="font-bold">Berkas pendaftaran Anda memerlukan perbaikan:</p>
+                                            <div class="p-3.5 bg-white rounded-2xl border-2 border-rose-200 text-rose-900 italic font-medium">
                                                 "{{ $anggota->catatan_verifikasi ?: 'Mohon periksa kembali kelengkapan biodata Anda.' }}"
                                             </div>
                                         </div>
-                                        <div class="mt-4 flex flex-wrap gap-2">
-                                            <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-2xs transition">
+                                        <div class="mt-4 flex flex-wrap gap-2.5">
+                                            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-2xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-black text-sm sm:text-base shadow-sm transition">
                                                 <span>Masuk &amp; Perbaiki Berkas</span>
                                             </a>
-                                            <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs shadow-2xs transition">
+                                            <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}" target="_blank" class="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-2xl bg-white hover:bg-slate-100 border-2 border-slate-300 text-slate-800 font-bold text-xs sm:text-sm shadow-xs transition">
                                                 <span>Bantuan Helpdesk WA</span>
                                             </a>
                                         </div>
                                     @else
-                                        <div class="mt-3 text-xs text-amber-900 space-y-1">
-                                            <p class="font-semibold">Berkas berhasil tersimpan dan sedang menunggu giliran verifikasi.</p>
-                                            <p class="text-amber-800 font-normal">Admin verifikator MPKSDI sedang memeriksa kelengkapan data. Anda akan menerima pemberitahuan via WhatsApp setelah disetujui.</p>
+                                        <div class="mt-3.5 text-xs sm:text-sm text-amber-950 space-y-1">
+                                            <p class="font-bold">Berkas berhasil tersimpan dan sedang menunggu giliran verifikasi.</p>
+                                            <p class="text-amber-900 font-medium">Admin verifikator MPKSDI sedang memeriksa kelengkapan data. Anda akan menerima pemberitahuan via WhatsApp setelah disetujui.</p>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     @else
-                        <div class="rounded-xl p-5 bg-slate-50 border border-slate-200 text-center space-y-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-500 flex items-center justify-center mx-auto">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                        <div class="rounded-2xl p-6 bg-slate-50 border-2 border-slate-200 text-center space-y-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-200 text-slate-600 flex items-center justify-center mx-auto text-xl">
+                                🔍
                             </div>
                             <div>
-                                <h4 class="text-sm font-bold text-slate-900">Data Pendaftaran Tidak Ditemukan</h4>
-                                <p class="text-xs text-slate-500 mt-0.5 font-normal">
+                                <h4 class="text-base sm:text-lg font-black text-slate-900">Data Pendaftaran Tidak Ditemukan</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
                                     Tidak ditemukan berkas dengan NIK atau No WhatsApp "<strong>{{ $identifier }}</strong>".
                                 </p>
                             </div>
-                            <div class="pt-1 flex justify-center gap-2">
-                                <a href="{{ route('anggota.register') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-2xs transition">
-                                    <span>Daftar Kader Baru Sekarang</span>
+                            <div class="pt-2 flex justify-center">
+                                <a href="{{ route('anggota.register') }}" class="inline-flex items-center gap-2 min-h-[48px] px-6 rounded-2xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-sm sm:text-base shadow-sm transition">
+                                    <span>Daftar Kader Baru Sekarang &rarr;</span>
                                 </a>
                             </div>
                         </div>
@@ -155,10 +153,10 @@
             @endif
 
             {{-- Footer Help Link --}}
-            <div class="mt-8 pt-6 border-t border-slate-100 text-center relative z-10">
-                <p class="text-xs text-slate-500 font-normal">
+            <div class="mt-8 pt-6 border-t-2 border-slate-100 text-center relative z-10">
+                <p class="text-xs sm:text-sm text-slate-600 font-medium">
                     Mengalami kesulitan saat mengecek data? Hubungi
-                    <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}" target="_blank" class="font-semibold text-emerald-600 hover:text-emerald-700 underline">
+                    <a href="{{ \App\Services\WhatsAppNotificationService::urlBantuanLupaSandi() }}" target="_blank" class="font-extrabold text-emerald-700 hover:text-emerald-900 underline">
                         Helpdesk WhatsApp MPKSDI
                     </a>
                 </p>

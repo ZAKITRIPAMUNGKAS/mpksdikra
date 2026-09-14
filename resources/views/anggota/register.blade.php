@@ -263,28 +263,6 @@
               @submit.prevent="submitForm($event)">
             @csrf
 
-            {{-- Restored Draft Notification Banner --}}
-            <div x-show="draftRestored" x-cloak class="mb-5 px-4 py-3 rounded-xl bg-sky-50 border border-sky-200/90 text-sky-950 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-sky-900 text-xs sm:text-sm">Draf formulir Anda otomatis dipulihkan</span>
-                        <span class="text-[11px] text-sky-700 font-normal">Isian formulir sebelumnya telah dimuat kembali dari memori browser ini.</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
-                    <button type="button" @click="clearDraft(true)" class="px-3 py-1.5 rounded-lg border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold transition shadow-2xs">
-                        Hapus Draf &amp; Ulangi
-                    </button>
-                    <button type="button" @click="draftRestored = false" class="text-sky-400 hover:text-sky-700 p-1 text-sm font-bold leading-none" title="Tutup">
-                        &times;
-                    </button>
-                </div>
-            </div>
 
             {{-- Dynamic Step Error Notification Banner --}}
             <div x-show="stepErrorBanner" x-cloak class="mb-5 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs sm:text-sm flex items-start gap-2.5 shadow-2xs">

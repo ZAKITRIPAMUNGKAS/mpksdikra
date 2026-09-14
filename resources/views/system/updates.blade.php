@@ -173,7 +173,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         {{-- Versi 2.1.0 --}}
         <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">

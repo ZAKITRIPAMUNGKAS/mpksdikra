@@ -15,7 +15,7 @@
                     </span>
                     <span class="text-slate-300">&bull;</span>
                     <span class="text-xs font-medium text-slate-500">
-                        {{ $isCabang ? 'Panel Kerja Admin Cabang' : 'v2.2.0 Stabil' }}
+                        {{ $isCabang ? 'Panel Kerja Admin Cabang' : 'v2.3.0 Stabil' }}
                     </span>
                 </div>
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
@@ -749,7 +749,7 @@
                     </div>
                     <div class="flex items-center justify-between gap-1">
                         <h3 class="font-bold text-slate-900 text-sm group-hover:text-[#005c8a] transition">Pusat Update Sistem</h3>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20">v2.2</span>
+                        <span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20">v2.3</span>
                     </div>
                     <p class="text-xs text-slate-500 leading-relaxed mt-1">Catatan rilis fitur baru, changelog performa, keamanan, dan roadmap MPKSDI.</p>
                 </div>

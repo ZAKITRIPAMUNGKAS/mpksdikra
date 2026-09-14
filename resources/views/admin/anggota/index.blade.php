@@ -60,6 +60,7 @@
             </form>
         </div>
     </div>
+    </div>
 
     {{-- Data Table Card --}}
     <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">

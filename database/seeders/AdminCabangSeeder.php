@@ -43,12 +43,12 @@ class AdminCabangSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin'],
             [
-                'name'        => 'Admin PDM Karanganyar',
-                'password'    => Hash::make(self::PASS_DAERAH),
-                'role'        => 'admin',
-                'status'      => 'aktif',
-                'no_wa'       => '081226000001',
-                'pcm'         => null,
+                'name' => 'Admin PDM Karanganyar',
+                'password' => Hash::make(self::PASS_DAERAH),
+                'role' => 'admin',
+                'status' => 'aktif',
+                'no_wa' => '081226000001',
+                'pcm' => null,
                 'verified_at' => now(),
             ]
         );
@@ -80,12 +80,12 @@ class AdminCabangSeeder extends Seeder
             User::updateOrCreate(
                 ['email' => $username],
                 [
-                    'name'        => 'Admin PCM ' . $cabang['pcm'],
-                    'password'    => Hash::make(self::PASS_CABANG),
-                    'role'        => 'admin_cabang',
-                    'status'      => 'aktif',
-                    'no_wa'       => $cabang['wa'],
-                    'pcm'         => $cabang['pcm'],
+                    'name' => 'Admin PCM '.$cabang['pcm'],
+                    'password' => Hash::make(self::PASS_CABANG),
+                    'role' => 'admin_cabang',
+                    'status' => 'aktif',
+                    'no_wa' => $cabang['wa'],
+                    'pcm' => $cabang['pcm'],
                     'verified_at' => now(),
                 ]
             );
@@ -97,7 +97,7 @@ class AdminCabangSeeder extends Seeder
             ['Role', 'Username (Tanpa @)', 'Password', 'Wilayah PCM'],
             array_merge(
                 [['Admin Daerah', 'admin', self::PASS_DAERAH, 'Semua Cabang (PDM)']],
-                array_map(fn($c) => [
+                array_map(fn ($c) => [
                     'Admin Cabang',
                     strtolower(str_replace(' ', '', $c['pcm'])),
                     self::PASS_CABANG,

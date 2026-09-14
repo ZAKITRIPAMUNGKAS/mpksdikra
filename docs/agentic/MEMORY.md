@@ -42,6 +42,21 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-15: Penempatan Ringkasan Statistik Demografi & Kemasjidan Kader Paling Atas Sebelum Grafik di Dashboard Admin:
+  1. Agregasi Data Demografi & Kemasjidan (`DashboardController`):
+     - Menghitung profesi/pekerjaan dominan, jumlah kader, dan persentase dari total anggota (`$pekerjaanDominan`, `$pekerjaanDominanCount`, `$persenPekerjaanDominan`, `$distribusiPekerjaan`).
+     - Menghitung rasio keaktifan sholat di masjid (`$persenSelaluMasjid`, `$selaluMasjidCount`, `$totalResponMasjid`, `$distribusiSholatMasjid`).
+     - Menghitung kepengurusan takmir masjid kader (`$takmirCount`, `$persenTakmir`).
+     - Menghitung tingkat pendidikan dominan dan kelancaran baca Qur'an (`$pendidikanDominan`, `$distribusiPendidikan`, `$persenQuranLancar`).
+     - Data otomatis terfilter per PCM untuk Admin Cabang (`admin_cabang`), dan teragregasi se-Kabupaten Karanganyar untuk Admin Daerah (`admin`).
+  2. Penataan Visual Dashboard (`admin.dashboard`):
+     - Menempatkan 4 Kartu Metrik Ringkas (Kebanyakan Profesi, Aktif di Masjid 5 Waktu, Pengurus Takmir, Pendidikan Terbanyak & Kemampuan Baca Qur'an) tepat di baris atas sebelum grafik tren pendaftaran kader.
+     - Menyediakan 2 kartu detail di bawah grafik: Visualisasi Progress Bar Top Profesi/Pekerjaan Kader dan Rincian Distribusi Keaktifan Sholat di Masjid serta Chips Jenjang Pendidikan Terakhir.
+  3. Verifikasi:
+     - 116 unit & feature tests lolos 100% (455 assertions).
+     - Laravel Pint clean, Vite production build sukses.
+
+
 - 2026-09-14: Implementasi Formulir Riwayat Pendidikan Bertingkat (Pendidikan Terakhir -> Rincian Sekolah/PT):
   1. Skema Database:
      - Dibuatkan migration `2026_09_14_000002_add_pendidikan_lengkap_to_anggota_table.php` yang menambahkan kolom `pendidikan_terakhir`, `pendidikan_smp`, `pendidikan_sma`, dan `pendidikan_s1` (Perguruan Tinggi) ke tabel `anggota`.

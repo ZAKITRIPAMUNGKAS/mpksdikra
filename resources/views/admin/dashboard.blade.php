@@ -219,6 +219,101 @@
         @endif
     </div>
 
+    {{-- HIGHLIGHT DEMOGRAFI & KEMASJIDAN KADER (Info Paling Atas Bersama Sebelum Grafik) --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        {{-- Card 1: Kebanyakan Profesi / Pekerjaan --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-sky-300 transition group">
+            <div>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Kebanyakan Profesi
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-sky-500 shrink-0"></span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <span class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight block truncate" title="{{ $pekerjaanDominan }}">
+                        {{ $pekerjaanDominan }}
+                    </span>
+                    <span class="text-xs text-slate-500 font-medium block mt-1">
+                        {{ $pekerjaanDominanCount }} Kader ({{ $persenPekerjaanDominan }}%)
+                    </span>
+                </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                <span class="truncate">Profesi Terbanyak</span>
+                <span class="font-bold text-[#005c8a] shrink-0">{{ $distribusiPekerjaan->count() }} Kategori</span>
+            </div>
+        </div>
+
+        {{-- Card 2: Aktif di Masjid --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition group">
+            <div>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Aktif di Masjid
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                </div>
+                <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight tabular-nums leading-none">
+                        {{ $persenSelaluMasjid }}%
+                    </span>
+                    <span class="text-xs text-slate-500 font-medium">Rutin</span>
+                </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                <span class="truncate">{{ $selaluMasjidCount }} Sholat di Masjid</span>
+                <span class="font-bold text-emerald-700 shrink-0">5 Waktu</span>
+            </div>
+        </div>
+
+        {{-- Card 3: Takmir Masjid --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-indigo-300 transition group">
+            <div>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Pengurus Takmir
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
+                </div>
+                <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight tabular-nums leading-none">
+                        {{ $persenTakmir }}%
+                    </span>
+                    <span class="text-xs text-slate-500 font-medium">Takmir</span>
+                </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                <span class="truncate">{{ $takmirCount }} Pengurus Aktif</span>
+                <span class="font-bold text-indigo-700 shrink-0">Amanah</span>
+            </div>
+        </div>
+
+        {{-- Card 4: Pendidikan Terbanyak & Al-Qur'an --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-amber-300 transition group">
+            <div>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Pendidikan Terbanyak
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <span class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight block truncate">
+                        {{ $pendidikanDominan }}
+                    </span>
+                    <span class="text-xs text-amber-700 font-semibold block mt-1">
+                        {{ $persenQuranLancar }}% Baca Qur'an Lancar
+                    </span>
+                </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                <span class="truncate">Tingkat Dominan</span>
+                <span class="font-bold text-slate-700 shrink-0">{{ $distribusiPendidikan->count() }} Jenjang</span>
+            </div>
+        </div>
+    </div>
+
     {{-- 4. Visual Analytics & Tren Perkaderan --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         {{-- Grafik Tren Pendaftaran Kader --}}
@@ -309,209 +404,113 @@
         </div>
     </div>
 
-    {{-- 4B. STATISTIK PROFIL & DEMOGRAFI DATABASE KADER (Pekerjaan, Kemasjidan, Pendidikan, Al-Qur'an) --}}
-    <div class="space-y-4">
-        {{-- Section Header & Highlight Badges --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pangkalan Data Profil Kader</span>
+    {{-- 4B. RINCIAN SEBARAN PROFESI & KEMASJIDAN KADER --}}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+        {{-- Card 1: Distribusi Pekerjaan / Profesi Kader --}}
+        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base tracking-tight">Sebaran Profesi &amp; Pekerjaan Kader</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Bidang pengabdian dan profesi kader {{ $isCabang ? ('di PCM ' . $cabangNama) : 'se-Kabupaten Karanganyar' }}</p>
                     </div>
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-                        Statistik Profil &amp; Demografi Kader {{ $isCabang ? ('PCM ' . $cabangNama) : 'Se-Karanganyar' }}
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        {{ $isCabang ? ('Rekapitulasi sebaran profesi pekerjaan, keaktifan ibadah di masjid, dan pendidikan kader di wilayah PCM ' . $cabangNama . '.') : 'Pemetaan agregat profesi pekerjaan, keaktifan ibadah kemasjidan, dan jenjang pendidikan kader di 17 Cabang se-Kabupaten Karanganyar.' }}
-                    </p>
+                    <span class="text-xs font-semibold text-slate-400">Top Profesi</span>
                 </div>
-                <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
-                    <span class="px-3 py-1 rounded-lg bg-sky-50 text-[#005c8a] border border-sky-200/70 text-xs font-bold shadow-2xs">
-                        {{ $totalAnggota }} Kader Terdata
-                    </span>
+
+                <div class="mt-4 space-y-3.5">
+                    @forelse($distribusiPekerjaan as $pek)
+                    @php
+                        $persenPek = $totalAnggota > 0 ? round(($pek->total / $totalAnggota) * 100, 1) : 0;
+                    @endphp
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-semibold text-slate-800">{{ $pek->pekerjaan }}</span>
+                            <span class="font-medium text-slate-600 tabular-nums">
+                                {{ $pek->total }} Kader 
+                                <span class="text-slate-400 text-[11px]">({{ $persenPek }}%)</span>
+                            </span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-sky-600 to-[#005c8a] rounded-full transition-all duration-500" style="width: {{ max($persenPek, 4) }}%;"></div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-8 text-center text-slate-400 text-xs">
+                        <p class="font-semibold text-slate-600">Belum ada data pekerjaan terisi</p>
+                        <p class="text-slate-400 mt-0.5">Data profesi akan terhimpun otomatis saat kader mengisi biodata.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
 
-            {{-- 4 Mini KPI Highlight Cards --}}
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-5">
-                {{-- Mini KPI 1: Sholat 5 Waktu di Masjid --}}
-                <div class="bg-slate-50/70 rounded-xl p-3.5 sm:p-4 border border-slate-200/80 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v2m0 0C8.5 7.5 7 10 7 13v7h10v-7c0-3-1.5-5.5-5-8z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20v-3.5a2 2 0 114 0V20"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 20h18"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block leading-tight">Sholat di Masjid</span>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span class="text-xl sm:text-2xl font-black text-emerald-700 tabular-nums leading-none">{{ $persenSelaluMasjid }}%</span>
-                        </div>
-                        <span class="text-[10px] text-slate-500 truncate block mt-0.5">{{ $selaluMasjidCount }} Kader Rutin</span>
-                    </div>
-                </div>
-
-                {{-- Mini KPI 2: Pengurus / Takmir Masjid --}}
-                <div class="bg-slate-50/70 rounded-xl p-3.5 sm:p-4 border border-slate-200/80 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-100 text-[#005c8a] flex items-center justify-center shrink-0 shadow-2xs">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block leading-tight">Takmir Masjid</span>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span class="text-xl sm:text-2xl font-black text-[#005c8a] tabular-nums leading-none">{{ $persenTakmir }}%</span>
-                        </div>
-                        <span class="text-[10px] text-slate-500 truncate block mt-0.5">{{ $takmirCount }} Pengurus Aktif</span>
-                    </div>
-                </div>
-
-                {{-- Mini KPI 3: Kemampuan Baca Al-Qur'an --}}
-                <div class="bg-slate-50/70 rounded-xl p-3.5 sm:p-4 border border-slate-200/80 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 shadow-2xs">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block leading-tight">Baca Al-Qur'an</span>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span class="text-xl sm:text-2xl font-black text-amber-700 tabular-nums leading-none">{{ $persenQuranLancar }}%</span>
-                        </div>
-                        <span class="text-[10px] text-slate-500 truncate block mt-0.5">Lancar &amp; Fasih</span>
-                    </div>
-                </div>
-
-                {{-- Mini KPI 4: Pendidikan Dominan --}}
-                <div class="bg-slate-50/70 rounded-xl p-3.5 sm:p-4 border border-slate-200/80 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 shadow-2xs">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block leading-tight">Pendidikan Terbanyak</span>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span class="text-xl sm:text-2xl font-black text-indigo-700 leading-none truncate block">{{ $pendidikanDominan }}</span>
-                        </div>
-                        <span class="text-[10px] text-slate-500 truncate block mt-0.5">Tingkat Dominan</span>
-                    </div>
-                </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Total Profesi Unik: <strong class="text-slate-800">{{ $distribusiPekerjaan->count() }} Kategori</strong></span>
+                <span class="text-slate-400 text-[11px]">Update Real-Time</span>
             </div>
         </div>
 
-        {{-- 2 Cards Detail: Distribusi Pekerjaan vs Kemasjidan & Pendidikan --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-            {{-- Card 1: Distribusi Pekerjaan / Profesi Kader --}}
-            <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-base tracking-tight">Sebaran Profesi &amp; Pekerjaan Kader</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Bidang pengabdian dan profesi kader {{ $isCabang ? ('di PCM ' . $cabangNama) : 'se-Kabupaten Karanganyar' }}</p>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-400">Top Profesi</span>
+        {{-- Card 2: Aktivitas Sholat di Masjid & Pendidikan Terakhir --}}
+        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+            <div>
+                {{-- Sub-Seksi 1: Keaktifan Sholat Berjamaah di Masjid --}}
+                <div class="pb-3 border-b border-slate-100">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Aktivitas Sholat Berjamaah di Masjid</h3>
+                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                            {{ $persenSelaluMasjid }}% Rutin Masjid
+                        </span>
                     </div>
+                    <p class="text-xs text-slate-500">Intensitas kehadiran kader dalam sholat berjamaah di masjid/musholla</p>
 
-                    <div class="mt-4 space-y-3.5">
-                        @forelse($distribusiPekerjaan as $pek)
+                    <div class="mt-3.5 space-y-2.5">
+                        @forelse($distribusiSholatMasjid as $shl)
                         @php
-                            $persenPek = $totalAnggota > 0 ? round(($pek->total / $totalAnggota) * 100, 1) : 0;
+                            $persenShl = $totalResponMasjid > 0 ? round(($shl->total / $totalResponMasjid) * 100, 1) : 0;
+                            $barColor = str_contains($shl->aktivitas_sholat_masjid, 'Selalu') ? 'bg-emerald-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Sering') ? 'bg-sky-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Kadang') ? 'bg-amber-500' : 'bg-slate-400'));
                         @endphp
                         <div>
                             <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="font-semibold text-slate-800">{{ $pek->pekerjaan }}</span>
-                                <span class="font-medium text-slate-600 tabular-nums">
-                                    {{ $pek->total }} Kader 
-                                    <span class="text-slate-400 text-[11px]">({{ $persenPek }}%)</span>
+                                <span class="font-medium text-slate-700 truncate max-w-[240px]">{{ $shl->aktivitas_sholat_masjid }}</span>
+                                <span class="font-semibold text-slate-800 tabular-nums">
+                                    {{ $shl->total }} <span class="font-normal text-slate-400 text-[11px]">({{ $persenShl }}%)</span>
                                 </span>
                             </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r from-sky-600 to-[#005c8a] rounded-full transition-all duration-500" style="width: {{ max($persenPek, 4) }}%;"></div>
+                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full {{ $barColor }} rounded-full" style="width: {{ max($persenShl, 3) }}%;"></div>
                             </div>
                         </div>
                         @empty
-                        <div class="py-8 text-center text-slate-400 text-xs">
-                            <p class="font-semibold text-slate-600">Belum ada data pekerjaan terisi</p>
-                            <p class="text-slate-400 mt-0.5">Data profesi akan terhimpun otomatis saat kader mengisi biodata.</p>
-                        </div>
+                        <p class="text-xs text-slate-400 text-center py-2">Belum ada data keaktifan sholat.</p>
                         @endforelse
                     </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>Total Profesi Unik: <strong class="text-slate-800">{{ $distribusiPekerjaan->count() }} Kategori</strong></span>
-                    <span class="text-slate-400 text-[11px]">Update Real-Time</span>
+                {{-- Sub-Seksi 2: Distribusi Jenjang Pendidikan Terakhir --}}
+                <div class="pt-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Jenjang Pendidikan Terakhir</h4>
+                        <span class="text-xs text-slate-400 font-medium">Latar Belakang Formal</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2.5">
+                        @forelse($distribusiPendidikan as $pdd)
+                        @php
+                            $persenPdd = $totalAnggota > 0 ? round(($pdd->total / $totalAnggota) * 100) : 0;
+                        @endphp
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200/90 hover:border-sky-200 transition text-xs shadow-2xs">
+                            <span class="font-bold text-slate-800">{{ $pdd->pendidikan_terakhir }}</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                            <span class="font-medium text-slate-600 tabular-nums">{{ $pdd->total }} <span class="text-slate-400 text-[10px]">({{ $persenPdd }}%)</span></span>
+                        </div>
+                        @empty
+                        <span class="text-xs text-slate-400">Belum ada data pendidikan.</span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
-            {{-- Card 2: Aktivitas Sholat di Masjid & Pendidikan Terakhir --}}
-            <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-                <div>
-                    {{-- Sub-Seksi 1: Keaktifan Sholat Berjamaah di Masjid --}}
-                    <div class="pb-3 border-b border-slate-100">
-                        <div class="flex items-center justify-between mb-1">
-                            <h3 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Aktivitas Sholat Berjamaah di Masjid</h3>
-                            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                {{ $persenSelaluMasjid }}% Rutin Masjid
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500">Intensitas kehadiran kader dalam sholat berjamaah di masjid/musholla</p>
-
-                        <div class="mt-3.5 space-y-2.5">
-                            @forelse($distribusiSholatMasjid as $shl)
-                            @php
-                                $persenShl = $totalResponMasjid > 0 ? round(($shl->total / $totalResponMasjid) * 100, 1) : 0;
-                                $barColor = str_contains($shl->aktivitas_sholat_masjid, 'Selalu') ? 'bg-emerald-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Sering') ? 'bg-sky-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Kadang') ? 'bg-amber-500' : 'bg-slate-400'));
-                            @endphp
-                            <div>
-                                <div class="flex items-center justify-between text-xs mb-1">
-                                    <span class="font-medium text-slate-700 truncate max-w-[240px]">{{ $shl->aktivitas_sholat_masjid }}</span>
-                                    <span class="font-semibold text-slate-800 tabular-nums">
-                                        {{ $shl->total }} <span class="font-normal text-slate-400 text-[11px]">({{ $persenShl }}%)</span>
-                                    </span>
-                                </div>
-                                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full {{ $barColor }} rounded-full" style="width: {{ max($persenShl, 3) }}%;"></div>
-                                </div>
-                            </div>
-                            @empty
-                            <p class="text-xs text-slate-400 text-center py-2">Belum ada data keaktifan sholat.</p>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    {{-- Sub-Seksi 2: Distribusi Jenjang Pendidikan Terakhir --}}
-                    <div class="pt-4">
-                        <div class="flex items-center justify-between mb-1">
-                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Jenjang Pendidikan Terakhir</h4>
-                            <span class="text-xs text-slate-400 font-medium">Latar Belakang Formal</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mt-2.5">
-                            @forelse($distribusiPendidikan as $pdd)
-                            @php
-                                $persenPdd = $totalAnggota > 0 ? round(($pdd->total / $totalAnggota) * 100) : 0;
-                            @endphp
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200/90 hover:border-sky-200 transition text-xs shadow-2xs">
-                                <span class="font-bold text-slate-800">{{ $pdd->pendidikan_terakhir }}</span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                <span class="font-medium text-slate-600 tabular-nums">{{ $pdd->total }} <span class="text-slate-400 text-[10px]">({{ $persenPdd }}%)</span></span>
-                            </div>
-                            @empty
-                            <span class="text-xs text-slate-400">Belum ada data pendidikan.</span>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>Respons Kemasjidan: <strong class="text-slate-800">{{ $totalResponMasjid }} / {{ $totalAnggota }} Kader</strong></span>
-                    <span class="text-slate-400 text-[11px]">Standar Tarjih &amp; MPKSDI</span>
-                </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Respons Kemasjidan: <strong class="text-slate-800">{{ $totalResponMasjid }} / {{ $totalAnggota }} Kader</strong></span>
+                <span class="text-slate-400 text-[11px]">Standar Tarjih &amp; MPKSDI</span>
             </div>
         </div>
     </div>

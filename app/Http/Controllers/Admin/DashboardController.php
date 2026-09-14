@@ -119,6 +119,10 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
+        $pekerjaanDominan = $distribusiPekerjaan->first()?->pekerjaan ?? 'Belum terisi';
+        $pekerjaanDominanCount = $distribusiPekerjaan->first()?->total ?? 0;
+        $persenPekerjaanDominan = $totalAnggota > 0 ? round(($pekerjaanDominanCount / $totalAnggota) * 100) : 0;
+
         $distribusiSholatMasjid = (clone $anggotaQuery)
             ->select('aktivitas_sholat_masjid', DB::raw('count(*) as total'))
             ->whereNotNull('aktivitas_sholat_masjid')
@@ -183,6 +187,9 @@ class DashboardController extends Controller
             'latestPending' => $latestPending,
             'latestAktif' => $latestAktif,
             'distribusiPekerjaan' => $distribusiPekerjaan,
+            'pekerjaanDominan' => $pekerjaanDominan,
+            'pekerjaanDominanCount' => $pekerjaanDominanCount,
+            'persenPekerjaanDominan' => $persenPekerjaanDominan,
             'distribusiSholatMasjid' => $distribusiSholatMasjid,
             'totalResponMasjid' => $totalResponMasjid,
             'selaluMasjidCount' => $selaluMasjidCount,

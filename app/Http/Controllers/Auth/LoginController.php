@@ -35,8 +35,10 @@ class LoginController extends Controller
         $cleanPcmSlug = str_replace([' ', '-', '_', '.'], '', $lowerLogin);
 
         $user = User::where(function ($q) use ($lowerLogin, $cleanPcmSlug, $normalizedWa, $digits) {
-            $q->where('email', $lowerLogin)
-                ->orWhere('email', $lowerLogin . '@mpksdi-kra.id');
+            $q->where('email', $lowerLogin);
+            if ($cleanPcmSlug !== '' && $cleanPcmSlug !== $lowerLogin) {
+                $q->orWhere('email', $cleanPcmSlug);
+            }
 
             // Dukungan login username nama kecamatan langsung (misal: 'tawangmangu')
             if ($cleanPcmSlug !== '') {

@@ -28,23 +28,20 @@ use Illuminate\Support\Facades\Hash;
  */
 class AdminCabangSeeder extends Seeder
 {
-    /** Password default admin cabang — mudah diingat */
+    /** Password default admin cabang */
     private const PASS_CABANG = 'cabangjra';
 
-    /** Password admin daerah — PDM Karanganyar */
+    /** Password admin daerah */
     private const PASS_DAERAH = 'AdminPDM@25';
-
-    /** Domain email */
-    private const DOMAIN = 'mpksdi-kra.id';
 
     public function run(): void
     {
-        // Bersihkan format email lama jika ada
-        User::where('email', 'like', 'cabang.%@' . self::DOMAIN)->delete();
+        // Bersihkan data akun admin cabang lama jika ada format @
+        User::where('role', 'admin_cabang')->delete();
 
         // ── 1. Admin Daerah (PDM) ─────────────────────────────────────
         User::updateOrCreate(
-            ['email' => 'admin@' . self::DOMAIN],
+            ['email' => 'admin'],
             [
                 'name'        => 'Admin PDM Karanganyar',
                 'password'    => Hash::make(self::PASS_DAERAH),
@@ -56,7 +53,7 @@ class AdminCabangSeeder extends Seeder
             ]
         );
 
-        // ── 2. Admin Cabang per PCM (17 kecamatan) ────────────────────
+        // ── 2. Admin Cabang per PCM (17 kecamatan) — Tanpa '@' ─────────
         $cabangList = [
             ['pcm' => 'Colomadu',     'wa' => '081226001001'],
             ['pcm' => 'Gondangrejo',  'wa' => '081226001002'],
@@ -78,11 +75,10 @@ class AdminCabangSeeder extends Seeder
         ];
 
         foreach ($cabangList as $cabang) {
-            $slug  = strtolower(str_replace(' ', '', $cabang['pcm']));
-            $email = "{$slug}@" . self::DOMAIN;
+            $username = strtolower(str_replace(' ', '', $cabang['pcm']));
 
             User::updateOrCreate(
-                ['email' => $email],
+                ['email' => $username],
                 [
                     'name'        => 'Admin PCM ' . $cabang['pcm'],
                     'password'    => Hash::make(self::PASS_CABANG),
@@ -95,16 +91,15 @@ class AdminCabangSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅  Admin Daerah (1) dan Admin Cabang (17) berhasil diperbarui.');
+        $this->command->info('✅  Admin Daerah (1) dan Admin Cabang (17) berhasil diperbarui (tanpa @).');
         $this->command->newLine();
         $this->command->table(
-            ['Role', 'Login / Username', 'Email Sistem', 'Password', 'Wilayah PCM'],
+            ['Role', 'Username (Tanpa @)', 'Password', 'Wilayah PCM'],
             array_merge(
-                [['Admin Daerah', 'admin', 'admin@' . self::DOMAIN, self::PASS_DAERAH, 'Semua Cabang (PDM)']],
+                [['Admin Daerah', 'admin', self::PASS_DAERAH, 'Semua Cabang (PDM)']],
                 array_map(fn($c) => [
                     'Admin Cabang',
                     strtolower(str_replace(' ', '', $c['pcm'])),
-                    strtolower(str_replace(' ', '', $c['pcm'])) . '@' . self::DOMAIN,
                     self::PASS_CABANG,
                     $c['pcm'],
                 ], $cabangList)

@@ -128,14 +128,14 @@ class AuthTest extends TestCase
     public function test_login_admin_cabang_using_pcm_name_and_cabangjra_password(): void
     {
         $adminCabang = User::factory()->create([
-            'email' => 'tawangmangu@mpksdi-kra.id',
+            'email' => 'tawangmangu',
             'role' => 'admin_cabang',
             'status' => 'aktif',
             'pcm' => 'Tawangmangu',
             'password' => Hash::make('cabangjra'),
         ]);
 
-        // 1. Login menggunakan nama kecamatan langsung 'tawangmangu'
+        // 1. Login menggunakan nama kecamatan langsung 'tawangmangu' (tanpa @)
         $this->post('/login', [
             'login' => 'tawangmangu',
             'password' => 'cabangjra',
@@ -145,9 +145,9 @@ class AuthTest extends TestCase
 
         auth()->logout();
 
-        // 2. Login menggunakan email sistem
+        // 2. Login dengan variasi huruf besar 'Tawangmangu'
         $this->post('/login', [
-            'login' => 'tawangmangu@mpksdi-kra.id',
+            'login' => 'Tawangmangu',
             'password' => 'cabangjra',
         ])->assertRedirect(route('admin.dashboard'));
 

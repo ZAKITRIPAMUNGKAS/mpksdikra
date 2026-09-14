@@ -20,16 +20,28 @@ class DashboardController extends Controller
             return redirect()->route('admin.executive');
         }
 
+        $user = auth()->user();
+        $isCabang = $user?->isAdminCabang();
+        $pcm = $user?->pcm;
+
+        $anggotaQuery = Anggota::query();
+        $userAnggotaQuery = User::where('role', 'anggota');
+
+        if ($isCabang && $pcm) {
+            $anggotaQuery->where(fn ($sub) => $sub->where('pcm', $pcm)->orWhere('kecamatan', $pcm));
+            $userAnggotaQuery->whereHas('anggota', fn ($aq) => $aq->where('pcm', $pcm)->orWhere('kecamatan', $pcm));
+        }
+
         // 1. Metric Counts
-        $totalAnggota = Anggota::count();
-        $pendingAnggota = User::where('role', 'anggota')->where('status', 'menunggu_verifikasi')->count();
-        $activeEvents = Event::whereIn('status', ['persiapan', 'berlangsung'])->count();
-        $totalEvents = Event::count();
-        $completedEvents = Event::where('status', 'selesai')->count();
-        $totalLulus = PenilaianAkhir::where('status_kelulusan', 'Lulus')->count();
-        $totalPesertaAll = DB::table('event_peserta')->where('status_aktif', true)->count();
+        $totalAnggota = (clone $anggotaQuery)->count();
+        $pendingAnggota = (clone $userAnggotaQuery)->where('status', 'menunggu_verifikasi')->count();
+        $activeEvents = $isCabang ? 0 : Event::whereIn('status', ['persiapan', 'berlangsung'])->count();
+        $totalEvents = $isCabang ? 0 : Event::count();
+        $completedEvents = $isCabang ? 0 : Event::where('status', 'selesai')->count();
+        $totalLulus = $isCabang ? 0 : PenilaianAkhir::where('status_kelulusan', 'Lulus')->count();
+        $totalPesertaAll = $isCabang ? 0 : DB::table('event_peserta')->where('status_aktif', true)->count();
         $persenKelulusan = $totalPesertaAll > 0 ? round(($totalLulus / $totalPesertaAll) * 100, 1) : 0;
-        $avgNilaiAkhir = PenilaianAkhir::avg('nilai_akhir');
+        $avgNilaiAkhir = $isCabang ? 0 : PenilaianAkhir::avg('nilai_akhir');
 
         // 2. Tren Pendaftaran Kader (6 Bulan Terakhir)
         $monthlyLabels = [];
@@ -37,7 +49,8 @@ class DashboardController extends Controller
         for ($i = 5; $i >= 0; $i--) {
             $month = Carbon::now()->subMonths($i);
             $key = $month->translatedFormat('M Y');
-            $count = Anggota::whereYear('created_at', $month->year)
+            $count = (clone $anggotaQuery)
+                ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->count();
 
@@ -47,39 +60,58 @@ class DashboardController extends Controller
 
         // 3. Distribusi Status Akun Kader
         $statusCounts = [
-            'aktif' => User::where('role', 'anggota')->where('status', 'aktif')->count(),
+            'aktif' => (clone $userAnggotaQuery)->where('status', 'aktif')->count(),
             'menunggu' => $pendingAnggota,
-            'ditolak' => User::where('role', 'anggota')->where('status', 'ditolak')->count(),
-            'nonaktif' => User::where('role', 'anggota')->where('status', 'nonaktif')->count(),
+            'ditolak' => (clone $userAnggotaQuery)->where('status', 'ditolak')->count(),
+            'nonaktif' => (clone $userAnggotaQuery)->where('status', 'nonaktif')->count(),
         ];
 
         // 4. Komposisi Gender
-        $genderL = Anggota::where('jenis_kelamin', 'L')->count();
-        $genderP = Anggota::where('jenis_kelamin', 'P')->count();
+        $genderL = (clone $anggotaQuery)->where('jenis_kelamin', 'L')->count();
+        $genderP = (clone $anggotaQuery)->where('jenis_kelamin', 'P')->count();
 
-        // 5. Sebaran Kader per Kecamatan (Top 7)
-        $topKecamatan = Anggota::select('kecamatan', DB::raw('count(*) as total'))
-            ->whereNotNull('kecamatan')
-            ->where('kecamatan', '!=', '')
-            ->groupBy('kecamatan')
-            ->orderByDesc('total')
-            ->limit(7)
-            ->get();
+        // 5. Sebaran Kader: Jika cabang, top desa/kelurahan di PCM tsb. Jika daerah, top kecamatan se-Kabupaten
+        if ($isCabang && $pcm) {
+            $topKecamatan = (clone $anggotaQuery)->select('desa_kelurahan as kecamatan', DB::raw('count(*) as total'))
+                ->whereNotNull('desa_kelurahan')
+                ->where('desa_kelurahan', '!=', '')
+                ->groupBy('desa_kelurahan')
+                ->orderByDesc('total')
+                ->limit(7)
+                ->get();
+        } else {
+            $topKecamatan = Anggota::select('kecamatan', DB::raw('count(*) as total'))
+                ->whereNotNull('kecamatan')
+                ->where('kecamatan', '!=', '')
+                ->groupBy('kecamatan')
+                ->orderByDesc('total')
+                ->limit(7)
+                ->get();
+        }
 
         // 6. Kegiatan Baitul Arqam Terkini (Maks 6)
-        $recentEvents = Event::withCount('pesertaAktif')
+        $recentEvents = $isCabang ? collect() : Event::withCount('pesertaAktif')
             ->latest('tanggal_mulai')
             ->limit(6)
             ->get();
 
         // 7. Pendaftar Terbaru Butuh Verifikasi
-        $latestPending = Anggota::with('user')
+        $latestPending = (clone $anggotaQuery)->with('user')
             ->whereHas('user', fn ($q) => $q->where('status', 'menunggu_verifikasi'))
             ->latest()
             ->limit(5)
             ->get();
 
+        // 8. Kader Terverifikasi Terbaru (Untuk Cabang)
+        $latestAktif = $isCabang ? (clone $anggotaQuery)->with('user')
+            ->whereHas('user', fn ($q) => $q->where('status', 'aktif'))
+            ->latest('updated_at')
+            ->limit(5)
+            ->get() : collect();
+
         return view('admin.dashboard', [
+            'isCabang' => $isCabang,
+            'cabangNama' => $pcm,
             'totalAnggota' => $totalAnggota,
             'pendingAnggota' => $pendingAnggota,
             'activeEvents' => $activeEvents,
@@ -97,6 +129,7 @@ class DashboardController extends Controller
             'topKecamatan' => $topKecamatan,
             'recentEvents' => $recentEvents,
             'latestPending' => $latestPending,
+            'latestAktif' => $latestAktif,
         ]);
     }
 }

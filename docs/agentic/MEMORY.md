@@ -42,6 +42,26 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-14: Implementasi Penuh Role Admin Cabang, Ekspor Data Excel Cabang, dan Optimasi UI Mobile KPI:
+  1. Perbaikan Bug Z-Index Drawer Mobile:
+     - Mengubah z-index backdrop mobile drawer menjadi `z-40` dan `<aside>` menjadi `z-50` pada `resources/views/layouts/app.blade.php`, mengeliminasi bug overlay gelap/blur yang sebelumnya menutupi sidebar di layar smartphone.
+  2. Diferensiasi Antarmuka & Otorisasi Admin Cabang vs Admin Daerah:
+     - Sidebar brand & breadcrumb topbar menampilkan identitas resmi "PCM [Kecamatan] / Panel Admin Cabang".
+     - Menu khusus Admin Cabang: Dashboard Cabang, Data Anggota Cabang (dengan live badge counter pending verifikasi PCM), dan Unduh Data (Excel). Menu Event BA dan Pengguna & Staf disembunyikan.
+     - Akses rute `/admin/users*`, `/admin/events/create`, dan `/admin/anggota/import` dibatasi ketat khusus `role:admin` (Admin Daerah). Akses ditolak (403 Forbidden) jika diakses `admin_cabang`.
+     - Scoping pangkalan data kader di `AnggotaController`: Admin Cabang hanya dapat melihat, menyetujui (verifikasi), menolak pendaftaran (dengan catatan perbaikan), dan mereset kata sandi anggota di wilayah PCM-nya saja. Upaya manipulasi kader di luar PCM otomatis di-abort (403).
+  3. Fitur Ekspor Data Anggota ke Excel (.xlsx):
+     - Dibuatkan class `App\Exports\AnggotaExport` dan view template `resources/views/exports/anggota.blade.php` dengan styling resmi navy-gold khas MPKSDI PDM Karanganyar.
+     - Tombol "Unduh Data Cabang" terintegrasi langsung di dashboard dan pangkalan data kader.
+  4. Optimasi Responsif Kartu KPI Dashboard di Layar Mobile:
+     - Mengatasi masalah teks bertumpuk/berdempetan ("PendaftarSemua", "50% Laki-50% Perempuan", "+4 Bulan Ini") di tampilan 2 kolom mobile.
+     - Visualisasi komposisi gender dipercantik dengan dua-warna progress bar (biru `#005c8a` dan rose `rose-400`).
+     - Label indikator dipangkas fleksibel dengan wrapping yang elegan dan bebas tabrakan kata di semua ukuran layar.
+  5. Verifikasi Komprehensif:
+     - 112 automated unit & feature tests lulus 100% (390 assertions).
+     - Code style Pint (`vendor/bin/pint`) terformat 100%.
+     - Vite production build (`npm run build`) berhasil (3.04s).
+
 - 2026-09-14: Audit dan Debugging Komprehensif Seluruh Sistem:
   1. Perbaikan Hierarki DOM & Alpine.js:
      - Ditemukan dan diperbaiki 2 extra tag penutup `</div></div>` pada `resources/views/components/pasfoto-fitter.blade.php` yang sebelumnya memutus scope Alpine `registrationForm()` dan `pasfotoFitter()` sehingga memicu ReferenceError (`modalOpen`, `rawImageSrc`, `scale`, `tab`, `isSubmitting`).

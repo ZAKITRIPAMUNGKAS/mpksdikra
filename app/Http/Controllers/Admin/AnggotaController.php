@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\AnggotaExport;
 use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\User;
@@ -11,6 +12,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AnggotaController extends Controller
 {
@@ -19,7 +22,18 @@ class AnggotaController extends Controller
         $status = $request->string('status')->toString();
         $q = trim($request->string('q')->toString());
 
+        $user = auth()->user();
+        $isCabang = $user?->isAdminCabang();
+        $pcm = $user?->pcm;
+
         $query = Anggota::with('user')->latest();
+
+        // Scope cabang jika user adalah Admin Cabang
+        if ($isCabang && $pcm) {
+            $query->where(function ($sub) use ($pcm) {
+                $sub->where('pcm', $pcm)->orWhere('kecamatan', $pcm);
+            });
+        }
 
         if (in_array($status, ['menunggu_verifikasi', 'aktif', 'nonaktif', 'ditolak'], true)) {
             $query->whereHas('user', fn ($uq) => $uq->where('status', $status));
@@ -35,17 +49,29 @@ class AnggotaController extends Controller
             });
         }
 
+        // Pending & Ditolak Counter
+        $pendingQuery = User::where('role', 'anggota')->where('status', 'menunggu_verifikasi');
+        $ditolakQuery = User::where('role', 'anggota')->where('status', 'ditolak');
+
+        if ($isCabang && $pcm) {
+            $pendingQuery->whereHas('anggota', fn ($aq) => $aq->where('pcm', $pcm)->orWhere('kecamatan', $pcm));
+            $ditolakQuery->whereHas('anggota', fn ($aq) => $aq->where('pcm', $pcm)->orWhere('kecamatan', $pcm));
+        }
+
         return view('admin.anggota.index', [
             'anggotas' => $query->paginate(20)->withQueryString(),
             'status' => $status,
             'q' => $q,
-            'pendingCount' => User::where('role', 'anggota')->where('status', 'menunggu_verifikasi')->count(),
-            'ditolakCount' => User::where('role', 'anggota')->where('status', 'ditolak')->count(),
+            'pendingCount' => $pendingQuery->count(),
+            'ditolakCount' => $ditolakQuery->count(),
+            'isCabang' => $isCabang,
+            'cabangNama' => $pcm,
         ]);
     }
 
     public function show(Anggota $anggota): View
     {
+        $this->authorizeCabang($anggota);
         $anggota->load(['user', 'organisasi']);
 
         return view('admin.anggota.show', ['anggota' => $anggota]);
@@ -53,6 +79,7 @@ class AnggotaController extends Controller
 
     public function verify(Anggota $anggota): RedirectResponse
     {
+        $this->authorizeCabang($anggota);
         $user = $anggota->user;
 
         if ($user->status === 'aktif') {
@@ -72,6 +99,8 @@ class AnggotaController extends Controller
 
     public function reject(Request $request, Anggota $anggota): RedirectResponse
     {
+        $this->authorizeCabang($anggota);
+
         $data = $request->validate([
             'catatan_verifikasi' => ['required', 'string', 'max:500'],
         ]);
@@ -89,6 +118,7 @@ class AnggotaController extends Controller
 
     public function deactivate(Anggota $anggota): RedirectResponse
     {
+        $this->authorizeCabang($anggota);
         $anggota->user->update(['status' => 'nonaktif']);
 
         return redirect()
@@ -98,6 +128,8 @@ class AnggotaController extends Controller
 
     public function resetPassword(Anggota $anggota): RedirectResponse
     {
+        $this->authorizeCabang($anggota);
+
         $defaultPassword = $anggota->tanggal_lahir
             ? Carbon::parse($anggota->tanggal_lahir)->format('dmY')
             : (strlen($anggota->nik) >= 6 ? substr($anggota->nik, -6) : '12345678');
@@ -117,6 +149,61 @@ class AnggotaController extends Controller
             ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword} (Tanggal Lahir)")
             ->with('wa_reset_url', $waUrl)
             ->with('reset_password_value', $defaultPassword);
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $user = auth()->user();
+        $isCabang = $user?->isAdminCabang();
+        $pcm = $user?->pcm;
+
+        $query = Anggota::with('user')->orderBy('nama_lengkap');
+
+        if ($isCabang && $pcm) {
+            $query->where(function ($sub) use ($pcm) {
+                $sub->where('pcm', $pcm)->orWhere('kecamatan', $pcm);
+            });
+            $subTitle = 'PIMPINAN CABANG MUHAMMADIYAH '.strtoupper($pcm);
+            $safePcm = preg_replace('/[^A-Za-z0-9_]/', '_', $pcm);
+            $fileName = 'Data_Kader_PCM_'.$safePcm.'_'.date('Ymd_His').'.xlsx';
+        } else {
+            // Admin Daerah dapat memfilter status / pencarian jika disediakan
+            $status = $request->string('status')->toString();
+            $q = trim($request->string('q')->toString());
+
+            if (in_array($status, ['menunggu_verifikasi', 'aktif', 'nonaktif', 'ditolak'], true)) {
+                $query->whereHas('user', fn ($uq) => $uq->where('status', $status));
+            }
+
+            if ($q !== '') {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('nama_lengkap', 'like', "%{$q}%")
+                        ->orWhere('nik', 'like', "%{$q}%")
+                        ->orWhere('nbm', 'like', "%{$q}%")
+                        ->orWhere('kecamatan', 'like', "%{$q}%")
+                        ->orWhere('desa_kelurahan', 'like', "%{$q}%");
+                });
+            }
+
+            $subTitle = 'PIMPINAN DAERAH MUHAMMADIYAH KABUPATEN KARANGANYAR';
+            $fileName = 'Data_Kader_MPKSDI_Karanganyar_'.date('Ymd_His').'.xlsx';
+        }
+
+        $anggotas = $query->get();
+
+        return Excel::download(new AnggotaExport($anggotas, $subTitle, $isCabang ? $pcm : null), $fileName);
+    }
+
+    private function authorizeCabang(Anggota $anggota): void
+    {
+        $user = auth()->user();
+        if ($user?->isAdminCabang()) {
+            $pcm = $user->pcm;
+            $match = strcasecmp($anggota->pcm ?? '', $pcm) === 0 || strcasecmp($anggota->kecamatan ?? '', $pcm) === 0;
+            if (! $match) {
+                abort(403, 'Anda tidak memiliki hak akses untuk mengelola data kader di luar cabang '.$pcm.'.');
+            }
+        }
     }
 
     private function waUrl(Anggota $anggota, string $pesan): ?string

@@ -10,30 +10,53 @@
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20">MPKSDI Karanganyar</span>
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20">
+                        {{ $isCabang ? ('PCM ' . $cabangNama) : 'MPKSDI Karanganyar' }}
+                    </span>
                     <span class="text-slate-300">&bull;</span>
-                    <span class="text-xs font-medium text-slate-500">v2.2.0 Stabil</span>
+                    <span class="text-xs font-medium text-slate-500">
+                        {{ $isCabang ? 'Panel Kerja Admin Cabang' : 'v2.2.0 Stabil' }}
+                    </span>
                 </div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Dashboard Administrasi</h1>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">Pangkalan data kader Muhammadiyah &amp; evaluasi kelulusan Baitul Arqam Karanganyar.</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                    {{ $isCabang ? ('Dashboard Cabang ' . $cabangNama) : 'Dashboard Administrasi' }}
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+                    {{ $isCabang ? ('Pangkalan data kader Muhammadiyah PCM ' . $cabangNama . ', persetujuan pendaftaran, dan cetak data resmi cabang.') : 'Pangkalan data kader Muhammadiyah & evaluasi kelulusan Baitul Arqam Karanganyar.' }}
+                </p>
             </div>
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
-                <a href="{{ route('panduan') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <span>Panduan</span>
-                </a>
-                <a href="{{ route('admin.anggota.import') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span>Impor Excel</span>
-                </a>
-                <a href="{{ route('admin.events.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white text-xs font-semibold rounded-lg shadow-2xs transition">
-                    <svg class="w-4 h-4 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Buat Event Baru</span>
-                </a>
+                @if($isCabang)
+                    <a href="{{ route('admin.anggota.export') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Unduh Data Cabang (Excel)</span>
+                    </a>
+                    <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white text-xs font-semibold rounded-lg shadow-2xs transition">
+                        <svg class="w-4 h-4 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>Data Kader Cabang</span>
+                    </a>
+                @else
+                    <a href="{{ route('panduan') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        <span>Panduan</span>
+                    </a>
+                    <a href="{{ route('admin.anggota.import') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Impor Excel</span>
+                    </a>
+                    <a href="{{ route('admin.events.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white text-xs font-semibold rounded-lg shadow-2xs transition">
+                        <svg class="w-4 h-4 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Buat Event Baru</span>
+                    </a>
+                @endif
             </div>
         </div>
     </div>
@@ -48,8 +71,8 @@
                 </svg>
             </div>
             <div>
-                <p class="text-sm font-bold text-amber-950">Ada {{ $pendingAnggota }} kader baru menunggu verifikasi administrasi</p>
-                <p class="text-xs text-amber-900/80 mt-0.5">Periksa kelengkapan NIK, data pimpinan, dan berkas pendaftar sebelum mengaktifkan akun.</p>
+                <p class="text-sm font-bold text-amber-950">Ada {{ $pendingAnggota }} kader {{ $isCabang ? ('PCM ' . $cabangNama) : '' }} menunggu konfirmasi persetujuan</p>
+                <p class="text-xs text-amber-900/80 mt-0.5">Periksa kelengkapan NIK, data pimpinan, dan berkas pendaftar sebelum menyetujui akun.</p>
             </div>
         </div>
         <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shrink-0 transition shadow-2xs">
@@ -59,66 +82,141 @@
     </div>
     @endif
 
-    {{-- 3. KPI Metric Grid (Simetris & Rapi) --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+    {{-- 3. KPI Metric Grid (Simetris, Rapi & Mobile-Friendly) --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {{-- Card 1: Total Kader --}}
         <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
             <div>
-                <span class="text-xs font-medium text-slate-500">Total Kader Terdaftar</span>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 tabular-nums">{{ $totalAnggota }} <span class="text-xs font-normal text-slate-500">Kader</span></p>
+                <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                    {{ $isCabang ? 'Kader Cabang' : 'Total Kader' }}
+                </span>
+                <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                    <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums leading-none">{{ $totalAnggota }}</span>
+                    <span class="text-xs text-slate-500 font-medium">Kader</span>
+                </div>
             </div>
-            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>{{ $statusCounts['aktif'] }} Kader Aktif</span>
-                <span class="font-semibold text-[#005c8a] bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md text-xs">+{{ $monthlyData[5] ?? 0 }} Bulan Ini</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1 text-xs">
+                <span class="inline-flex items-center gap-1 font-medium text-slate-600 truncate text-[11px] sm:text-xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span>{{ $statusCounts['aktif'] }} Aktif</span>
+                </span>
+                <span class="font-bold text-[#005c8a] bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                    +{{ $monthlyData[5] ?? 0 }} Bln Ini
+                </span>
             </div>
         </div>
 
         {{-- Card 2: Menunggu Verifikasi --}}
         <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium {{ $pendingAnggota > 0 ? 'text-amber-800' : 'text-slate-500' }}">Perlu Verifikasi</span>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold {{ $pendingAnggota > 0 ? 'text-amber-700' : 'text-slate-400' }} uppercase tracking-wider block truncate">
+                        Verifikasi
+                    </span>
                     @if($pendingAnggota > 0)
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
                     @endif
                 </div>
-                <p class="text-2xl sm:text-3xl font-bold {{ $pendingAnggota > 0 ? 'text-amber-600' : 'text-slate-900' }} mt-2 tabular-nums">{{ $pendingAnggota }} <span class="text-xs font-normal text-slate-500">Antrean</span></p>
+                <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                    <span class="text-2xl sm:text-3xl font-black {{ $pendingAnggota > 0 ? 'text-amber-600' : 'text-slate-900' }} tracking-tight tabular-nums leading-none">{{ $pendingAnggota }}</span>
+                    <span class="text-xs text-slate-500 font-medium">Antrean</span>
+                </div>
             </div>
-            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span class="text-slate-500">Pendaftar Baru</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
                 @if($pendingAnggota > 0)
-                    <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-amber-700 hover:text-amber-900 font-semibold hover:underline flex items-center gap-0.5 text-xs">
-                        Tinjau Antrean &rarr;
+                    <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-amber-700 hover:text-amber-900 font-bold text-[11px] sm:text-xs inline-flex items-center gap-1 truncate w-full">
+                        <span>Tinjau Antrean</span>
+                        <span>&rarr;</span>
                     </a>
                 @else
-                    <span class="text-emerald-700 font-medium text-xs">Semua Terverifikasi</span>
+                    <div class="flex items-center gap-1 text-[11px] sm:text-xs text-emerald-700 font-semibold truncate">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span class="truncate">Semua Terverifikasi</span>
+                    </div>
                 @endif
             </div>
         </div>
 
-        {{-- Card 3: Event BA Aktif --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-            <div>
-                <span class="text-xs font-medium text-slate-500">Event Baitul Arqam</span>
-                <p class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 tabular-nums">{{ $activeEvents }} <span class="text-xs font-normal text-slate-500">Event Aktif</span></p>
+        @if($isCabang)
+            {{-- Card 3 (Cabang): Komposisi Gender --}}
+            @php
+                $pctL = $totalAnggota > 0 ? round(($genderL / $totalAnggota) * 100) : 0;
+                $pctP = $totalAnggota > 0 ? (100 - $pctL) : 0;
+            @endphp
+            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Gender
+                    </span>
+                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2 font-black text-slate-900 leading-none">
+                        <span class="text-2xl sm:text-3xl tabular-nums">{{ $genderL }}</span>
+                        <span class="text-xs text-slate-500 font-medium">L</span>
+                        <span class="text-slate-300 font-normal">/</span>
+                        <span class="text-2xl sm:text-3xl tabular-nums">{{ $genderP }}</span>
+                        <span class="text-xs text-slate-500 font-medium">P</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1">
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
+                        <div style="width: {{ $pctL }}%;" class="bg-[#005c8a] h-full" title="Laki-laki: {{ $pctL }}%"></div>
+                        <div style="width: {{ $pctP }}%;" class="bg-rose-400 h-full" title="Perempuan: {{ $pctP }}%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 font-medium pt-0.5">
+                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-[#005c8a] shrink-0"></span> {{ $pctL }}% L</span>
+                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span> {{ $pctP }}% P</span>
+                    </div>
+                </div>
             </div>
-            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>{{ $completedEvents }} Selesai</span>
-                <span>{{ $totalEvents }} Total Agenda</span>
-            </div>
-        </div>
 
-        {{-- Card 4: Kelulusan Perkaderan --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-            <div>
-                <span class="text-xs font-medium text-slate-500">Tingkat Kelulusan</span>
-                <p class="text-2xl sm:text-3xl font-bold text-[#005c8a] mt-2 tabular-nums">{{ $persenKelulusan }}% <span class="text-xs font-normal text-slate-500">({{ $totalLulus }} Lulus)</span></p>
+            {{-- Card 4 (Cabang): Desa / Kelurahan Terdata --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        Ranting / Desa
+                    </span>
+                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                        <span class="text-2xl sm:text-3xl font-black text-[#005c8a] tracking-tight tabular-nums leading-none">{{ $topKecamatan->count() }}</span>
+                        <span class="text-xs text-slate-500 font-medium">Wilayah</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 gap-1">
+                    <span class="truncate text-[11px] sm:text-xs font-medium text-slate-700">PCM {{ $cabangNama }}</span>
+                    <span class="font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                        Aktif
+                    </span>
+                </div>
             </div>
-            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Rata-rata NA: <strong class="text-slate-700 font-semibold">{{ $avgNilaiAkhir ? number_format($avgNilaiAkhir, 1) : '—' }}</strong></span>
-                <span class="text-slate-400 text-xs">Skala 100</span>
+        @else
+            {{-- Card 3 (Daerah): Event BA Aktif --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">Event Baitul Arqam</span>
+                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                        <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums leading-none">{{ $activeEvents }}</span>
+                        <span class="text-xs text-slate-500 font-medium">Event Aktif</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                    <span>{{ $completedEvents }} Selesai</span>
+                    <span class="font-semibold text-slate-700">{{ $totalEvents }} Total</span>
+                </div>
             </div>
-        </div>
+
+            {{-- Card 4 (Daerah): Kelulusan Perkaderan --}}
+            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">Kelulusan</span>
+                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                        <span class="text-2xl sm:text-3xl font-black text-[#005c8a] tracking-tight tabular-nums leading-none">{{ $persenKelulusan }}%</span>
+                        <span class="text-xs text-slate-500 font-medium">({{ $totalLulus }} Lulus)</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                    <span>Rerata NA: <strong class="text-slate-700 font-bold">{{ $avgNilaiAkhir ? number_format($avgNilaiAkhir, 1) : '—' }}</strong></span>
+                    <span class="text-slate-400 text-[10px]">Skala 100</span>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- 4. Visual Analytics & Tren Perkaderan --}}
@@ -211,157 +309,270 @@
         </div>
     </div>
 
-    {{-- 5. Baris Kegiatan Terkini & Pendaftar Baru (Operational Center) --}}
+    {{-- 5. Baris Operasional: Jika Cabang, tampilkan Antrean Verifikasi & Kader Aktif. Jika Daerah, tampilkan Event BA & Antrean Verifikasi --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-        {{-- Event BA Terkini dengan Aksi Cepat Cetak Laporan (PDF & Excel) --}}
-        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base tracking-tight">Agenda Perkaderan &amp; Dokumen Resmi</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Jadwal pelaksanaan, ranking nilai, dan dokumen cetak resmi</p>
-                    </div>
-                    <a href="{{ route('admin.events.index') }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
-                        Lihat Semua &rarr;
-                    </a>
-                </div>
-
-                <div class="mt-4 divide-y divide-slate-100">
-                    @forelse($recentEvents as $ev)
-                    <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <a href="{{ route('admin.events.show', $ev) }}" title="{{ $ev->nama_event }}" class="font-semibold text-slate-900 hover:text-[#005c8a] text-sm truncate block transition">
-                                    {{ $ev->nama_event }}
-                                </a>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium capitalize shrink-0
-                                    {{ $ev->status === 'persiapan' ? 'bg-amber-50 text-amber-800 border border-amber-200' : '' }}
-                                    {{ $ev->status === 'berlangsung' ? 'bg-sky-50 text-sky-800 border border-sky-200' : '' }}
-                                    {{ $ev->status === 'selesai' ? 'bg-slate-100 text-slate-600 border border-slate-200' : '' }}">
-                                    {{ $ev->status }}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                                <span class="flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    {{ $ev->tanggal_mulai ? $ev->tanggal_mulai->format('d M Y') : '—' }}
-                                </span>
-                                <span>&bull;</span>
-                                <span class="font-medium text-slate-700 tabular-nums">{{ $ev->peserta_aktif_count }} Kader</span>
-                            </div>
+        @if($isCabang)
+            {{-- Kolom 1 (Cabang): Kader Menunggu Verifikasi di PCM Ini --}}
+            <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base tracking-tight">Kader Menunggu Konfirmasi Persetujuan</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Antrean pendaftaran baru kader di wilayah PCM {{ $cabangNama }}</p>
                         </div>
-                        
-                        {{-- Tombol Output Cetak Cepat (PDF & Excel) atau Kelola --}}
-                        <div class="flex items-center gap-1.5 shrink-0 self-stretch sm:self-center pt-1 sm:pt-0">
-                            @if($ev->status === 'persiapan')
-                            <a href="{{ route('admin.events.show', $ev) }}" 
-                               title="Kelola Agenda & Sesi Baitul Arqam"
-                               class="flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-2xs inline-flex items-center justify-center gap-1">
-                                <span>Kelola Event</span>
-                                <span>&rarr;</span>
-                            </a>
-                            @else
-                            <a href="{{ route('admin.events.ranking', $ev) }}" 
-                               title="Lihat Peringkat & Rekap Nilai"
-                               class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-2xs">
-                                <span>Peringkat</span>
-                            </a>
-                            <a href="{{ route('admin.events.exportExcel', $ev) }}" 
-                               title="Unduh Laporan Format Excel (.xlsx)"
-                               class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition shadow-2xs inline-flex items-center justify-center gap-1">
-                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span>Excel</span>
-                            </a>
-                            <a href="{{ route('admin.events.report', $ev) }}" 
-                               title="Unduh Laporan Resmi Format PDF"
-                               class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition shadow-2xs inline-flex items-center justify-center gap-1">
-                                <svg class="w-3.5 h-3.5 text-[#005c8a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span>PDF</span>
-                            </a>
-                            @endif
-                        </div>
-                    </div>
-                    @empty
-                    <div class="py-8 text-center text-slate-400 text-xs">
-                        Belum ada kegiatan Baitul Arqam yang dibuat.
-                        <a href="{{ route('admin.events.create') }}" class="text-[#005c8a] hover:underline font-semibold block mt-1">Buat Event Sekarang &rarr;</a>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            
-            <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
-                <a href="{{ route('admin.events.create') }}" class="flex-1 py-2 px-3.5 bg-[#005c8a] hover:bg-[#00486d] text-white font-semibold rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-2xs">
-                    <svg class="w-4 h-4 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    <span>Buat Agenda Baru</span>
-                </a>
-                <a href="{{ route('admin.events.index') }}" class="py-2 px-3.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-lg border border-slate-300 text-xs transition flex items-center justify-center gap-2 shadow-2xs">
-                    <span>Semua Agenda</span>
-                </a>
-            </div>
-        </div>
-
-        {{-- Pendaftar Baru Perlu Verifikasi --}}
-        <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base tracking-tight">Kader Menunggu Verifikasi</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Antrean persetujuan berkas pendaftaran baru</p>
-                    </div>
-                    <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
-                        Lihat Antrean &rarr;
-                    </a>
-                </div>
-
-                <div class="mt-4 divide-y divide-slate-100">
-                    @forelse($latestPending as $p)
-                    <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200">
-                                {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <span class="font-semibold text-slate-900 text-sm truncate block">
-                                    {{ $p->nama_lengkap }}
-                                </span>
-                                <span class="text-xs text-slate-500 block truncate mt-0.5">
-                                    {{ $p->kecamatan ? 'PCM ' . $p->kecamatan : 'Karanganyar' }} &bull; {{ $p->created_at?->diffForHumans() }}
-                                </span>
-                            </div>
-                        </div>
-                        <a href="{{ route('admin.anggota.show', $p) }}" class="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold transition shrink-0 shadow-2xs">
-                            Periksa
+                        <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
+                            Lihat Semua Antrean &rarr;
                         </a>
                     </div>
-                    @empty
-                    <div class="py-8 text-center text-slate-400 text-xs">
-                        <p class="font-semibold text-slate-700">Semua pendaftaran telah diverifikasi</p>
-                        <p class="text-xs text-slate-400 mt-0.5">Tidak ada antrean pending saat ini.</p>
+
+                    <div class="mt-4 divide-y divide-slate-100">
+                        @forelse($latestPending as $p)
+                        <div class="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0 border border-amber-200">
+                                    {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <span class="font-semibold text-slate-900 text-sm truncate block">
+                                        {{ $p->nama_lengkap }}
+                                    </span>
+                                    <span class="text-xs text-slate-500 block truncate mt-0.5">
+                                        NIK: {{ $p->nik }} &bull; {{ $p->desa_kelurahan ? 'Desa ' . $p->desa_kelurahan : ($p->prm ? 'PRM ' . $p->prm : 'PCM ' . $cabangNama) }} &bull; {{ $p->created_at?->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <a href="{{ route('admin.anggota.show', $p) }}" class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition shadow-2xs">
+                                    Konfirmasi &amp; Setujui
+                                </a>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="py-12 text-center text-slate-400 text-xs">
+                            <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <p class="font-semibold text-slate-700">Semua pendaftaran telah diverifikasi!</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Tidak ada antrean pendaftar baru di PCM {{ $cabangNama }}.</p>
+                        </div>
+                        @endforelse
                     </div>
-                    @endforelse
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Total antrean: <strong class="text-slate-800">{{ $pendingAnggota }} kader</strong></span>
+                    <a href="{{ route('admin.anggota.index') }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
+                        Buka Semua Kader Cabang &rarr;
+                    </a>
                 </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-100">
-                <a href="{{ route('admin.anggota.index') }}" class="w-full py-2 px-3.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition flex items-center justify-center gap-2">
-                    <span>Buka Pangkalan Data Anggota</span>
-                </a>
+            {{-- Kolom 2 (Cabang): Kader Aktif Terbaru di Cabang Ini --}}
+            <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base tracking-tight">Kader Terverifikasi Terbaru</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Anggota aktif resmi PCM {{ $cabangNama }}</p>
+                        </div>
+                        <a href="{{ route('admin.anggota.index', ['status' => 'aktif']) }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
+                            Lihat Semua &rarr;
+                        </a>
+                    </div>
+
+                    <div class="mt-4 divide-y divide-slate-100">
+                        @forelse($latestAktif as $akt)
+                        <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                <div class="w-8 h-8 rounded-lg bg-[#005c8a]/10 text-[#005c8a] font-bold text-xs flex items-center justify-center shrink-0 border border-[#005c8a]/20">
+                                    {{ strtoupper(substr($akt->nama_lengkap, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <span class="font-semibold text-slate-900 text-sm truncate block">
+                                        {{ $akt->nama_lengkap }}
+                                    </span>
+                                    <span class="text-xs text-slate-500 block truncate mt-0.5">
+                                        {{ $akt->pekerjaan ?? 'Kader Persyarikatan' }} &bull; {{ $akt->desa_kelurahan ?? $akt->kecamatan }}
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.anggota.show', $akt) }}" class="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold transition shrink-0">
+                                Profil
+                            </a>
+                        </div>
+                        @empty
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            <p class="font-semibold text-slate-700">Belum ada kader aktif</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Silakan verifikasi pendaftar baru untuk mengaktifkan kader.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <a href="{{ route('admin.anggota.export') }}" class="w-full py-2 px-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-lg border border-emerald-200 text-xs transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Unduh Seluruh Data Kader PCM {{ $cabangNama }} (.xlsx)</span>
+                    </a>
+                </div>
             </div>
-        </div>
+        @else
+            {{-- Event BA Terkini dengan Aksi Cepat Cetak Laporan (PDF & Excel) untuk Admin Daerah --}}
+            <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base tracking-tight">Agenda Perkaderan &amp; Dokumen Resmi</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Jadwal pelaksanaan, ranking nilai, dan dokumen cetak resmi</p>
+                        </div>
+                        <a href="{{ route('admin.events.index') }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
+                            Lihat Semua &rarr;
+                        </a>
+                    </div>
+
+                    <div class="mt-4 divide-y divide-slate-100">
+                        @forelse($recentEvents as $ev)
+                        <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <a href="{{ route('admin.events.show', $ev) }}" title="{{ $ev->nama_event }}" class="font-semibold text-slate-900 hover:text-[#005c8a] text-sm truncate block transition">
+                                        {{ $ev->nama_event }}
+                                    </a>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium capitalize shrink-0
+                                        {{ $ev->status === 'persiapan' ? 'bg-amber-50 text-amber-800 border border-amber-200' : '' }}
+                                        {{ $ev->status === 'berlangsung' ? 'bg-sky-50 text-sky-800 border border-sky-200' : '' }}
+                                        {{ $ev->status === 'selesai' ? 'bg-slate-100 text-slate-600 border border-slate-200' : '' }}">
+                                        {{ $ev->status }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ $ev->tanggal_mulai ? $ev->tanggal_mulai->format('d M Y') : '—' }}
+                                    </span>
+                                    <span>&bull;</span>
+                                    <span class="font-medium text-slate-700 tabular-nums">{{ $ev->peserta_aktif_count }} Kader</span>
+                                </div>
+                            </div>
+                            
+                            {{-- Tombol Output Cetak Cepat (PDF & Excel) atau Kelola --}}
+                            <div class="flex items-center gap-1.5 shrink-0 self-stretch sm:self-center pt-1 sm:pt-0">
+                                @if($ev->status === 'persiapan')
+                                <a href="{{ route('admin.events.show', $ev) }}" 
+                                   title="Kelola Agenda & Sesi Baitul Arqam"
+                                   class="flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-2xs inline-flex items-center justify-center gap-1">
+                                    <span>Kelola Event</span>
+                                    <span>&rarr;</span>
+                                </a>
+                                @else
+                                <a href="{{ route('admin.events.ranking', $ev) }}" 
+                                   title="Lihat Peringkat & Rekap Nilai"
+                                   class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-2xs">
+                                    <span>Peringkat</span>
+                                </a>
+                                <a href="{{ route('admin.events.exportExcel', $ev) }}" 
+                                   title="Unduh Laporan Format Excel (.xlsx)"
+                                   class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition shadow-2xs inline-flex items-center justify-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Excel</span>
+                                </a>
+                                <a href="{{ route('admin.events.report', $ev) }}" 
+                                   title="Unduh Laporan Resmi Format PDF"
+                                   class="flex-1 sm:flex-initial text-center px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition shadow-2xs inline-flex items-center justify-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-[#005c8a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>PDF</span>
+                                </a>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            Belum ada kegiatan Baitul Arqam yang dibuat.
+                            <a href="{{ route('admin.events.create') }}" class="text-[#005c8a] hover:underline font-semibold block mt-1">Buat Event Sekarang &rarr;</a>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
+                    <a href="{{ route('admin.events.create') }}" class="flex-1 py-2 px-3.5 bg-[#005c8a] hover:bg-[#00486d] text-white font-semibold rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-2xs">
+                        <svg class="w-4 h-4 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span>Buat Agenda Baru</span>
+                    </a>
+                    <a href="{{ route('admin.events.index') }}" class="py-2 px-3.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-lg border border-slate-300 text-xs transition flex items-center justify-center gap-2 shadow-2xs">
+                        <span>Semua Agenda</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Pendaftar Baru Perlu Verifikasi untuk Admin Daerah --}}
+            <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base tracking-tight">Kader Menunggu Verifikasi</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Antrean persetujuan berkas pendaftaran baru</p>
+                        </div>
+                        <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-xs font-semibold text-[#005c8a] hover:underline">
+                            Lihat Antrean &rarr;
+                        </a>
+                    </div>
+
+                    <div class="mt-4 divide-y divide-slate-100">
+                        @forelse($latestPending as $p)
+                        <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200">
+                                    {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <span class="font-semibold text-slate-900 text-sm truncate block">
+                                        {{ $p->nama_lengkap }}
+                                    </span>
+                                    <span class="text-xs text-slate-500 block truncate mt-0.5">
+                                        {{ $p->kecamatan ? 'PCM ' . $p->kecamatan : 'Karanganyar' }} &bull; {{ $p->created_at?->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.anggota.show', $p) }}" class="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold transition shrink-0 shadow-2xs">
+                                Periksa
+                            </a>
+                        </div>
+                        @empty
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            <p class="font-semibold text-slate-700">Semua pendaftaran telah diverifikasi</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Tidak ada antrean pending saat ini.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <a href="{{ route('admin.anggota.index') }}" class="w-full py-2 px-3.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition flex items-center justify-center gap-2">
+                        <span>Buka Pangkalan Data Anggota</span>
+                    </a>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- 6. Sebaran Kader per Wilayah & Pintasan Cepat --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-        {{-- Sebaran Kader per Cabang (Top Kecamatan) --}}
+        {{-- Sebaran Kader per Cabang (atau per Desa jika Cabang) --}}
         <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                     <div>
-                        <h3 class="font-bold text-slate-900 text-base tracking-tight">Sebaran Kader per Cabang (PCM)</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Konsentrasi kader terbanyak di Karanganyar</p>
+                        <h3 class="font-bold text-slate-900 text-base tracking-tight">
+                            {{ $isCabang ? ('Sebaran Kader per Desa / Kelurahan (PCM ' . $cabangNama . ')') : 'Sebaran Kader per Cabang (PCM)' }}
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $isCabang ? ('Konsentrasi kader di wilayah PCM ' . $cabangNama) : 'Konsentrasi kader terbanyak di Karanganyar' }}
+                        </p>
                     </div>
                     <span class="text-xs font-semibold text-slate-400">Top Wilayah</span>
                 </div>
@@ -373,7 +584,7 @@
                     @endphp
                     <div>
                         <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-semibold text-slate-800">PCM {{ $kec->kecamatan }}</span>
+                            <span class="font-semibold text-slate-800">{{ $isCabang ? 'Desa/Kel. ' : 'PCM ' }}{{ $kec->kecamatan }}</span>
                             <span class="font-medium text-slate-600 tabular-nums">{{ $kec->total }} Kader <span class="text-xs text-slate-400">({{ $persenKec }}%)</span></span>
                         </div>
                         <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -381,15 +592,21 @@
                         </div>
                     </div>
                     @empty
-                    <p class="text-xs text-slate-400 text-center py-6">Belum ada data kecamatan.</p>
+                    <p class="text-xs text-slate-400 text-center py-6">{{ $isCabang ? 'Belum ada data desa/kelurahan di cabang ini.' : 'Belum ada data kecamatan.' }}</p>
                     @endforelse
                 </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-slate-100">
-                <a href="/#sebaran" target="_blank" class="w-full py-1.5 text-center text-xs font-semibold text-[#005c8a] hover:underline block">
-                    Lihat Peta Spasial 17 Cabang Karanganyar &rarr;
-                </a>
+                @if($isCabang)
+                    <a href="{{ route('admin.anggota.export') }}" class="w-full py-1.5 text-center text-xs font-semibold text-emerald-700 hover:underline block">
+                        Unduh Rekap Kader Seluruh Wilayah Cabang (.xlsx) &rarr;
+                    </a>
+                @else
+                    <a href="/#sebaran" target="_blank" class="w-full py-1.5 text-center text-xs font-semibold text-[#005c8a] hover:underline block">
+                        Lihat Peta Spasial 17 Cabang Karanganyar &rarr;
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -403,31 +620,54 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-[#005c8a] transition">Pangkalan Data Kader</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed mt-1">Verifikasi berkas pendaftar, kelola profil, ekspor data, dan terbitkan KTA.</p>
+                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-[#005c8a] transition">
+                        {{ $isCabang ? ('Kader PCM ' . $cabangNama) : 'Pangkalan Data Kader' }}
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mt-1">
+                        {{ $isCabang ? ('Verifikasi berkas, persetujuan pendaftar, dan cek profil kader PCM ' . $cabangNama . '.') : 'Verifikasi berkas pendaftar, kelola profil, ekspor data, dan terbitkan KTA.' }}
+                    </p>
                 </div>
                 <span class="inline-flex items-center gap-1 text-xs font-semibold text-[#005c8a] mt-3">
-                    <span>Buka Master Anggota</span>
+                    <span>{{ $isCabang ? 'Buka Data Cabang' : 'Buka Master Anggota' }}</span>
                     <span>&rarr;</span>
                 </span>
             </a>
 
-            {{-- Card 2: Manajemen Event BA --}}
-            <a href="{{ route('admin.events.index') }}" class="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs hover:border-[#005c8a]/50 transition flex flex-col justify-between">
-                <div>
-                    <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100 mb-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                        </svg>
+            @if($isCabang)
+                {{-- Card 2 (Cabang): Unduh Data Excel --}}
+                <a href="{{ route('admin.anggota.export') }}" class="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs hover:border-emerald-500/50 transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100 mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition">Unduh Data Excel</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mt-1">Ekspor seluruh data pangkalan kader PCM {{ $cabangNama }} ke format Excel lengkap.</p>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-sm group-hover:text-[#005c8a] transition">Manajemen Baitul Arqam</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed mt-1">Jadwal sesi, scan presensi QR, penilaian kelulusan, dan cetak sertifikat.</p>
-                </div>
-                <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 mt-3">
-                    <span>Kelola Agenda Event</span>
-                    <span>&rarr;</span>
-                </span>
-            </a>
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 mt-3">
+                        <span>Unduh Excel Cabang</span>
+                        <span>&rarr;</span>
+                    </span>
+                </a>
+            @else
+                {{-- Card 2 (Daerah): Manajemen Event BA --}}
+                <a href="{{ route('admin.events.index') }}" class="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs hover:border-[#005c8a]/50 transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100 mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm group-hover:text-[#005c8a] transition">Manajemen Baitul Arqam</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mt-1">Jadwal sesi, scan presensi QR, penilaian kelulusan, dan cetak sertifikat.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 mt-3">
+                        <span>Kelola Agenda Event</span>
+                        <span>&rarr;</span>
+                    </span>
+                </a>
+            @endif
 
             {{-- Card 3: Panduan & Tutorial Sistem --}}
             <a href="{{ route('panduan') }}" class="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs hover:border-[#005c8a]/50 transition flex flex-col justify-between">

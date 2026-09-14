@@ -58,7 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/updates', [SystemHelpController::class, 'updates'])->name('updates');
 });
 
-Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Executive: read-only overview
@@ -66,7 +66,13 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
         Route::get('/executive', [ExecutiveController::class, 'index'])->name('executive');
     });
 
-    // Read event list/detail/reports: admin, facilitator, executive (event_access scopes per event)
+    // Events create & store: Admin Daerah only (sebelum route model binding {event})
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+        Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    });
+
+    // Read event list/detail/reports: admin daerah, facilitator, executive (event_access scopes per event)
     Route::middleware(['role:admin,fasilitator,executive'])->group(function () {
         Route::get('/events', [EventController::class, 'index'])->name('events.index');
         Route::get('/events/{event}', [EventController::class, 'show'])->middleware('event_access')->name('events.show');
@@ -76,26 +82,32 @@ Route::middleware(['auth', 'role:admin,fasilitator,executive'])->prefix('admin')
         Route::get('/events/{event}/outbound', [OutboundKelompokController::class, 'index'])->middleware('event_access')->name('events.outbound.index');
     });
 
-    // Admin only: members + event config
+    // Admin Daerah only: anggota import
     Route::middleware('role:admin')->group(function () {
         Route::get('/anggota/import', [AnggotaImportController::class, 'show'])->name('anggota.import');
         Route::get('/anggota/template-excel', [AnggotaImportController::class, 'downloadTemplate'])->name('anggota.import.template');
         Route::post('/anggota/import', [AnggotaImportController::class, 'store'])->name('anggota.import.store');
+    });
 
+    // Anggota management: Admin Daerah & Admin Cabang
+    Route::middleware('role:admin,admin_cabang')->group(function () {
         Route::get('/anggota', [AdminAnggotaController::class, 'index'])->name('anggota.index');
+        Route::get('/anggota/export', [AdminAnggotaController::class, 'export'])->name('anggota.export');
         Route::get('/anggota/{anggota}', [AdminAnggotaController::class, 'show'])->name('anggota.show');
         Route::post('/anggota/{anggota}/verify', [AdminAnggotaController::class, 'verify'])->name('anggota.verify');
         Route::post('/anggota/{anggota}/reject', [AdminAnggotaController::class, 'reject'])->name('anggota.reject');
         Route::post('/anggota/{anggota}/deactivate', [AdminAnggotaController::class, 'deactivate'])->name('anggota.deactivate');
         Route::post('/anggota/{anggota}/reset-password', [AdminAnggotaController::class, 'resetPassword'])->name('anggota.reset-password');
+    });
+
+    // Admin Daerah only: users + event config
+    Route::middleware('role:admin')->group(function () {
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::post('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle');
 
-        Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
-        Route::post('/events', [EventController::class, 'store'])->name('events.store');
         Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');

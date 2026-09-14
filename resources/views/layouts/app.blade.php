@@ -34,7 +34,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          @click="sidebarOpen = false" 
-         class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 lg:hidden" 
+         class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 lg:hidden" 
          style="display: none;"></div>
 
     {{-- SIDEBAR CONTAINER (FIXED & CLEAN MINIMALIST) --}}
@@ -44,7 +44,7 @@
                'w-64 lg:w-64': !sidebarCollapsed,
                'w-64 lg:w-20': sidebarCollapsed
            }"
-           class="fixed inset-y-0 left-0 z-40 flex flex-col bg-white text-slate-700 transition-all duration-300 ease-in-out border-r border-slate-200/90 shadow-sm lg:translate-x-0 select-none h-screen">
+           class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white text-slate-700 transition-all duration-300 ease-in-out border-r border-slate-200/90 shadow-sm lg:translate-x-0 select-none h-screen">
         
         {{-- Sidebar Brand / Logos --}}
         <div class="h-16 flex items-center px-4 border-b border-slate-200/80 justify-between bg-white">
@@ -57,7 +57,9 @@
                 </div>
                 <div class="flex flex-col min-w-0 transition-opacity duration-200" :class="{ 'lg:hidden': sidebarCollapsed }">
                     <span class="font-bold text-slate-900 text-sm tracking-tight leading-tight">MPKSDI</span>
-                    <span class="text-xs text-slate-500 font-medium">PDM Karanganyar</span>
+                    <span class="text-xs text-slate-500 font-medium truncate">
+                        {{ auth()->user()?->isAdminCabang() ? ('PCM ' . auth()->user()->pcm) : 'PDM Karanganyar' }}
+                    </span>
                 </div>
             </a>
 
@@ -73,11 +75,11 @@
                 {{-- Menu Utama --}}
                 <div class="space-y-1">
                     <div class="px-3 pt-1 pb-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider" :class="{ 'lg:hidden': sidebarCollapsed }">
-                        Menu Utama
+                        {{ auth()->user()->isAdminCabang() ? 'Menu Cabang' : 'Menu Utama' }}
                     </div>
 
-                    @if(auth()->user()->isAdmin())
-                        {{-- Admin Dashboard --}}
+                    @if(auth()->user()->isAdminDaerah())
+                        {{-- Admin Daerah: Dashboard --}}
                         <a href="{{ route('admin.dashboard') }}" 
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.dashboard') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
                            title="Dashboard Utama">
@@ -87,7 +89,7 @@
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Dashboard</span>
                         </a>
 
-                        {{-- Event BA --}}
+                        {{-- Admin Daerah: Event BA --}}
                         <a href="{{ route('admin.events.index') }}" 
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.events.*') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
                            title="Event Baitul Arqam">
@@ -97,7 +99,7 @@
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Event BA</span>
                         </a>
 
-                        {{-- Master Anggota --}}
+                        {{-- Admin Daerah: Master Anggota --}}
                         <a href="{{ route('admin.anggota.index') }}" 
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.anggota.*') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
                            title="Pangkalan Data Kader">
@@ -107,7 +109,7 @@
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Master Anggota</span>
                         </a>
 
-                        {{-- Pengguna & Staf --}}
+                        {{-- Admin Daerah: Pengguna & Staf --}}
                         <a href="{{ route('admin.users.index') }}" 
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.users.*') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
                            title="Pengguna & Staf">
@@ -115,6 +117,51 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Pengguna &amp; Staf</span>
+                        </a>
+                    @endif
+
+                    @if(auth()->user()->isAdminCabang())
+                        {{-- Admin Cabang: Dashboard Cabang --}}
+                        <a href="{{ route('admin.dashboard') }}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.dashboard') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
+                           title="Dashboard Cabang {{ auth()->user()->pcm }}">
+                            <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.dashboard') ? 'text-[#005c8a]' : 'text-slate-400 group-hover:text-slate-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Dashboard Cabang</span>
+                        </a>
+
+                        {{-- Admin Cabang: Data Anggota Cabang --}}
+                        <a href="{{ route('admin.anggota.index') }}" 
+                           class="flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.anggota.*') && !request()->routeIs('admin.anggota.export') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
+                           title="Data Kader PCM {{ auth()->user()->pcm }}">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.anggota.*') && !request()->routeIs('admin.anggota.export') ? 'text-[#005c8a]' : 'text-slate-400 group-hover:text-slate-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Data Anggota Cabang</span>
+                            </div>
+                            @php
+                                $cabangPendingCount = \App\Models\User::where('role', 'anggota')
+                                    ->where('status', 'menunggu_verifikasi')
+                                    ->whereHas('anggota', fn($q) => $q->where('pcm', auth()->user()->pcm)->orWhere('kecamatan', auth()->user()->pcm))
+                                    ->count();
+                            @endphp
+                            @if($cabangPendingCount > 0)
+                                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shrink-0" :class="{ 'lg:hidden': sidebarCollapsed }">
+                                    {{ $cabangPendingCount }}
+                                </span>
+                            @endif
+                        </a>
+
+                        {{-- Admin Cabang: Unduh Data Kader Excel --}}
+                        <a href="{{ route('admin.anggota.export') }}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/80"
+                           title="Unduh Data Kader PCM {{ auth()->user()->pcm }} (Excel)">
+                            <svg class="w-5 h-5 shrink-0 text-emerald-600 group-hover:text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Unduh Data (Excel)</span>
                         </a>
                     @endif
 
@@ -236,7 +283,9 @@
                     </div>
                     <div class="min-w-0 transition-opacity duration-200" :class="{ 'lg:hidden': sidebarCollapsed }">
                         <p class="text-xs font-semibold text-slate-900 truncate leading-tight">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-slate-500 capitalize">{{ auth()->user()->role }}</p>
+                        <p class="text-xs text-slate-500 truncate">
+                            {{ auth()->user()->isAdminCabang() ? ('Admin PCM ' . auth()->user()->pcm) : (auth()->user()->isAdminDaerah() ? 'Admin Daerah PDM' : ucfirst(str_replace('_', ' ', auth()->user()->role))) }}
+                        </p>
                     </div>
                 </div>
 
@@ -291,10 +340,12 @@
                         {{-- Current Contextual Label --}}
                         @auth
                             <div class="flex items-center gap-2 text-xs sm:text-sm">
-                                <span class="text-slate-500 font-medium">MPKSDI PDM Karanganyar</span>
+                                <span class="text-slate-500 font-medium">
+                                    {{ auth()->user()->isAdminCabang() ? ('PCM ' . auth()->user()->pcm) : 'MPKSDI PDM Karanganyar' }}
+                                </span>
                                 <span class="text-slate-300">/</span>
                                 <span class="font-bold text-slate-800">
-                                    {{ auth()->user()->isAnggota() ? 'Portal Kader' : (auth()->user()->isExecutive() ? 'Executive Desk' : (auth()->user()->isFasilitator() ? 'Panel Fasilitator' : 'Panel Administrasi')) }}
+                                    {{ auth()->user()->isAnggota() ? 'Portal Kader' : (auth()->user()->isExecutive() ? 'Executive Desk' : (auth()->user()->isFasilitator() ? 'Panel Fasilitator' : (auth()->user()->isAdminCabang() ? 'Panel Admin Cabang' : 'Panel Administrasi'))) }}
                                 </span>
                             </div>
                         @endauth
@@ -313,7 +364,9 @@
                                 </div>
                                 <div class="hidden sm:block text-left leading-tight">
                                     <span class="text-xs font-bold text-slate-800 block truncate max-w-[140px]">{{ auth()->user()->name }}</span>
-                                    <span class="text-xs text-slate-500 capitalize block">{{ auth()->user()->role }}</span>
+                                    <span class="text-xs text-slate-500 block truncate max-w-[140px]">
+                                        {{ auth()->user()->isAdminCabang() ? ('Admin PCM ' . auth()->user()->pcm) : (auth()->user()->isAdminDaerah() ? 'Admin Daerah' : ucfirst(str_replace('_', ' ', auth()->user()->role))) }}
+                                    </span>
                                 </div>
                             </div>
                         @endauth

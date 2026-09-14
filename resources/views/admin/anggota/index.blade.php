@@ -11,7 +11,7 @@
             <div>
                 <div class="flex items-center gap-2 flex-wrap mb-1.5">
                     <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20">
-                        Master Data Perkaderan
+                        {{ $isCabang ? ('PCM ' . $cabangNama) : 'Master Data Perkaderan PDM' }}
                     </span>
                     @if($pendingCount > 0)
                         <span class="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
@@ -24,42 +24,59 @@
                         </span>
                     @endif
                 </div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Pangkalan Data Anggota &amp; Kader</h1>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">Master database kader Muhammadiyah Karanganyar untuk penugasan dan kepesertaan Baitul Arqam.</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                    {{ $isCabang ? ('Pangkalan Data Kader PCM ' . $cabangNama) : 'Pangkalan Data Anggota & Kader' }}
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
+                    {{ $isCabang ? ('Kelola verifikasi pendaftaran kader, tinjau biodata anggota cabang, dan unduh data resmi PCM ' . $cabangNama . '.') : 'Master database kader Muhammadiyah Karanganyar untuk penugasan dan kepesertaan Baitul Arqam.' }}
+                </p>
             </div>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            <a href="{{ route('admin.anggota.import') }}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-2xs shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                </svg>
-                <span>Impor Excel</span>
-            </a>
-
-            <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                <div class="relative">
-                    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama, NIK, PCM..."
-                        class="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full sm:w-48 bg-white outline-none shadow-2xs">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                {{-- Tombol Unduh Data Excel (Tersedia untuk Admin Cabang & Admin Daerah) --}}
+                <a href="{{ route('admin.anggota.export', request()->query()) }}" 
+                   title="Unduh data kader ke format Excel (.xlsx)"
+                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-2xs shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                </div>
-                <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
-                    <option value="">Semua Status</option>
-                    <option value="menunggu_verifikasi" @selected($status==='menunggu_verifikasi')>Menunggu Verifikasi</option>
-                    <option value="aktif" @selected($status==='aktif')>Aktif</option>
-                    <option value="ditolak" @selected($status==='ditolak')>Ditolak</option>
-                    <option value="nonaktif" @selected($status==='nonaktif')>Nonaktif</option>
-                </select>
-                <button type="submit" class="px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white rounded-lg text-xs font-semibold transition shadow-2xs">
-                    Cari
-                </button>
-                @if(!empty($q) || !empty($status))
-                    <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">Reset</a>
+                    <span>{{ $isCabang ? 'Unduh Data Cabang' : 'Unduh Excel' }}</span>
+                </a>
+
+                @if(!$isCabang)
+                {{-- Tombol Impor Excel hanya untuk Admin Daerah --}}
+                <a href="{{ route('admin.anggota.import') }}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-2xs shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <span>Impor Excel</span>
+                </a>
                 @endif
-            </form>
+
+                <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div class="relative">
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="{{ $isCabang ? 'Cari nama, NIK, PRM...' : 'Cari nama, NIK, PCM...' }}"
+                            class="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full sm:w-48 bg-white outline-none shadow-2xs">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                        <option value="">Semua Status</option>
+                        <option value="menunggu_verifikasi" @selected($status==='menunggu_verifikasi')>Menunggu Verifikasi</option>
+                        <option value="aktif" @selected($status==='aktif')>Aktif</option>
+                        <option value="ditolak" @selected($status==='ditolak')>Ditolak</option>
+                        <option value="nonaktif" @selected($status==='nonaktif')>Nonaktif</option>
+                    </select>
+                    <button type="submit" class="px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white rounded-lg text-xs font-semibold transition shadow-2xs">
+                        Cari
+                    </button>
+                    @if(!empty($q) || !empty($status))
+                        <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">Reset</a>
+                    @endif
+                </form>
+            </div>
         </div>
-    </div>
     </div>
 
     {{-- Data Table Card --}}

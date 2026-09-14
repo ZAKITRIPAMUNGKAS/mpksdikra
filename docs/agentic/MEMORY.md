@@ -133,6 +133,14 @@ Pola berguna dari referensi:
   4. Impor Data Anggota (`AnggotaImport`):
      - Kata sandi default akun hasil impor diatur ke tanggal tahun lahir (`dmY`).
   5. Seluruh 102 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
+- 2026-09-14: Integrasi Pasfoto Kader pada Portal Dashboard & Navigasi:
+  1. Fitur:
+     - Menampilkan pasfoto formal kader pada kartu sambutan utama Dashboard Portal (`portal/dashboard.blade.php`) dengan bingkai rasio pasfoto 3:4 yang proporsional (`w-14 h-18 sm:w-16 sm:h-20 rounded-xl border-2 border-sky-400`).
+     - Mengintegrasikan pasfoto kader pada avatar kanan atas Navbar Header (`layouts/app.blade.php`) dan avatar pojok kiri bawah Sidebar Footer.
+     - Jika anggota belum mengunggah pasfoto, sistem otomatis menampilkan avatar inisial warna khas persyarikatan sebagai fallback.
+  2. Otorisasi Keamanan:
+     - Memperbarui `FotoController`: membedakan `isAdminDaerah()` (akses seluruh foto) dan `isAdminCabang()` (akses foto anggota cabang yang bersangkutan), serta pemilik foto.
+  3. Verifikasi: 116 tests passed 100%, Pint passed, commit & push sukses.
 - 2026-09-14: Penyempurnaan & Auto-Sync Login Admin Daerah (admin / AdminPDM@25) & 17 Admin Cabang:
   1. Akar Masalah:
      - Di server produksi, data seeder `AdminCabangSeeder` belum pernah dijalankan atau akun admin daerah masih menggunakan email lama (`admin@mpksdi-kra.id` / `admin@mpksdi.test`).

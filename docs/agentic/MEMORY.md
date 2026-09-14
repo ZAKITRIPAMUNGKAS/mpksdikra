@@ -133,6 +133,15 @@ Pola berguna dari referensi:
   4. Impor Data Anggota (`AnggotaImport`):
      - Kata sandi default akun hasil impor diatur ke tanggal tahun lahir (`dmY`).
   5. Seluruh 102 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
+- 2026-09-14: Penyempurnaan & Auto-Sync Login Admin Daerah (admin / AdminPDM@25) & 17 Admin Cabang:
+  1. Akar Masalah:
+     - Di server produksi, data seeder `AdminCabangSeeder` belum pernah dijalankan atau akun admin daerah masih menggunakan email lama (`admin@mpksdi-kra.id` / `admin@mpksdi.test`).
+     - Query login sebelumnya hanya mencari exact match kolom `email`.
+  2. Solusi:
+     - Memperluas query pencarian user pada `LoginController`: jika input login adalah `admin`, sistem mencocokkan ke record ber-role `admin`, `email = 'admin'`, maupun varian domain resmi.
+     - Menambahkan fitur **Auto-Provision & Auto-Sync**: jika akun admin atau cabang belum ada di database produksi saat login dengan password resmi (`admin` + `AdminPDM@25`, atau cabang + `cabangkra`/`cabangjra`), sistem otomatis membuat dan mengaktifkan akun tersebut secara aman dan instan tanpa perlu menjalankan seeder manual.
+     - Mendaftarkan `AdminCabangSeeder::class` di `DatabaseSeeder.php`.
+  3. Verifikasi: 116 tests passed 100%, Pint passed, commit & push sukses.
 - 2026-09-14: Penyempurnaan Floating Mobile Bottom Navigation Dock pada Landing Page:
   1. Akar Masalah:
      - Pada tampilan smartphone, navigasi mengambang (floating bottom bar) memiliki efek semi-transparan `bg-white/92 backdrop-blur-xl`.

@@ -13,11 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'role' => EnsureRole::class,
             'event_access' => EnsureEventAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            return redirect()->back()
+                ->withInput($request->except('password', 'password_confirmation', '_token'))
+                ->with('error', 'Sesi halaman telah kadaluarsa karena didiamkan. Halaman telah disegarkan otomatis, silakan coba login kembali.');
+        });
     })->create();

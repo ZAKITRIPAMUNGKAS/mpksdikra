@@ -284,7 +284,7 @@
         </div>
     </header>
 
-    <main id="main-content" class="space-y-16 sm:space-y-20 pb-20">
+    <main id="main-content" class="space-y-16 sm:space-y-20 pb-28 sm:pb-20">
 
         {{-- SECTION 2: Hero Banner Melengkung Proporsional dengan Foto Gedung Dakwah Siluet Kanan-ke-Kiri --}}
         <section id="beranda" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8">
@@ -1954,7 +1954,7 @@
                  onScroll();
              }
           }"
-         class="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[340px] sm:max-w-sm z-[100] bg-white/92 backdrop-blur-xl rounded-full border border-slate-200/80 shadow-[0_10px_28px_-6px_rgba(15,23,42,0.12),0_2px_8px_-2px_rgba(15,23,42,0.04)] p-1.5 transition-all">
+          class="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[360px] z-40 bg-white rounded-full border border-slate-200 shadow-[0_12px_28px_-4px_rgba(15,23,42,0.18),0_4px_12px_-2px_rgba(15,23,42,0.08)] p-1.5 transition-all">
         
         <div class="grid {{ auth()->check() ? 'grid-cols-4' : 'grid-cols-5' }} items-center gap-1">
             
@@ -1995,8 +1995,8 @@
             @auth
                 {{-- 4. Dashboard (Logged in - Harmonious Pill Accent) --}}
                 <a href="{{ auth()->user()->isAdmin() || auth()->user()->isFasilitator() ? route('admin.dashboard') : (auth()->user()->isExecutive() ? route('admin.executive') : route('portal.dashboard')) }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-sky-700 bg-sky-100/70 hover:bg-sky-100 font-bold transition-all duration-200 group active:scale-95">
-                    <svg class="w-4.5 h-4.5 text-sky-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-white bg-sky-600 hover:bg-sky-700 font-bold transition-all duration-200 group active:scale-95 shadow-2xs">
+                    <svg class="w-4.5 h-4.5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
                     <span class="text-[10px] leading-none mt-1 tracking-tight">Dashboard</span>
@@ -2004,7 +2004,7 @@
             @else
                 {{-- 4. Masuk --}}
                 <a href="{{ route('login') }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-medium transition-all duration-200 group active:scale-95">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium transition-all duration-200 group active:scale-95">
                     <svg class="w-4.5 h-4.5 text-slate-500 group-hover:text-slate-800 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
@@ -2013,8 +2013,8 @@
 
                 {{-- 5. Daftar (Primary Action - Harmonious Pill Accent) --}}
                 <a href="{{ route('anggota.register') }}" 
-                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-sky-700 bg-sky-100/70 hover:bg-sky-100 font-bold transition-all duration-200 group active:scale-95">
-                    <svg class="w-4.5 h-4.5 text-sky-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex flex-col items-center justify-center py-1.5 px-1 rounded-full text-white bg-sky-600 hover:bg-sky-700 font-bold transition-all duration-200 group active:scale-95 shadow-2xs">
+                    <svg class="w-4.5 h-4.5 text-white stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
                     <span class="text-[10px] leading-none mt-1 tracking-tight">Daftar</span>

@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Hash;
 class AdminCabangSeeder extends Seeder
 {
     /** Password default admin cabang */
-    private const PASS_CABANG = 'cabangjra';
+    private const PASS_CABANG = 'cabangkra';
 
     /** Password admin daerah */
     private const PASS_DAERAH = 'AdminPDM@25';

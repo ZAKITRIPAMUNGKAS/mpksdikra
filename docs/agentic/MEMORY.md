@@ -133,6 +133,18 @@ Pola berguna dari referensi:
   4. Impor Data Anggota (`AnggotaImport`):
      - Kata sandi default akun hasil impor diatur ke tanggal tahun lahir (`dmY`).
   5. Seluruh 102 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
+- 2026-09-15: Penambahan Statistik Profil & Demografi Database Kader di Dashboard Admin:
+  1. Fitur:
+     - Menghadirkan seksi analitik demografi dan sosial-keagamaan pada Dashboard Admin (`resources/views/admin/dashboard.blade.php` & `DashboardController.php`).
+     - **4 Mini KPI Badges**:
+       * Persentase Sholat Berjamaah 5 Waktu di Masjid (% rutin masjid & jumlah kader).
+       * Persentase Pengurus/Takmir Masjid (% takmir aktif & jumlah kader).
+       * Persentase Kemampuan Membaca Al-Qur'an (% lancar & fasih).
+       * Jenjang Pendidikan Terbanyak / Dominan.
+     - **Visualisasi Sebaran Profesi / Pekerjaan**: Bar progres persentase per kategori pekerjaan (Guru AUM, Wiraswasta, PNS, Karyawan, dll) secara dinamis.
+     - **Visualisasi Kemasjidan & Pendidikan**: Rincian aktivitas sholat berjamaah di masjid bertingkat dan pills badge distribusi jenjang pendidikan terakhir (SD, SMP, SMA, D3, S1, S2, S3).
+     - **Isolasi Wilayah**: Otomatis teragregasi penuh untuk Admin Daerah PDM, dan terfilter khusus untuk Admin Cabang PCM (seperti PCM Colomadu).
+  2. Verifikasi: 116 tests passed 100%, Pint passed, Vite build sukses, commit & push berhasil.
 - 2026-09-14: Integrasi Pasfoto Kader pada Portal Dashboard & Navigasi:
   1. Fitur:
      - Menampilkan pasfoto formal kader pada kartu sambutan utama Dashboard Portal (`portal/dashboard.blade.php`) dengan bingkai rasio pasfoto 3:4 yang proporsional (`w-14 h-18 sm:w-16 sm:h-20 rounded-xl border-2 border-sky-400`).

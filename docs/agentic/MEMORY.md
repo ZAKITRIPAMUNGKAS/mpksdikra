@@ -133,6 +133,16 @@ Pola berguna dari referensi:
   4. Impor Data Anggota (`AnggotaImport`):
      - Kata sandi default akun hasil impor diatur ke tanggal tahun lahir (`dmY`).
   5. Seluruh 102 automated tests lulus 100% (green), Pint lolos, Vite production build sukses.
+- 2026-09-14: Penyempurnaan Floating Mobile Bottom Navigation Dock pada Landing Page:
+  1. Akar Masalah:
+     - Pada tampilan smartphone, navigasi mengambang (floating bottom bar) memiliki efek semi-transparan `bg-white/92 backdrop-blur-xl`.
+     - Karena rendering backdrop blur pada browser mobile sering kali tembus atau tidak mem-blur secara pekat saat hardware acceleration hemat daya, teks 4 kartu pilar perkaderan ("Ideologi", "Ke-Muhammadiyahan", "Kepemimpinan", "Fikih Ibadah") tembus ke dalam dock navigasi dan bertabrakan dengan teks tombol navigasi ("Beranda", "Program", "Peta PCM", "Masuk", "Daftar").
+  2. Solusi & Implementasi:
+     - Mengubah latar belakang navigasi melayang menjadi putih pekat solid 100% (`bg-white`), menghilangkan efek tembus pandang sama sekali.
+     - Mempertegas bayangan elevasi (`shadow-[0_12px_28px_-4px_rgba(15,23,42,0.18)]`) dan border pembatas (`border-slate-200`) agar terpisah bersih dari konten di baliknya.
+     - Menjadikan tombol aksi utama (Daftar / Dashboard) berwarna kontras (`bg-sky-600 text-white font-bold`) dengan ikon putih stroke tebal.
+     - Menambahkan padding bawah mobile `pb-28 sm:pb-20` pada `<main>` agar footer tidak tertutup floating dock saat di-scroll ke paling bawah.
+  3. Verifikasi: 115 tests passed 100%, Vite build clean, commit & push sukses.
 - 2026-09-14: Penyempurnaan Formulir Pendaftaran Mandiri (/daftar), Profil Anggota, dan Penyesuaian Tokoh Resmi:
   1. Tab 1 Formulir Pendaftaran: Label `Kecamatan (Cabang)` disederhanakan menjadi `Kecamatan` saja.
   2. Tab 3 Kemuhammadiyahan:

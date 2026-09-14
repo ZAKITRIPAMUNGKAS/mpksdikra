@@ -42,6 +42,24 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-14: Audit dan Debugging Komprehensif Seluruh Sistem:
+  1. Perbaikan Hierarki DOM & Alpine.js:
+     - Ditemukan dan diperbaiki 2 extra tag penutup `</div></div>` pada `resources/views/components/pasfoto-fitter.blade.php` yang sebelumnya memutus scope Alpine `registrationForm()` dan `pasfotoFitter()` sehingga memicu ReferenceError (`modalOpen`, `rawImageSrc`, `scale`, `tab`, `isSubmitting`).
+     - Seluruh file Blade (100%) dipindai dan diverifikasi: keseimbangan tag `<div>`, `<form>`, dan `<template>` kini 100% simetris (termasuk penambahan closing div yang kurang pada `admin/anggota/index.blade.php` dan `landing/index.blade.php`).
+  2. Dropdown Bertingkat & Hierarki Wilayah Karanganyar:
+     - Dropdown bertingkat 17 Kecamatan dan Desa/Kelurahan se-Kabupaten Karanganyar diurutkan secara hierarki logis yang benar: Kabupaten (fixed Karanganyar) -> Kecamatan -> Desa/Kelurahan.
+     - Judul halaman `/daftar` disesuaikan menjadi "Daftar Anggota Muhammadiyah".
+     - Menghilangkan banner pemulihan draf yang redundant ("double info") sehingga status draf terpusat ringkas pada badge auto-save.
+  3. Manajemen Akun Admin Cabang & Daerah:
+     - Menambahkan role `admin_cabang` dan kolom `pcm` pada tabel `users`.
+     - Dibuatkan 17 akun Admin Cabang per PCM dengan username murni nama kecamatan (misal: `tawangmangu`, `colomadu`, `jaten`) tanpa karakter `@` maupun domain, dengan password disamakan `cabangjra` (disertai toleransi typo `cabangkra`).
+     - 1 akun Admin Daerah PDM Karanganyar dengan username `admin` dan password `AdminPDM@25`.
+  4. Verifikasi Total:
+     - 103 automated tests lulus 100% (361 assertions).
+     - Code style Pint (`vendor/bin/pint --test`) passed 100%.
+     - Vite production build (`npm run build`) sukses tanpa warning/error.
+     - Log aplikasi bersih dari runtime error.
+
 - 2026-09-14: Perombakan Komprehensif UI/UX Seluruh Formulir untuk Kader Senior / Lansia (Usia 40–70+):
   1. Standar Desain Aksesibilitas Lansia:
      - Seluruh input teks, dropdown, radio, dan tombol form ditingkatkan ke ukuran minimum ergonomis (`min-h-[50px]` hingga `min-h-[56px]`, `py-3.5` hingga `py-4`, `px-4`).

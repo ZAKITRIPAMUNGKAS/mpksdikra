@@ -12,7 +12,7 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    public const ROLES = ['admin', 'anggota', 'fasilitator', 'executive'];
+    public const ROLES = ['admin', 'admin_cabang', 'anggota', 'fasilitator', 'executive'];
 
     protected $fillable = [
         'name',
@@ -22,6 +22,7 @@ class User extends Authenticatable
         'status',
         'no_wa',
         'verified_at',
+        'pcm',
     ];
 
     protected $hidden = [
@@ -40,7 +41,17 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
+        return in_array($this->role, ['admin', 'admin_cabang']);
+    }
+
+    public function isAdminDaerah(): bool
+    {
         return $this->role === 'admin';
+    }
+
+    public function isAdminCabang(): bool
+    {
+        return $this->role === 'admin_cabang';
     }
 
     public function isAnggota(): bool

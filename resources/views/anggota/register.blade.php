@@ -479,41 +479,29 @@
                 </div>
 
                 {{-- Dropdown Bertingkat: Kabupaten (fixed) → Kecamatan → Desa/Kelurahan --}}
-                <div x-data="{
-                    wilayah: @js(config('arqam.opsi_form.wilayah_karanganyar')),
-                    kecamatan: '{{ old('kecamatan') }}',
-                    desa: '{{ old('desa_kelurahan') }}',
-                    get desaList() {
-                        return this.kecamatan && this.wilayah[this.kecamatan] ? this.wilayah[this.kecamatan] : [];
-                    },
-                    onKecamatanChange() {
-                        this.desa = '';
-                        this.$dispatch('clear-error-kecamatan');
-                        this.$dispatch('clear-error-desa');
-                    }
-                }" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
 
                     {{-- Desa / Kelurahan --}}
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                             Desa / Kelurahan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
-                        <select name="desa_kelurahan" x-model="desa" required
+                        <select name="desa_kelurahan" x-model="selectedDesa" required
                             @change="clearError('desa_kelurahan')"
-                            :disabled="!kecamatan"
+                            :disabled="!selectedKecamatan"
                             :class="clientErrors.desa_kelurahan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('desa_kelurahan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                             aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
                             <option value="">-- Pilih Desa/Kelurahan --</option>
                             <template x-for="d in desaList" :key="d">
-                                <option :value="d" :selected="d === desa" x-text="d"></option>
+                                <option :value="d" :selected="d === selectedDesa" x-text="d"></option>
                             </template>
                         </select>
                         <template x-if="clientErrors.desa_kelurahan">
                             <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.desa_kelurahan"></p>
                         </template>
                         @error('desa_kelurahan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
-                        <p class="text-xs text-slate-400 mt-1" x-show="!kecamatan">Pilih kecamatan terlebih dahulu</p>
+                        <p class="text-xs text-slate-400 mt-1" x-show="!selectedKecamatan">Pilih kecamatan terlebih dahulu</p>
                     </div>
 
                     {{-- Kecamatan --}}
@@ -521,7 +509,7 @@
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                             Kecamatan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
-                        <select name="kecamatan" x-model="kecamatan" required
+                        <select name="kecamatan" x-model="selectedKecamatan" required
                             @change="onKecamatanChange(); clearError('kecamatan')"
                             :class="clientErrors.kecamatan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('kecamatan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]"
@@ -1238,6 +1226,18 @@ function registrationForm() {
         // Reactive selections for Muhammadiyah & Ortom
         checkedMuhammadiyah: {{ \Illuminate\Support\Js::from(old('keaktifan_muhammadiyah', [])) }},
         checkedOrtom: {{ \Illuminate\Support\Js::from(old('keaktifan_ortom', [])) }},
+
+        // Dropdown bertingkat wilayah Karanganyar
+        wilayahData: @js(config('arqam.opsi_form.wilayah_karanganyar')),
+        selectedKecamatan: {{ \Illuminate\Support\Js::from(old('kecamatan', '')) }},
+        selectedDesa: {{ \Illuminate\Support\Js::from(old('desa_kelurahan', '')) }},
+        get desaList() {
+            return this.selectedKecamatan && this.wilayahData[this.selectedKecamatan]
+                ? this.wilayahData[this.selectedKecamatan] : [];
+        },
+        onKecamatanChange() {
+            this.selectedDesa = '';
+        },
 
         toggleMuhammadiyah(val, isChecked) {
             if (val === 'Tidak aktif') {

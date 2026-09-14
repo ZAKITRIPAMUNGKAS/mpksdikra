@@ -750,7 +750,7 @@
                         <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
                     </div>
                     <p class="text-xs sm:text-sm text-slate-500 mb-2.5">Sentuh lembaga ZIS tempat biasa Bapak/Ibu menyalurkan zakat/infaq:</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         @foreach(config('arqam.opsi_form.lembaga_zis') as $v)
                         <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-slate-800 p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40 bg-white cursor-pointer select-none transition min-h-[50px] shadow-2xs">
                             <input type="checkbox" name="lembaga_zis[]" value="{{ $v }}"
@@ -761,14 +761,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between gap-4 pt-5 border-t border-slate-200">
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('diri')"
-                        class="min-h-[50px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('org')"
-                        class="min-h-[50px] sm:min-h-[54px] px-7 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
+                        class="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] px-6 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
                         <span>Lanjut: Data Organisasi</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -915,14 +915,14 @@
                         class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                 </div>
 
-                <div class="flex items-center justify-between gap-4 pt-5 border-t border-slate-200">
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
-                        class="min-h-[50px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('kemasyarakatan')"
-                        class="min-h-[50px] sm:min-h-[54px] px-7 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
+                        class="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] px-6 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
                         <span>Lanjut: Kemasyarakatan</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -1226,14 +1226,14 @@
                 </div>
 
                 {{-- Action Buttons --}}
-                <div class="flex items-center justify-between gap-3 pt-5 border-t-2 border-slate-200">
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t-2 border-slate-200">
                     <button type="button" @click="goTo('org')"
-                        class="min-h-[52px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition flex items-center justify-center gap-2 text-sm sm:text-base shrink-0">
+                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition flex items-center justify-center gap-2 text-sm sm:text-base">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="submit" :disabled="isSubmitting"
-                        class="min-h-[54px] sm:min-h-[58px] px-8 sm:px-10 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-2.5 whitespace-nowrap">
+                        class="w-full sm:w-auto min-h-[52px] sm:min-h-[58px] px-8 sm:px-10 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
                         <template x-if="isSubmitting">
                             <span class="flex items-center gap-2.5">
                                 <svg class="w-5 h-5 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

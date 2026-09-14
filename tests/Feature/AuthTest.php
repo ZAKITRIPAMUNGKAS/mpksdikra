@@ -162,5 +162,9 @@ class AuthTest extends TestCase
         ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($adminCabang);
+
+        // Verifikasi tidak 403 saat mengakses dashboard admin dan master anggota
+        $this->get(route('admin.dashboard'))->assertOk();
+        $this->get(route('admin.anggota.index'))->assertOk();
     }
 }

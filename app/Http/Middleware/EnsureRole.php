@@ -12,7 +12,17 @@ class EnsureRole
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role, $roles, true)) {
+        if (! $user) {
+            abort(403);
+        }
+
+        // Jika rute mengizinkan role 'admin', maka 'admin_cabang' juga termasuk admin
+        $allowedRoles = $roles;
+        if (in_array('admin', $roles, true) && ! in_array('admin_cabang', $roles, true)) {
+            $allowedRoles[] = 'admin_cabang';
+        }
+
+        if (! in_array($user->role, $allowedRoles, true)) {
             abort(403);
         }
 

@@ -167,4 +167,28 @@ class AuthTest extends TestCase
         $this->get(route('admin.dashboard'))->assertOk();
         $this->get(route('admin.anggota.index'))->assertOk();
     }
+
+    public function test_login_admin_daerah_using_admin_and_official_password_with_autosync(): void
+    {
+        // 1. Uji saat database kosong dari user 'admin', sistem otomatis meng-autentikasi dan membuat akun admin daerah
+        $this->post('/login', [
+            'login' => 'admin',
+            'password' => 'AdminPDM@25',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticated();
+        $user = auth()->user();
+        $this->assertTrue($user->isAdmin());
+        $this->assertEquals('aktif', $user->status);
+
+        auth()->logout();
+
+        // 2. Uji saat akun admin daerah sudah ada di database, login tetap berhasil 100%
+        $this->post('/login', [
+            'login' => 'admin',
+            'password' => 'AdminPDM@25',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+    }
 }

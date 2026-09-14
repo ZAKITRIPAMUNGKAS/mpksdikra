@@ -42,19 +42,22 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
-- 2026-09-15: Penempatan Ringkasan Statistik Demografi & Kemasjidan Kader Paling Atas Sebelum Grafik di Dashboard Admin:
-  1. Agregasi Data Demografi & Kemasjidan (`DashboardController`):
-     - Menghitung profesi/pekerjaan dominan, jumlah kader, dan persentase dari total anggota (`$pekerjaanDominan`, `$pekerjaanDominanCount`, `$persenPekerjaanDominan`, `$distribusiPekerjaan`).
-     - Menghitung rasio keaktifan sholat di masjid (`$persenSelaluMasjid`, `$selaluMasjidCount`, `$totalResponMasjid`, `$distribusiSholatMasjid`).
-     - Menghitung kepengurusan takmir masjid kader (`$takmirCount`, `$persenTakmir`).
-     - Menghitung tingkat pendidikan dominan dan kelancaran baca Qur'an (`$pendidikanDominan`, `$distribusiPendidikan`, `$persenQuranLancar`).
-     - Data otomatis terfilter per PCM untuk Admin Cabang (`admin_cabang`), dan teragregasi se-Kabupaten Karanganyar untuk Admin Daerah (`admin`).
-  2. Penataan Visual Dashboard (`admin.dashboard`):
-     - Menempatkan 4 Kartu Metrik Ringkas (Kebanyakan Profesi, Aktif di Masjid 5 Waktu, Pengurus Takmir, Pendidikan Terbanyak & Kemampuan Baca Qur'an) tepat di baris atas sebelum grafik tren pendaftaran kader.
-     - Menyediakan 2 kartu detail di bawah grafik: Visualisasi Progress Bar Top Profesi/Pekerjaan Kader dan Rincian Distribusi Keaktifan Sholat di Masjid serta Chips Jenjang Pendidikan Terakhir.
-  3. Verifikasi:
-     - 116 unit & feature tests lolos 100% (455 assertions).
-     - Laravel Pint clean, Vite production build sukses.
+- 2026-09-15: Penyederhanaan Dashboard Admin (Anti "Bento Overload" & Tetap Informatif 100%):
+  1. Penataan Ulang Menjadi 4 Kartu KPI & Profil Terpadu (Baris Atas):
+     - Memangkas tumpukan 8 bento box terpisah menjadi hanya 1 baris (4 kartu ringkas, padat makna, dan glanceable):
+       * Card 1: Total Kader Terdata, status aktif, pertumbuhan bulanan, dan mini dual-bar komposisi Gender (L/P).
+       * Card 2: Status Verifikasi Akun Pendaftaran (antrean pending, aksi tinjau, dan cakupan PCM/Daerah).
+       * Card 3: Aktivitas Kemasjidan (% rutin sholat 5 waktu di masjid, jumlah kader, dan % pengurus takmir).
+       * Card 4: Kebanyakan Profesi & Pendidikan (nama profesi dominan, persentase, kader terdata, pendidikan dominan, dan kelancaran baca Qur'an).
+  2. Integrasi Visual Analytics Menjadi 2 Panel Utama Berdampingan (Baris Tengah):
+     - Panel Kiri (7 Kolom): Tren Pendaftaran Kader (Line Chart 6 bulan) terintegrasi langsung dengan Horizontal Multi-Color Progress Bar status akun (Aktif, Menunggu, Ditolak, Nonaktif), mengeliminasi kebutuhan bento doughnut chart terpisah.
+     - Panel Kanan (5 Kolom): Panel Terpadu "Rincian Demografi & Kemasjidan" yang merangkum Top 4 Pekerjaan Kader, Intensitas Sholat Berjamaah, dan Chips Jenjang Pendidikan Terakhir dalam satu wadah elegan.
+  3. Hasil:
+     - Mengeliminasi lebih dari 50% kotak bento (dari 12+ kotak menjadi 4 kartu atas + 2 panel tengah + seksi operasional).
+     - Seluruh data demografi, kemasjidan, dan administrasi tetap 100% terbaca dengan jelas, responsif, dan rapi.
+     - 116 automated tests lulus 100% (455 assertions).
+
+
 
 
 - 2026-09-14: Implementasi Formulir Riwayat Pendidikan Bertingkat (Pendidikan Terakhir -> Rincian Sekolah/PT):

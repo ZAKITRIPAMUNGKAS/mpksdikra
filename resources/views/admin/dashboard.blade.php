@@ -82,36 +82,51 @@
     </div>
     @endif
 
-    {{-- 3. KPI Metric Grid (Simetris, Rapi & Mobile-Friendly) --}}
+    @php
+        $pctL = $totalAnggota > 0 ? round(($genderL / $totalAnggota) * 100) : 0;
+        $pctP = $totalAnggota > 0 ? (100 - $pctL) : 0;
+        $pctAktif = $totalAnggota > 0 ? round(($statusCounts['aktif'] / $totalAnggota) * 100) : 0;
+        $pctMenunggu = $totalAnggota > 0 ? round(($statusCounts['menunggu'] / $totalAnggota) * 100) : 0;
+        $pctDitolak = $totalAnggota > 0 ? round(($statusCounts['ditolak'] / $totalAnggota) * 100) : 0;
+        $pctNonaktif = $totalAnggota > 0 ? round(($statusCounts['nonaktif'] / $totalAnggota) * 100) : 0;
+    @endphp
+
+    {{-- 3. Ringkasan Utama: 4 Kartu KPI & Profil Dominan (Padat, Jelas, & Terbaca Seketika) --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {{-- Card 1: Total Kader --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+        {{-- Card 1: Total Kader & Gender --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition">
             <div>
-                <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                    {{ $isCabang ? 'Kader Cabang' : 'Total Kader' }}
-                </span>
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
+                        {{ $isCabang ? 'Kader Cabang' : 'Total Kader' }}
+                    </span>
+                    <span class="font-bold text-[#005c8a] bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                        +{{ $monthlyData[5] ?? 0 }} Bln Ini
+                    </span>
+                </div>
                 <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
                     <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums leading-none">{{ $totalAnggota }}</span>
                     <span class="text-xs text-slate-500 font-medium">Kader</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1 text-xs">
-                <span class="inline-flex items-center gap-1 font-medium text-slate-600 truncate text-[11px] sm:text-xs">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                    <span>{{ $statusCounts['aktif'] }} Aktif</span>
-                </span>
-                <span class="font-bold text-[#005c8a] bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
-                    +{{ $monthlyData[5] ?? 0 }} Bln Ini
-                </span>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1">
+                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 font-medium">
+                    <span class="truncate">Gender: <strong class="text-slate-700">{{ $pctL }}% L</strong> / <strong class="text-slate-700">{{ $pctP }}% P</strong></span>
+                    <span class="tabular-nums text-slate-400 text-[10px] shrink-0">{{ $genderL }}L / {{ $genderP }}P</span>
+                </div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
+                    <div style="width: {{ $pctL }}%;" class="bg-[#005c8a] h-full" title="Laki-laki: {{ $pctL }}%"></div>
+                    <div style="width: {{ $pctP }}%;" class="bg-rose-400 h-full" title="Perempuan: {{ $pctP }}%"></div>
+                </div>
             </div>
         </div>
 
-        {{-- Card 2: Menunggu Verifikasi --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+        {{-- Card 2: Status Verifikasi Pendaftaran --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition">
             <div>
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-[11px] sm:text-xs font-bold {{ $pendingAnggota > 0 ? 'text-amber-700' : 'text-slate-400' }} uppercase tracking-wider block truncate">
-                        Verifikasi
+                        Verifikasi Akun
                     </span>
                     @if($pendingAnggota > 0)
                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
@@ -122,10 +137,10 @@
                     <span class="text-xs text-slate-500 font-medium">Antrean</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100">
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs gap-1">
                 @if($pendingAnggota > 0)
-                    <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-amber-700 hover:text-amber-900 font-bold text-[11px] sm:text-xs inline-flex items-center gap-1 truncate w-full">
-                        <span>Tinjau Antrean</span>
+                    <a href="{{ route('admin.anggota.index', ['status' => 'menunggu_verifikasi']) }}" class="text-amber-700 hover:text-amber-900 font-bold text-[11px] sm:text-xs inline-flex items-center gap-1 truncate">
+                        <span>Tinjau Berkas</span>
                         <span>&rarr;</span>
                     </a>
                 @else
@@ -134,383 +149,215 @@
                         <span class="truncate">Semua Terverifikasi</span>
                     </div>
                 @endif
+                <span class="text-slate-400 text-[10px] sm:text-[11px] font-medium truncate shrink-0">
+                    {{ $isCabang ? ('PCM ' . $cabangNama) : ($totalEvents . ' Event BA') }}
+                </span>
             </div>
         </div>
 
-        @if($isCabang)
-            {{-- Card 3 (Cabang): Komposisi Gender --}}
-            @php
-                $pctL = $totalAnggota > 0 ? round(($genderL / $totalAnggota) * 100) : 0;
-                $pctP = $totalAnggota > 0 ? (100 - $pctL) : 0;
-            @endphp
-            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        Gender
-                    </span>
-                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2 font-black text-slate-900 leading-none">
-                        <span class="text-2xl sm:text-3xl tabular-nums">{{ $genderL }}</span>
-                        <span class="text-xs text-slate-500 font-medium">L</span>
-                        <span class="text-slate-300 font-normal">/</span>
-                        <span class="text-2xl sm:text-3xl tabular-nums">{{ $genderP }}</span>
-                        <span class="text-xs text-slate-500 font-medium">P</span>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1">
-                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
-                        <div style="width: {{ $pctL }}%;" class="bg-[#005c8a] h-full" title="Laki-laki: {{ $pctL }}%"></div>
-                        <div style="width: {{ $pctP }}%;" class="bg-rose-400 h-full" title="Perempuan: {{ $pctP }}%"></div>
-                    </div>
-                    <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 font-medium pt-0.5">
-                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-[#005c8a] shrink-0"></span> {{ $pctL }}% L</span>
-                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span> {{ $pctP }}% P</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Card 4 (Cabang): Desa / Kelurahan Terdata --}}
-            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        Ranting / Desa
-                    </span>
-                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
-                        <span class="text-2xl sm:text-3xl font-black text-[#005c8a] tracking-tight tabular-nums leading-none">{{ $topKecamatan->count() }}</span>
-                        <span class="text-xs text-slate-500 font-medium">Wilayah</span>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 gap-1">
-                    <span class="truncate text-[11px] sm:text-xs font-medium text-slate-700">PCM {{ $cabangNama }}</span>
-                    <span class="font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
-                        Aktif
-                    </span>
-                </div>
-            </div>
-        @else
-            {{-- Card 3 (Daerah): Event BA Aktif --}}
-            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">Event Baitul Arqam</span>
-                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
-                        <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums leading-none">{{ $activeEvents }}</span>
-                        <span class="text-xs text-slate-500 font-medium">Event Aktif</span>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                    <span>{{ $completedEvents }} Selesai</span>
-                    <span class="font-semibold text-slate-700">{{ $totalEvents }} Total</span>
-                </div>
-            </div>
-
-            {{-- Card 4 (Daerah): Kelulusan Perkaderan --}}
-            <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">Kelulusan</span>
-                    <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
-                        <span class="text-2xl sm:text-3xl font-black text-[#005c8a] tracking-tight tabular-nums leading-none">{{ $persenKelulusan }}%</span>
-                        <span class="text-xs text-slate-500 font-medium">({{ $totalLulus }} Lulus)</span>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                    <span>Rerata NA: <strong class="text-slate-700 font-bold">{{ $avgNilaiAkhir ? number_format($avgNilaiAkhir, 1) : '—' }}</strong></span>
-                    <span class="text-slate-400 text-[10px]">Skala 100</span>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    {{-- HIGHLIGHT DEMOGRAFI & KEMASJIDAN KADER (Info Paling Atas Bersama Sebelum Grafik) --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {{-- Card 1: Kebanyakan Profesi / Pekerjaan --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-sky-300 transition group">
-            <div>
-                <div class="flex items-center justify-between gap-1">
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        Kebanyakan Profesi
-                    </span>
-                    <span class="w-2 h-2 rounded-full bg-sky-500 shrink-0"></span>
-                </div>
-                <div class="mt-1.5 sm:mt-2">
-                    <span class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight block truncate" title="{{ $pekerjaanDominan }}">
-                        {{ $pekerjaanDominan }}
-                    </span>
-                    <span class="text-xs text-slate-500 font-medium block mt-1">
-                        {{ $pekerjaanDominanCount }} Kader ({{ $persenPekerjaanDominan }}%)
-                    </span>
-                </div>
-            </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                <span class="truncate">Profesi Terbanyak</span>
-                <span class="font-bold text-[#005c8a] shrink-0">{{ $distribusiPekerjaan->count() }} Kategori</span>
-            </div>
-        </div>
-
-        {{-- Card 2: Aktif di Masjid --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition group">
+        {{-- Card 3: Aktivitas Kemasjidan & Takmir --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition">
             <div>
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
                         Aktif di Masjid
                     </span>
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span class="font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                        {{ $persenSelaluMasjid }}% Rutin
+                    </span>
                 </div>
                 <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
-                    <span class="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight tabular-nums leading-none">
-                        {{ $persenSelaluMasjid }}%
-                    </span>
-                    <span class="text-xs text-slate-500 font-medium">Rutin</span>
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight tabular-nums leading-none">{{ $selaluMasjidCount }}</span>
+                    <span class="text-xs text-slate-500 font-medium">Sholat 5 Waktu</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                <span class="truncate">{{ $selaluMasjidCount }} Sholat di Masjid</span>
-                <span class="font-bold text-emerald-700 shrink-0">5 Waktu</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500 gap-1">
+                <span class="truncate"><strong class="text-slate-800 font-semibold">{{ $persenTakmir }}%</strong> Pengurus Takmir</span>
+                <span class="text-[10px] text-slate-400 shrink-0">({{ $takmirCount }} Kader)</span>
             </div>
         </div>
 
-        {{-- Card 3: Takmir Masjid --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-indigo-300 transition group">
+        {{-- Card 4: Kebanyakan Profesi & Pendidikan --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-sky-300 transition">
             <div>
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        Pengurus Takmir
+                        Kebanyakan Profesi
                     </span>
-                    <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
-                </div>
-                <div class="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
-                    <span class="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight tabular-nums leading-none">
-                        {{ $persenTakmir }}%
+                    <span class="font-bold text-[#005c8a] bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                        {{ $persenPekerjaanDominan }}%
                     </span>
-                    <span class="text-xs text-slate-500 font-medium">Takmir</span>
-                </div>
-            </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                <span class="truncate">{{ $takmirCount }} Pengurus Aktif</span>
-                <span class="font-bold text-indigo-700 shrink-0">Amanah</span>
-            </div>
-        </div>
-
-        {{-- Card 4: Pendidikan Terbanyak & Al-Qur'an --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between hover:border-amber-300 transition group">
-            <div>
-                <div class="flex items-center justify-between gap-1">
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        Pendidikan Terbanyak
-                    </span>
-                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
                 </div>
                 <div class="mt-1.5 sm:mt-2">
-                    <span class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight block truncate">
-                        {{ $pendidikanDominan }}
+                    <span class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight block truncate" title="{{ $pekerjaanDominan }}">
+                        {{ $pekerjaanDominan }}
                     </span>
-                    <span class="text-xs text-amber-700 font-semibold block mt-1">
-                        {{ $persenQuranLancar }}% Baca Qur'an Lancar
+                    <span class="text-[11px] sm:text-xs text-slate-500 font-medium block mt-0.5">
+                        {{ $pekerjaanDominanCount }} Kader Terdata
                     </span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
-                <span class="truncate">Tingkat Dominan</span>
-                <span class="font-bold text-slate-700 shrink-0">{{ $distribusiPendidikan->count() }} Jenjang</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500 gap-1">
+                <span class="truncate">Pendidikan: <strong class="text-slate-800">{{ $pendidikanDominan }}</strong></span>
+                <span class="text-emerald-700 font-semibold text-[10px] sm:text-[11px] shrink-0">{{ $persenQuranLancar }}% Qur'an</span>
             </div>
         </div>
     </div>
 
-    {{-- 4. Visual Analytics & Tren Perkaderan --}}
+    {{-- 4. Bagian Visual Analytics & Demografi Terpadu (Hanya 2 Panel Berdampingan - Simple & Bersih) --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-        {{-- Grafik Tren Pendaftaran Kader --}}
-        <div class="lg:col-span-8 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between"
+        {{-- Panel Kiri (7 Kolom): Tren Pertumbuhan Pendaftaran & Status Akun --}}
+        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between"
              x-data="growthChartData(@js($monthlyLabels), @js($monthlyData))"
              x-init="initChart()">
             <div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
                     <div>
                         <h2 class="text-base font-bold text-slate-900 tracking-tight">Tren Pendaftaran Kader</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Statistik pendaftaran mandiri kader 6 bulan terakhir</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Statistik pertumbuhan anggota mandiri 6 bulan terakhir</p>
                     </div>
                     <div class="text-xs text-slate-500 font-medium">
-                        Total Pendaftar: <strong class="text-slate-800">{{ $totalAnggota }}</strong>
+                        Total 6 Bulan: <strong class="text-slate-800">{{ array_sum($monthlyData) }} Kader</strong>
                     </div>
                 </div>
 
-                {{-- Canvas Area --}}
-                <div class="mt-4 relative h-48 sm:h-64 w-full">
+                {{-- Canvas Line Chart --}}
+                <div class="mt-4 relative h-48 sm:h-56 w-full">
                     <canvas x-ref="growthCanvas"></canvas>
                 </div>
             </div>
 
-            {{-- Tren Highlight Metrics --}}
-            <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-[#005c8a]"></span>
-                    <span>Total 6 Bulan: <strong class="text-slate-900 font-semibold">{{ array_sum($monthlyData) }} Kader</strong></span>
+            {{-- Ringkasan Status Akun Terintegrasi (Horizontal Status Bar) --}}
+            <div class="mt-4 pt-3.5 border-t border-slate-100">
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
+                    <span>Proporsi Status Pendaftaran Kader</span>
+                    <span class="text-slate-400 font-normal text-[11px]">{{ $totalAnggota }} Total Terdaftar</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-slate-300 hidden sm:inline">&bull;</span>
-                    <span>Bulan Ini: <strong class="text-[#005c8a] font-semibold">+{{ $monthlyData[5] ?? 0 }} Baru</strong></span>
+                
+                {{-- Horizontal Multi-Color Progress Bar --}}
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden flex shadow-2xs">
+                    <div style="width: {{ $pctAktif }}%;" class="bg-[#005c8a] h-full" title="Aktif: {{ $statusCounts['aktif'] }} ({{ $pctAktif }}%)"></div>
+                    <div style="width: {{ $pctMenunggu }}%;" class="bg-[#f8bb00] h-full" title="Menunggu: {{ $statusCounts['menunggu'] }} ({{ $pctMenunggu }}%)"></div>
+                    <div style="width: {{ $pctDitolak }}%;" class="bg-[#e11d48] h-full" title="Ditolak: {{ $statusCounts['ditolak'] }} ({{ $pctDitolak }}%)"></div>
+                    <div style="width: {{ $pctNonaktif }}%;" class="bg-slate-300 h-full" title="Nonaktif: {{ $statusCounts['nonaktif'] }} ({{ $pctNonaktif }}%)"></div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-slate-300 hidden sm:inline">&bull;</span>
-                    <span>Kelulusan Rata-rata: <strong class="text-slate-900 font-semibold">{{ $avgNilaiAkhir ? number_format($avgNilaiAkhir, 1) : '—' }}</strong></span>
+
+                {{-- Legend Row --}}
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#005c8a] shrink-0"></span>
+                        <span class="text-slate-600 truncate">Aktif: <strong class="text-slate-900 font-bold">{{ $statusCounts['aktif'] }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#f8bb00] shrink-0"></span>
+                        <span class="text-slate-600 truncate">Menunggu: <strong class="{{ $pendingAnggota > 0 ? 'text-amber-700' : 'text-slate-900' }} font-bold">{{ $statusCounts['menunggu'] }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#e11d48] shrink-0"></span>
+                        <span class="text-slate-600 truncate">Ditolak: <strong class="text-slate-900 font-bold">{{ $statusCounts['ditolak'] }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
+                        <span class="text-slate-600 truncate">Nonaktif: <strong class="text-slate-900 font-bold">{{ $statusCounts['nonaktif'] }}</strong></span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Grafik Distribusi Status Pendaftaran --}}
-        <div class="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between"
-             x-data="statusChartData(@js(array_values($statusCounts)))"
-             x-init="initChart()">
-            <div>
-                <div class="pb-4 border-b border-slate-100">
-                    <h2 class="text-base font-bold text-slate-900 tracking-tight">Status Pendaftaran</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Proporsi verifikasi akun anggota</p>
-                </div>
-
-                {{-- Canvas Doughnut --}}
-                <div class="mt-4 relative h-40 sm:h-48 w-full flex items-center justify-center">
-                    <canvas x-ref="statusCanvas"></canvas>
-                </div>
-            </div>
-
-            {{-- Legend List --}}
-            <div class="mt-4 pt-3.5 border-t border-slate-100 space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="inline-flex items-center gap-2 text-slate-600 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-[#005c8a]"></span>
-                        <span>Aktif Terverifikasi</span>
-                    </span>
-                    <span class="font-semibold text-slate-900 tabular-nums">{{ $statusCounts['aktif'] }} <span class="text-xs font-normal text-slate-400">({{ $totalAnggota > 0 ? round(($statusCounts['aktif'] / $totalAnggota) * 100) : 0 }}%)</span></span>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                    <span class="inline-flex items-center gap-2 text-slate-600 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-[#f8bb00]"></span>
-                        <span>Menunggu Verifikasi</span>
-                    </span>
-                    <span class="font-semibold {{ $pendingAnggota > 0 ? 'text-amber-700' : 'text-slate-900' }} tabular-nums">{{ $statusCounts['menunggu'] }} <span class="text-xs font-normal text-slate-400">({{ $totalAnggota > 0 ? round(($statusCounts['menunggu'] / $totalAnggota) * 100) : 0 }}%)</span></span>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                    <span class="inline-flex items-center gap-2 text-slate-600 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-[#e11d48]"></span>
-                        <span>Ditolak / Revisi</span>
-                    </span>
-                    <span class="font-semibold text-slate-900 tabular-nums">{{ $statusCounts['ditolak'] }}</span>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                    <span class="inline-flex items-center gap-2 text-slate-600 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
-                        <span>Nonaktif</span>
-                    </span>
-                    <span class="font-semibold text-slate-900 tabular-nums">{{ $statusCounts['nonaktif'] }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- 4B. RINCIAN SEBARAN PROFESI & KEMASJIDAN KADER --}}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-        {{-- Card 1: Distribusi Pekerjaan / Profesi Kader --}}
-        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        {{-- Panel Kanan (5 Kolom): Panel Terpadu Profil Demografi, Kemasjidan & Pendidikan --}}
+        <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+            <div class="space-y-4">
+                {{-- Header Panel --}}
+                <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-slate-900 text-base tracking-tight">Sebaran Profesi &amp; Pekerjaan Kader</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Bidang pengabdian dan profesi kader {{ $isCabang ? ('di PCM ' . $cabangNama) : 'se-Kabupaten Karanganyar' }}</p>
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Rincian Demografi &amp; Kemasjidan</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Sebaran profesi, sholat jamaah, &amp; latar pendidikan</p>
                     </div>
-                    <span class="text-xs font-semibold text-slate-400">Top Profesi</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#005c8a] bg-sky-50 border border-sky-100 px-2 py-0.5 rounded">Profil</span>
                 </div>
 
-                <div class="mt-4 space-y-3.5">
-                    @forelse($distribusiPekerjaan as $pek)
-                    @php
-                        $persenPek = $totalAnggota > 0 ? round(($pek->total / $totalAnggota) * 100, 1) : 0;
-                    @endphp
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-semibold text-slate-800">{{ $pek->pekerjaan }}</span>
-                            <span class="font-medium text-slate-600 tabular-nums">
-                                {{ $pek->total }} Kader 
-                                <span class="text-slate-400 text-[11px]">({{ $persenPek }}%)</span>
-                            </span>
-                        </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-sky-600 to-[#005c8a] rounded-full transition-all duration-500" style="width: {{ max($persenPek, 4) }}%;"></div>
-                        </div>
+                {{-- Seksi 1: Sebaran Profesi Teratas --}}
+                <div>
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Sebaran Pekerjaan Kader</span>
+                        <span class="text-slate-400 text-[11px]">{{ $distribusiPekerjaan->count() }} Kategori</span>
                     </div>
-                    @empty
-                    <div class="py-8 text-center text-slate-400 text-xs">
-                        <p class="font-semibold text-slate-600">Belum ada data pekerjaan terisi</p>
-                        <p class="text-slate-400 mt-0.5">Data profesi akan terhimpun otomatis saat kader mengisi biodata.</p>
+                    <div class="space-y-2">
+                        @forelse($distribusiPekerjaan->take(4) as $pek)
+                        @php
+                            $persenPek = $totalAnggota > 0 ? round(($pek->total / $totalAnggota) * 100, 1) : 0;
+                        @endphp
+                        <div>
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="font-medium text-slate-700 truncate max-w-[170px]">{{ $pek->pekerjaan }}</span>
+                                <span class="font-semibold text-slate-800 tabular-nums text-[11px]">
+                                    {{ $pek->total }} <span class="text-slate-400 font-normal">({{ $persenPek }}%)</span>
+                                </span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-sky-600 to-[#005c8a] rounded-full" style="width: {{ max($persenPek, 4) }}%;"></div>
+                            </div>
+                        </div>
+                        @empty
+                        <p class="text-xs text-slate-400 py-1">Belum ada data pekerjaan.</p>
+                        @endforelse
                     </div>
-                    @endforelse
                 </div>
-            </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Total Profesi Unik: <strong class="text-slate-800">{{ $distribusiPekerjaan->count() }} Kategori</strong></span>
-                <span class="text-slate-400 text-[11px]">Update Real-Time</span>
-            </div>
-        </div>
-
-        {{-- Card 2: Aktivitas Sholat di Masjid & Pendidikan Terakhir --}}
-        <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
-            <div>
-                {{-- Sub-Seksi 1: Keaktifan Sholat Berjamaah di Masjid --}}
-                <div class="pb-3 border-b border-slate-100">
-                    <div class="flex items-center justify-between mb-1">
-                        <h3 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Aktivitas Sholat Berjamaah di Masjid</h3>
-                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                            {{ $persenSelaluMasjid }}% Rutin Masjid
-                        </span>
+                {{-- Seksi 2: Sholat Berjamaah di Masjid --}}
+                <div class="pt-3 border-t border-slate-100">
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Sholat Berjamaah di Masjid</span>
+                        <span class="text-emerald-700 font-semibold text-[11px]">{{ $persenSelaluMasjid }}% Rutin 5 Waktu</span>
                     </div>
-                    <p class="text-xs text-slate-500">Intensitas kehadiran kader dalam sholat berjamaah di masjid/musholla</p>
-
-                    <div class="mt-3.5 space-y-2.5">
-                        @forelse($distribusiSholatMasjid as $shl)
+                    <div class="space-y-2">
+                        @forelse($distribusiSholatMasjid->take(3) as $shl)
                         @php
                             $persenShl = $totalResponMasjid > 0 ? round(($shl->total / $totalResponMasjid) * 100, 1) : 0;
                             $barColor = str_contains($shl->aktivitas_sholat_masjid, 'Selalu') ? 'bg-emerald-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Sering') ? 'bg-sky-600' : (str_contains($shl->aktivitas_sholat_masjid, 'Kadang') ? 'bg-amber-500' : 'bg-slate-400'));
                         @endphp
                         <div>
                             <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="font-medium text-slate-700 truncate max-w-[240px]">{{ $shl->aktivitas_sholat_masjid }}</span>
-                                <span class="font-semibold text-slate-800 tabular-nums">
-                                    {{ $shl->total }} <span class="font-normal text-slate-400 text-[11px]">({{ $persenShl }}%)</span>
+                                <span class="font-medium text-slate-700 truncate max-w-[170px]">{{ $shl->aktivitas_sholat_masjid }}</span>
+                                <span class="font-semibold text-slate-800 tabular-nums text-[11px]">
+                                    {{ $shl->total }} <span class="text-slate-400 font-normal">({{ $persenShl }}%)</span>
                                 </span>
                             </div>
                             <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full {{ $barColor }} rounded-full" style="width: {{ max($persenShl, 3) }}%;"></div>
+                                <div class="h-full {{ $barColor }} rounded-full" style="width: {{ max($persenShl, 4) }}%;"></div>
                             </div>
                         </div>
                         @empty
-                        <p class="text-xs text-slate-400 text-center py-2">Belum ada data keaktifan sholat.</p>
+                        <p class="text-xs text-slate-400 py-1">Belum ada data keaktifan sholat.</p>
                         @endforelse
                     </div>
                 </div>
 
-                {{-- Sub-Seksi 2: Distribusi Jenjang Pendidikan Terakhir --}}
-                <div class="pt-4">
-                    <div class="flex items-center justify-between mb-1">
-                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Jenjang Pendidikan Terakhir</h4>
-                        <span class="text-xs text-slate-400 font-medium">Latar Belakang Formal</span>
+                {{-- Seksi 3: Jenjang Pendidikan Terakhir --}}
+                <div class="pt-3 border-t border-slate-100">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                        <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Jenjang Pendidikan</span>
+                        <span class="text-slate-400 text-[11px]">Formal</span>
                     </div>
-                    <div class="flex flex-wrap gap-2 mt-2.5">
+                    <div class="flex flex-wrap gap-1.5">
                         @forelse($distribusiPendidikan as $pdd)
                         @php
                             $persenPdd = $totalAnggota > 0 ? round(($pdd->total / $totalAnggota) * 100) : 0;
                         @endphp
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200/90 hover:border-sky-200 transition text-xs shadow-2xs">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200/80 text-[11px] text-slate-700">
                             <span class="font-bold text-slate-800">{{ $pdd->pendidikan_terakhir }}</span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                            <span class="font-medium text-slate-600 tabular-nums">{{ $pdd->total }} <span class="text-slate-400 text-[10px]">({{ $persenPdd }}%)</span></span>
-                        </div>
+                            <span class="text-slate-400 text-[10px]">({{ $pdd->total }})</span>
+                        </span>
                         @empty
-                        <span class="text-xs text-slate-400">Belum ada data pendidikan.</span>
+                        <span class="text-xs text-slate-400">Belum ada data.</span>
                         @endforelse
                     </div>
                 </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Respons Kemasjidan: <strong class="text-slate-800">{{ $totalResponMasjid }} / {{ $totalAnggota }} Kader</strong></span>
-                <span class="text-slate-400 text-[11px]">Standar Tarjih &amp; MPKSDI</span>
+            <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span>Respon: <strong class="text-slate-700">{{ $totalResponMasjid }}</strong> / {{ $totalAnggota }} Kader</span>
+                <span class="text-slate-400 text-[10px]">Standar MPKSDI</span>
             </div>
         </div>
     </div>

@@ -10,11 +10,20 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-950 to-[#005c8a] border border-sky-400/80 flex items-center justify-center text-[#f8bb00] text-xl font-bold shadow-2xs">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
+                @if(auth()->user()->anggota)
+                    <div class="w-14 h-18 sm:w-16 sm:h-20 rounded-xl overflow-hidden border-2 border-sky-400 shadow-sm shrink-0 bg-slate-100">
+                        <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" 
+                             alt="Pasfoto {{ auth()->user()->name }}" 
+                             class="w-full h-full object-cover object-top"
+                             loading="eager">
+                    </div>
+                @else
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-slate-950 to-[#005c8a] border border-sky-400/80 flex items-center justify-center text-[#f8bb00] text-xl font-bold shadow-2xs shrink-0">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                @endif
                 <div>
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
                         <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ auth()->user()->name }}</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>

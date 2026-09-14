@@ -278,9 +278,13 @@
         <div class="p-3 border-t border-slate-200/80 bg-slate-50/80">
             <div class="flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2.5 min-w-0 overflow-hidden">
-                    <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
+                    @if(auth()->user()->anggota?->foto)
+                        <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0">
+                    @else
+                        <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </div>
+                    @endif
                     <div class="min-w-0 transition-opacity duration-200" :class="{ 'lg:hidden': sidebarCollapsed }">
                         <p class="text-xs font-semibold text-slate-900 truncate leading-tight">{{ auth()->user()->name }}</p>
                         <p class="text-xs text-slate-500 truncate">
@@ -359,9 +363,13 @@
 
                         @auth
                             <div class="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-                                <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shadow-2xs">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                </div>
+                                @if(auth()->user()->anggota?->foto)
+                                    <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0">
+                                @else
+                                    <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shadow-2xs shrink-0">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
                                 <div class="hidden sm:block text-left leading-tight">
                                     <span class="text-xs font-bold text-slate-800 block truncate max-w-[140px]">{{ auth()->user()->name }}</span>
                                     <span class="text-xs text-slate-500 block truncate max-w-[140px]">

@@ -14,8 +14,10 @@ class FotoController extends Controller
     {
         $user = auth()->user();
 
-        $canView = $user->isAdmin()
+        $canView = $user->isAdminDaerah()
             || $user->isExecutive()
+            || $user->isFasilitator()
+            || ($user->isAdminCabang() && (empty($user->pcm) || strcasecmp(trim($user->pcm), trim($anggota->pcm ?? '')) === 0))
             || ($user->anggota && (int) $user->anggota->id === (int) $anggota->id);
 
         abort_unless($canView, 403, 'Akses foto tidak diizinkan.');

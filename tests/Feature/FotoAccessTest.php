@@ -36,5 +36,18 @@ class FotoAccessTest extends TestCase
         $this->actingAs($u2)
             ->get(route('foto.anggota', $a1))
             ->assertForbidden();
+
+        // Branch admin can access member in their branch
+        $a1->update(['pcm' => 'Tawangmangu']);
+        $adminCabangSame = User::factory()->create(['role' => 'admin_cabang', 'status' => 'aktif', 'pcm' => 'Tawangmangu']);
+        $adminCabangOther = User::factory()->create(['role' => 'admin_cabang', 'status' => 'aktif', 'pcm' => 'Colomadu']);
+
+        $this->actingAs($adminCabangSame)
+            ->get(route('foto.anggota', $a1))
+            ->assertOk();
+
+        $this->actingAs($adminCabangOther)
+            ->get(route('foto.anggota', $a1))
+            ->assertForbidden();
     }
 }

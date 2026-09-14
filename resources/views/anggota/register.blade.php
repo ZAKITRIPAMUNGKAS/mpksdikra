@@ -551,33 +551,7 @@
                     @enderror
                 </div>
 
-                {{-- Informasi Pembuatan Akun Otomatis (Sangat Ramah Kader Senior) --}}
-                <div class="p-5 sm:p-6 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold text-2xl shadow-xs">
-                        <span aria-hidden="true">🔑</span>
-                    </div>
-                    <div class="space-y-2 flex-1">
-                        <h4 class="text-base sm:text-lg font-extrabold text-amber-950 tracking-tight">Akun Masuk Portal Dibuat Otomatis</h4>
-                        <p class="text-xs sm:text-sm text-amber-900 leading-relaxed font-normal">
-                            Bapak/Ibu <strong>tidak perlu membuat kata sandi baru</strong>. Setelah pendaftaran disetujui admin, akses masuk portal kader adalah:
-                        </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
-                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Username:</span>
-                                <strong class="text-slate-900 font-mono text-sm sm:text-base block mt-0.5">Nomor WhatsApp / HP</strong>
-                                <span class="text-xs text-slate-500 block mt-0.5">Sesuai nomor yang diisikan di atas</span>
-                            </div>
-                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
-                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Kata Sandi (Password):</span>
-                                <strong class="text-slate-900 text-sm sm:text-base block mt-0.5">Tanggal Lahir Anda</strong>
-                                <span class="text-xs text-slate-500 block mt-0.5">8 Digit Angka: DDMMYYYY</span>
-                            </div>
-                        </div>
-                        <p class="text-xs sm:text-sm text-amber-900/90 font-medium pt-1">
-                            💡 <em>Contoh: Jika tanggal lahir Bapak/Ibu <strong>17 Agustus 1985</strong>, kata sandi login adalah <strong>17081985</strong>.</em>
-                        </p>
-                    </div>
-                </div>
+
 
                 <div class="flex items-center justify-end pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
@@ -1117,7 +1091,36 @@
                     </div>
                 </div>
 
+                {{-- Informasi Pembuatan Akun Otomatis (Sangat Ramah Kader Senior) --}}
+                <div class="p-5 sm:p-6 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold text-2xl shadow-xs">
+                        <span aria-hidden="true">🔑</span>
+                    </div>
+                    <div class="space-y-2 flex-1">
+                        <h4 class="text-base sm:text-lg font-extrabold text-amber-950 tracking-tight">Akun Masuk Portal Dibuat Otomatis</h4>
+                        <p class="text-xs sm:text-sm text-amber-900 leading-relaxed font-normal">
+                            Bapak/Ibu <strong>tidak perlu membuat kata sandi baru</strong>. Setelah pendaftaran disetujui admin, akses masuk portal kader adalah:
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
+                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Username:</span>
+                                <strong class="text-slate-900 font-mono text-sm sm:text-base block mt-0.5">Nomor WhatsApp / HP</strong>
+                                <span class="text-xs text-slate-500 block mt-0.5">Sesuai nomor yang diisikan di Tab 1</span>
+                            </div>
+                            <div class="bg-white border-2 border-amber-200 rounded-xl p-3.5 shadow-2xs">
+                                <span class="text-slate-500 block text-xs font-bold uppercase tracking-wider">Kata Sandi (Password):</span>
+                                <strong class="text-slate-900 text-sm sm:text-base block mt-0.5">Tanggal Lahir Anda</strong>
+                                <span class="text-xs text-slate-500 block mt-0.5">8 Digit Angka: DDMMYYYY</span>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-amber-900/90 font-medium pt-1">
+                            <span aria-hidden="true">💡</span> <em>Contoh: Jika tanggal lahir Bapak/Ibu <strong>17 Agustus 1985</strong>, kata sandi login adalah <strong>17081985</strong>.</em>
+                        </p>
+                    </div>
+                </div>
+
                 {{-- Kotak Konfirmasi Pengiriman --}}
+
                 <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 flex items-start gap-3.5">
                     <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 font-black text-sm">
                         ✓

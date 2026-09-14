@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\TokenMismatchException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+        $exceptions->render(function (TokenMismatchException $e, $request) {
             return redirect()->back()
                 ->withInput($request->except('password', 'password_confirmation', '_token'))
                 ->with('error', 'Sesi halaman telah kadaluarsa karena didiamkan. Halaman telah disegarkan otomatis, silakan coba login kembali.');

@@ -109,6 +109,58 @@ class DashboardController extends Controller
             ->limit(5)
             ->get() : collect();
 
+        // 9. Statistik Profil & Demografi Database Kader (Pekerjaan, Kemasjidan, Pendidikan, Al-Qur'an)
+        $distribusiPekerjaan = (clone $anggotaQuery)
+            ->select('pekerjaan', DB::raw('count(*) as total'))
+            ->whereNotNull('pekerjaan')
+            ->where('pekerjaan', '!=', '')
+            ->groupBy('pekerjaan')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get();
+
+        $distribusiSholatMasjid = (clone $anggotaQuery)
+            ->select('aktivitas_sholat_masjid', DB::raw('count(*) as total'))
+            ->whereNotNull('aktivitas_sholat_masjid')
+            ->where('aktivitas_sholat_masjid', '!=', '')
+            ->groupBy('aktivitas_sholat_masjid')
+            ->orderByDesc('total')
+            ->get();
+
+        $totalResponMasjid = $distribusiSholatMasjid->sum('total');
+        $selaluMasjidCount = (clone $anggotaQuery)
+            ->where('aktivitas_sholat_masjid', 'like', '%Selalu%')
+            ->count();
+        $persenSelaluMasjid = $totalResponMasjid > 0 ? round(($selaluMasjidCount / $totalResponMasjid) * 100) : 0;
+
+        $takmirCount = (clone $anggotaQuery)
+            ->where(function ($q) {
+                $q->where('keaktifan_takmir', 'Ya')
+                    ->orWhere(function ($sub) {
+                        $sub->whereNotNull('jabatan_takmir')->where('jabatan_takmir', '!=', '');
+                    });
+            })->count();
+        $persenTakmir = $totalAnggota > 0 ? round(($takmirCount / $totalAnggota) * 100) : 0;
+
+        $distribusiPendidikan = (clone $anggotaQuery)
+            ->select('pendidikan_terakhir', DB::raw('count(*) as total'))
+            ->whereNotNull('pendidikan_terakhir')
+            ->where('pendidikan_terakhir', '!=', '')
+            ->groupBy('pendidikan_terakhir')
+            ->orderByDesc('total')
+            ->get();
+
+        $pendidikanDominan = $distribusiPendidikan->first()?->pendidikan_terakhir ?? '-';
+
+        $totalResponQuran = (clone $anggotaQuery)
+            ->whereNotNull('kemampuan_baca_quran')
+            ->where('kemampuan_baca_quran', '!=', '')
+            ->count();
+        $quranLancarCount = (clone $anggotaQuery)
+            ->where('kemampuan_baca_quran', 'like', '%Lancar%')
+            ->count();
+        $persenQuranLancar = $totalResponQuran > 0 ? round(($quranLancarCount / $totalResponQuran) * 100) : 0;
+
         return view('admin.dashboard', [
             'isCabang' => $isCabang,
             'cabangNama' => $pcm,
@@ -130,6 +182,16 @@ class DashboardController extends Controller
             'recentEvents' => $recentEvents,
             'latestPending' => $latestPending,
             'latestAktif' => $latestAktif,
+            'distribusiPekerjaan' => $distribusiPekerjaan,
+            'distribusiSholatMasjid' => $distribusiSholatMasjid,
+            'totalResponMasjid' => $totalResponMasjid,
+            'selaluMasjidCount' => $selaluMasjidCount,
+            'persenSelaluMasjid' => $persenSelaluMasjid,
+            'takmirCount' => $takmirCount,
+            'persenTakmir' => $persenTakmir,
+            'distribusiPendidikan' => $distribusiPendidikan,
+            'pendidikanDominan' => $pendidikanDominan,
+            'persenQuranLancar' => $persenQuranLancar,
         ]);
     }
 }

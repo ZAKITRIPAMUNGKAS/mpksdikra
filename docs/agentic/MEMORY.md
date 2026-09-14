@@ -51,7 +51,9 @@ Pola berguna dari referensi:
      - Akses rute `/admin/users*`, `/admin/events/create`, dan `/admin/anggota/import` dibatasi ketat khusus `role:admin` (Admin Daerah). Akses ditolak (403 Forbidden) jika diakses `admin_cabang`.
      - Scoping pangkalan data kader di `AnggotaController`: Admin Cabang hanya dapat melihat, menyetujui (verifikasi), menolak pendaftaran (dengan catatan perbaikan), dan mereset kata sandi anggota di wilayah PCM-nya saja. Upaya manipulasi kader di luar PCM otomatis di-abort (403).
   3. Fitur Ekspor Data Anggota ke Excel (.xlsx):
-     - Dibuatkan class `App\Exports\AnggotaExport` dan view template `resources/views/exports/anggota.blade.php` dengan styling resmi navy-gold khas MPKSDI PDM Karanganyar.
+     - Dibuatkan class `App\Exports\AnggotaExport` dan view template `resources/views/exports/anggota.blade.php` dengan styling resmi navy khas MPKSDI PDM Karanganyar.
+     - Memuat SELURUH 43 atribut data formulir pendaftaran anggota (Tab 1 Data Diri, Tab 2 Keagamaan, Tab 3 Kemuhammadiyahan/Organisasi, Tab 4 Kemasjidan & Harapan, plus status administrasi).
+     - Dilengkapi grup header kategori bertingkat, format apostrof aman untuk NIK/NBM/No WA agar tidak berubah menjadi notasi ilmiah/kehilangan nol, perapian array string (bahasa, ZIS, sumber info), dan pemetaan jabatan organisasi & ortom terstruktur.
      - Tombol "Unduh Data Cabang" terintegrasi langsung di dashboard dan pangkalan data kader.
   4. Optimasi Responsif Kartu KPI Dashboard di Layar Mobile:
      - Mengatasi masalah teks bertumpuk/berdempetan ("PendaftarSemua", "50% Laki-50% Perempuan", "+4 Bulan Ini") di tampilan 2 kolom mobile.

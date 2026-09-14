@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exports\AnggotaExport;
 use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -121,5 +122,94 @@ class AdminAnggotaTest extends TestCase
             ->assertSee('Guru SMA Muhammadiyah 1')
             ->assertSee('Ketua Majelis')
             ->assertSee('Sekretaris');
+    }
+
+    public function test_admin_export_excel_renders_all_form_fields_completely(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif', 'email' => 'kader@test.com']);
+        $anggota = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Ahmad Dahlan Putra',
+            'nik' => '3313020101900001',
+            'nbm' => '1234567',
+            'no_wa' => '081234567890',
+            'jenis_kelamin' => 'L',
+            'tempat_lahir' => 'Karanganyar',
+            'tanggal_lahir' => '1990-01-01',
+            'status_pernikahan' => 'Nikah',
+            'alamat_rumah' => 'Jl. Lawu No. 10',
+            'desa_kelurahan' => 'Lalung',
+            'kecamatan' => 'Karanganyar',
+            'pcm' => 'Karanganyar',
+            'prm' => 'Lalung',
+            'kabupaten' => 'Karanganyar',
+            'pekerjaan' => 'PNS',
+            'jabatan_aum' => 'Guru SD',
+            'pendidikan_sd' => 'SD Muhammadiyah 1',
+            'bahasa_dikuasai' => ['Bahasa Indonesia', 'Bahasa Arab'],
+            'kemampuan_baca_quran' => 'Lancar dan fasih',
+            'hafalan_quran' => '1 juz',
+            'aktivitas_sholat_masjid' => 'Selalu sholat 5 waktu di masjid',
+            'aktivitas_kajian_agama' => 'Seminggu lebih dari 3x',
+            'jumlah_buku_agama' => 'Lebih dari 20 judul buku',
+            'sumber_info_muhammadiyah' => ['Kajian yang diikuti', 'Buku yang dibaca'],
+            'langganan_suara_muhammadiyah' => 'Rutin beli',
+            'lembaga_zis' => ['LAZISMU'],
+            'tokoh_berpengaruh' => 'K.H. Ahmad Dahlan',
+            'alasan_pilih_tokoh' => 'Inspirasi dakwah pencerahan',
+            'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah'],
+            'jabatan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah' => 'Ketua'],
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'jabatan_ortom' => ['Pemuda Muhammadiyah' => 'Ketua'],
+            'organisasi_lain' => 'Ketua Karang Taruna',
+            'aktifitas_jamaah_masjid' => 'Imam rawatib',
+            'keaktifan_takmir' => 'Ya',
+            'jabatan_takmir' => 'Ketua Takmir',
+            'keaktifan_kemasyarakatan' => 'Ketua RT 02',
+            'harapan_pcm' => 'PCM lebih masif mengadakan pengkaderan',
+            'harapan_ba' => 'Baitul Arqam terselenggara rutin',
+            'catatan_verifikasi' => 'Data lengkap terverifikasi',
+        ]);
+
+        $export = new AnggotaExport(collect([$anggota]));
+        $html = $export->view()->render();
+
+        // Verifikasi Header Grup Kategori
+        $this->assertStringContainsString('ADMINISTRASI SISTEM', $html);
+        $this->assertStringContainsString('IDENTITAS &amp; KONTAK PRIBADI', $html);
+        $this->assertStringContainsString('DOMISILI &amp; WILAYAH', $html);
+        $this->assertStringContainsString('PROFESI &amp; PENDIDIKAN', $html);
+        $this->assertStringContainsString('PROFIL KEAGAMAAN &amp; LITERASI', $html);
+        $this->assertStringContainsString('KEMUHAMMADIYAHAN &amp; ORTOM', $html);
+        $this->assertStringContainsString('KEMASJIDAN, SOSIAL &amp; HARAPAN', $html);
+        $this->assertStringContainsString('CATATAN', $html);
+
+        // Verifikasi Kolom dan Nilai Lengkap Formulir
+        $this->assertStringContainsString('Ahmad Dahlan Putra', $html);
+        $this->assertStringContainsString("'3313020101900001", $html);
+        $this->assertStringContainsString("'1234567", $html);
+        $this->assertStringContainsString("'081234567890", $html);
+        $this->assertStringContainsString('kader@test.com', $html);
+        $this->assertStringContainsString('SD Muhammadiyah 1', $html);
+        $this->assertStringContainsString('Bahasa Indonesia, Bahasa Arab', $html);
+        $this->assertStringContainsString('Lancar dan fasih', $html);
+        $this->assertStringContainsString('1 juz', $html);
+        $this->assertStringContainsString('Selalu sholat 5 waktu di masjid', $html);
+        $this->assertStringContainsString('Seminggu lebih dari 3x', $html);
+        $this->assertStringContainsString('Lebih dari 20 judul buku', $html);
+        $this->assertStringContainsString('Kajian yang diikuti, Buku yang dibaca', $html);
+        $this->assertStringContainsString('Rutin beli', $html);
+        $this->assertStringContainsString('LAZISMU', $html);
+        $this->assertStringContainsString('K.H. Ahmad Dahlan', $html);
+        $this->assertStringContainsString('Inspirasi dakwah pencerahan', $html);
+        $this->assertStringContainsString('Pimpinan Cabang Muhammadiyah (Ketua)', $html);
+        $this->assertStringContainsString('Pemuda Muhammadiyah (Ketua)', $html);
+        $this->assertStringContainsString('Ketua Karang Taruna', $html);
+        $this->assertStringContainsString('Imam rawatib', $html);
+        $this->assertStringContainsString('Ketua Takmir', $html);
+        $this->assertStringContainsString('Ketua RT 02', $html);
+        $this->assertStringContainsString('PCM lebih masif mengadakan pengkaderan', $html);
+        $this->assertStringContainsString('Baitul Arqam terselenggara rutin', $html);
+        $this->assertStringContainsString('Data lengkap terverifikasi', $html);
     }
 }

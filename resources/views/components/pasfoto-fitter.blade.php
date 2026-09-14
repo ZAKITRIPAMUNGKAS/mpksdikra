@@ -140,8 +140,6 @@
             </template>
         </div>
     </div>
-        </div>
-    </div>
 
     {{-- MODAL ATUR MANUAL (HANYA MUNCUL JIKA USER KLIK "ATUR MANUAL") --}}
     <div x-show="modalOpen" x-cloak

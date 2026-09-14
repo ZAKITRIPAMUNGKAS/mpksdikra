@@ -42,20 +42,20 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
-- 2026-09-15: Penyederhanaan Dashboard Admin (Anti "Bento Overload" & Tetap Informatif 100%):
-  1. Penataan Ulang Menjadi 4 Kartu KPI & Profil Terpadu (Baris Atas):
-     - Memangkas tumpukan 8 bento box terpisah menjadi hanya 1 baris (4 kartu ringkas, padat makna, dan glanceable):
-       * Card 1: Total Kader Terdata, status aktif, pertumbuhan bulanan, dan mini dual-bar komposisi Gender (L/P).
-       * Card 2: Status Verifikasi Akun Pendaftaran (antrean pending, aksi tinjau, dan cakupan PCM/Daerah).
-       * Card 3: Aktivitas Kemasjidan (% rutin sholat 5 waktu di masjid, jumlah kader, dan % pengurus takmir).
-       * Card 4: Kebanyakan Profesi & Pendidikan (nama profesi dominan, persentase, kader terdata, pendidikan dominan, dan kelancaran baca Qur'an).
-  2. Integrasi Visual Analytics Menjadi 2 Panel Utama Berdampingan (Baris Tengah):
-     - Panel Kiri (7 Kolom): Tren Pendaftaran Kader (Line Chart 6 bulan) terintegrasi langsung dengan Horizontal Multi-Color Progress Bar status akun (Aktif, Menunggu, Ditolak, Nonaktif), mengeliminasi kebutuhan bento doughnut chart terpisah.
-     - Panel Kanan (5 Kolom): Panel Terpadu "Rincian Demografi & Kemasjidan" yang merangkum Top 4 Pekerjaan Kader, Intensitas Sholat Berjamaah, dan Chips Jenjang Pendidikan Terakhir dalam satu wadah elegan.
-  3. Hasil:
-     - Mengeliminasi lebih dari 50% kotak bento (dari 12+ kotak menjadi 4 kartu atas + 2 panel tengah + seksi operasional).
-     - Seluruh data demografi, kemasjidan, dan administrasi tetap 100% terbaca dengan jelas, responsif, dan rapi.
-     - 116 automated tests lulus 100% (455 assertions).
+- 2026-09-15: Rilis Resmi Versi 2.3.0 & Perapian Tampilan Username Kader:
+  1. Penjelasan & Penanganan Awalan 62 pada Username:
+     - Nomor WhatsApp dinormalisasi ke format internasional E.164 (`628xxx`) di database untuk integrasi API WhatsApp Gateway.
+     - Login fleksibel: `LoginController` mendukung input nomor HP baik dengan awalan `08`, `62`, maupun `+62` tanpa batasan.
+     - UI kartu pendaftaran (`register.blade.php`) dan pesan notifikasi WA (`WhatsAppNotificationService`) kini menampilkan format lokal ramah `08xxxxxxxxxx` (serta alternatif `62xxxxxxxxxx`) dengan keterangan bahwa kedua awalan sama-sama valid untuk masuk portal.
+  2. Pembaruan Halaman Pusat Informasi Sistem (`/updates`):
+     - Memperbarui rilis stabil resmi ke `Versi 2.3.0 Stable` (15 September 2026).
+     - Menambahkan catatan komprehensif v2.3.0: Panel 17 Admin Cabang (PCM), Ekspor Data Excel 47 Atribut, Dashboard Analitik Terpadu & Anti Bento Overload, Desain Form Aksesibilitas Lansia (40-70+ thn), dan Penanganan Sesi Kedaluwarsa.
+     - Footer layout diperbarui ke `Pembaruan v2.3`.
+  3. Verifikasi:
+     - 116 unit & feature tests lolos 100% (456 assertions).
+     - Laravel Pint clean, Vite production build sukses.
+
+
 
 
 

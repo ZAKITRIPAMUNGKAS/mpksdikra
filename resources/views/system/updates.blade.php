@@ -12,13 +12,13 @@
             <div class="flex items-center gap-2.5 flex-wrap mb-3">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#005c8a] text-white shadow-2xs">
                     <svg class="w-3.5 h-3.5 text-[#f8bb00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span>Versi 2.2.0 Stable</span>
+                    <span>Versi 2.3.0 Stable</span>
                 </span>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
                     Sistem Beroperasi Normal
                 </span>
-                <span class="text-xs text-slate-500">Rilis: 12 September 2026</span>
+                <span class="text-xs text-slate-500">Rilis: 15 September 2026</span>
             </div>
 
             <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
@@ -60,20 +60,76 @@
             </a>
         </div>
 
-        {{-- Versi 2.2.0 (Terbaru) --}}
+        {{-- Versi 2.3.0 (Terbaru) --}}
         <div class="bg-white rounded-xl border border-sky-200/80 p-5 sm:p-6 shadow-2xs relative overflow-hidden">
             <div class="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-bl-full pointer-events-none -z-0"></div>
             
             <div class="relative z-10">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
                     <div class="flex items-center gap-2.5 flex-wrap">
-                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#005c8a] text-white">v2.2.0</span>
-                        <h3 class="font-bold text-slate-900 text-base">Linear Minimalist, Fixed Viewport Sidebar &amp; Pusat Dokumentasi</h3>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#005c8a] text-white">v2.3.0</span>
+                        <h3 class="font-bold text-slate-900 text-base">Multi-Cabang (17 PCM), Analitik Demografi &amp; Kemasjidan Terpadu, serta Aksesibilitas Lansia</h3>
                     </div>
-                    <span class="text-xs font-medium text-slate-400">12 September 2026</span>
+                    <span class="text-xs font-medium text-slate-400">15 September 2026</span>
                 </div>
 
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {{-- Multi-Cabang & Ekspor --}}
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-200/60">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-[#005c8a]"></span>
+                            <h4 class="font-bold text-slate-900 text-xs">Multi-Cabang &amp; Ekspor Data</h4>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>Hak akses terisolasi untuk 17 Admin Cabang (PCM) se-Karanganyar.</li>
+                            <li>Login instan nama kecamatan langsung tanpa karakter khusus (`colomadu`, `jaten`, dll).</li>
+                            <li>Ekspor data pangkalan kader cabang ke Excel (.xlsx) dengan 47 atribut komprehensif.</li>
+                            <li>Persetujuan dan penolakan berkas terverifikasi khusus wilayah masing-masing PCM.</li>
+                        </ul>
+                    </div>
+
+                    {{-- Analitik Demografi Terpadu --}}
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-200/60">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                            <h4 class="font-bold text-slate-900 text-xs">Analitik Demografi Terpadu</h4>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>4 Kartu KPI &amp; Profil Utama di baris atas (Kader &amp; Gender, Verifikasi, Kemasjidan, Profesi Dominan).</li>
+                            <li>Visual Analytics 2-Panel tanpa bento overload: Tren 6 bulan + Horizontal Status Bar dan Panel Demografi.</li>
+                            <li>Agregasi real-time: profesi dominan kader, % sholat 5 waktu di masjid, dan rasio pengurus takmir.</li>
+                            <li>Filter dinamis se-Kabupaten untuk PDM dan per-wilayah untuk PCM.</li>
+                        </ul>
+                    </div>
+
+                    {{-- Ergonomi Lansia & Keandalan --}}
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-200/60">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <h4 class="font-bold text-slate-900 text-xs">Ergonomi Lansia &amp; Keandalan</h4>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>Desain form ergonomis untuk kader senior (usia 40–70+ thn): input 50-56px dan kontras tinggi.</li>
+                            <li>Riwayat pendidikan bertingkat dinamis (SD, SMP, SMA, S1/S2/S3).</li>
+                            <li>Login fleksibel multi-format: awalan `08`, `62`, maupun `+62` otomatis dikenali.</li>
+                            <li>Penanganan sesi kedaluwarsa (*Graceful CSRF 419 token recovery*) &amp; HTTPS proxy cPanel.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Versi 2.2.0 --}}
+        <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">v2.2.0</span>
+                    <h3 class="font-bold text-slate-900 text-base">Linear Minimalist, Fixed Viewport Sidebar &amp; Pusat Dokumentasi</h3>
+                </div>
+                <span class="text-xs font-medium text-slate-400">12 September 2026</span>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                     {{-- Visual & Layout --}}
                     <div class="p-4 rounded-lg bg-slate-50 border border-slate-200/60">
                         <div class="flex items-center gap-2 mb-2">

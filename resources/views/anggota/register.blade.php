@@ -93,7 +93,7 @@
                         </div>
                         <div>
                             <span class="text-slate-400 block text-[11px]">Nomor WhatsApp:</span>
-                            <span class="font-mono font-bold text-slate-800">{{ $regData['no_wa'] ?? '-' }}</span>
+                            <span class="font-mono font-bold text-slate-800">{{ $regData['no_wa_display'] ?? ($regData['no_wa'] ?? '-') }}</span>
                         </div>
                         @if(!empty($regData['kecamatan']))
                         <div>
@@ -122,23 +122,26 @@
                     </div>
 
                     {{-- Informasi Akun Login Kader --}}
-                    <div class="mt-4 p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-xl text-xs space-y-1 text-left">
+                    <div class="mt-4 p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-xl text-xs space-y-1.5 text-left">
                         <div class="font-bold text-amber-900 flex items-center gap-1.5">
                             <span aria-hidden="true">🔑</span>
                             <span>Akses Masuk Portal Kader (Setelah Diverifikasi Admin):</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 pt-1">
-                            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/80">
+                            <div class="bg-white/90 p-2.5 rounded-lg border border-amber-200/80">
                                 <span class="text-slate-500 block text-[10px]">Username:</span>
-                                <strong class="font-mono text-slate-900 text-xs">{{ $regData['username'] ?? ($regData['no_wa'] ?? '-') }}</strong>
-                                <span class="text-[10px] text-slate-400 block mt-0.5">(Nomor WhatsApp)</span>
+                                <strong class="font-mono text-slate-900 text-xs">{{ $regData['username'] ?? ($regData['no_wa_display'] ?? ($regData['no_wa'] ?? '-')) }}</strong>
+                                <span class="text-[10px] text-slate-500 block mt-0.5">(Bisa ketik <strong>{{ $regData['username'] ?? '08...' }}</strong> atau <strong>{{ $regData['username_alt'] ?? '62...' }}</strong>)</span>
                             </div>
-                            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/80">
+                            <div class="bg-white/90 p-2.5 rounded-lg border border-amber-200/80">
                                 <span class="text-slate-500 block text-[10px]">Kata Sandi:</span>
                                 <strong class="font-mono text-slate-900 text-xs">{{ $regData['password_default'] ?? 'Tanggal Lahir Anda' }}</strong>
-                                <span class="text-[10px] text-slate-400 block mt-0.5">(Format: DDMMYYYY)</span>
+                                <span class="text-[10px] text-slate-500 block mt-0.5">(Format: HariBulanTahun, misal: 17081995)</span>
                             </div>
                         </div>
+                        <p class="text-[11px] text-amber-900/80 pt-1 leading-normal">
+                            💡 <em>Catatan: Sistem mendukung login dengan nomor WhatsApp awalan <strong>08</strong> maupun <strong>62</strong> secara otomatis.</em>
+                        </p>
                     </div>
                 </div>
                 @endif

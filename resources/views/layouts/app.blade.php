@@ -421,7 +421,7 @@
                     <div class="flex items-center gap-2 text-xs">
                         <a href="{{ route('panduan') }}" class="hover:text-[#005c8a] font-medium transition">Panduan Sistem</a>
                         <span class="text-slate-300">&bull;</span>
-                        <a href="{{ route('updates') }}" class="hover:text-[#005c8a] font-medium transition">Pembaruan v2.2</a>
+                        <a href="{{ route('updates') }}" class="hover:text-[#005c8a] font-medium transition">Pembaruan v2.3</a>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">

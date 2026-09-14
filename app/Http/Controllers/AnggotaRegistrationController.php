@@ -51,17 +51,21 @@ class AnggotaRegistrationController extends Controller
             Anggota::create($anggotaData);
         });
 
+        $noWaDisplay = str_starts_with($noWa, '62') ? ('0'.substr($noWa, 2)) : $noWa;
+
         return redirect()->route('anggota.register')
             ->with('success', 'Pendaftaran berhasil dikirim. Anda telah terdaftar dan akun menunggu verifikasi data oleh tim admin MPKSDI.')
             ->with('registered_data', [
                 'nama' => $data['nama_lengkap'],
                 'nik' => $data['nik'],
                 'no_wa' => $noWa,
+                'no_wa_display' => $noWaDisplay,
                 'email' => $data['email'] ?? null,
                 'kecamatan' => $data['kecamatan'] ?? null,
                 'pcm' => $data['pcm'] ?? null,
                 'prm' => $data['prm'] ?? null,
-                'username' => $noWa,
+                'username' => $noWaDisplay,
+                'username_alt' => $noWa,
                 'password_default' => Carbon::parse($data['tanggal_lahir'])->format('dmY'),
             ]);
     }

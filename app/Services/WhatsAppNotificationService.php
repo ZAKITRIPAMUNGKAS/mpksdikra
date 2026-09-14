@@ -34,6 +34,7 @@ class WhatsAppNotificationService
     {
         $nama = $anggota->nama_lengkap;
         $noWa = $anggota->no_wa ?: '-';
+        $noWaDisplay = str_starts_with($noWa, '62') ? ('0'.substr($noWa, 2)) : $noWa;
         $portalUrl = route('login');
         $sandi = $anggota->tanggal_lahir
             ? Carbon::parse($anggota->tanggal_lahir)->format('dmY')
@@ -45,8 +46,8 @@ class WhatsAppNotificationService
             ."Anda kini dapat masuk ke Portal Kader melalui tautan berikut:\n"
             ."🔗 {$portalUrl}\n\n"
             ."Detail Masuk Portal:\n"
-            ."👤 Username: *{$noWa}* (Nomor HP/WhatsApp)\n"
-            ."🔑 Kata Sandi: *{$sandi}* (Tanggal & Tahun Lahir DDMMYYYY)\n\n"
+            ."👤 Username: *{$noWaDisplay}* (atau *{$noWa}*)\n"
+            ."🔑 Kata Sandi: *{$sandi}* (Format: Tanggal & Tahun Lahir DDMMYYYY)\n\n"
             ."Nashrun Minallah wa Fathun Qarib.\n"
             ."Wassalamu'alaikum Wr. Wb.\n\n"
             .'— *Sekretariat MPKSDI PDM Karanganyar*';
@@ -103,13 +104,14 @@ class WhatsAppNotificationService
     {
         $nama = $anggota->nama_lengkap;
         $noWa = $anggota->no_wa ?: ($anggota->user?->no_wa ?: '-');
+        $noWaDisplay = str_starts_with($noWa, '62') ? ('0'.substr($noWa, 2)) : $noWa;
         $portalUrl = route('login');
 
         return "Assalamu'alaikum Wr. Wb.\n\n"
             ."Yth. Bapak/Ibu *{$nama}*,\n\n"
             ."Kata sandi akun Portal Kader MPKSDI PDM Karanganyar Anda telah di-reset oleh Admin.\n\n"
             ."Detail Akun Masuk Portal:\n"
-            ."👤 Username: *{$noWa}* (Nomor HP/WhatsApp)\n"
+            ."👤 Username: *{$noWaDisplay}* (atau *{$noWa}*)\n"
             ."🔑 Sandi Baru: *{$passwordBaru}* (Tanggal & Tahun Lahir DDMMYYYY)\n\n"
             ."Silakan masuk ke portal melalui tautan berikut:\n"
             ."🔗 {$portalUrl}\n\n"

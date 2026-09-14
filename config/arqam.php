@@ -105,5 +105,78 @@ return [
             'Tasikmadu',
             'Tawangmangu',
         ],
+
+        'wilayah_karanganyar' => [
+            'Colomadu' => [
+                'Bolon', 'Baturan', 'Blulukan', 'Gajahan', 'Gedongan', 'Klodran',
+                'Malangjiwan', 'Paulan', 'Tohudan', 'Wonosari',
+            ],
+            'Gondangrejo' => [
+                'Jeruk', 'Jatikuwung', 'Kaling', 'Karangturi', 'Kragan',
+                'Plesungan', 'Rejosari', 'Selokaton', 'Tuban', 'Wonorejo',
+            ],
+            'Jaten' => [
+                'Brujul', 'Dagen', 'Jaten', 'Jetis', 'Ngringo',
+                'Palur', 'Sroyo', 'Suruhkalang',
+            ],
+            'Jatipuro' => [
+                'Jatipuro', 'Jatiharjo', 'Jatirejo', 'Jatisuko', 'Jatisawit',
+                'Jatiwarno', 'Kwangsan', 'Ngunut',
+            ],
+            'Jatiyoso' => [
+                'Beruk', 'Tlobo', 'Jatiyoso', 'Karangsari', 'Wonokeling',
+                'Wonorejo', 'Wukirsawit',
+            ],
+            'Jenawi' => [
+                'Anggrasmanis', 'Balong', 'Jenawi', 'Lempong', 'Menjing',
+                'Seloromo', 'Sidomukti', 'Trengguli',
+            ],
+            'Jumantono' => [
+                'Blorong', 'Gemantar', 'Genengan', 'Jumantono', 'Kebak',
+                'Ngunut', 'Sedayu', 'Sukosari', 'Tunggulrejo',
+            ],
+            'Jumapolo' => [
+                'Bakalan', 'Giriwondo', 'Jumapolo', 'Kadipiro', 'Karangbangun',
+                'Lemahbang', 'Ploso', 'Polan', 'Sumberejo',
+            ],
+            'Karanganyar' => [
+                'Bejen', 'Bolong', 'Cangakan', 'Delingan', 'Gayamdompo',
+                'Gedong', 'Jantiharjo', 'Jungke', 'Karanganyar', 'Lalung',
+                'Popongan', 'Tegalgede', 'Tegal Sari', 'Waru',
+            ],
+            'Karangpandan' => [
+                'Doplang', 'Harjosari', 'Karangpandan', 'Karang', 'Kedungjeruk',
+                'Ngemplak', 'Salam', 'Tohkuning',
+            ],
+            'Kebakkramat' => [
+                'Banjarharjo', 'Kaliwuluh', 'Kebak', 'Kebakkramat', 'Macanan',
+                'Malanggaten', 'Nangsri', 'Pulosari', 'Sroyo', 'Waru',
+            ],
+            'Kerjo' => [
+                'Botok', 'Gempolan', 'Kaling', 'Karangrejo', 'Kerjo Kidul',
+                'Kerjo Lor', 'Kwadungan', 'Sumberejo', 'Tawangsari',
+            ],
+            'Matesih' => [
+                'Gantiwarno', 'Girilayu', 'Koripan', 'Matesih', 'Ngadiluwih',
+                'Pablengan', 'Plosorejo', 'Salam', 'Sepanjang',
+            ],
+            'Mojogedang' => [
+                'Buntar', 'Gebyok', 'Gentungan', 'Kedungjeruk', 'Krendowahono',
+                'Mojogedang', 'Mojoroto', 'Pereng', 'Sewurejo',
+                'Sidodadi', 'Sidomulyo',
+            ],
+            'Ngargoyoso' => [
+                'Berjo', 'Dukuh', 'Kemuning', 'Ngargoyoso', 'Puntukrejo',
+                'Segorogunung', 'Sendangijo',
+            ],
+            'Tasikmadu' => [
+                'Buran', 'Gaum', 'Kalijirak', 'Karangmojo', 'Ngijo',
+                'Papahan', 'Randusari', 'Suruh', 'Wonolopo',
+            ],
+            'Tawangmangu' => [
+                'Blumbang', 'Gondosuli', 'Karanglo', 'Kalisoro', 'Nglebak',
+                'Plumbon', 'Sepanjang', 'Tawangmangu',
+            ],
+        ],
     ],
 ];

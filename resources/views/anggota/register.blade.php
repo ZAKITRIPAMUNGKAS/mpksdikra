@@ -232,7 +232,7 @@
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
                             Pangkalan Data Kader Persyarikatan
                         </span>
-                        <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Daftar Anggota MPKSDI</h1>
+                        <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Daftar Anggota Muhammadiyah</h1>
                         <p class="text-xs sm:text-sm text-slate-500 mt-0.5 leading-relaxed font-normal">Lengkapi biodata kader secara akurat untuk verifikasi dan kepesertaan Baitul Arqam.</p>
                     </div>
                 </div>
@@ -478,41 +478,76 @@
                     @error('alamat_rumah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                {{-- Dropdown Bertingkat: Kabupaten (fixed) → Kecamatan → Desa/Kelurahan --}}
+                <div x-data="{
+                    wilayah: @js(config('arqam.opsi_form.wilayah_karanganyar')),
+                    kecamatan: '{{ old('kecamatan') }}',
+                    desa: '{{ old('desa_kelurahan') }}',
+                    get desaList() {
+                        return this.kecamatan && this.wilayah[this.kecamatan] ? this.wilayah[this.kecamatan] : [];
+                    },
+                    onKecamatanChange() {
+                        this.desa = '';
+                        this.$dispatch('clear-error-kecamatan');
+                        this.$dispatch('clear-error-desa');
+                    }
+                }" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+
+                    {{-- Desa / Kelurahan --}}
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Desa / Kelurahan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
-                        <input name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" autocomplete="address-level3" required placeholder="Contoh: Papahan"
-                            @input="clearError('desa_kelurahan')"
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Desa / Kelurahan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                        </label>
+                        <select name="desa_kelurahan" x-model="desa" required
+                            @change="clearError('desa_kelurahan')"
+                            :disabled="!kecamatan"
                             :class="clientErrors.desa_kelurahan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('desa_kelurahan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                            aria-invalid="{{ $errors->has('desa_kelurahan') ? 'true' : 'false' }}">
+                            <option value="">-- Pilih Desa/Kelurahan --</option>
+                            <template x-for="d in desaList" :key="d">
+                                <option :value="d" :selected="d === desa" x-text="d"></option>
+                            </template>
+                        </select>
                         <template x-if="clientErrors.desa_kelurahan">
                             <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.desa_kelurahan"></p>
                         </template>
                         @error('desa_kelurahan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
+                        <p class="text-xs text-slate-400 mt-1" x-show="!kecamatan">Pilih kecamatan terlebih dahulu</p>
                     </div>
+
+                    {{-- Kecamatan --}}
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kecamatan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
-                        <input name="kecamatan" value="{{ old('kecamatan') }}" autocomplete="address-level2" required placeholder="Contoh: Tasikmadu / Jaten"
-                            @input="clearError('kecamatan')"
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Kecamatan <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                        </label>
+                        <select name="kecamatan" x-model="kecamatan" required
+                            @change="onKecamatanChange(); clearError('kecamatan')"
                             :class="clientErrors.kecamatan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('kecamatan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('kecamatan') ? 'true' : 'false' }}">
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]"
+                            aria-invalid="{{ $errors->has('kecamatan') ? 'true' : 'false' }}">
+                            <option value="">-- Pilih Kecamatan --</option>
+                            @foreach(array_keys(config('arqam.opsi_form.wilayah_karanganyar')) as $kec)
+                                <option value="{{ $kec }}" {{ old('kecamatan') === $kec ? 'selected' : '' }}>{{ $kec }}</option>
+                            @endforeach
+                        </select>
                         <template x-if="clientErrors.kecamatan">
                             <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.kecamatan"></p>
                         </template>
                         @error('kecamatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+
+                    {{-- Kabupaten (fixed Karanganyar) --}}
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kabupaten <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span></label>
-                        <input name="kabupaten" value="{{ old('kabupaten', 'Karanganyar') }}" autocomplete="address-level1" required
-                            @input="clearError('kabupaten')"
-                            :class="clientErrors.kabupaten ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('kabupaten') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('kabupaten') ? 'true' : 'false' }}">
-                        <template x-if="clientErrors.kabupaten">
-                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.kabupaten"></p>
-                        </template>
-                        @error('kabupaten') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Kabupaten <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                        </label>
+                        <input type="text" name="kabupaten" value="Karanganyar" readonly
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-500 cursor-not-allowed min-h-[50px] sm:min-h-[52px]">
+                        <span class="text-xs text-slate-400 mt-1 block">Khusus anggota Muhammadiyah Kabupaten Karanganyar</span>
                     </div>
                 </div>
+
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
@@ -1582,15 +1617,11 @@ function registrationForm() {
             }
 
             if (!getVal('desa_kelurahan')) {
-                this.clientErrors.desa_kelurahan = 'Desa / Kelurahan wajib diisi.';
+                this.clientErrors.desa_kelurahan = 'Desa / Kelurahan wajib dipilih.';
             }
 
             if (!getVal('kecamatan')) {
-                this.clientErrors.kecamatan = 'Kecamatan wajib diisi.';
-            }
-
-            if (!getVal('kabupaten')) {
-                this.clientErrors.kabupaten = 'Kabupaten wajib diisi.';
+                this.clientErrors.kecamatan = 'Kecamatan wajib dipilih.';
             }
 
             const rawWa = getVal('no_wa');

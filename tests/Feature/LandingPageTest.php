@@ -33,6 +33,6 @@ class LandingPageTest extends TestCase
     {
         $this->get(route('anggota.register'))
             ->assertOk()
-            ->assertSee('Daftar Anggota MPKSDI');
+            ->assertSee('Daftar Anggota Muhammadiyah');
     }
 }

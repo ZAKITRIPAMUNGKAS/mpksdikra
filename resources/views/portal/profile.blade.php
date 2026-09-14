@@ -3,7 +3,28 @@
 @section('title', 'Biodata Kader — ' . ($anggota?->nama_lengkap ?? auth()->user()->name))
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6" x-data="{ tab: 'identitas' }">
+<div class="max-w-4xl mx-auto space-y-6" x-data="{
+    tab: 'identitas',
+    selectedEdu: {{ \Illuminate\Support\Js::from(old('pendidikan_terakhir', $anggota?->pendidikan_terakhir ?? '')) }},
+    shouldShowEdu(lvl) {
+        if (!this.selectedEdu) return false;
+        if (this.selectedEdu === 'Lainnya') {
+            return lvl === 'Lainnya' || lvl === 'SD';
+        }
+        const map = {
+            'SD': 1,
+            'SMP': 2,
+            'SMA': 3,
+            'D3': 4,
+            'S1': 4,
+            'S2': 5,
+            'S3': 6,
+        };
+        const current = map[this.selectedEdu] || 0;
+        const target = map[lvl] || 0;
+        return current >= target;
+    }
+}">
     {{-- Header Banner with Avatar & Status --}}
     <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs relative overflow-hidden">
         <x-batik-corner position="top-right" class="w-36 h-36 text-[#005c8a] opacity-[0.18]" />
@@ -153,7 +174,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Pekerjaan / Profesi Utama</label>
                     <input name="pekerjaan" value="{{ old('pekerjaan', $anggota->pekerjaan ?: $anggota->jabatan_aum) }}" placeholder="Contoh: Guru / PNS / Wiraswasta / Karyawan"
@@ -164,10 +185,59 @@
                     <input name="nbm" value="{{ old('nbm', $anggota->nbm) }}" placeholder="Contoh: 1084201"
                         class="w-full px-4 py-3.5 text-base font-mono bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
+            </div>
+
+            {{-- Riwayat Pendidikan Kader Bertingkat --}}
+            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+                    <h4 class="text-sm sm:text-base font-black text-slate-900">Riwayat Pendidikan Kader</h4>
+                </div>
+
                 <div>
-                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Pendidikan Terakhir</label>
-                    <input name="pendidikan_sd" value="{{ old('pendidikan_sd', $anggota->pendidikan_sd) }}" placeholder="Contoh: S1 Pendidikan Agama Islam"
-                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1.5">
+                        Pendidikan Terakhir <span class="text-sky-700 text-xs font-normal">(Pilih Terlebih Dahulu)</span>
+                    </label>
+                    <select name="pendidikan_terakhir" x-model="selectedEdu"
+                        class="w-full px-4 py-3 text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition min-h-[48px]">
+                        <option value="">-- Pilih Pendidikan Terakhir --</option>
+                        @foreach(config('arqam.opsi_form.pendidikan_terakhir') as $k => $label)
+                            <option value="{{ $k }}" @selected(old('pendidikan_terakhir', $anggota->pendidikan_terakhir) === $k)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div x-show="selectedEdu" x-transition class="space-y-3 pt-1" style="display: none;">
+                    <div x-show="shouldShowEdu('SD')" x-transition>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">
+                            <span x-show="selectedEdu !== 'Lainnya'">Nama SD / MI / Sederajat</span>
+                            <span x-show="selectedEdu === 'Lainnya'">Nama Lembaga Pendidikan / Pesantren / Keterangan</span>
+                        </label>
+                        <input name="pendidikan_sd" value="{{ old('pendidikan_sd', $anggota->pendidikan_sd) }}"
+                            :placeholder="selectedEdu === 'Lainnya' ? 'Contoh: Ponpes Isy Karima / PKBM' : 'Contoh: MIM Karanganyar / SDN 1 Karanganyar'"
+                            class="w-full px-4 py-2.5 text-sm bg-white border-2 border-slate-200 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[44px]">
+                    </div>
+
+                    <div x-show="shouldShowEdu('SMP')" x-transition>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama SMP / MTs / Sederajat</label>
+                        <input name="pendidikan_smp" value="{{ old('pendidikan_smp', $anggota->pendidikan_smp) }}"
+                            placeholder="Contoh: SMP Muhammadiyah 1 Karanganyar / MTsN 1 Karanganyar"
+                            class="w-full px-4 py-2.5 text-sm bg-white border-2 border-slate-200 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[44px]">
+                    </div>
+
+                    <div x-show="shouldShowEdu('SMA')" x-transition>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama SMA / SMK / MA / Sederajat</label>
+                        <input name="pendidikan_sma" value="{{ old('pendidikan_sma', $anggota->pendidikan_sma) }}"
+                            placeholder="Contoh: SMA Muhammadiyah 1 Karanganyar / SMKN 1 Karanganyar"
+                            class="w-full px-4 py-2.5 text-sm bg-white border-2 border-slate-200 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[44px]">
+                    </div>
+
+                    <div x-show="shouldShowEdu('D3')" x-transition>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Perguruan Tinggi / Universitas (Kampus &amp; Program Studi)</label>
+                        <input name="pendidikan_s1" value="{{ old('pendidikan_s1', $anggota->pendidikan_s1) }}"
+                            placeholder="Contoh: Universitas Muhammadiyah Surakarta - Pendidikan Agama Islam"
+                            class="w-full px-4 py-2.5 text-sm bg-white border-2 border-slate-200 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[44px]">
+                    </div>
                 </div>
             </div>
 

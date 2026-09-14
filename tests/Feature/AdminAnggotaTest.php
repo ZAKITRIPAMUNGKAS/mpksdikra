@@ -145,7 +145,11 @@ class AdminAnggotaTest extends TestCase
             'kabupaten' => 'Karanganyar',
             'pekerjaan' => 'PNS',
             'jabatan_aum' => 'Guru SD',
+            'pendidikan_terakhir' => 'S1',
             'pendidikan_sd' => 'SD Muhammadiyah 1',
+            'pendidikan_smp' => 'SMP Muhammadiyah 1',
+            'pendidikan_sma' => 'SMA Muhammadiyah 1',
+            'pendidikan_s1' => 'UMS - FAI',
             'bahasa_dikuasai' => ['Bahasa Indonesia', 'Bahasa Arab'],
             'kemampuan_baca_quran' => 'Lancar dan fasih',
             'hafalan_quran' => '1 juz',
@@ -190,7 +194,11 @@ class AdminAnggotaTest extends TestCase
         $this->assertStringContainsString("'1234567", $html);
         $this->assertStringContainsString("'081234567890", $html);
         $this->assertStringContainsString('kader@test.com', $html);
+        $this->assertStringContainsString('S1 / D4 (Sarjana)', $html);
         $this->assertStringContainsString('SD Muhammadiyah 1', $html);
+        $this->assertStringContainsString('SMP Muhammadiyah 1', $html);
+        $this->assertStringContainsString('SMA Muhammadiyah 1', $html);
+        $this->assertStringContainsString('UMS - FAI', $html);
         $this->assertStringContainsString('Bahasa Indonesia, Bahasa Arab', $html);
         $this->assertStringContainsString('Lancar dan fasih', $html);
         $this->assertStringContainsString('1 juz', $html);

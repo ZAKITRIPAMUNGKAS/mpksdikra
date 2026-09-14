@@ -42,6 +42,19 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-14: Implementasi Formulir Riwayat Pendidikan Bertingkat (Pendidikan Terakhir -> Rincian Sekolah/PT):
+  1. Skema Database:
+     - Dibuatkan migration `2026_09_14_000002_add_pendidikan_lengkap_to_anggota_table.php` yang menambahkan kolom `pendidikan_terakhir`, `pendidikan_smp`, `pendidikan_sma`, dan `pendidikan_s1` (Perguruan Tinggi) ke tabel `anggota`.
+  2. Alur Pengisian Interaktif (Alpine.js):
+     - Kader terlebih dahulu memilih jenjang `Pendidikan Terakhir` (SD/MI, SMP/MTs, SMA/SMK/MA, D3, S1, S2, S3, atau Lainnya).
+     - Kolom rincian nama sekolah/kampus (`pendidikan_sd`, `pendidikan_smp`, `pendidikan_sma`, `pendidikan_s1`) terbuka dinamis dan halus hanya sesuai jenjang yang ditempuh oleh kader.
+     - Diterapkan secara seragam di formulir pendaftaran mandiri (`register.blade.php`) dan portal pembaruan profil kader (`profile.blade.php`).
+  3. Integrasi Admin & Ekspor Excel:
+     - Halaman detail anggota admin (`admin/anggota/show.blade.php`) menampilkan badge pendidikan terakhir dan kartu rincian institusi pendidikan lengkap.
+     - Ekspor Excel (`exports/anggota.blade.php`) diperluas menjadi 47 kolom memuat seluruh kolom riwayat pendidikan.
+  4. Pengujian:
+     - 115 tests lolos 100% (443 assertions) mencakup registrasi, update profil, dan render ekspor Excel.
+
 - 2026-09-14: Implementasi Penuh Role Admin Cabang, Ekspor Data Excel Cabang, dan Optimasi UI Mobile KPI:
   1. Perbaikan Bug Z-Index Drawer Mobile:
      - Mengubah z-index backdrop mobile drawer menjadi `z-40` dan `<aside>` menjadi `z-50` pada `resources/views/layouts/app.blade.php`, mengeliminasi bug overlay gelap/blur yang sebelumnya menutupi sidebar di layar smartphone.

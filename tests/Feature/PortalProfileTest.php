@@ -83,4 +83,35 @@ class PortalProfileTest extends TestCase
         $this->assertSame('Ketua PCPM', $fresh->jabatan_ortom['Pemuda Muhammadiyah'] ?? null);
         $this->assertSame('Kepala Sekolah', $fresh->jabatan_aum);
     }
+
+    public function test_anggota_can_update_education_background(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)
+            ->put(route('portal.profile.update'), [
+                'nama_lengkap' => $a->nama_lengkap,
+                'alamat_rumah' => $a->alamat_rumah,
+                'tempat_lahir' => $a->tempat_lahir,
+                'tanggal_lahir' => $a->tanggal_lahir->format('Y-m-d'),
+                'status_pernikahan' => $a->status_pernikahan,
+                'desa_kelurahan' => $a->desa_kelurahan,
+                'kecamatan' => $a->kecamatan,
+                'kabupaten' => $a->kabupaten,
+                'pendidikan_terakhir' => 'S1',
+                'pendidikan_sd' => 'SDN 2 Karanganyar',
+                'pendidikan_smp' => 'SMPN 1 Karanganyar',
+                'pendidikan_sma' => 'SMAN 1 Karanganyar',
+                'pendidikan_s1' => 'UNS - FKIP',
+            ])
+            ->assertRedirect();
+
+        $fresh = $a->fresh();
+        $this->assertSame('S1', $fresh->pendidikan_terakhir);
+        $this->assertSame('SDN 2 Karanganyar', $fresh->pendidikan_sd);
+        $this->assertSame('SMPN 1 Karanganyar', $fresh->pendidikan_smp);
+        $this->assertSame('SMAN 1 Karanganyar', $fresh->pendidikan_sma);
+        $this->assertSame('UNS - FKIP', $fresh->pendidikan_s1);
+    }
 }

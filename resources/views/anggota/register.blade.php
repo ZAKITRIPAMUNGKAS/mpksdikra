@@ -565,10 +565,103 @@
 
             {{-- Tab 2: Keagamaan (Desain Nyaman & Mudah Disentuh) --}}
             <div x-show="tab==='agama'" class="space-y-6" style="display: none;">
-                <div>
-                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Pendidikan SD / Sederajat (Opsional)</label>
-                    <input name="pendidikan_sd" value="{{ old('pendidikan_sd') }}" placeholder="Contoh: MIM Karanganyar / SDN 1 Karanganyar"
-                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                {{-- Seksi Pendidikan Bertingkat (Pendidikan Terakhir Terlebih Dahulu) --}}
+                <div class="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-50 to-sky-50/40 border-2 border-slate-200/90 shadow-2xs space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-slate-200/80">
+                        <div class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
+                            🎓
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Riwayat Pendidikan Kader</h3>
+                            <p class="text-xs text-slate-500">Pilih jenjang pendidikan terakhir Anda terlebih dahulu, lalu lengkapi nama sekolah di bawahnya.</p>
+                        </div>
+                    </div>
+
+                    {{-- Langkah 1: Pilih Pendidikan Terakhir Dulu --}}
+                    <div>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Pendidikan Terakhir <span class="text-sky-700 text-xs font-normal">(Pilih Terlebih Dahulu)</span>
+                        </label>
+                        <select name="pendidikan_terakhir" x-model="selectedEdu" @change="saveDraft()"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-semibold text-slate-900 border-2 border-slate-300 hover:border-sky-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <option value="">-- 1. Pilih Pendidikan Terakhir Anda --</option>
+                            @foreach(config('arqam.opsi_form.pendidikan_terakhir') as $k => $label)
+                                <option value="{{ $k }}" @selected(old('pendidikan_terakhir') === $k)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('pendidikan_terakhir')
+                            <p class="text-xs sm:text-sm text-rose-600 font-bold mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Panduan Sebelum Memilih --}}
+                    <div x-show="!selectedEdu" class="p-3.5 sm:p-4 rounded-xl bg-white/90 border border-dashed border-slate-300 text-slate-600 text-xs sm:text-sm flex items-start gap-3">
+                        <span class="text-xl shrink-0 mt-0.5">ℹ️</span>
+                        <div class="leading-relaxed">
+                            <strong class="text-slate-800">Petunjuk Pengisian:</strong> Silakan pilih <strong>Pendidikan Terakhir</strong> di atas terlebih dahulu. Formulir nama sekolah / universitas akan terbuka otomatis sesuai jenjang pendidikan yang Anda tempuh.
+                        </div>
+                    </div>
+
+                    {{-- Langkah 2: Isian Riwayat Pendidikan Dinamis Berdasarkan Pendidikan Terakhir --}}
+                    <div x-show="selectedEdu" x-transition class="space-y-4 pt-1" style="display: none;">
+                        <div class="flex items-center gap-2 text-xs font-bold text-sky-900 uppercase tracking-wider bg-sky-100/60 px-3 py-1.5 rounded-lg border border-sky-200/80">
+                            <span>✍️ Rincian Nama Sekolah / Perguruan Tinggi:</span>
+                        </div>
+
+                        {{-- Input SD --}}
+                        <div x-show="shouldShowEdu('SD')" x-transition>
+                            <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                                <span x-show="selectedEdu !== 'Lainnya'">Nama SD / MI / Sederajat</span>
+                                <span x-show="selectedEdu === 'Lainnya'">Nama Lembaga Pendidikan / Pesantren / Keterangan</span>
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            </label>
+                            <input name="pendidikan_sd" value="{{ old('pendidikan_sd') }}" @input="saveDraft()"
+                                :placeholder="selectedEdu === 'Lainnya' ? 'Contoh: Pondok Pesantren Isy Karima / PKBM' : 'Contoh: MIM Karanganyar / SDN 1 Karanganyar'"
+                                class="w-full px-4 py-3 text-sm sm:text-base font-medium text-slate-900 border-2 border-slate-200 hover:border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            @error('pendidikan_sd')
+                                <p class="text-xs text-rose-600 font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Input SMP --}}
+                        <div x-show="shouldShowEdu('SMP')" x-transition>
+                            <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                                Nama SMP / MTs / Sederajat <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            </label>
+                            <input name="pendidikan_smp" value="{{ old('pendidikan_smp') }}" @input="saveDraft()"
+                                placeholder="Contoh: SMP Muhammadiyah 1 Karanganyar / MTsN 1 Karanganyar"
+                                class="w-full px-4 py-3 text-sm sm:text-base font-medium text-slate-900 border-2 border-slate-200 hover:border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            @error('pendidikan_smp')
+                                <p class="text-xs text-rose-600 font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Input SMA --}}
+                        <div x-show="shouldShowEdu('SMA')" x-transition>
+                            <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                                Nama SMA / SMK / MA / Sederajat <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            </label>
+                            <input name="pendidikan_sma" value="{{ old('pendidikan_sma') }}" @input="saveDraft()"
+                                placeholder="Contoh: SMA Muhammadiyah 1 Karanganyar / SMKN 1 Karanganyar"
+                                class="w-full px-4 py-3 text-sm sm:text-base font-medium text-slate-900 border-2 border-slate-200 hover:border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            @error('pendidikan_sma')
+                                <p class="text-xs text-rose-600 font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Input Perguruan Tinggi (D3 / S1 / S2 / S3) --}}
+                        <div x-show="shouldShowEdu('D3')" x-transition>
+                            <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                                Perguruan Tinggi / Universitas (Nama Kampus &amp; Program Studi) <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            </label>
+                            <input name="pendidikan_s1" value="{{ old('pendidikan_s1') }}" @input="saveDraft()"
+                                placeholder="Contoh: Universitas Muhammadiyah Surakarta - Pendidikan Agama Islam"
+                                class="w-full px-4 py-3 text-sm sm:text-base font-medium text-slate-900 border-2 border-slate-200 hover:border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[46px]">
+                            @error('pendidikan_s1')
+                                <p class="text-xs text-rose-600 font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -1194,12 +1287,33 @@
 <script>
 function registrationForm() {
     return {
-        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_sd', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'pekerjaan', 'pcm', 'prm', 'keaktifan_muhammadiyah', 'jabatan_muhammadiyah', 'keaktifan_ortom', 'jabatan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
+        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_terakhir', 'pendidikan_sd', 'pendidikan_smp', 'pendidikan_sma', 'pendidikan_s1', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'pekerjaan', 'pcm', 'prm', 'keaktifan_muhammadiyah', 'jabatan_muhammadiyah', 'keaktifan_ortom', 'jabatan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
         showPass: false,
         showConfirmPass: false,
         isSubmitting: false,
         clientErrors: {},
         stepErrorBanner: null,
+
+        // State Pendidikan Bertingkat
+        selectedEdu: {{ \Illuminate\Support\Js::from(old('pendidikan_terakhir', '')) }},
+        shouldShowEdu(lvl) {
+            if (!this.selectedEdu) return false;
+            if (this.selectedEdu === 'Lainnya') {
+                return lvl === 'Lainnya' || lvl === 'SD';
+            }
+            const map = {
+                'SD': 1,
+                'SMP': 2,
+                'SMA': 3,
+                'D3': 4,
+                'S1': 4,
+                'S2': 5,
+                'S3': 6,
+            };
+            const current = map[this.selectedEdu] || 0;
+            const target = map[lvl] || 0;
+            return current >= target;
+        },
 
         // Reactive selections for Muhammadiyah & Ortom
         checkedMuhammadiyah: {{ \Illuminate\Support\Js::from(old('keaktifan_muhammadiyah', [])) }},
@@ -1489,6 +1603,11 @@ function registrationForm() {
                 }
                 if (draft['keaktifan_ortom[]']) {
                     this.checkedOrtom = Array.isArray(draft['keaktifan_ortom[]']) ? draft['keaktifan_ortom[]'] : [];
+                }
+
+                // Restore selectedEdu for dynamic education fields
+                if (draft.pendidikan_terakhir) {
+                    this.selectedEdu = draft.pendidikan_terakhir;
                 }
 
                 // Restore pasfoto if present

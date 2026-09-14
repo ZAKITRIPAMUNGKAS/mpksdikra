@@ -1,17 +1,17 @@
 <table>
     <thead>
         <tr>
-            <th colspan="43" style="font-size: 14pt; font-weight: bold; text-align: center; color: #002b40;">
+            <th colspan="47" style="font-size: 14pt; font-weight: bold; text-align: center; color: #002b40;">
                 {{ $subTitle }}
             </th>
         </tr>
         <tr>
-            <th colspan="43" style="font-size: 12pt; font-weight: bold; text-align: center; color: #005c8a;">
+            <th colspan="47" style="font-size: 12pt; font-weight: bold; text-align: center; color: #005c8a;">
                 MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
             </th>
         </tr>
         <tr>
-            <th colspan="43" style="font-size: 11pt; font-weight: bold; text-align: center;">
+            <th colspan="47" style="font-size: 11pt; font-weight: bold; text-align: center;">
                 DATA LENGKAP KADER DAN ANGGOTA PERSYARIKATAN MUHAMMADIYAH
                 @if($pcm)
                     - PCM {{ strtoupper($pcm) }}
@@ -19,12 +19,12 @@
             </th>
         </tr>
         <tr>
-            <th colspan="43" style="font-size: 9pt; text-align: center; font-style: italic; color: #475569;">
+            <th colspan="47" style="font-size: 9pt; text-align: center; font-style: italic; color: #475569;">
                 Diekspor pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB
             </th>
         </tr>
         <tr>
-            <th colspan="43"></th>
+            <th colspan="47"></th>
         </tr>
         <tr>
             <th colspan="2" style="font-weight: bold; text-align: left;">Total Kader</th>
@@ -36,17 +36,17 @@
             <th colspan="2" style="font-weight: bold; text-align: left;">Laki-laki</th>
             <th colspan="5" style="text-align: left;">: {{ $totalLaki }} Orang</th>
             <th colspan="2" style="font-weight: bold; text-align: left;">Perempuan</th>
-            <th colspan="13" style="text-align: left;">: {{ $totalPerempuan }} Orang</th>
+            <th colspan="17" style="text-align: left;">: {{ $totalPerempuan }} Orang</th>
         </tr>
         <tr>
-            <th colspan="43"></th>
+            <th colspan="47"></th>
         </tr>
         {{-- Baris Grup Header --}}
         <tr style="font-weight: bold; text-align: center; color: #ffffff;">
             <th colspan="3" style="background-color: #003853; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">ADMINISTRASI SISTEM</th>
             <th colspan="10" style="background-color: #005077; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">IDENTITAS &amp; KONTAK PRIBADI</th>
             <th colspan="6" style="background-color: #00689b; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">DOMISILI &amp; WILAYAH</th>
-            <th colspan="3" style="background-color: #0b78af; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">PROFESI &amp; PENDIDIKAN</th>
+            <th colspan="7" style="background-color: #0b78af; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">PROFESI &amp; PENDIDIKAN</th>
             <th colspan="11" style="background-color: #0284c7; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">PROFIL KEAGAMAAN &amp; LITERASI</th>
             <th colspan="3" style="background-color: #0369a1; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">KEMUHAMMADIYAHAN &amp; ORTOM</th>
             <th colspan="6" style="background-color: #075985; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">KEMASJIDAN, SOSIAL &amp; HARAPAN</th>
@@ -75,7 +75,11 @@
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Kabupaten</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pekerjaan / Profesi</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Jabatan di AUM</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan Terakhir</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan SD / Sederajat</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan SMP / Sederajat</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan SMA / Sederajat</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Perguruan Tinggi / S1</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Bahasa yang Dikuasai</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Kemampuan Baca Al-Qur'an</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Hafalan Al-Qur'an</th>
@@ -139,6 +143,9 @@
             // Email (utamakan dari profil anggota, fallback ke user email bila bukan placeholder)
             $userEmail = $a->user?->email;
             $email = $a->email ?? (!empty($userEmail) && !str_contains($userEmail, '@placeholder.test') ? $userEmail : '-');
+
+            // Label Pendidikan Terakhir
+            $labelEdu = config('arqam.opsi_form.pendidikan_terakhir.' . $a->pendidikan_terakhir, $a->pendidikan_terakhir ?: '-');
         @endphp
         <tr style="{{ $idx % 2 === 1 ? 'background-color: #f8fafc;' : '' }}">
             <td style="text-align: center; border: 1px solid #cbd5e1;">{{ $idx + 1 }}</td>
@@ -172,7 +179,11 @@
             <td style="border: 1px solid #cbd5e1;">{{ $a->kabupaten ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->pekerjaan ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->jabatan_aum ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $labelEdu }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->pendidikan_sd ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->pendidikan_smp ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->pendidikan_sma ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->pendidikan_s1 ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $bahasa ?: '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->kemampuan_baca_quran ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->hafalan_quran ?? '-' }}</td>
@@ -197,7 +208,7 @@
         </tr>
         @empty
         <tr>
-            <td colspan="43" style="text-align: center; padding: 20px; font-style: italic; color: #94a3b8; border: 1px solid #cbd5e1;">
+            <td colspan="47" style="text-align: center; padding: 20px; font-style: italic; color: #94a3b8; border: 1px solid #cbd5e1;">
                 Tidak ada data kader yang ditemukan.
             </td>
         </tr>

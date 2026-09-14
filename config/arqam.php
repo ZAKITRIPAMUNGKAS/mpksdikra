@@ -70,6 +70,16 @@ return [
         'langganan_suara_muhammadiyah' => ['Rutin beli', 'Terkadang beli', 'Tidak pernah beli'],
         'lembaga_zis' => ['LAZISMU', 'BAZNAS', 'LEMBAGA LAIN'],
         'bahasa_dikuasai' => ['Bahasa Indonesia', 'Bahasa Jawa', 'Bahasa Arab', 'Bahasa Inggris', 'Lainnya'],
+        'pendidikan_terakhir' => [
+            'SD' => 'SD / MI / Sederajat',
+            'SMP' => 'SMP / MTs / Sederajat',
+            'SMA' => 'SMA / SMK / MA / Sederajat',
+            'D3' => 'D1 / D2 / D3 (Diploma)',
+            'S1' => 'S1 / D4 (Sarjana)',
+            'S2' => 'S2 (Magister)',
+            'S3' => 'S3 (Doktor)',
+            'Lainnya' => 'Lainnya / Pesantren / Non-Formal',
+        ],
         'keaktifan_muhammadiyah' => [
             'Pimpinan Daerah Muhammadiyah',
             'Pimpinan Cabang Muhammadiyah',

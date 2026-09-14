@@ -184,8 +184,29 @@
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Ranting (PRM):</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->prm ?? '-' }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Pekerjaan / Profesi:</span> <span class="font-medium text-slate-900 text-sm">{{ $anggota->pekerjaan ?? ($anggota->jabatan_aum ?? '-') }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Nomor Baku Muh (NBM):</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->nbm ?? '-' }}</span></div>
+            <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Pendidikan Terakhir:</span> <span class="font-medium text-slate-900 text-sm">{{ config('arqam.opsi_form.pendidikan_terakhir.' . $anggota->pendidikan_terakhir, $anggota->pendidikan_terakhir ?: '-') }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">No. WhatsApp:</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->no_wa }}</span></div>
             <div class="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60"><span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Email:</span> <span class="font-mono font-medium text-slate-900 text-sm">{{ $anggota->email ?? '-' }}</span></div>
+
+            @if($anggota->pendidikan_sd || $anggota->pendidikan_smp || $anggota->pendidikan_sma || $anggota->pendidikan_s1)
+            <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">
+                <span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1 text-xs">Riwayat Institusi Pendidikan:</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1.5">
+                    @if($anggota->pendidikan_sd)
+                        <div class="text-xs text-slate-700 bg-white p-2 rounded-lg border border-slate-200"><strong class="text-slate-500 block text-[11px] mb-0.5">SD / MI:</strong> {{ $anggota->pendidikan_sd }}</div>
+                    @endif
+                    @if($anggota->pendidikan_smp)
+                        <div class="text-xs text-slate-700 bg-white p-2 rounded-lg border border-slate-200"><strong class="text-slate-500 block text-[11px] mb-0.5">SMP / MTs:</strong> {{ $anggota->pendidikan_smp }}</div>
+                    @endif
+                    @if($anggota->pendidikan_sma)
+                        <div class="text-xs text-slate-700 bg-white p-2 rounded-lg border border-slate-200"><strong class="text-slate-500 block text-[11px] mb-0.5">SMA / SMK / MA:</strong> {{ $anggota->pendidikan_sma }}</div>
+                    @endif
+                    @if($anggota->pendidikan_s1)
+                        <div class="text-xs text-slate-700 bg-white p-2 rounded-lg border border-slate-200"><strong class="text-slate-500 block text-[11px] mb-0.5">Perguruan Tinggi / S1:</strong> {{ $anggota->pendidikan_s1 }}</div>
+                    @endif
+                </div>
+            </div>
+            @endif
 
             @if(!empty($anggota->keaktifan_muhammadiyah))
             <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">

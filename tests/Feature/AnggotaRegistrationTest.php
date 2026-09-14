@@ -233,4 +233,32 @@ class AnggotaRegistrationTest extends TestCase
         // Tanggal lahir 1985-08-17 -> Password 17081985
         $this->assertTrue(Hash::check('17081985', $user->password));
     }
+
+    public function test_registration_saves_complete_education_background(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313020202950002',
+            'no_wa' => '081299887766',
+            'email' => 'sarjana@example.test',
+            'pendidikan_terakhir' => 'S1',
+            'pendidikan_sd' => 'MIM Karanganyar',
+            'pendidikan_smp' => 'MTsN Karanganyar',
+            'pendidikan_sma' => 'SMA Muhammadiyah 1 Karanganyar',
+            'pendidikan_s1' => 'UMS - Pendidikan Agama Islam',
+        ]);
+
+        $this->post(route('anggota.register.store'), $payload)
+            ->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '3313020202950002')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('S1', $anggota->pendidikan_terakhir);
+        $this->assertSame('MIM Karanganyar', $anggota->pendidikan_sd);
+        $this->assertSame('MTsN Karanganyar', $anggota->pendidikan_smp);
+        $this->assertSame('SMA Muhammadiyah 1 Karanganyar', $anggota->pendidikan_sma);
+        $this->assertSame('UMS - Pendidikan Agama Islam', $anggota->pendidikan_s1);
+    }
 }

@@ -445,6 +445,28 @@
                     </div>
                 </div>
 
+                {{-- Nama Ayah & Nama Ibu Kandung --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Nama Ayah Kandung <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                        </label>
+                        <input name="nama_ayah" value="{{ old('nama_ayah') }}" autocomplete="off" placeholder="Contoh: H. Ahmad Syukri"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
+                        <span class="text-xs text-slate-500 mt-1 block">Nama lengkap ayah kandung untuk arsip nasab & silsilah.</span>
+                        @error('nama_ayah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            Nama Ibu Kandung <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                        </label>
+                        <input name="nama_ibu" value="{{ old('nama_ibu') }}" autocomplete="off" placeholder="Contoh: Hj. Siti Maryam"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
+                        <span class="text-xs text-slate-500 mt-1 block">Nama lengkap ibu kandung untuk arsip pangkalan data.</span>
+                        @error('nama_ibu') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                         Alamat Lengkap Rumah <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
@@ -555,7 +577,8 @@
                     @enderror
                 </div>
 
-
+                {{-- Pertanyaan Kustom Seksi Biodata Diri --}}
+                <x-form-custom-fields :questions="$customQuestions['diri'] ?? null" />
 
                 <div class="flex items-center justify-end pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
@@ -764,6 +787,9 @@
                     </div>
                 </div>
 
+                {{-- Pertanyaan Kustom Seksi Keagamaan --}}
+                <x-form-custom-fields :questions="$customQuestions['agama'] ?? null" />
+
                 <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('diri')"
                         class="w-full sm:w-auto min-h-[48px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base">
@@ -917,6 +943,9 @@
                     <input name="organisasi_lain" value="{{ old('organisasi_lain') }}" placeholder="Contoh: PGRI, IDI, Karang Taruna dll. (kosongkan bila tidak ada)"
                         class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                 </div>
+
+                {{-- Pertanyaan Kustom Seksi Organisasi --}}
+                <x-form-custom-fields :questions="$customQuestions['organisasi'] ?? null" />
 
                 <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
@@ -1216,8 +1245,10 @@
                     </div>
                 </div>
 
-                {{-- Kotak Konfirmasi Pengiriman --}}
+                {{-- Pertanyaan Kustom Seksi Kemasyarakatan & Tambahan --}}
+                <x-form-custom-fields :questions="array_merge(($customQuestions['kemasyarakatan'] ?? collect())->all(), ($customQuestions['tambahan'] ?? collect())->all())" />
 
+                {{-- Kotak Konfirmasi Pengiriman --}}
                 <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 flex items-start gap-3.5">
                     <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 font-black text-sm">
                         ✓

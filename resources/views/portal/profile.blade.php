@@ -176,6 +176,19 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nama Ayah Kandung</label>
+                    <input name="nama_ayah" value="{{ old('nama_ayah', $anggota->nama_ayah) }}" placeholder="Contoh: H. Ahmad Syukri"
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
+                </div>
+                <div>
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nama Ibu Kandung</label>
+                    <input name="nama_ibu" value="{{ old('nama_ibu', $anggota->nama_ibu) }}" placeholder="Contoh: Hj. Siti Maryam"
+                        class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Pekerjaan / Profesi Utama</label>
                     <input name="pekerjaan" value="{{ old('pekerjaan', $anggota->pekerjaan ?: $anggota->jabatan_aum) }}" placeholder="Contoh: Guru / PNS / Wiraswasta / Karyawan"
                         class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
@@ -240,6 +253,9 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Pertanyaan Kustom Seksi Biodata Diri --}}
+            <x-form-custom-fields :questions="$customQuestions['diri'] ?? null" :values="old('custom_fields', $anggota->custom_fields ?? [])" />
 
             <div class="pt-5 border-t-2 border-slate-100 flex justify-end">
                 <button type="button" @click="tab = 'agama'"
@@ -307,6 +323,9 @@
                     </select>
                 </div>
             </div>
+
+            {{-- Pertanyaan Kustom Seksi Keagamaan --}}
+            <x-form-custom-fields :questions="$customQuestions['agama'] ?? null" :values="old('custom_fields', $anggota->custom_fields ?? [])" />
 
             <div class="flex items-center justify-between gap-3 pt-5 border-t-2 border-slate-100">
                 <button type="button" @click="tab = 'identitas'"
@@ -735,6 +754,9 @@
                         class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
                     @error('keaktifan_kemasyarakatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
+
+                {{-- Pertanyaan Kustom Seksi Organisasi, Kemasyarakatan & Tambahan --}}
+                <x-form-custom-fields :questions="array_merge(($customQuestions['organisasi'] ?? collect())->all(), ($customQuestions['kemasyarakatan'] ?? collect())->all(), ($customQuestions['tambahan'] ?? collect())->all())" :values="old('custom_fields', $anggota->custom_fields ?? [])" />
             </div>
 
             <div class="flex items-center justify-between pt-5 border-t-2 border-slate-100">

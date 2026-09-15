@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventOutputController;
 use App\Http\Controllers\Admin\ExecutiveController;
 use App\Http\Controllers\Admin\FasilitatorController;
+use App\Http\Controllers\Admin\FormPertanyaanController;
 use App\Http\Controllers\Admin\KeaktifanController;
 use App\Http\Controllers\Admin\OutboundKelompokController;
 use App\Http\Controllers\Admin\PesertaController;
@@ -108,6 +109,15 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::post('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle');
+
+        // Admin Daerah: Google-Form-style Form Kader Builder
+        Route::get('/form-kader', [FormPertanyaanController::class, 'index'])->name('form-kader.index');
+        Route::post('/form-kader', [FormPertanyaanController::class, 'store'])->name('form-kader.store');
+        Route::put('/form-kader/{pertanyaan}', [FormPertanyaanController::class, 'update'])->name('form-kader.update');
+        Route::delete('/form-kader/{pertanyaan}', [FormPertanyaanController::class, 'destroy'])->name('form-kader.destroy');
+        Route::post('/form-kader/{pertanyaan}/toggle-aktif', [FormPertanyaanController::class, 'toggleAktif'])->name('form-kader.toggle-aktif');
+        Route::post('/form-kader/{pertanyaan}/toggle-wajib', [FormPertanyaanController::class, 'toggleWajib'])->name('form-kader.toggle-wajib');
+        Route::post('/form-kader/{pertanyaan}/reorder', [FormPertanyaanController::class, 'reorder'])->name('form-kader.reorder');
 
         Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');

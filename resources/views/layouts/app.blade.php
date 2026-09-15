@@ -118,6 +118,16 @@
                             </svg>
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Pengguna &amp; Staf</span>
                         </a>
+
+                        {{-- Admin Daerah: Form Pendaftaran (Google Form Editor) --}}
+                        <a href="{{ route('admin.form-kader.index') }}" 
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition duration-150 group {{ request()->routeIs('admin.form-kader.*') ? 'bg-sky-50 text-[#005c8a] shadow-2xs border border-sky-200/70' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}"
+                           title="Pengaturan Formulir Pendaftaran Kader">
+                            <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.form-kader.*') ? 'text-[#005c8a]' : 'text-slate-400 group-hover:text-slate-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                            <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Formulir Kader</span>
+                        </a>
                     @endif
 
                     @if(auth()->user()->isAdminCabang())

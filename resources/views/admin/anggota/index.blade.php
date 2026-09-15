@@ -120,23 +120,49 @@
                                 {{ $a->user->status === 'menunggu_verifikasi' ? 'Menunggu' : $a->user->status }}
                             </span>
                         </td>
-                        <td class="py-3.5 px-5 text-right">
-                            <div class="inline-flex items-center gap-1.5">
+                        <td class="py-3.5 px-5 text-right whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1.5 justify-end">
+                                {{-- Aksi Cepat Kontekstual Berdasarkan Status --}}
+                                @if($a->user->status === 'menunggu_verifikasi')
+                                    <form method="POST" action="{{ route('admin.anggota.verify', $a) }}" class="inline"
+                                        onsubmit="return confirm('Verifikasi & aktifkan akun kader {{ $a->nama_lengkap }}?')">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold shadow-2xs transition" title="Verifikasi & Aktifkan Pendaftaran Langsung">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Verifikasi</span>
+                                        </button>
+                                    </form>
+                                @elseif($a->user->status === 'nonaktif')
+                                    <form method="POST" action="{{ route('admin.anggota.activate', $a) }}" class="inline"
+                                        onsubmit="return confirm('Aktifkan kembali akun kader {{ $a->nama_lengkap }}?')">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold shadow-2xs transition" title="Aktifkan Kembali Akun Kader">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Aktifkan</span>
+                                        </button>
+                                    </form>
+                                @endif
+
+                                {{-- Icon WhatsApp Asli / Real --}}
                                 @if($a->no_wa)
                                     <a href="https://api.whatsapp.com/send?phone={{ \App\Services\WhatsAppNotificationService::formatNomor($a->no_wa) }}"
                                        target="_blank" rel="noopener noreferrer"
-                                       title="Hubungi via WhatsApp ({{ $a->no_wa }})"
-                                       class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition shadow-2xs">
-                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.004.577 1.773.847 2.806.847h.001c3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.768-5.769-5.768zm3.376 8.21c-.14.394-.712.753-1.001.782-.289.028-.59.13-1.928-.423-1.338-.553-2.193-1.91-2.26-2-.067-.09-1.042-1.388-1.042-2.646 0-1.258.657-1.878.891-2.133.234-.255.511-.318.682-.318.17 0 .341.002.49.01.157.008.367-.06.574.437.213.513.725 1.767.789 1.896.064.13.106.28.021.451-.085.17-.128.277-.255.426-.128.149-.27.332-.385.446-.128.128-.261.267-.113.522.149.255.66 1.088 1.416 1.762.973.867 1.792 1.137 2.048 1.265.255.128.405.107.554-.064.149-.17.639-.745.81-1.001.17-.255.341-.213.575-.128.234.085 1.491.703 1.747.831.255.128.426.191.49.298.064.106.064.618-.076 1.012z"/>
+                                       title="Chat WhatsApp ke {{ $a->nama_lengkap }} ({{ $a->no_wa }})"
+                                       class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/30 hover:border-[#25D366] transition shadow-2xs group"
+                                       aria-label="Kirim Pesan WhatsApp">
+                                        <svg class="w-4 h-4 fill-current group-hover:scale-110 transition" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.275-.1-.476-.15-.677.15-.2.3-.777.978-.952 1.179-.176.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.798-1.5-1.784-1.676-2.085-.175-.301-.019-.464.132-.613.136-.135.301-.351.452-.527.15-.175.2-.301.301-.501.101-.2.051-.376-.025-.527-.076-.15-.677-1.633-.928-2.235-.244-.586-.493-.506-.677-.515-.176-.009-.376-.009-.577-.009s-.527.075-.802.376c-.276.301-1.053 1.029-1.053 2.51 0 1.48 1.079 2.91 1.229 3.111.15.2 2.122 3.24 5.141 4.544.718.31 1.28.495 1.717.634.721.229 1.378.196 1.897.119.579-.086 1.78-.727 2.031-1.43.251-.703.251-1.304.176-1.43-.076-.125-.276-.2-.577-.35zM12.04 21.786c-1.78 0-3.525-.466-5.066-1.348l-.363-.209-3.766.988 1.005-3.671-.23-.367c-.968-1.542-1.479-3.327-1.478-5.158 0-5.496 4.471-9.967 9.973-9.967 2.663 0 5.166 1.038 7.047 2.922 1.88 1.884 2.914 4.39 2.912 7.054 0 5.498-4.471 9.968-9.972 9.968zm8.455-17.026C18.239 2.497 15.247 1.438 12.04 1.438c-5.83 0-10.574 4.743-10.576 10.575 0 1.863.486 3.682 1.41 5.283L1.13 23.12l6.002-1.574c1.543.841 3.284 1.285 5.048 1.286h.005c5.829 0 10.575-4.744 10.577-10.576.002-2.825-1.096-5.482-3.092-7.478z"/>
                                         </svg>
                                     </a>
                                 @endif
-                                <a href="{{ route('admin.anggota.show', $a) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-2xs">
-                                    <span>Detail</span>
+
+                                {{-- Tombol Detail --}}
+                                <a href="{{ route('admin.anggota.show', $a) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-xs font-semibold text-slate-700 transition shadow-2xs" title="Lihat profil dan dokumen kader">
                                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
+                                    <span>Detail</span>
                                 </a>
                             </div>
                         </td>

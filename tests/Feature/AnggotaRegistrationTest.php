@@ -261,4 +261,31 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('SMA Muhammadiyah 1 Karanganyar', $anggota->pendidikan_sma);
         $this->assertSame('UMS - Pendidikan Agama Islam', $anggota->pendidikan_s1);
     }
+
+    public function test_registration_saves_parent_names_and_custom_fields(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313030303960003',
+            'no_wa' => '081388776655',
+            'email' => 'ortu@example.test',
+            'nama_ayah' => 'H. Ahmad Dahlan',
+            'nama_ibu' => 'Hj. Siti Walidah',
+            'custom_fields' => [
+                'ukuran_kaos' => 'XL',
+                'riwayat_penyakit' => 'Tidak Ada',
+            ],
+        ]);
+
+        $this->post(route('anggota.register.store'), $payload)
+            ->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '3313030303960003')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('H. Ahmad Dahlan', $anggota->nama_ayah);
+        $this->assertSame('Hj. Siti Walidah', $anggota->nama_ibu);
+        $this->assertEquals(['ukuran_kaos' => 'XL', 'riwayat_penyakit' => 'Tidak Ada'], $anggota->custom_fields);
+    }
 }

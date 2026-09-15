@@ -44,7 +44,7 @@
         {{-- Baris Grup Header --}}
         <tr style="font-weight: bold; text-align: center; color: #ffffff;">
             <th colspan="3" style="background-color: #003853; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">ADMINISTRASI SISTEM</th>
-            <th colspan="10" style="background-color: #005077; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">IDENTITAS &amp; KONTAK PRIBADI</th>
+            <th colspan="12" style="background-color: #005077; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">IDENTITAS &amp; KONTAK PRIBADI</th>
             <th colspan="6" style="background-color: #00689b; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">DOMISILI &amp; WILAYAH</th>
             <th colspan="7" style="background-color: #0b78af; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">PROFESI &amp; PENDIDIKAN</th>
             <th colspan="11" style="background-color: #0284c7; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #002233;">PROFIL KEAGAMAAN &amp; LITERASI</th>
@@ -65,6 +65,8 @@
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #001f30;">Tanggal Lahir</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #001f30;">Usia</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #001f30;">Status Pernikahan</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Nama Ayah</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Nama Ibu</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">No. WhatsApp / HP</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Email</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Alamat Lengkap</th>
@@ -169,6 +171,8 @@
                 {{ $usia !== null ? $usia . ' th' : '-' }}
             </td>
             <td style="text-align: center; border: 1px solid #cbd5e1;">{{ $a->status_pernikahan ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->nama_ayah ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->nama_ibu ?? '-' }}</td>
             <td style="text-align: left; border: 1px solid #cbd5e1;">@if($a->no_wa)'{{ $a->no_wa }}@else-@endif</td>
             <td style="text-align: left; border: 1px solid #cbd5e1;">{{ $email }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->alamat_rumah ?? '-' }}</td>

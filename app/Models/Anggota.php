@@ -24,6 +24,8 @@ class Anggota extends Model
         'nik',
         'nbm',
         'jabatan_aum',
+        'nama_ayah',
+        'nama_ibu',
         'pekerjaan',
         'tempat_lahir',
         'tanggal_lahir',
@@ -65,6 +67,7 @@ class Anggota extends Model
         'keaktifan_kemasyarakatan',
         'harapan_pcm',
         'harapan_ba',
+        'custom_fields',
     ];
 
     protected $casts = [
@@ -76,6 +79,7 @@ class Anggota extends Model
         'jabatan_muhammadiyah' => 'array',
         'keaktifan_ortom' => 'array',
         'jabatan_ortom' => 'array',
+        'custom_fields' => 'array',
     ];
 
     public function user(): BelongsTo

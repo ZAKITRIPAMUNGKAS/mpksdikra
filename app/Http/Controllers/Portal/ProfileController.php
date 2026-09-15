@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\FormPertanyaan;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,8 +16,16 @@ class ProfileController extends Controller
     public function index(): View
     {
         $anggota = auth()->user()->anggota;
+        $customQuestions = FormPertanyaan::where('is_custom', true)
+            ->where('is_aktif', true)
+            ->ordered()
+            ->get()
+            ->groupBy('seksi');
 
-        return view('portal.profile', ['anggota' => $anggota]);
+        return view('portal.profile', [
+            'anggota' => $anggota,
+            'customQuestions' => $customQuestions,
+        ]);
     }
 
     public function update(Request $request): RedirectResponse
@@ -33,6 +42,8 @@ class ProfileController extends Controller
             'kecamatan' => ['required', 'string', 'max:255'],
             'kabupaten' => ['required', 'string', 'max:255'],
             'nbm' => ['nullable', 'string', 'max:50'],
+            'nama_ayah' => ['nullable', 'string', 'max:255'],
+            'nama_ibu' => ['nullable', 'string', 'max:255'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
             'pcm' => ['nullable', 'string', 'max:255'],
             'prm' => ['nullable', 'string', 'max:255'],
@@ -67,6 +78,7 @@ class ProfileController extends Controller
             'keaktifan_kemasyarakatan' => ['nullable', 'string', 'max:2000'],
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
+            'custom_fields' => ['nullable', 'array'],
         ]);
 
         if (empty($data['jabatan_aum']) && ! empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {

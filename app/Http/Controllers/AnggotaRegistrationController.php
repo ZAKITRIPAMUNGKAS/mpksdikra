@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AnggotaRegistrationRequest;
 use App\Models\Anggota;
+use App\Models\FormPertanyaan;
 use App\Models\User;
 use App\Services\NomorWaNormalizer;
 use Carbon\Carbon;
@@ -16,7 +17,13 @@ class AnggotaRegistrationController extends Controller
 {
     public function show(): View
     {
-        return view('anggota.register');
+        $customQuestions = FormPertanyaan::where('is_custom', true)
+            ->where('is_aktif', true)
+            ->ordered()
+            ->get()
+            ->groupBy('seksi');
+
+        return view('anggota.register', compact('customQuestions'));
     }
 
     public function store(AnggotaRegistrationRequest $request): RedirectResponse

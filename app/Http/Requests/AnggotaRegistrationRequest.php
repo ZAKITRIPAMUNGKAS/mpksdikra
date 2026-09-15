@@ -26,6 +26,8 @@ class AnggotaRegistrationRequest extends FormRequest
             'nik' => ['required', 'digits:16', 'unique:anggota,nik'],
             'nbm' => ['nullable', 'string', 'max:20'],
             'jabatan_aum' => ['nullable', 'string', 'max:255'],
+            'nama_ayah' => ['nullable', 'string', 'max:255'],
+            'nama_ibu' => ['nullable', 'string', 'max:255'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
             'tempat_lahir' => ['required', 'string', 'max:255'],
             'tanggal_lahir' => ['required', 'date', 'before:today'],
@@ -73,6 +75,7 @@ class AnggotaRegistrationRequest extends FormRequest
             'keaktifan_kemasyarakatan' => ['nullable', 'string', 'max:2000'],
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
+            'custom_fields' => ['nullable', 'array'],
         ];
     }
 

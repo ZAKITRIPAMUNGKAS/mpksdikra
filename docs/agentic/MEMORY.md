@@ -42,6 +42,22 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Integrasi Fitur Formulir Kader Dinamis (Google Form Editor), Biodata Orang Tua, dan Pembersihan UI Admin:
+  1. Biodata Orang Tua & Dynamic Custom Fields:
+     - Migration menambahkan kolom `nama_ayah` (Nama Ayah Kandung), `nama_ibu` (Nama Ibu Kandung), dan `custom_fields` (JSON) ke tabel `anggota`.
+     - Ditampilkan pada formulir pendaftaran mandiri (`register.blade.php`), portal profil kader (`portal/profile.blade.php`), detail anggota admin (`admin/anggota/show.blade.php`), dan ekspor data Excel (`exports/anggota.blade.php`).
+  2. Modul Manajemen Formulir Dinamis Ala Google Form (`/admin/form-kader`):
+     - Dibuat tabel `form_pertanyaan` dengan seksi (data_diri, keagamaan, kemuhammadiyahan, kemasyarakatan), tipe pertanyaan (text, textarea, number, select, checkbox), opsi dinamis, placeholder, toggle status aktif/sembunyi, toggle wajib/opsional, dan pengurutan nomor urut.
+     - Dikelola melalui antarmuka interaktif khusus Admin Daerah di `resources/views/admin/form-pertanyaan/index.blade.php` dengan modal Google-Form builder dan tabs seksi.
+     - Komponen rendering dinamis `<x-form-custom-fields>` dipasang pada form pendaftaran dan portal kader, menyimpan jawaban langsung ke JSON `custom_fields` secara fleksibel tanpa perlu migrasi berkala.
+  3. Pembersihan & Perbaikan UI Detail Kader (`admin/anggota/show.blade.php`):
+     - Mengeliminasi duplikasi banner & tombol pada status kader nonaktif (menghapus tombol ganda di header, menyatukan banner reaktivasi tunggal bernuansa gelap elegan, dan membatasi banner merah catatan perbaikan hanya saat status 'ditolak').
+     - Memperbarui kartu WhatsApp kader dengan logo resmi SVG WhatsApp hijau (`#25D366`), bukan icon emoji.
+  4. Verifikasi:
+     - 126 feature/unit tests lulus 100% (517 assertions).
+     - Laravel Pint clean (100% passed).
+     - Vite production build (`npm run build`) sukses tanpa issue.
+
 - 2026-09-15: Integrasi Data Admin Cabang (PCM) di Halaman Manajemen Akun Staf & Pengguna:
   1. Akar Masalah:
      - Query di `UserController::index` sebelumnya hanya memfilter `['admin', 'fasilitator', 'executive']`, sehingga 17 akun Admin Cabang yang sudah terdaftar di database tidak muncul.

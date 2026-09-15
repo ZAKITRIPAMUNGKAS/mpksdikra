@@ -36,13 +36,22 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (102 test hijau per 2026-09-14).
+- `php artisan test` — PHPUnit feature tests (131 test hijau per 2026-09-16).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
-- 2026-09-16: Transformasi Total Desain CV & Biodata Kader Menjadi Executive 2-Column Layout (1 Lembar Pas):
+- 2026-09-16: Rombak Final Desain PDF CV/Biodata Kader → Corporate Executive Profile (1 Lembar Tepat):
+  - Template `resources/views/pdf/biodata-kader.blade.php` ditulis ulang dari nol.
+  - Konsep "corporate executive dossier": kop resmi (logo MPKSDI kiri, Muhammadiyah kanan), divider navy-gold, doc-bar judul dokumen dengan nomor registrasi.
+  - **Pattern batik SVG**: diambil langsung dari `public/aset/batik-web-corner.svg` (identik komponen `batik-corner.blade.php`), ditempatkan di sudut kanan atas & kiri bawah.
+  - **Watermark logo MPKSDI** ultra-subtle di tengah halaman (opacity 4.5%).
+  - **Sidebar kiri (~166px)**: pasfoto, nama, NIK, badge status (aktif/nonaktif/pending berwarna), data pribadi (TTL, gender, nikah, ayah, ibu), kontak & domisili, pendidikan & bahasa, QR verifikasi.
+  - **Panel kanan**: 4 seksi dengan header navy + aksen kuning — I. Amanah & Profesi, II. Keagamaan & Kemasjidan (split 2 kolom), III. Rekam Jejak BA & keterangan custom, IV. Lembar Pengesahan.
+  - `PAGE_COUNT: 1` terverifikasi via DomPDF langsung.
+  - 131 tests passed, Pint clean, npm build OK. Commit: `4dea35c`.
+
   1. Eliminasi "Database-Generated Slop":
      - Menghilangkan struktur tabel kotak kaku, garis zebra kuitansi, dan blok hitam pekat yang memberatkan visual.
      - Menghapus ornamen sudut yang sebelumnya menabrak teks kop surat, menggantikannya dengan watermark resmi logo MPKSDI ultra-subtle (transparansi ~3.5% baked alpha) yang bersih dan tidak mengganggu keterbacaan data.

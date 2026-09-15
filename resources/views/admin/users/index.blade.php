@@ -126,6 +126,9 @@
                             </span>
                         </td>
                         <td class="py-3.5 px-5 text-right">
+                            <a href="{{ route('admin.users.edit', $u) }}" class="inline-block px-3 py-1 text-xs font-semibold rounded-lg border border-sky-200 text-sky-800 hover:bg-sky-50 transition shadow-2xs mr-1">
+                                Edit
+                            </a>
                             @if($u->id !== auth()->id())
                             <form method="POST" action="{{ route('admin.users.toggle', $u) }}" class="inline-block"
                                 onsubmit="return confirm('Ubah status akun {{ $u->name }}?')">

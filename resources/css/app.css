@@ -66,53 +66,46 @@ textarea:focus {
     box-shadow: 0 0 0 3px rgba(0, 92, 138, 0.15);
 }
 
-/* Heavy & Cinematic Scroll Reveal Animations */
+/* Light Scroll Reveal Animations */
 .reveal {
     opacity: 0;
-    transform: translateY(42px);
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: translateY(16px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-left {
     opacity: 0;
-    transform: translateX(-46px);
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: translateX(-20px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-right {
     opacity: 0;
-    transform: translateX(46px);
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: translateX(20px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-scale {
     opacity: 0;
-    transform: scale(0.86) translateY(28px);
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: scale(0.96) translateY(12px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-pop {
     opacity: 0;
-    transform: scale(0.8);
-    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.34, 1.4, 0.64, 1);
-    will-change: opacity, transform;
+    transform: scale(0.94);
+    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-top {
     opacity: 0;
-    transform: translateY(-28px);
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: translateY(-14px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-fade {
     opacity: 0;
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.is-revealed,
@@ -166,26 +159,24 @@ textarea:focus {
 
 /* Interactive Card Animations & Motion Effects */
 .card-lift {
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-    will-change: transform, box-shadow;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .card-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 22px 36px -12px rgba(0, 92, 138, 0.16), 0 12px 20px -8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -10px rgba(0, 92, 138, 0.14), 0 6px 12px -6px rgba(0, 0, 0, 0.05);
 }
 
 .card-lift-sm {
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
-    will-change: transform, box-shadow;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
 }
 
 .card-lift-sm:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 24px -8px rgba(0, 92, 138, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -6px rgba(0, 92, 138, 0.10), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
 }
 
-/* Ensure reveal entrance works at full 1.15s duration on cards */
+/* Entrance + hover: entrance singkat, hover tetap responsif */
 .reveal.card-lift,
 .reveal-left.card-lift,
 .reveal-right.card-lift,
@@ -198,18 +189,17 @@ textarea:focus {
 .reveal-scale.card-lift-sm,
 .reveal-pop.card-lift-sm,
 .reveal-top.card-lift-sm {
-    transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.3s ease;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 
-/* Once revealed, hover transforms seamlessly */
 .reveal.is-revealed.card-lift:hover,
 .reveal-left.is-revealed.card-lift:hover,
 .reveal-right.is-revealed.card-lift:hover,
 .reveal-scale.is-revealed.card-lift:hover,
 .reveal-pop.is-revealed.card-lift:hover,
 .reveal-top.is-revealed.card-lift:hover {
-    transform: translateY(-8px);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    transform: translateY(-3px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .reveal.is-revealed.card-lift-sm:hover,
@@ -218,19 +208,18 @@ textarea:focus {
 .reveal-scale.is-revealed.card-lift-sm:hover,
 .reveal-pop.is-revealed.card-lift-sm:hover,
 .reveal-top.is-revealed.card-lift-sm:hover {
-    transform: translateY(-5px);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    transform: translateY(-2px);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
 }
 
 /* Feature Item Badge Spring Reaction */
 .feature-badge-icon {
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, background-color 0.3s ease;
-    will-change: transform;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background-color 0.2s ease;
 }
 
 .group:hover .feature-badge-icon {
-    transform: scale(1.22) rotate(8deg);
-    box-shadow: 0 10px 18px -4px rgba(2, 132, 199, 0.38);
+    transform: scale(1.1) rotate(4deg);
+    box-shadow: 0 6px 12px -4px rgba(2, 132, 199, 0.3);
 }
 
 /* Diagonal Shimmer Sheen on Card Hover */
@@ -255,42 +244,31 @@ textarea:focus {
 
 .card-sheen:hover::after {
     left: 150%;
-    transition: left 0.85s ease-in-out;
+    transition: left 0.6s ease-in-out;
 }
 
-/* Gentle Micro Floating Animation for Hero Badges */
-@keyframes card-float-gentle {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
-}
-
-.animate-card-float {
-    animation: card-float-gentle 4.5s ease-in-out infinite;
-}
-
+/* Static soft glow for key focus badges (no infinite animation) */
+.animate-card-float,
 .animate-card-float-delayed {
-    animation: card-float-gentle 4.5s ease-in-out infinite 2.25s;
-}
-
-/* Pulsing Glow Ring for Key Focus Badges */
-@keyframes pulse-ring {
-    0% {
-        box-shadow: 0 0 0 0 rgba(1, 176, 245, 0.45);
-    }
-    70% {
-        box-shadow: 0 0 0 7px rgba(1, 176, 245, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(1, 176, 245, 0);
-    }
+    animation: none;
 }
 
 .animate-pulse-ring {
-    animation: pulse-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    box-shadow: 0 0 0 3px rgba(1, 176, 245, 0.18);
+    animation: none;
+}
+
+/* WhatsApp action button (warna brand WA, class eksplisit agar tidak bergantung scan arbitrary value) */
+.wa-btn {
+    background-color: #25d3661a;
+    color: #25d366;
+    border-color: #25d3664d;
+}
+
+.wa-btn:hover {
+    background-color: #25d366;
+    color: #ffffff;
+    border-color: #25d366;
 }
 
 /* Keyboard Focus Visibility */

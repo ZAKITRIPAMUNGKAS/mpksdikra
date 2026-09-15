@@ -76,6 +76,46 @@ class UserController extends Controller
             ->with('success', "Akun {$data['role']} berhasil dibuat dan aktif.");
     }
 
+    public function edit(User $user): View
+    {
+        abort_unless(in_array($user->role, ['admin', 'admin_cabang', 'fasilitator', 'executive'], true), 404);
+
+        return view('admin.users.edit', ['user' => $user]);
+    }
+
+    public function update(Request $request, User $user): RedirectResponse
+    {
+        abort_unless(in_array($user->role, ['admin', 'admin_cabang', 'fasilitator', 'executive'], true), 404);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', Rule::in(['admin', 'admin_cabang', 'fasilitator', 'executive'])],
+            'pcm' => ['nullable', 'required_if:role,admin_cabang', 'string', 'max:100'],
+            'no_wa' => ['nullable', 'string'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $noWa = ! empty($data['no_wa']) ? NomorWaNormalizer::normalize($data['no_wa']) : $user->no_wa;
+
+        $user->fill([
+            'name' => $data['name'],
+            'email' => strtolower(trim($data['email'])),
+            'role' => $data['role'],
+            'pcm' => $data['role'] === 'admin_cabang' ? ($data['pcm'] ?? null) : null,
+            'no_wa' => $noWa,
+        ]);
+
+        if (! empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "Akun {$user->name} berhasil diperbarui.");
+    }
+
     public function toggleStatus(User $user): RedirectResponse
     {
         abort_if((int) $user->id === (int) auth()->id(), 403, 'Anda tidak dapat mengubah status akun Anda sendiri.');

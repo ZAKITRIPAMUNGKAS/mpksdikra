@@ -42,6 +42,7 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Changelog `/updates` diperbarui ke v2.3.1 untuk validasi server-side pertanyaan custom aktif (wajib, tipe, opsi). Field standar tetap dirender hardcode; pengaturan standar belum terhubung ke form publik/profil. Jangan mengklaim integrasi Google Forms penuh selesai. Filter `is_custom` dipertahankan untuk mencegah duplikasi field inti.
 - 2026-09-16: Rombak Final Desain PDF CV/Biodata Kader → Corporate Executive Profile (1 Lembar Tepat):
   - Template `resources/views/pdf/biodata-kader.blade.php` ditulis ulang dari nol.
   - Konsep "corporate executive dossier": kop resmi (logo MPKSDI kiri, Muhammadiyah kanan), divider navy-gold, doc-bar judul dokumen dengan nomor registrasi.
@@ -876,4 +877,3 @@ Pola berguna dari referensi:
       - 94 feature & unit tests lulus 100% (293 assertions).
       - Laravel Pint lolos (0 issues).
       - Vite production build sukses (assets terkompilasi dalam 2.77s).
-

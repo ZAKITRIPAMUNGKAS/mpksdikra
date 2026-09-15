@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\FormPertanyaan;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -76,7 +77,7 @@ class AnggotaRegistrationRequest extends FormRequest
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
             'custom_fields' => ['nullable', 'array'],
-        ];
+        ] + FormPertanyaan::activeValidationRules();
     }
 
     public function messages(): array

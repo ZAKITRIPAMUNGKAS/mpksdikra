@@ -6,6 +6,7 @@ use App\Models\FormPertanyaan;
 use App\Models\User;
 use Database\Seeders\FormPertanyaanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
 class FormPertanyaanTest extends TestCase
@@ -48,6 +49,36 @@ class FormPertanyaanTest extends TestCase
         $response->assertSee('Pengaturan Formulir Pendaftaran Kader');
         $response->assertSee('Nama Ayah Kandung');
         $response->assertSee('Nama Ibu Kandung');
+    }
+
+    public function test_default_questions_are_not_duplicated_as_custom_answers(): void
+    {
+        $this->seed(FormPertanyaanSeeder::class);
+
+        $this->get(route('anggota.register'))
+            ->assertOk()
+            ->assertDontSee('name="custom_fields[nama_lengkap]"', false)
+            ->assertSee('name="nama_lengkap"', false);
+
+        $rules = FormPertanyaan::activeValidationRules();
+
+        $this->assertArrayNotHasKey('custom_fields.nama_lengkap', $rules);
+    }
+
+    public function test_admin_required_setting_generates_required_validation_rule(): void
+    {
+        $question = FormPertanyaan::create([
+            'kode' => 'custom_contoh', 'label' => 'Contoh', 'seksi' => 'tambahan',
+            'tipe' => 'text', 'is_custom' => true, 'is_aktif' => true, 'is_wajib' => true,
+        ]);
+
+        $rules = FormPertanyaan::activeValidationRules();
+
+        $validator = Validator::make([], $rules);
+        $this->assertTrue($validator->fails());
+        $this->assertTrue($validator->errors()->has('custom_fields.custom_contoh'));
+        $question->update(['is_aktif' => false]);
+        $this->assertTrue(Validator::make([], FormPertanyaan::activeValidationRules())->passes());
     }
 
     public function test_non_admin_daerah_cannot_access_form_pertanyaan_page(): void

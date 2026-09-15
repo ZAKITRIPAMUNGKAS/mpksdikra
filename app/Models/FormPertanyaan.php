@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 
 class FormPertanyaan extends Model
 {
@@ -63,5 +64,28 @@ class FormPertanyaan extends Model
     public function scopeSeksi(Builder $query, string $seksi): Builder
     {
         return $query->where('seksi', $seksi);
+    }
+
+    public static function activeValidationRules(): array
+    {
+        $rules = [];
+
+        foreach (static::aktif()->where('is_custom', true)->ordered()->get() as $question) {
+            $key = 'custom_fields.'.$question->kode;
+            $required = $question->is_wajib ? 'required' : 'nullable';
+
+            $rules[$key] = match ($question->tipe) {
+                'number' => [$required, 'numeric'],
+                'select' => array_merge([$required, 'string'], $question->opsi ? [Rule::in($question->opsi)] : []),
+                'checkbox' => [$required, 'array'],
+                default => [$required, 'string', 'max:5000'],
+            };
+
+            if ($question->tipe === 'checkbox') {
+                $rules[$key.'.*'] = array_merge(['string'], $question->opsi ? [Rule::in($question->opsi)] : []);
+            }
+        }
+
+        return $rules;
     }
 }

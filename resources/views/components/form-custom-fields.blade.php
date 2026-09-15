@@ -1,10 +1,10 @@
-@props(['questions' => null, 'values' => []])
+@props(['questions' => null, 'values' => [], 'title' => 'Pertanyaan Formulir'])
 
 @if(!empty($questions) && count($questions) > 0)
     <div class="pt-4 border-t border-slate-200 space-y-4">
         <div class="flex items-center gap-2">
             <span class="text-xs font-bold uppercase tracking-wider text-sky-800 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
-                Pertanyaan Tambahan
+                {{ $title }}
             </span>
         </div>
 

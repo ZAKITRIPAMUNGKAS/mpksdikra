@@ -82,7 +82,7 @@ class ProfileController extends Controller
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
             'custom_fields' => ['nullable', 'array'],
-        ]);
+        ] + FormPertanyaan::activeValidationRules());
 
         if (empty($data['jabatan_aum']) && ! empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
             $data['jabatan_aum'] = $data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'];

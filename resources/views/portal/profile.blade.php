@@ -66,10 +66,18 @@
                 </div>
             </div>
 
-            <a href="{{ route('portal.dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-700 bg-white hover:bg-sky-50 hover:text-sky-800 border border-slate-200/90 transition shadow-2xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span>Kembali ke Portal</span>
-            </a>
+            <div class="flex items-center gap-2 flex-wrap">
+                <a href="{{ route('portal.profile.cetak-pdf') }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-300 transition shadow-2xs">
+                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>Cetak Biodata (PDF)</span>
+                </a>
+                <a href="{{ route('portal.dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-700 bg-white hover:bg-sky-50 hover:text-sky-800 border border-slate-200/90 transition shadow-2xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>Kembali ke Portal</span>
+                </a>
+            </div>
         </div>
 
         @if($anggota?->catatan_verifikasi)

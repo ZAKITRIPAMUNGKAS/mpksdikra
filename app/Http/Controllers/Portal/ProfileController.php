@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\FormPertanyaan;
+use App\Services\QrService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -101,5 +104,33 @@ class ProfileController extends Controller
         auth()->user()->update(['name' => $data['nama_lengkap']]);
 
         return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function cetakPdf(QrService $qrService)
+    {
+        $anggota = auth()->user()->anggota;
+        abort_unless($anggota !== null, 404, 'Data anggota tidak ditemukan.');
+        $anggota->load(['user', 'organisasi', 'eventPeserta.event']);
+
+        $qrUrl = url('/cek-status?q='.urlencode($anggota->nik ?: ($anggota->no_wa ?: (string) $anggota->id)));
+        $qrPng = $qrService->qrPngDataUriForText($qrUrl, 6, 2);
+
+        $fotoDataUri = null;
+        if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+            $mime = Storage::disk('local')->mimeType($anggota->foto) ?: 'image/jpeg';
+            $content = Storage::disk('local')->get($anggota->foto);
+            $fotoDataUri = 'data:'.$mime.';base64,'.base64_encode($content);
+        }
+
+        $pdf = Pdf::loadView('pdf.biodata-kader', compact('anggota', 'qrPng', 'fotoDataUri'));
+        $pdf->setPaper('a4', 'portrait');
+
+        $filename = 'cv-biodata-'.Str::slug($anggota->nama_lengkap).'.pdf';
+
+        if (request()->has('stream')) {
+            return $pdf->stream($filename);
+        }
+
+        return $pdf->download($filename);
     }
 }

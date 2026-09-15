@@ -95,6 +95,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/anggota', [AdminAnggotaController::class, 'index'])->name('anggota.index');
         Route::get('/anggota/export', [AdminAnggotaController::class, 'export'])->name('anggota.export');
         Route::get('/anggota/{anggota}', [AdminAnggotaController::class, 'show'])->name('anggota.show');
+        Route::get('/anggota/{anggota}/cetak-pdf', [AdminAnggotaController::class, 'cetakPdf'])->name('anggota.cetak-pdf');
         Route::post('/anggota/{anggota}/verify', [AdminAnggotaController::class, 'verify'])->name('anggota.verify');
         Route::post('/anggota/{anggota}/reject', [AdminAnggotaController::class, 'reject'])->name('anggota.reject');
         Route::post('/anggota/{anggota}/deactivate', [AdminAnggotaController::class, 'deactivate'])->name('anggota.deactivate');
@@ -183,6 +184,7 @@ Route::middleware(['auth', 'role:anggota'])->prefix('portal')->name('portal.')->
     Route::get('/dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profil', [PortalProfileController::class, 'index'])->name('profile.index');
     Route::put('/profil', [PortalProfileController::class, 'update'])->name('profile.update');
+    Route::get('/biodata-pdf', [PortalProfileController::class, 'cetakPdf'])->name('profile.cetak-pdf');
 
     Route::get('/tes', [PortalTesController::class, 'index'])->name('tes.index');
     Route::get('/tes/{event}/{tipe}', [PortalTesController::class, 'show'])->name('tes.show');

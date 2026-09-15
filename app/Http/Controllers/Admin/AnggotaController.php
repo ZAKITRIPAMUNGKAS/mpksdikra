@@ -6,11 +6,15 @@ use App\Exports\AnggotaExport;
 use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\User;
+use App\Services\QrService;
 use App\Services\WhatsAppNotificationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -75,6 +79,33 @@ class AnggotaController extends Controller
         $anggota->load(['user', 'organisasi']);
 
         return view('admin.anggota.show', ['anggota' => $anggota]);
+    }
+
+    public function cetakPdf(Anggota $anggota, QrService $qrService)
+    {
+        $this->authorizeCabang($anggota);
+        $anggota->load(['user', 'organisasi', 'eventPeserta.event']);
+
+        $qrUrl = url('/cek-status?q='.urlencode($anggota->nik ?: ($anggota->no_wa ?: (string) $anggota->id)));
+        $qrPng = $qrService->qrPngDataUriForText($qrUrl, 6, 2);
+
+        $fotoDataUri = null;
+        if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+            $mime = Storage::disk('local')->mimeType($anggota->foto) ?: 'image/jpeg';
+            $content = Storage::disk('local')->get($anggota->foto);
+            $fotoDataUri = 'data:'.$mime.';base64,'.base64_encode($content);
+        }
+
+        $pdf = Pdf::loadView('pdf.biodata-kader', compact('anggota', 'qrPng', 'fotoDataUri'));
+        $pdf->setPaper('a4', 'portrait');
+
+        $filename = 'cv-biodata-'.Str::slug($anggota->nama_lengkap).'.pdf';
+
+        if (request()->has('stream')) {
+            return $pdf->stream($filename);
+        }
+
+        return $pdf->download($filename);
     }
 
     public function verify(Anggota $anggota): RedirectResponse

@@ -68,19 +68,22 @@ class QrService
 
     public function qrPngDataUri(EventPeserta $ep): string
     {
+        return $this->qrPngDataUriForText($this->payload($ep));
+    }
+
+    public function qrPngDataUriForText(string $text, int $scale = 8, int $margin = 2): string
+    {
         $matrix = Encoder::encode(
-            $this->payload($ep),
+            $text,
             ErrorCorrectionLevel::forBits(0)
         )->getMatrix();
 
         $size = $matrix->getWidth();
-        $scale = 10;
-        $margin = 4;
         $px = ($size + $margin * 2) * $scale;
 
         $img = imagecreatetruecolor($px, $px);
         $white = imagecolorallocate($img, 255, 255, 255);
-        $black = imagecolorallocate($img, 18, 37, 27);
+        $black = imagecolorallocate($img, 0, 43, 64);
         imagefilledrectangle($img, 0, 0, $px, $px, $white);
 
         for ($y = 0; $y < $size; $y++) {

@@ -33,12 +33,18 @@
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">Pangkalan Data Kader &bull; MPKSDI PDM Karanganyar</p>
                 </div>
             </div>
-            <div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <a href="{{ route('portal.profile.cetak-pdf') }}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-sky-300 bg-sky-50 text-xs font-semibold text-sky-800 hover:bg-sky-100 transition shadow-2xs">
+                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>Cetak CV / Biodata</span>
+                </a>
                 <a href="{{ route('portal.profile.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200/90 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-sky-800 transition shadow-2xs">
                     <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                    <span>Biodata Kader</span>
+                    <span>Kelola Profil</span>
                 </a>
             </div>
         </div>

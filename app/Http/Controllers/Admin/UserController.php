@@ -18,9 +18,12 @@ class UserController extends Controller
         $role = $request->string('role')->toString();
         $q = trim($request->string('q')->toString());
 
-        $query = User::whereIn('role', ['admin', 'fasilitator', 'executive'])->latest();
+        $allowedRoles = ['admin', 'admin_cabang', 'fasilitator', 'executive'];
+        $query = User::whereIn('role', $allowedRoles)
+            ->orderByRaw("CASE role WHEN 'admin' THEN 1 WHEN 'admin_cabang' THEN 2 WHEN 'fasilitator' THEN 3 WHEN 'executive' THEN 4 ELSE 5 END")
+            ->orderBy('name');
 
-        if (in_array($role, ['admin', 'fasilitator', 'executive'], true)) {
+        if (in_array($role, $allowedRoles, true)) {
             $query->where('role', $role);
         }
 
@@ -28,12 +31,13 @@ class UserController extends Controller
             $query->where(function ($sub) use ($q) {
                 $sub->where('name', 'like', "%{$q}%")
                     ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('pcm', 'like', "%{$q}%")
                     ->orWhere('no_wa', 'like', "%{$q}%");
             });
         }
 
         return view('admin.users.index', [
-            'users' => $query->paginate(15)->withQueryString(),
+            'users' => $query->paginate(25)->withQueryString(),
             'currentRole' => $role,
             'q' => $q,
         ]);
@@ -48,9 +52,10 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', Rule::in(['admin', 'fasilitator', 'executive'])],
+            'role' => ['required', Rule::in(['admin', 'admin_cabang', 'fasilitator', 'executive'])],
+            'pcm' => ['nullable', 'required_if:role,admin_cabang', 'string', 'max:100'],
             'no_wa' => ['nullable', 'string'],
         ]);
 
@@ -58,9 +63,10 @@ class UserController extends Controller
 
         User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'email' => strtolower(trim($data['email'])),
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
+            'pcm' => $data['role'] === 'admin_cabang' ? ($data['pcm'] ?? null) : null,
             'status' => 'aktif',
             'no_wa' => $noWa,
             'verified_at' => now(),

@@ -42,6 +42,15 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-15: Integrasi Data Admin Cabang (PCM) di Halaman Manajemen Akun Staf & Pengguna:
+  1. Akar Masalah:
+     - Query di `UserController::index` sebelumnya hanya memfilter `['admin', 'fasilitator', 'executive']`, sehingga 17 akun Admin Cabang yang sudah terdaftar di database tidak muncul.
+  2. Solusi & Pembaruan:
+     - Memperluas query `UserController::index` untuk menyertakan role `admin_cabang`, dengan urutan prioritas terstruktur (Admin Daerah -> Admin Cabang -> Fasilitator -> Eksekutif) dan pencarian mencakup nama, email/username, no WA, dan wilayah `pcm`.
+     - Menambahkan tab filter `Admin Cabang (PCM)` di `resources/views/admin/users/index.blade.php` dengan badge wilayah PCM, username login, kontak WhatsApp, dan tindakan kelola status aktif/nonaktif.
+     - Memperbarui `resources/views/admin/users/create.blade.php` dan `UserController::store` sehingga Admin Daerah dapat membuat akun Admin Cabang baru secara terstruktur dengan memilih wilayah PCM (17 kecamatan resmi se-Karanganyar).
+  3. Verifikasi:
+     - 120 tests lulus 100% (487 assertions), Pint passed, Vite production build clean.
 - 2026-09-15: Pengembangan Sistem Penonaktifan & Reaktivasi Akun Kader:
   1. Modal & Kategori Penonaktifan:
      - Admin dapat menonaktifkan kader dengan memilih kategori alasan terstruktur (Pindah Domisili/Mutasi Luar Daerah, Wafat/Meninggal Dunia, Mengundurkan Diri dari Kepengurusan/AUM, Pelanggaran Etik/Disiplin Persyarikatan, atau Lainnya) serta catatan detail di `resources/views/admin/anggota/show.blade.php`.

@@ -30,23 +30,23 @@
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">Tambah Akun Staf Baru</h1>
                 <p class="text-xs sm:text-sm text-slate-500 mb-6 font-normal">Buat akun untuk Fasilitator, Eksekutif (Pimpinan), atau Administrator sistem.</p>
 
-                <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-4" x-data="{ role: '{{ old('role', 'fasilitator') }}' }">
                     @csrf
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nama Lengkap &amp; Gelar <span class="text-red-500">*</span></label>
                         <input type="text" name="name" value="{{ old('name') }}" required
                             class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-normal rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/70 focus:bg-white outline-none transition shadow-2xs"
-                            placeholder="Contoh: Dr. H. Ahmad Dahlan, M.Ag">
+                            placeholder="Contoh: Dr. H. Ahmad Dahlan, M.Ag atau Admin PCM Colomadu">
                         @error('name') <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Email Akun (Login) <span class="text-red-500">*</span></label>
-                            <input type="email" name="email" value="{{ old('email') }}" required
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Email / Username Login <span class="text-red-500">*</span></label>
+                            <input type="text" name="email" value="{{ old('email') }}" required
                                 class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-normal rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/70 focus:bg-white outline-none transition shadow-2xs"
-                                placeholder="staf@mpksdi.test">
+                                placeholder="Email (misal: staf@mpksdi.test) atau username cabang (misal: colomadu)">
                             @error('email') <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                         </div>
 
@@ -61,12 +61,26 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Peran / Hak Akses <span class="text-red-500">*</span></label>
-                        <select name="role" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/70 focus:bg-white outline-none transition shadow-2xs cursor-pointer">
+                        <select name="role" x-model="role" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/70 focus:bg-white outline-none transition shadow-2xs cursor-pointer">
                             <option value="fasilitator" @selected(old('role')==='fasilitator')>Fasilitator (Penugasan event: scanner presensi, nilai observasi, keaktifan)</option>
                             <option value="executive" @selected(old('role')==='executive')>Eksekutif / Pimpinan (Akses tinjau laporan, monitoring, &amp; ekspor data)</option>
-                            <option value="admin" @selected(old('role')==='admin')>Admin Utama (Akses penuh ke konfigurasi dan manajemen sistem)</option>
+                            <option value="admin_cabang" @selected(old('role')==='admin_cabang')>Admin Cabang (Pengelola pangkalan data &amp; verifikasi kader tingkat PCM)</option>
+                            <option value="admin" @selected(old('role')==='admin')>Admin Utama Daerah (Akses penuh ke konfigurasi dan manajemen sistem PDM)</option>
                         </select>
                         @error('role') <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Dynamic PCM Dropdown untuk Admin Cabang --}}
+                    <div x-show="role === 'admin_cabang'" x-transition class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                        <label class="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-1.5">Wilayah Pimpinan Cabang Muhammadiyah (PCM) <span class="text-red-500">*</span></label>
+                        <select name="pcm" :required="role === 'admin_cabang'" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-lg border border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white outline-none transition shadow-2xs cursor-pointer">
+                            <option value="">-- Pilih Wilayah PCM se-Kabupaten Karanganyar --</option>
+                            @foreach(['Colomadu', 'Gondangrejo', 'Jaten', 'Jatipuro', 'Jatiyoso', 'Jenawi', 'Jumantono', 'Jumapolo', 'Karanganyar', 'Karangpandan', 'Kebakkramat', 'Kerjo', 'Matesih', 'Mojogedang', 'Ngargoyoso', 'Tasikmadu', 'Tawangmangu'] as $pcm)
+                                <option value="{{ $pcm }}" @selected(old('pcm') === $pcm)>PCM {{ $pcm }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-[11px] text-emerald-800 mt-1.5 font-normal">Admin cabang hanya memiliki kewenangan melihat dan memverifikasi berkas kader di PCM yang ditugaskan.</p>
+                        @error('pcm') <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
@@ -103,6 +117,12 @@
             <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Matriks Wewenang Peran</span>
                 <div class="space-y-3.5 text-xs">
+                    <div class="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200/80">
+                        <strong class="text-emerald-950 block font-bold mb-1">Admin Cabang (PCM):</strong>
+                        <p class="text-slate-600 leading-relaxed font-normal">
+                            Akses panel pangkalan data tingkat cabang. Berwenang memverifikasi, menolak dengan catatan, mereset kata sandi, dan mengunduh rekapitulasi data kader (Excel) di PCM masing-masing.
+                        </p>
+                    </div>
                     <div class="p-3 rounded-lg bg-sky-50/60 border border-sky-200/80">
                         <strong class="text-sky-900 block font-bold mb-1">Fasilitator Perkaderan:</strong>
                         <p class="text-slate-600 leading-relaxed font-normal">
@@ -116,9 +136,9 @@
                         </p>
                     </div>
                     <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                        <strong class="text-slate-900 block font-bold mb-1">Administrator Utama:</strong>
+                        <strong class="text-slate-900 block font-bold mb-1">Administrator Utama Daerah:</strong>
                         <p class="text-slate-600 leading-relaxed font-normal">
-                            Hak akses penuh seluruh sistem: memverifikasi pendaftaran kader, mengelola bank soal CBT, mengkonfigurasi rubrik, manajemen akun personalia, dan penerbitan sertifikat.
+                            Hak akses penuh seluruh sistem: memverifikasi pendaftaran kader, konfigurasi 17 cabang, kelola akun personalia, bank soal CBT, dan penerbitan sertifikat.
                         </p>
                     </div>
                 </div>

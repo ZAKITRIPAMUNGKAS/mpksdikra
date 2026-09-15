@@ -42,14 +42,15 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
-- 2026-09-16: Penyempurnaan Cetak CV / Biodata PDF Menjadi 1 Lembar Penuh, Watermark Logo MPKSDI & Pattern SVG Batik:
-  1. Presisi 1 Lembar Penuh (Strict Single-Page A4):
-     - Menata ulang layout vertikal, padding tabel, dan tinggi hero box secara proporsional sehingga seluruh data diri, riwayat pendidikan, amanah persyarikatan, profil keagamaan, serta kolom tanda tangan dan pengesahan pas tepat dalam 1 (satu) halaman A4 tanpa tumpah ke halaman kedua.
-     - Telah diverifikasi dengan uji batch halaman pada seluruh sampel kader di database (`PAGE_COUNT: 1`).
-  2. Watermark Resmi Logo MPKSDI:
-     - Dibuatkan aset watermark transparan khusus `public/aset/logo-mpksdi-watermark.png` dari lambang resmi MPKSDI dengan transparansi halus (~6-7% opacity) yang ditempatkan persis di tengah halaman dokumen di balik konten teks/tabel.
-  3. Ornamen Pattern SVG Batik Solo:
-     - Mengintegrasikan elemen visual `public/aset/batik-surya-solo.svg` pada sudut dokumen sebagai aksen ornamen tradisi batik khas persyarikatan.
+- 2026-09-16: Transformasi Total Desain CV & Biodata Kader Menjadi Executive 2-Column Layout (1 Lembar Pas):
+  1. Eliminasi "Database-Generated Slop":
+     - Menghilangkan struktur tabel kotak kaku, garis zebra kuitansi, dan blok hitam pekat yang memberatkan visual.
+     - Menghapus ornamen sudut yang sebelumnya menabrak teks kop surat, menggantikannya dengan watermark resmi logo MPKSDI ultra-subtle (transparansi ~3.5% baked alpha) yang bersih dan tidak mengganggu keterbacaan data.
+  2. Arsitektur Executive 2-Column Resume:
+     - **Sidebar Kiri (~33%)**: Wadah berlatar abu-abu halus (`#f8fafc`) memuat pasfoto 3×4 formal, nama, NIK, badge status kader, data pribadi/keluarga (TTL, gender, nikah, ayah, ibu), kontak & domisili, riwayat pendidikan & bahasa, serta QR Code validasi keaslian dokumen di bagian dasar.
+     - **Kanvas Utama Kanan (~67%)**: Judul seksi bernuansa Deep Ocean Blue (`#002b40`) dengan aksen garis bawah tipis, memuat Amanah Persyarikatan & Profesi (PCM, PRM, AUM, Ortom), Profil Keagamaan & Kemasjidan (Qur'an, Sholat, Kajian, ZIS, Takmir, Pengabdian), Rekam Jejak BA & Catatan Tambahan, serta Lembar Pengesahan Resmi (Kader & Ketua MPKSDI H. Zainudin Ahpandi, S.E.).
+  3. Strict 1-Page Precision:
+     - Dikalibrasi presisi dengan margin 7mm/9mm dan font hierarchy terstruktur sehingga 100% pas dalam 1 halaman A4 tanpa tumpah ke halaman kedua (`PAGE_COUNT: 1`).
   4. Pengujian & Verifikasi:
      - 131 tests lulus 100% (528 assertions). Pint clean, Vite production build clean.
 

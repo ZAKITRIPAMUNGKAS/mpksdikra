@@ -146,14 +146,72 @@ class AnggotaController extends Controller
         return $redirect;
     }
 
-    public function deactivate(Anggota $anggota): RedirectResponse
+    public function deactivate(Request $request, Anggota $anggota): RedirectResponse
     {
         $this->authorizeCabang($anggota);
-        $anggota->user->update(['status' => 'nonaktif']);
 
-        return redirect()
+        $alasan = trim((string) $request->input('alasan_nonaktif', ''));
+        if ($alasan === '') {
+            $alasan = 'Penonaktifan oleh Administrator MPKSDI.';
+        }
+
+        $anggota->user->update(['status' => 'nonaktif']);
+        $anggota->update([
+            'catatan_verifikasi' => $alasan,
+        ]);
+
+        $pesan = WhatsAppNotificationService::pesanPenonaktifan($anggota, $alasan);
+        $waUrl = $this->waUrl($anggota, $pesan);
+
+        $autoStatus = null;
+        if ($anggota->no_wa) {
+            $autoStatus = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        }
+
+        $redirect = redirect()
             ->route('admin.anggota.show', $anggota)
-            ->with('success', 'Anggota dinonaktifkan.');
+            ->with('success', 'Anggota berhasil dinonaktifkan.')
+            ->with('wa_url', $waUrl);
+
+        if ($autoStatus !== null) {
+            $redirect->with('wa_auto_sent', $autoStatus['success'])
+                ->with('wa_auto_message', $autoStatus['message']);
+        }
+
+        return $redirect;
+    }
+
+    public function activate(Anggota $anggota): RedirectResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        $anggota->user->update([
+            'status' => 'aktif',
+            'verified_at' => $anggota->user->verified_at ?? now(),
+        ]);
+        $anggota->update([
+            'catatan_verifikasi' => null,
+        ]);
+
+        $pesan = WhatsAppNotificationService::pesanReaktivasi($anggota);
+        $waUrl = $this->waUrl($anggota, $pesan);
+
+        $autoStatus = null;
+        if ($anggota->no_wa) {
+            $autoStatus = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        }
+
+        $redirect = redirect()
+            ->route('admin.anggota.show', $anggota)
+            ->with('success', 'Akun anggota telah diaktifkan kembali.')
+            ->with('wa_url', $waUrl);
+
+        if ($autoStatus !== null) {
+            $redirect->with('wa_auto_sent', $autoStatus['success'])
+                ->with('wa_auto_message', $autoStatus['message']);
+        }
+
+        return $redirect;
     }
 
     public function resetPassword(Anggota $anggota): RedirectResponse

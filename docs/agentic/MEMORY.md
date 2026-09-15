@@ -42,6 +42,20 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-15: Pengembangan Sistem Penonaktifan & Reaktivasi Akun Kader:
+  1. Modal & Kategori Penonaktifan:
+     - Admin dapat menonaktifkan kader dengan memilih kategori alasan terstruktur (Pindah Domisili/Mutasi Luar Daerah, Wafat/Meninggal Dunia, Mengundurkan Diri dari Kepengurusan/AUM, Pelanggaran Etik/Disiplin Persyarikatan, atau Lainnya) serta catatan detail di `resources/views/admin/anggota/show.blade.php`.
+     - Keterangan disimpan pada kolom `catatan_verifikasi` model `Anggota`.
+  2. Notifikasi WhatsApp Otomatis:
+     - Dibuatkan template pesan resmi `pesanPenonaktifan` dan `pesanReaktivasi` di `WhatsAppNotificationService`.
+     - `AnggotaController::deactivate` otomatis mengirimkan pemberitahuan WA dan menyimpan fallback `wa_url`.
+     - `AnggotaController::activate` ditambahkan (rute `POST /admin/anggota/{anggota}/activate`) untuk mengaktifkan kembali (reaktivasi) akun kader yang nonaktif dan mengirimkan pesan reaktivasi via WhatsApp.
+  3. Integrasi Login & Cek Status:
+     - `LoginController`: Menampilkan pesan gagal login informatif yang memuat alasan penonaktifan spesifik kader.
+     - `auth/cek-status.blade.php`: Menampilkan kartu status pendaftaran "NONAKTIF" berdesain slate yang jelas, memuat alasan penonaktifan dan tombol pintas WhatsApp ke Helpdesk MPKSDI.
+  4. Pengujian & Verifikasi:
+     - 119 tests lulus 100% (477 assertions) mencakup deactivasi ber-alasan, aktivasi kembali, dan cek status nonaktif.
+     - Pint clean, Vite production build sukses.
 - 2026-09-15: Integrasi Pengiriman Pesan Otomatis WhatsApp Gateway (Fonnte API):
   1. Arsitektur & Konfigurasi:
      - Menambahkan konfigurasi gateway di `config/services.php` (`services.whatsapp`) dan `.env.example` (`WA_GATEWAY_PROVIDER`, `WA_GATEWAY_TOKEN`, `WA_GATEWAY_ENDPOINT`).

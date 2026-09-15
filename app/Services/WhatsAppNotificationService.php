@@ -194,6 +194,48 @@ class WhatsAppNotificationService
     }
 
     /**
+     * Pesan notifikasi penonaktifan akun kader oleh admin
+     */
+    public static function pesanPenonaktifan(Anggota $anggota, string $alasan = ''): string
+    {
+        $nama = $anggota->nama_lengkap;
+        $keterangan = $alasan ?: 'Penyesuaian administrasi kepengurusan kader.';
+
+        return "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Yth. Bapak/Ibu *{$nama}*,\n\n"
+            ."Pemberitahuan administrasi kader di *MPKSDI PDM Karanganyar*:\n"
+            ."Status akun keanggotaan Anda saat ini telah diubah menjadi *NONAKTIF*.\n\n"
+            ."📝 Keterangan / Alasan:\n"
+            ."*\"{$keterangan}\"*\n\n"
+            ."Apabila terdapat kekeliruan atau membutuhkan klarifikasi lebih lanjut, silakan menghubungi Sekretariat MPKSDI PDM Karanganyar.\n\n"
+            ."Wassalamu'alaikum Wr. Wb.\n\n"
+            .'— *Sekretariat MPKSDI PDM Karanganyar*';
+    }
+
+    /**
+     * Pesan notifikasi pengaktifan kembali (reaktivasi) akun kader
+     */
+    public static function pesanReaktivasi(Anggota $anggota): string
+    {
+        $nama = $anggota->nama_lengkap;
+        $noWa = $anggota->no_wa ?: '-';
+        $noWaDisplay = str_starts_with($noWa, '62') ? ('0'.substr($noWa, 2)) : $noWa;
+        $portalUrl = route('login');
+
+        return "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Yth. Bapak/Ibu *{$nama}*,\n\n"
+            ."Alhamdulillah, akun Portal Kader Anda di *MPKSDI PDM Karanganyar* telah *DIAKTIFKAN KEMBALI*.\n\n"
+            ."Anda kini dapat kembali masuk dan mengakses portal perkaderan:\n"
+            ."🔗 {$portalUrl}\n\n"
+            ."Detail Masuk Portal:\n"
+            ."👤 Username: *{$noWaDisplay}* (atau *{$noWa}*)\n"
+            ."🔑 Kata Sandi: Tanggal Lahir Anda (Format DDMMYYYY)\n\n"
+            ."Nashrun Minallah wa Fathun Qarib.\n"
+            ."Wassalamu'alaikum Wr. Wb.\n\n"
+            .'— *Sekretariat MPKSDI PDM Karanganyar*';
+    }
+
+    /**
      * Pesan bantuan lupa sandi untuk kader ke Helpdesk MPKSDI
      */
     public static function urlBantuanLupaSandi(string $helpdeskNoWa = '6281226000000'): string

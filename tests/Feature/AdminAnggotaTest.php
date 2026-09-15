@@ -118,13 +118,40 @@ class AdminAnggotaTest extends TestCase
     {
         $admin = $this->admin();
         $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
-        $a = Anggota::factory()->create(['user_id' => $user->id]);
+        $a = Anggota::factory()->create(['user_id' => $user->id, 'no_wa' => '081234567890']);
 
         $this->actingAs($admin)
-            ->post(route('admin.anggota.deactivate', $a))
-            ->assertRedirect(route('admin.anggota.show', $a));
+            ->post(route('admin.anggota.deactivate', $a), [
+                'alasan_nonaktif' => 'Pindah domisili luar daerah',
+            ])
+            ->assertRedirect(route('admin.anggota.show', $a))
+            ->assertSessionHas('success')
+            ->assertSessionHas('wa_url')
+            ->assertSessionHas('wa_auto_sent', true);
 
         $this->assertSame('nonaktif', $user->fresh()->status);
+        $this->assertSame('Pindah domisili luar daerah', $a->fresh()->catatan_verifikasi);
+    }
+
+    public function test_admin_can_activate_nonaktif_anggota(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'nonaktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'no_wa' => '081234567890',
+            'catatan_verifikasi' => 'Alasan sebelumnya',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.anggota.activate', $a))
+            ->assertRedirect(route('admin.anggota.show', $a))
+            ->assertSessionHas('success')
+            ->assertSessionHas('wa_url')
+            ->assertSessionHas('wa_auto_sent', true);
+
+        $this->assertSame('aktif', $user->fresh()->status);
+        $this->assertNull($a->fresh()->catatan_verifikasi);
     }
 
     public function test_admin_can_view_anggota_detail_with_pcm_prm_and_organizations(): void

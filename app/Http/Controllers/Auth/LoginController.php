@@ -162,7 +162,7 @@ class LoginController extends Controller
         if (! $user->isAktif()) {
             $msg = match ($user->status) {
                 'ditolak' => 'Pendaftaran akun Anda belum dapat disetujui.'.($user->anggota?->catatan_verifikasi ? ' Catatan: '.$user->anggota->catatan_verifikasi : ' Silakan hubungi admin MPKSDI.'),
-                'nonaktif' => 'Akun Anda berstatus nonaktif. Silakan hubungi admin MPKSDI.',
+                'nonaktif' => 'Akun Anda berstatus nonaktif.'.($user->anggota?->catatan_verifikasi ? ' Keterangan: '.$user->anggota->catatan_verifikasi : ' Silakan hubungi admin MPKSDI.'),
                 default => 'Akun belum diverifikasi admin.',
             };
 

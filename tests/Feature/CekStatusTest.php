@@ -66,6 +66,23 @@ class CekStatusTest extends TestCase
             ->assertSee('Foto KTP buram, mohon perbaiki.');
     }
 
+    public function test_cek_status_shows_nonaktif_status_and_notes(): void
+    {
+        $user = User::factory()->create(['status' => 'nonaktif']);
+        Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Kader Nonaktif',
+            'nik' => '3313010101900013',
+            'catatan_verifikasi' => 'Pindah domisili luar provinsi.',
+        ]);
+
+        $this->post(route('cek-status.check'), ['identifier' => '3313010101900013'])
+            ->assertOk()
+            ->assertSee('Kader Nonaktif')
+            ->assertSee('NONAKTIF')
+            ->assertSee('Pindah domisili luar provinsi.');
+    }
+
     public function test_cek_status_shows_not_found(): void
     {
         $this->post(route('cek-status.check'), ['identifier' => '9999999999999999'])

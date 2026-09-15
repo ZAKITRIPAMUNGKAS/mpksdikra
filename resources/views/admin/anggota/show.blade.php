@@ -34,12 +34,22 @@
                     </div>
                 </div>
             </div>
-            <div class="flex gap-2 flex-wrap items-center" x-data="{ showRejectModal: false }">
-                @if($anggota->user->status !== 'aktif')
+            <div class="flex gap-2 flex-wrap items-center" x-data="{ showRejectModal: false, showDeactivateModal: false }">
+                @if($anggota->user->status === 'menunggu_verifikasi' || $anggota->user->status === 'ditolak')
                 <form method="POST" action="{{ route('admin.anggota.verify', $anggota) }}">
                     @csrf
                     <button type="submit" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
                         Verifikasi &amp; Aktifkan
+                    </button>
+                </form>
+                @endif
+
+                @if($anggota->user->status === 'nonaktif')
+                <form method="POST" action="{{ route('admin.anggota.activate', $anggota) }}" onsubmit="return confirm('Aktifkan kembali akun kader ini?')">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>Aktifkan Kembali (Reaktivasi)</span>
                     </button>
                 </form>
                 @endif
@@ -72,18 +82,66 @@
                 @endif
 
                 @if($anggota->user->status === 'aktif')
-                <form method="POST" action="{{ route('admin.anggota.deactivate', $anggota) }}"
-                    onsubmit="return confirm('Nonaktifkan anggota ini?')">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 border border-red-200 text-red-700 text-xs font-semibold rounded-lg bg-white hover:bg-red-50 transition shadow-2xs">
-                        Nonaktifkan
-                    </button>
-                </form>
+                <button type="button" @click="showDeactivateModal = true" class="px-4 py-2 border border-red-200 text-red-700 text-xs font-semibold rounded-lg bg-white hover:bg-red-50 transition shadow-2xs flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    <span>Nonaktifkan</span>
+                </button>
+
+                {{-- Modal Penonaktifan --}}
+                <div x-show="showDeactivateModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
+                    <div @click.away="showDeactivateModal = false" class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-slate-200" x-data="{ preset: '', customText: '' }">
+                        <h3 class="text-base font-bold text-slate-900 mb-1 tracking-tight">Nonaktifkan Keanggotaan Kader</h3>
+                        <p class="text-xs text-slate-500 mb-4 font-normal">Kader yang dinonaktifkan tidak dapat masuk ke portal perkaderan. Keterangan penonaktifan akan dicatat di sistem dan dikirimkan via WhatsApp.</p>
+                        
+                        <form method="POST" action="{{ route('admin.anggota.deactivate', $anggota) }}"
+                            @submit="if(preset && preset !== 'Lainnya') { $refs.alasanInput.value = preset + (customText ? ' - ' + customText : ''); } else if(customText) { $refs.alasanInput.value = customText; }">
+                            @csrf
+                            <input type="hidden" name="alasan_nonaktif" x-ref="alasanInput">
+
+                            <div class="mb-3">
+                                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Pilih Kategori Alasan:</label>
+                                <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition" :class="{ 'border-sky-500 bg-sky-50/50 font-semibold text-sky-900': preset === 'Pindah Domisili / Mutasi Luar Daerah' }">
+                                        <input type="radio" name="preset_option" value="Pindah Domisili / Mutasi Luar Daerah" @click="preset = 'Pindah Domisili / Mutasi Luar Daerah'" class="text-sky-600">
+                                        <span>Pindah Domisili / Mutasi Luar Daerah</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition" :class="{ 'border-sky-500 bg-sky-50/50 font-semibold text-sky-900': preset === 'Wafat / Meninggal Dunia' }">
+                                        <input type="radio" name="preset_option" value="Wafat / Meninggal Dunia" @click="preset = 'Wafat / Meninggal Dunia'" class="text-sky-600">
+                                        <span>Wafat / Meninggal Dunia</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition" :class="{ 'border-sky-500 bg-sky-50/50 font-semibold text-sky-900': preset === 'Mengundurkan Diri dari Kepengurusan / AUM' }">
+                                        <input type="radio" name="preset_option" value="Mengundurkan Diri dari Kepengurusan / AUM" @click="preset = 'Mengundurkan Diri dari Kepengurusan / AUM'" class="text-sky-600">
+                                        <span>Mengundurkan Diri dari Kepengurusan / AUM</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition" :class="{ 'border-sky-500 bg-sky-50/50 font-semibold text-sky-900': preset === 'Pelanggaran Disiplin / Kode Etik Persyarikatan' }">
+                                        <input type="radio" name="preset_option" value="Pelanggaran Disiplin / Kode Etik Persyarikatan" @click="preset = 'Pelanggaran Disiplin / Kode Etik Persyarikatan'" class="text-sky-600">
+                                        <span>Pelanggaran Disiplin / Kode Etik Persyarikatan</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition" :class="{ 'border-sky-500 bg-sky-50/50 font-semibold text-sky-900': preset === 'Lainnya' }">
+                                        <input type="radio" name="preset_option" value="Lainnya" @click="preset = 'Lainnya'" class="text-sky-600">
+                                        <span>Alasan Lainnya...</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Catatan / Keterangan Tambahan:</label>
+                                <textarea x-model="customText" rows="3" placeholder="Tuliskan catatan atau keterangan detail..."
+                                    class="w-full text-xs p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition resize-none"></textarea>
+                            </div>
+
+                            <div class="flex justify-end gap-2">
+                                <button type="button" @click="showDeactivateModal = false" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
+                                <button type="submit" class="px-4 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition shadow-2xs">Konfirmasi Nonaktifkan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 @endif
 
                 {{-- Reset Password Button --}}
                 <form method="POST" action="{{ route('admin.anggota.reset-password', $anggota) }}"
-                    onsubmit="return confirm('Reset kata sandi anggota ini ke sandi bawaan (6 digit NIK terakhir)?')">
+                    onsubmit="return confirm('Reset kata sandi anggota ini ke sandi bawaan (Tanggal Lahir / 6 digit NIK terakhir)?')">
                     @csrf
                     <button type="submit" class="px-3.5 py-2 border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold rounded-lg shadow-2xs transition flex items-center gap-1.5" title="Reset Kata Sandi Akun">
                         <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
@@ -92,6 +150,30 @@
                 </form>
             </div>
         </div>
+
+        {{-- Banner Informasi Status Nonaktif --}}
+        @if($anggota->user->status === 'nonaktif')
+        <div class="mb-6 p-4 rounded-xl bg-slate-100 border border-slate-300 text-xs flex items-center justify-between flex-wrap gap-3 shadow-2xs">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-slate-600 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                    ⏸
+                </div>
+                <div>
+                    <div class="font-bold text-slate-900">Status Keanggotaan: NONAKTIF</div>
+                    <div class="text-slate-600 mt-0.5">
+                        Keterangan: <strong class="text-slate-800 font-medium">"{{ $anggota->catatan_verifikasi ?: 'Penonaktifan oleh Administrator MPKSDI.' }}"</strong>
+                    </div>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('admin.anggota.activate', $anggota) }}" onsubmit="return confirm('Aktifkan kembali akun kader ini?')">
+                @csrf
+                <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-2xs flex items-center gap-1.5 transition text-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span>Aktifkan Kembali Kader</span>
+                </button>
+            </form>
+        </div>
+        @endif
 
         {{-- Alert Notifikasi Pasca Reset Password --}}
         @if(session('wa_reset_url'))

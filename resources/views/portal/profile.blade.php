@@ -32,7 +32,13 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
             <div class="flex items-center gap-4">
                 @if($anggota?->foto)
-                    <img src="{{ route('foto.anggota', $anggota) }}" alt="{{ $anggota->nama_lengkap }}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-sky-400/80 shadow-2xs shrink-0">
+                    <img src="{{ route('foto.anggota', $anggota) }}"
+                         alt="{{ $anggota->nama_lengkap }}"
+                         class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-sky-400/80 shadow-2xs shrink-0"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-slate-950 to-[#005c8a] border border-sky-400/80 items-center justify-center text-[#f8bb00] text-xl font-bold shrink-0 shadow-2xs" style="display:none;">
+                        {{ strtoupper(substr($anggota->nama_lengkap ?? auth()->user()->name, 0, 1)) }}
+                    </div>
                 @else
                     <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-slate-950 to-[#005c8a] border border-sky-400/80 flex items-center justify-center text-[#f8bb00] text-xl font-bold shrink-0 shadow-2xs">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}

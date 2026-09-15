@@ -51,9 +51,9 @@
             <a href="{{ auth()->user()?->isAnggota() ? route('portal.dashboard') : (auth()->user()?->isExecutive() ? route('admin.executive') : route('admin.dashboard')) }}" 
                class="flex items-center gap-3 overflow-hidden group">
                 <div class="flex items-center gap-2 shrink-0">
-                    <img src="{{ asset('aset/logo-muhammadiyah.png') }}" alt="Logo Muhammadiyah" class="h-7 w-auto object-contain">
+                    <img src="{{ asset('aset/logo-muhammadiyah.png') }}" alt="Logo Muhammadiyah" class="h-7 w-auto object-contain" onerror="this.style.display='none'">
                     <div class="h-4 w-px bg-slate-200"></div>
-                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-7 w-auto object-contain">
+                    <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-7 w-auto object-contain" onerror="this.src='{{ asset('aset/logo-mpksdi.png') }}'">
                 </div>
                 <div class="flex flex-col min-w-0 transition-opacity duration-200" :class="{ 'lg:hidden': sidebarCollapsed }">
                     <span class="font-bold text-slate-900 text-sm tracking-tight leading-tight">MPKSDI</span>

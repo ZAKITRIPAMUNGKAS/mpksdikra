@@ -20,7 +20,8 @@
                 <div class="flex items-center gap-4">
                     <img src="{{ route('foto.anggota', $anggota) }}"
                         alt="{{ $anggota->nama_lengkap }}"
-                        class="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-xl border border-slate-200 shadow-2xs shrink-0 bg-slate-100">
+                        class="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-xl border border-slate-200 shadow-2xs shrink-0 bg-slate-100"
+                        onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23002b40\'/%3E%3Ctext x=\'50%25\' y=\'54%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23f8bb00\' font-family=\'Arial\' font-size=\'64\' font-weight=\'bold\'%3E{{ strtoupper(substr($anggota->nama_lengkap, 0, 2)) }}%3C/text%3E%3C/svg%3E'">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $anggota->nama_lengkap }}</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium uppercase tracking-wider mt-1.5

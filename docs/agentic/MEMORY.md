@@ -42,25 +42,15 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
-- 2026-09-16: Fitur Cetak Curriculum Vitae (CV) / Biodata Resmi Kader (PDF) dengan Kop & Ornamen Batik:
-  1. Arsitektur Dokumen PDF & Desain Batik:
-     - Dibuatkan view template `resources/views/pdf/biodata-kader.blade.php` berukuran A4 Portrait standar resmi.
-     - Kop surat resmi MPKSDI PDM Karanganyar dengan dua logo resmi: Logo MPKSDI dan Logo Muhammadiyah, alamat Gedung Dakwah, dan garis ganda berornamen batik (`batik-border-band.png`).
-     - Watermark latar belakang halus motif Batik Surya 12 / Kawung Karanganyar dengan transparansi terintegrasi (`batik-watermark.png`) yang dirender tajam tanpa artefak di DomPDF.
-     - Nomor registrasi otomatis dokumen (`MPKSDI-KRA/{id}/{pcm}`).
-  2. Cakupan Data Lengkap (CV Standar Eksekutif Persyarikatan):
-     - Profile Hero: Pasfoto 3:4 berwarna, biodata ringkas, badge status verifikasi, dan QR Code dinamis untuk pemindaian keaslian dokumen via kamera smartphone yang tertaut ke Cek Status.
-     - Seksi I (Data Pribadi & Kependudukan): NIK, NBM, Nama Lengkap, TTL, Usia, Jenis Kelamin, Status Nikah, Nama Ayah & Ibu Kandung, Alamat KTP & Domisili, Kontak WA & Email.
-     - Seksi II (Pendidikan & Kompetensi): Jenjang pendidikan terakhir, riwayat SD, SMP, SMA, S1/Perguruan Tinggi, dan bahasa yang dikuasai.
-     - Seksi III (Amanah Persyarikatan & Profesi): Pekerjaan utama, jabatan AUM, PCM, PRM, keaktifan di Majelis/Lembaga & Ortom (Pemuda Muhammadiyah, NA, Aisyiyah, IPM, HW, TS) beserta nama jabatan.
-     - Seksi IV (Keagamaan, Kemasjidan & Kemasyarakatan): Kemampuan Qur'an & tajwid, hafalan, sholat 5 waktu masjid, kajian rutin, penyaluran ZIS, takmir masjid, dan peran kemasyarakatan.
-     - Seksi V (Riwayat Perkaderan Baitul Arqam & Custom Fields): Daftar riwayat event BA yang pernah diikuti dan predikat kelulusan, serta jawaban pertanyaan kustom dinamis form builder.
-     - Pengesahan Resmi: Tanda tangan kader dan tanda tangan resmi Ketua MPKSDI PDM Karanganyar (H. Zainudin Ahpandi, S.E.).
-  3. Integrasi Rute & Tombol Aksi:
-     - Admin: Rute `admin.anggota.cetak-pdf` di `AdminAnggotaController::cetakPdf`, dengan tombol aksi "Cetak CV / Biodata" di halaman detail anggota (`admin/anggota/show.blade.php`). Otorisasi cabang terjaga (Admin Cabang hanya bisa mencetak anggota di PCM-nya).
-     - Kader: Rute `portal.profile.cetak-pdf` di `ProfileController::cetakPdf`, dengan tombol "Cetak Biodata (PDF)" di profil kader (`portal/profile.blade.php`) dan "Cetak CV / Biodata" di dashboard kader (`portal/dashboard.blade.php`).
+- 2026-09-16: Penyempurnaan Cetak CV / Biodata PDF Menjadi 1 Lembar Penuh, Watermark Logo MPKSDI & Pattern SVG Batik:
+  1. Presisi 1 Lembar Penuh (Strict Single-Page A4):
+     - Menata ulang layout vertikal, padding tabel, dan tinggi hero box secara proporsional sehingga seluruh data diri, riwayat pendidikan, amanah persyarikatan, profil keagamaan, serta kolom tanda tangan dan pengesahan pas tepat dalam 1 (satu) halaman A4 tanpa tumpah ke halaman kedua.
+     - Telah diverifikasi dengan uji batch halaman pada seluruh sampel kader di database (`PAGE_COUNT: 1`).
+  2. Watermark Resmi Logo MPKSDI:
+     - Dibuatkan aset watermark transparan khusus `public/aset/logo-mpksdi-watermark.png` dari lambang resmi MPKSDI dengan transparansi halus (~6-7% opacity) yang ditempatkan persis di tengah halaman dokumen di balik konten teks/tabel.
+  3. Ornamen Pattern SVG Batik Solo:
+     - Mengintegrasikan elemen visual `public/aset/batik-surya-solo.svg` pada sudut dokumen sebagai aksen ornamen tradisi batik khas persyarikatan.
   4. Pengujian & Verifikasi:
-     - Dibuatkan `tests/Feature/CetakCvPdfTest.php` mencakup download admin daerah, download admin cabang sewilayah, proteksi lintas cabang (403), download mandiri kader, dan proteksi guest redirect login.
      - 131 tests lulus 100% (528 assertions). Pint clean, Vite production build clean.
 
 - 2026-09-16: Integrasi Fitur Formulir Kader Dinamis (Google Form Editor), Biodata Orang Tua, dan Pembersihan UI Admin:

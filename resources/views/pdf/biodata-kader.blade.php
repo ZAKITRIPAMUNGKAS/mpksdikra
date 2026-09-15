@@ -2,518 +2,493 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Curriculum Vitae / Biodata Kader — {{ $anggota->nama_lengkap }}</title>
+    <title>Biodata Kader — {{ $anggota->nama_lengkap }}</title>
     <style>
         @page {
             size: A4 portrait;
-            margin: 7mm 9mm 5mm 9mm;
+            margin: 6mm 8mm 5mm 8mm;
         }
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         body {
             font-family: 'DejaVu Sans', Helvetica, Arial, sans-serif;
-            font-size: 7pt;
+            font-size: 6.8pt;
             color: #1e293b;
-            line-height: 1.25;
-            margin: 0;
-            padding: 0;
+            line-height: 1.28;
             background: #ffffff;
-            position: relative;
         }
 
-        /* Watermark Logo MPKSDI Ultra-Subtle di Tengah Halaman */
-        .watermark-bg {
+        /* ─── WATERMARK ─────────────────────────────────────── */
+        .wm {
             position: fixed;
-            top: 30%;
-            left: 28%;
-            width: 320px;
-            z-index: -1000;
-            text-align: center;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            margin-top: -100px;
+            margin-left: -100px;
+            z-index: -100;
+            opacity: 0.045;
         }
-        .watermark-bg img {
-            width: 320px;
-            height: auto;
-        }
+        .wm img { width: 200px; height: auto; }
 
-        /* Kop Surat Resmi */
-        .kop-table {
+        /* ─── BATIK CORNER TOP-RIGHT ─────────────────────────── */
+        .batik-tr {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 110px;
+            height: 110px;
+            z-index: -1;
+            opacity: 0.55;
+        }
+        .batik-tr img { width: 110px; height: auto; }
+
+        /* ─── BATIK CORNER BOTTOM-LEFT ───────────────────────── */
+        .batik-bl {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 90px;
+            height: 90px;
+            z-index: -1;
+            opacity: 0.40;
+            transform: rotate(180deg);
+        }
+        .batik-bl img { width: 90px; height: auto; }
+
+        /* ─── KOP SURAT ──────────────────────────────────────── */
+        .kop {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0px;
+            margin-bottom: 0;
         }
-        .kop-table td {
-            vertical-align: middle;
-            border: none;
-            padding: 0;
-        }
-        .kop-logo {
-            width: 46px;
-            text-align: center;
-        }
-        .kop-text {
-            text-align: center;
-            padding: 0 8px;
-        }
-        .kop-org-1 {
-            font-size: 7.2pt;
+        .kop td { vertical-align: middle; border: none; padding: 0; }
+        .kop-logo { width: 42px; text-align: center; }
+        .kop-logo img { height: 34px; width: auto; }
+        .kop-body { text-align: center; padding: 0 10px; }
+        .kop-lembaga {
+            font-size: 6.5pt;
             font-weight: bold;
-            color: #002b40;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            margin: 0;
-        }
-        .kop-org-2 {
-            font-size: 10pt;
-            font-weight: 900;
-            color: #005c8a;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            margin: 1px 0 0;
-        }
-        .kop-sub {
-            font-size: 5.8pt;
-            color: #64748b;
-            margin: 1px 0 0;
-            line-height: 1.2;
-        }
-        .kop-divider {
-            border-top: 1.8px solid #002b40;
-            border-bottom: 0.6px solid #f8bb00;
-            height: 1.2px;
-            margin-top: 2.5px;
-            margin-bottom: 4px;
-        }
-
-        /* Sub-Header Dokumen */
-        .doc-bar {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 5px;
-            padding-bottom: 2px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .doc-bar td {
-            vertical-align: middle;
-            border: none;
-            padding: 0;
-        }
-        .doc-title {
-            font-size: 8.5pt;
-            font-weight: 900;
-            color: #002b40;
+            color: #475569;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
-        .doc-meta {
-            font-size: 5.6pt;
-            color: #64748b;
-            text-align: right;
-            font-family: monospace;
+        .kop-judul {
+            font-size: 10.5pt;
+            font-weight: 900;
+            color: #002b40;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-top: 1px;
+        }
+        .kop-alamat {
+            font-size: 5.5pt;
+            color: #94a3b8;
+            margin-top: 1.5px;
+            line-height: 1.2;
         }
 
-        /* Layout Utama: 2 Kolom Sejajar */
-        .main-layout {
+        /* ─── DIVIDER GANDA ──────────────────────────────────── */
+        .divider-double {
+            border-top: 1.8px solid #002b40;
+            border-bottom: 0.6px solid #c9a800;
+            height: 1px;
+            margin: 3px 0 4px;
+        }
+
+        /* ─── DOC BAR ────────────────────────────────────────── */
+        .doc-bar {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f8fafc;
+            border: 0.6px solid #e2e8f0;
+            border-radius: 2px;
+            margin-bottom: 5px;
+        }
+        .doc-bar td { padding: 2px 5px; vertical-align: middle; border: none; }
+        .doc-title {
+            font-size: 7.8pt;
+            font-weight: 900;
+            color: #002b40;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .doc-meta {
+            font-size: 5.2pt;
+            color: #94a3b8;
+            text-align: right;
+            font-family: 'DejaVu Sans Mono', monospace;
+        }
+
+        /* ─── LAYOUT UTAMA ───────────────────────────────────── */
+        .layout {
             width: 100%;
             border-collapse: collapse;
         }
-        .main-layout > tbody > tr > td {
+        .layout > tbody > tr > td {
             vertical-align: top;
             border: none;
             padding: 0;
         }
-        .col-sidebar {
-            width: 175px;
-            padding-right: 6px;
-        }
-        .col-content {
-            padding-left: 6px;
-        }
+        .col-left { width: 166px; padding-right: 5px; }
+        .col-right { padding-left: 5px; }
 
-        /* Sidebar Container (Panel Kiri) */
-        .sidebar-box {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 6px 7px;
-        }
-
-        /* Foto Kader */
-        .photo-wrap {
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .photo-frame {
-            display: inline-block;
-            width: 54px;
-            height: 70px;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
+        /* ─── SIDEBAR KIRI ───────────────────────────────────── */
+        .sidebar {
+            background: #f8fafc;
+            border: 0.6px solid #dde3ea;
             border-radius: 3px;
+            padding: 7px 7px 6px;
+        }
+
+        /* Foto */
+        .foto-wrap { text-align: center; margin-bottom: 4px; }
+        .foto-frame {
+            display: inline-block;
+            width: 56px;
+            height: 72px;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+            border-radius: 2px;
             overflow: hidden;
             text-align: center;
         }
-        .photo-frame img {
-            width: 54px;
-            height: 70px;
-            object-fit: cover;
-        }
-        .photo-placeholder {
-            line-height: 70px;
-            font-size: 6pt;
+        .foto-frame img { width: 56px; height: 72px; object-fit: cover; }
+        .foto-ph {
+            font-size: 5.5pt;
             color: #94a3b8;
+            line-height: 72px;
             font-weight: bold;
         }
 
-        /* Identitas Singkat di Sidebar */
-        .side-name {
-            font-size: 9pt;
+        /* Nama & Badge */
+        .s-name {
+            font-size: 8pt;
             font-weight: 900;
             color: #002b40;
             text-align: center;
             line-height: 1.15;
-            margin-bottom: 2px;
+            margin-bottom: 1.5px;
         }
-        .side-nik {
-            font-size: 6.2pt;
+        .s-nik {
+            font-size: 5.8pt;
             color: #64748b;
             text-align: center;
-            font-family: monospace;
-            margin-bottom: 3px;
+            font-family: 'DejaVu Sans Mono', monospace;
+            margin-bottom: 2px;
         }
-        .side-status-badge {
-            text-align: center;
-            margin-bottom: 5px;
-        }
-        .badge-pill {
+        .s-badge-wrap { text-align: center; margin-bottom: 5px; }
+        .s-badge {
             display: inline-block;
             padding: 1px 5px;
-            border-radius: 2px;
-            font-size: 5.5pt;
+            font-size: 5.2pt;
             font-weight: bold;
+            border-radius: 1px;
             text-transform: uppercase;
             letter-spacing: 0.2px;
         }
-        .badge-aktif {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 0.5px solid #bae6fd;
-        }
+        .badge-aktif  { background: #dbeafe; color: #1d4ed8; border: 0.5px solid #bfdbfe; }
+        .badge-nonaktif { background: #fee2e2; color: #b91c1c; border: 0.5px solid #fecaca; }
+        .badge-pending  { background: #fef9c3; color: #92400e; border: 0.5px solid #fde68a; }
 
-        /* Group Divider Sidebar */
-        .side-divider {
-            border-bottom: 0.5px solid #e2e8f0;
-            margin: 4px 0;
-        }
-        .side-heading {
-            font-size: 6.2pt;
+        /* Divider Sidebar */
+        .s-div { border-bottom: 0.5px solid #e2e8f0; margin: 3px 0; }
+
+        /* Section heading sidebar */
+        .s-head {
+            font-size: 5.5pt;
             font-weight: 800;
             color: #005c8a;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 2.5px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
-        /* List Data di Sidebar */
-        .side-item {
-            margin-bottom: 2.5px;
-            line-height: 1.2;
-        }
-        .side-label {
-            font-size: 5.5pt;
-            color: #64748b;
+        /* Item list sidebar */
+        .s-item { margin-bottom: 2px; line-height: 1.2; }
+        .s-lbl {
+            font-size: 5.2pt;
+            color: #94a3b8;
             text-transform: uppercase;
             font-weight: 600;
             display: block;
+            letter-spacing: 0.1px;
         }
-        .side-val {
-            font-size: 6.5pt;
+        .s-val {
+            font-size: 6.2pt;
             color: #0f172a;
             font-weight: 600;
             word-wrap: break-word;
         }
 
-        /* QR Verifikasi di Sidebar Bawah */
-        .side-qr-wrap {
+        /* QR Box */
+        .qr-box {
             text-align: center;
             margin-top: 5px;
             padding-top: 4px;
             border-top: 0.5px dashed #cbd5e1;
         }
-        .side-qr-img {
-            width: 48px;
-            height: 48px;
-            border: 0.5px solid #cbd5e1;
-            padding: 1px;
-            background: #ffffff;
-        }
-        .side-qr-text {
-            font-size: 4.8pt;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            margin-top: 1.5px;
-            line-height: 1;
-        }
+        .qr-box img { width: 44px; height: 44px; border: 0.5px solid #cbd5e1; padding: 1px; background: #fff; }
+        .qr-lbl { font-size: 4.5pt; color: #94a3b8; text-transform: uppercase; margin-top: 1px; line-height: 1.1; letter-spacing: 0.2px; }
 
-        /* Kolom Kanan (Konten Utama) */
-        .sec-header {
-            font-size: 7.2pt;
+        /* ─── PANEL KANAN ────────────────────────────────────── */
+        /* Section header */
+        .r-sec {
+            font-size: 6.8pt;
             font-weight: 900;
             color: #002b40;
             text-transform: uppercase;
             letter-spacing: 0.4px;
-            border-bottom: 1.2px solid #005c8a;
+            border-bottom: 1px solid #005c8a;
             padding-bottom: 1px;
-            margin-top: 0;
-            margin-bottom: 3.5px;
-        }
-        .sec-header-subsequent {
-            margin-top: 4.5px;
-        }
-        .sec-header span {
-            color: #f8bb00;
-            margin-right: 3px;
-        }
-
-        /* Grid Data Bersih di Kolom Kanan */
-        .cardlet-table {
-            width: 100%;
-            border-collapse: collapse;
             margin-bottom: 3px;
         }
-        .cardlet-table td {
+        .r-sec + .r-sec { margin-top: 4px; }
+        .r-sec span { color: #c9a800; margin-right: 2px; }
+
+        /* Tabel data 3 kolom */
+        .dt {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2.5px;
+        }
+        .dt td {
             vertical-align: top;
-            padding: 1.5px 3px;
-            border-bottom: 0.5px solid #f1f5f9;
-            font-size: 6.8pt;
+            padding: 1.2px 2px;
+            border-bottom: 0.4px solid #f1f5f9;
+            font-size: 6.5pt;
             line-height: 1.22;
         }
-        .cardlet-table tr:last-child td {
-            border-bottom: none;
-        }
-        .c-label {
-            width: 112px;
-            color: #64748b;
-            font-weight: 600;
-        }
-        .c-colon {
-            width: 5px;
-            text-align: center;
-            color: #94a3b8;
-        }
-        .c-val {
-            color: #0f172a;
-        }
+        .dt tr:last-child td { border-bottom: none; }
+        .dl { width: 108px; color: #64748b; font-weight: 600; }
+        .dc { width: 5px; text-align: center; color: #94a3b8; }
+        .dv { color: #0f172a; }
 
-        /* Split 2 Kolom di Kolom Kanan */
-        .right-split {
+        /* Split 2 kolom di panel kanan */
+        .split {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 2px;
         }
-        .right-split > tbody > tr > td {
+        .split > tbody > tr > td {
             width: 50%;
             vertical-align: top;
-            padding: 0 2px;
+            padding: 0;
             border: none;
         }
-        .right-split > tbody > tr > td:first-child {
-            padding-left: 0;
-            padding-right: 2px;
-        }
-        .right-split > tbody > tr > td:last-child {
-            padding-right: 0;
-            padding-left: 2px;
-        }
+        .split > tbody > tr > td:first-child { padding-right: 3px; }
+        .split > tbody > tr > td:last-child  { padding-left: 3px; }
 
-        .tag-pill {
+        /* Tag pill */
+        .tag {
             display: inline-block;
-            padding: 0.5px 3.5px;
-            font-size: 6pt;
+            padding: 0.4px 3px;
+            font-size: 5.8pt;
             font-weight: 600;
-            border-radius: 2px;
+            border-radius: 1px;
             background: #f1f5f9;
-            border: 0.5px solid #cbd5e1;
+            border: 0.4px solid #cbd5e1;
             color: #334155;
-            margin: 0.5px;
+            margin: 0.4px 0.4px;
         }
-        .tag-sky {
-            background: #e0f2fe;
-            border-color: #bae6fd;
-            color: #0369a1;
-        }
+        .tag-blue { background: #dbeafe; border-color: #bfdbfe; color: #1e40af; }
+        .tag-sky  { background: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
 
-        /* Lembar Pengesahan */
-        .sign-table {
+        /* Section margin */
+        .mt { margin-top: 4px; }
+
+        /* ─── PENGESAHAN ─────────────────────────────────────── */
+        .sign {
             width: 100%;
             border-collapse: collapse;
             margin-top: 4px;
             padding-top: 3px;
-            border-top: 0.8px solid #e2e8f0;
+            border-top: 0.7px solid #e2e8f0;
         }
-        .sign-table td {
+        .sign td {
             vertical-align: top;
             text-align: center;
             border: none;
-            padding: 0 6px;
+            padding: 0 4px;
         }
-        .sign-date {
-            font-size: 6.2pt;
-            color: #64748b;
-            margin-bottom: 1px;
-        }
+        .sign-date { font-size: 5.8pt; color: #64748b; margin-bottom: 1px; }
         .sign-role {
-            font-size: 6.5pt;
+            font-size: 6pt;
             font-weight: bold;
             color: #002b40;
             text-transform: uppercase;
-            line-height: 1.15;
-            margin-bottom: 22px;
+            line-height: 1.2;
+            margin-bottom: 20px;
         }
         .sign-name {
-            font-size: 7.2pt;
+            font-size: 7pt;
             font-weight: bold;
             color: #0f172a;
             text-decoration: underline;
-            margin: 0;
         }
-        .sign-meta {
-            font-size: 5.6pt;
-            color: #64748b;
-            margin-top: 1px;
-        }
+        .sign-nbm { font-size: 5.3pt; color: #64748b; margin-top: 0.5px; }
 
-        /* Catatan Kaki */
-        .footer-note {
-            margin-top: 3px;
-            border-top: 0.5px dashed #cbd5e1;
+        /* ─── CATATAN KAKI ───────────────────────────────────── */
+        .footer {
+            margin-top: 2.5px;
+            border-top: 0.4px dashed #cbd5e1;
             padding-top: 1.5px;
-            font-size: 5pt;
+            font-size: 4.8pt;
             color: #94a3b8;
-            text-align: justify;
-            line-height: 1.15;
+            text-align: center;
+            line-height: 1.3;
         }
     </style>
 </head>
 <body>
 
-    {{-- Watermark Logo MPKSDI Halus di Tengah Halaman --}}
-    <div class="watermark-bg">
-        <img src="{{ public_path('aset/logo-mpksdi-watermark.png') }}" alt="Watermark MPKSDI">
+    {{-- Watermark ultra-subtle tengah halaman --}}
+    <div class="wm">
+        <img src="{{ public_path('aset/logo-mpksdi.png') }}" alt="">
     </div>
 
-    {{-- 1. KOP SURAT RESMI MPKSDI PDM KARANGANYAR --}}
-    <table class="kop-table">
+    {{-- Pattern batik pojok kanan atas --}}
+    <div class="batik-tr">
+        <img src="{{ public_path('aset/batik-web-corner.svg') }}" alt="">
+    </div>
+
+    {{-- Pattern batik pojok kiri bawah (rotasi 180°) --}}
+    <div class="batik-bl">
+        <img src="{{ public_path('aset/batik-web-corner.svg') }}" alt="">
+    </div>
+
+    {{-- ═══════════════════════════════════════════════════════
+         KOP SURAT RESMI
+    ════════════════════════════════════════════════════════ --}}
+    <table class="kop">
         <tr>
             <td class="kop-logo">
-                <img src="{{ public_path('aset/logo-mpksdi.png') }}" style="height: 38px; width: auto;" alt="Logo MPKSDI">
+                <img src="{{ public_path('aset/logo-mpksdi.png') }}" alt="MPKSDI">
             </td>
-            <td class="kop-text">
-                <div class="kop-org-1">PIMPINAN DAERAH MUHAMMADIYAH KABUPATEN KARANGANYAR</div>
-                <div class="kop-org-2">MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)</div>
-                <div class="kop-sub">
-                    Gedung Dakwah Muhammadiyah &bull; Jl. Lawu, Papahan, Tasikmadu, Karanganyar 57722 &bull; Web: <i>mpksdikra.muhammadiyah.or.id</i>
-                </div>
+            <td class="kop-body">
+                <div class="kop-lembaga">Pimpinan Daerah Muhammadiyah Kabupaten Karanganyar</div>
+                <div class="kop-judul">Majelis Pembinaan Kader &amp; Sumber Daya Insani</div>
+                <div class="kop-alamat">Gedung Dakwah Muhammadiyah &bull; Jl. Lawu, Papahan, Tasikmadu, Kab. Karanganyar 57722 &bull; mpksdikra.muhammadiyah.or.id</div>
             </td>
             <td class="kop-logo">
-                <img src="{{ public_path('aset/logo-muhammadiyah.png') }}" style="height: 36px; width: auto;" alt="Logo Muhammadiyah">
+                <img src="{{ public_path('aset/logo-muhammadiyah.png') }}" alt="Muhammadiyah">
             </td>
         </tr>
     </table>
-    <div class="kop-divider"></div>
+    <div class="divider-double"></div>
 
-    {{-- 2. BAR SUB-HEADER DOKUMEN --}}
+    {{-- ═══════════════════════════════════════════════════════
+         DOC BAR – Judul & Meta
+    ════════════════════════════════════════════════════════ --}}
     <table class="doc-bar">
         <tr>
-            <td class="doc-title">CURRICULUM VITAE &amp; BIODATA KADER RESMI</td>
-            <td class="doc-meta">No. Registrasi: MPKSDI-KRA/{{ str_pad($anggota->id, 5, '0', STR_PAD_LEFT) }}/{{ $anggota->pcm ? strtoupper(str_replace([' ', '/', '-'], '', $anggota->pcm)) : 'KRA' }} &bull; {{ now()->translatedFormat('d F Y H:i') }} WIB</td>
+            <td class="doc-title">Curriculum Vitae &amp; Biodata Resmi Kader Muhammadiyah</td>
+            <td class="doc-meta">
+                No. {{ str_pad($anggota->id, 5, '0', STR_PAD_LEFT) }}/MPKSDI-KRA/{{ now()->format('Y') }}
+                &bull; Cetak: {{ now()->translatedFormat('d M Y') }}
+            </td>
         </tr>
     </table>
 
-    {{-- 3. EXECUTIVE 2-COLUMN LAYOUT --}}
-    <table class="main-layout">
+    {{-- ═══════════════════════════════════════════════════════
+         LAYOUT UTAMA — 2 KOLOM
+    ════════════════════════════════════════════════════════ --}}
+    <table class="layout">
         <tr>
-            {{-- KOLOM KIRI: SIDEBAR KADER (33%) --}}
-            <td class="col-sidebar">
-                <div class="sidebar-box">
-                    {{-- Pasfoto Formal --}}
-                    <div class="photo-wrap">
-                        <div class="photo-frame">
+            {{-- ─── KOLOM KIRI: SIDEBAR ─────────────────────── --}}
+            <td class="col-left">
+                <div class="sidebar">
+
+                    {{-- Pasfoto --}}
+                    <div class="foto-wrap">
+                        <div class="foto-frame">
                             @if(!empty($fotoDataUri))
                                 <img src="{{ $fotoDataUri }}" alt="Foto">
                             @else
-                                <div class="photo-placeholder">FOTO 3&times;4</div>
+                                <div class="foto-ph">FOTO<br>3×4</div>
                             @endif
                         </div>
                     </div>
 
-                    {{-- Nama & Status --}}
-                    <div class="side-name">{{ strtoupper($anggota->nama_lengkap) }}</div>
-                    <div class="side-nik">NIK: {{ $anggota->nik }}</div>
-                    <div class="side-status-badge">
-                        <span class="badge-pill badge-aktif">KADER {{ strtoupper($anggota->user->status ?? 'AKTIF') }}</span>
+                    {{-- Nama & NIK & Badge --}}
+                    <div class="s-name">{{ strtoupper($anggota->nama_lengkap) }}</div>
+                    <div class="s-nik">NIK: {{ $anggota->nik ?: '—' }}</div>
+                    <div class="s-badge-wrap">
+                        @php
+                            $status = strtolower($anggota->user->status ?? 'pending');
+                            $badgeClass = match($status) {
+                                'aktif'    => 'badge-aktif',
+                                'nonaktif' => 'badge-nonaktif',
+                                default    => 'badge-pending',
+                            };
+                        @endphp
+                        <span class="s-badge {{ $badgeClass }}">Kader {{ ucfirst($status) }}</span>
                     </div>
 
-                    {{-- Data Pribadi & Keluarga --}}
-                    <div class="side-heading">DATA PRIBADI &amp; KELUARGA</div>
-                    <div class="side-item">
-                        <span class="side-label">NBM (No. Baku Muhammadiyah)</span>
-                        <span class="side-val">{{ $anggota->nbm ?: 'Belum Memiliki' }}</span>
+                    <div class="s-div"></div>
+
+                    {{-- Data Pribadi --}}
+                    <div class="s-head">Data Pribadi</div>
+                    <div class="s-item">
+                        <span class="s-lbl">NBM</span>
+                        <span class="s-val">{{ $anggota->nbm ?: 'Belum Memiliki' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Tempat &amp; Tanggal Lahir</span>
-                        <span class="side-val">{{ $anggota->tempat_lahir ?: '-' }}, {{ $anggota->tanggal_lahir ? $anggota->tanggal_lahir->translatedFormat('d M Y') : '-' }} ({{ $anggota->tanggal_lahir ? $anggota->tanggal_lahir->age : ($anggota->umur ?: '-') }} Thn)</span>
+                    <div class="s-item">
+                        <span class="s-lbl">Tempat / Tanggal Lahir</span>
+                        <span class="s-val">{{ $anggota->tempat_lahir ?: '—' }}, {{ $anggota->tanggal_lahir ? $anggota->tanggal_lahir->translatedFormat('d M Y') : '—' }}
+                        @if($anggota->tanggal_lahir) ({{ $anggota->tanggal_lahir->age }} Thn) @elseif($anggota->umur) ({{ $anggota->umur }} Thn) @endif</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Jenis Kelamin / Pernikahan</span>
-                        <span class="side-val">{{ $anggota->jenis_kelamin ?: '-' }} &bull; {{ $anggota->status_pernikahan ?: '-' }}</span>
+                    <div class="s-item">
+                        <span class="s-lbl">Jenis Kelamin / Nikah</span>
+                        <span class="s-val">{{ $anggota->jenis_kelamin ?: '—' }} &bull; {{ $anggota->status_pernikahan ?: '—' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Nama Ayah Kandung</span>
-                        <span class="side-val"><b>{{ $anggota->nama_ayah ?: '-' }}</b></span>
+                    <div class="s-item">
+                        <span class="s-lbl">Nama Ayah Kandung</span>
+                        <span class="s-val">{{ $anggota->nama_ayah ?: '—' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Nama Ibu Kandung</span>
-                        <span class="side-val"><b>{{ $anggota->nama_ibu ?: '-' }}</b></span>
+                    <div class="s-item">
+                        <span class="s-lbl">Nama Ibu Kandung</span>
+                        <span class="s-val">{{ $anggota->nama_ibu ?: '—' }}</span>
                     </div>
 
-                    <div class="side-divider"></div>
+                    <div class="s-div"></div>
 
                     {{-- Kontak & Domisili --}}
-                    <div class="side-heading">KONTAK &amp; DOMISILI</div>
-                    <div class="side-item">
-                        <span class="side-label">WhatsApp / No. HP</span>
-                        <span class="side-val"><b>{{ $anggota->no_wa ?: '-' }}</b></span>
+                    <div class="s-head">Kontak &amp; Domisili</div>
+                    <div class="s-item">
+                        <span class="s-lbl">WhatsApp / No. HP</span>
+                        <span class="s-val">{{ $anggota->no_wa ?: '—' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Alamat Email</span>
-                        <span class="side-val">{{ $anggota->email ?: '-' }}</span>
+                    <div class="s-item">
+                        <span class="s-lbl">Email</span>
+                        <span class="s-val">{{ $anggota->email ?: '—' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Alamat Lengkap (KTP)</span>
-                        <span class="side-val">{{ $anggota->alamat_rumah ?: '-' }}</span>
+                    <div class="s-item">
+                        <span class="s-lbl">Alamat (KTP)</span>
+                        <span class="s-val">{{ $anggota->alamat_rumah ?: '—' }}</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Kelurahan &amp; Kecamatan</span>
-                        <span class="side-val">{{ $anggota->desa_kelurahan ?: '-' }}, {{ $anggota->kecamatan ?: '-' }}</span>
-                    </div>
-                    <div class="side-item">
-                        <span class="side-label">Kabupaten</span>
-                        <span class="side-val">{{ $anggota->kabupaten ?: 'Kab. Karanganyar' }}</span>
+                    <div class="s-item">
+                        <span class="s-lbl">Kel. / Kec. / Kab.</span>
+                        <span class="s-val">{{ $anggota->desa_kelurahan ?: '—' }}, {{ $anggota->kecamatan ?: '—' }}, {{ $anggota->kabupaten ?: 'Kab. Karanganyar' }}</span>
                     </div>
 
-                    <div class="side-divider"></div>
+                    <div class="s-div"></div>
 
-                    {{-- Pendidikan & Bahasa --}}
-                    <div class="side-heading">PENDIDIKAN &amp; BAHASA</div>
-                    <div class="side-item">
-                        <span class="side-label">Pendidikan Terakhir</span>
-                        <span class="side-val"><b>{{ $anggota->pendidikan_terakhir ?: '-' }}</b> @if($anggota->pendidikan_s1) ({{ $anggota->pendidikan_s1 }}) @elseif($anggota->pendidikan_sma) ({{ $anggota->pendidikan_sma }}) @endif</span>
+                    {{-- Pendidikan --}}
+                    <div class="s-head">Pendidikan &amp; Bahasa</div>
+                    <div class="s-item">
+                        <span class="s-lbl">Pendidikan Terakhir</span>
+                        <span class="s-val">{{ $anggota->pendidikan_terakhir ?: '—' }}
+                        @if($anggota->pendidikan_s1) — {{ $anggota->pendidikan_s1 }} @elseif($anggota->pendidikan_sma) — {{ $anggota->pendidikan_sma }} @endif</span>
                     </div>
-                    <div class="side-item">
-                        <span class="side-label">Bahasa yang Dikuasai</span>
-                        <span class="side-val">
+                    <div class="s-item">
+                        <span class="s-lbl">Bahasa Dikuasai</span>
+                        <span class="s-val">
                             @if(!empty($anggota->bahasa_dikuasai) && is_array($anggota->bahasa_dikuasai))
                                 {{ implode(', ', $anggota->bahasa_dikuasai) }}
                             @else
@@ -522,140 +497,139 @@
                         </span>
                     </div>
 
-                    {{-- QR Code Verifikasi Dokumen --}}
-                    <div class="side-qr-wrap">
-                        <img class="side-qr-img" src="{{ $qrPng }}" alt="QR Verifikasi">
-                        <div class="side-qr-text">Pindai Verifikasi<br>Keaslian Dokumen</div>
+                    {{-- QR Verifikasi --}}
+                    <div class="qr-box">
+                        <img src="{{ $qrPng }}" alt="QR Verifikasi">
+                        <div class="qr-lbl">Pindai untuk<br>Verifikasi Dokumen</div>
                     </div>
+
                 </div>
             </td>
 
-            {{-- KOLOM KANAN: KONTEN UTAMA (67%) --}}
-            <td class="col-content">
-                {{-- SEKSI 1: AMANAH PERSYARIKATAN & KIPRAH PROFESI --}}
-                <div class="sec-header"><span>I.</span> Amanah Persyarikatan, Profesi &amp; Organisasi</div>
-                <table class="cardlet-table">
+            {{-- ─── KOLOM KANAN: KONTEN UTAMA ───────────────── --}}
+            <td class="col-right">
+
+                {{-- ▸ SEKSI I: AMANAH & PROFESI --}}
+                <div class="r-sec"><span>I.</span> Amanah Persyarikatan, Profesi &amp; Organisasi</div>
+                <table class="dt">
                     <tr>
-                        <td class="c-label">Profesi / Pekerjaan Utama</td><td class="c-colon">:</td>
-                        <td class="c-val"><b>{{ $anggota->pekerjaan ?: '-' }}</b></td>
+                        <td class="dl">Profesi / Pekerjaan</td><td class="dc">:</td>
+                        <td class="dv"><b>{{ $anggota->pekerjaan ?: '—' }}</b></td>
                     </tr>
                     <tr>
-                        <td class="c-label">Amanah di Amal Usaha (AUM)</td><td class="c-colon">:</td>
-                        <td class="c-val">{{ $anggota->jabatan_aum ?: '-' }}</td>
+                        <td class="dl">Amanah di AUM</td><td class="dc">:</td>
+                        <td class="dv">{{ $anggota->jabatan_aum ?: '—' }}</td>
                     </tr>
                     <tr>
-                        <td class="c-label">Pimpinan Cabang (PCM)</td><td class="c-colon">:</td>
-                        <td class="c-val"><b>{{ $anggota->pcm ?: ($anggota->kecamatan ?: '-') }}</b></td>
+                        <td class="dl">PCM (Cabang)</td><td class="dc">:</td>
+                        <td class="dv"><b>{{ $anggota->pcm ?: ($anggota->kecamatan ?: '—') }}</b></td>
                     </tr>
                     <tr>
-                        <td class="c-label">Pimpinan Ranting (PRM)</td><td class="c-colon">:</td>
-                        <td class="c-val">{{ $anggota->prm ?: '-' }}</td>
+                        <td class="dl">PRM (Ranting)</td><td class="dc">:</td>
+                        <td class="dv">{{ $anggota->prm ?: '—' }}</td>
                     </tr>
                     <tr>
-                        <td class="c-label">Struktur Pimpinan Muhammadiyah</td><td class="c-colon">:</td>
-                        <td class="c-val">
+                        <td class="dl">Struktur Pimpinan</td><td class="dc">:</td>
+                        <td class="dv">
                             @if(!empty($anggota->keaktifan_muhammadiyah) && is_array($anggota->keaktifan_muhammadiyah))
                                 @foreach($anggota->keaktifan_muhammadiyah as $km)
-                                    <span class="tag-pill tag-sky">{{ $km }}</span>
+                                    <span class="tag tag-sky">{{ $km }}</span>
                                 @endforeach
                             @else
-                                <span class="text-slate-400">-</span>
+                                —
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <td class="c-label">Organisasi Otonom (Ortom)</td><td class="c-colon">:</td>
-                        <td class="c-val">
+                        <td class="dl">Organisasi Otonom</td><td class="dc">:</td>
+                        <td class="dv">
                             @if(!empty($anggota->keaktifan_ortom) && is_array($anggota->keaktifan_ortom))
                                 @foreach($anggota->keaktifan_ortom as $ko)
-                                    <span class="tag-pill">{{ $ko }}</span>
+                                    <span class="tag">{{ $ko }}</span>
                                 @endforeach
                                 @if(!empty($anggota->jabatan_ortom) && is_array($anggota->jabatan_ortom))
-                                    <span style="color: #475569; font-size: 6.2pt;">({{ implode(', ', array_filter($anggota->jabatan_ortom)) }})</span>
+                                    <span style="color:#64748b; font-size:5.8pt;">({{ implode(', ', array_filter($anggota->jabatan_ortom)) }})</span>
                                 @endif
                             @else
-                                <span class="text-slate-400">-</span>
+                                —
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <td class="c-label">Organisasi Eksternal Lainnya</td><td class="c-colon">:</td>
-                        <td class="c-val">{{ $anggota->organisasi_lain ?: '-' }}</td>
+                        <td class="dl">Organisasi Lain</td><td class="dc">:</td>
+                        <td class="dv">{{ $anggota->organisasi_lain ?: '—' }}</td>
                     </tr>
                 </table>
 
-                {{-- SEKSI 2: PROFIL KEAGAMAAN, KEMASJIDAN & KEMASYARAKATAN --}}
-                <div class="sec-header sec-header-subsequent"><span>II.</span> Profil Keagamaan, Kemasjidan &amp; Kemasyarakatan</div>
-                <table class="right-split">
+                {{-- ▸ SEKSI II: KEAGAMAAN & KEMASJIDAN --}}
+                <div class="r-sec mt"><span>II.</span> Profil Keagamaan, Kemasjidan &amp; Kemasyarakatan</div>
+                <table class="split">
                     <tr>
                         <td>
-                            <table class="cardlet-table">
+                            <table class="dt">
                                 <tr>
-                                    <td class="c-label" style="width: 82px;">Baca Al-Qur'an</td><td class="c-colon">:</td>
-                                    <td class="c-val"><b>{{ $anggota->kemampuan_baca_quran ?: '-' }}</b></td>
+                                    <td class="dl" style="width:82px;">Baca Al-Qur'an</td><td class="dc">:</td>
+                                    <td class="dv"><b>{{ $anggota->kemampuan_baca_quran ?: '—' }}</b></td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Hafalan Al-Qur'an</td><td class="c-colon">:</td>
-                                    <td class="c-val">{{ $anggota->hafalan_quran ?: '-' }}</td>
+                                    <td class="dl">Hafalan</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->hafalan_quran ?: '—' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Sholat 5 Waktu Masjid</td><td class="c-colon">:</td>
-                                    <td class="c-val">{{ $anggota->aktivitas_sholat_masjid ?: '-' }}</td>
+                                    <td class="dl">Sholat Masjid</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->aktivitas_sholat_masjid ?: '—' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Kajian Rutin Agama</td><td class="c-colon">:</td>
-                                    <td class="c-val">{{ $anggota->aktivitas_kajian_agama ?: '-' }}</td>
+                                    <td class="dl">Kajian Rutin</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->aktivitas_kajian_agama ?: '—' }}</td>
                                 </tr>
                             </table>
                         </td>
                         <td>
-                            <table class="cardlet-table">
+                            <table class="dt">
                                 <tr>
-                                    <td class="c-label" style="width: 78px;">Penyaluran ZIS</td><td class="c-colon">:</td>
-                                    <td class="c-val">
+                                    <td class="dl" style="width:72px;">Penyaluran ZIS</td><td class="dc">:</td>
+                                    <td class="dv">
                                         @if(!empty($anggota->lembaga_zis) && is_array($anggota->lembaga_zis))
                                             {{ implode(', ', $anggota->lembaga_zis) }}
                                         @else
-                                            {{ is_string($anggota->lembaga_zis) ? $anggota->lembaga_zis : '-' }}
+                                            {{ is_string($anggota->lembaga_zis) ? $anggota->lembaga_zis : '—' }}
                                         @endif
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Masjid Binaan</td><td class="c-colon">:</td>
-                                    <td class="c-val">{{ $anggota->aktifitas_jamaah_masjid ?: '-' }}</td>
+                                    <td class="dl">Masjid Binaan</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->aktifitas_jamaah_masjid ?: '—' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Pengurus Takmir</td><td class="c-colon">:</td>
-                                    <td class="c-val">
-                                        {{ $anggota->keaktifan_takmir ?: 'Tidak' }}
-                                        @if($anggota->jabatan_takmir) ({{ $anggota->jabatan_takmir }}) @endif
-                                    </td>
+                                    <td class="dl">Pengurus Takmir</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->keaktifan_takmir ?: 'Tidak' }}@if($anggota->jabatan_takmir) ({{ $anggota->jabatan_takmir }}) @endif</td>
                                 </tr>
                                 <tr>
-                                    <td class="c-label">Kemasyarakatan</td><td class="c-colon">:</td>
-                                    <td class="c-val">{{ $anggota->keaktifan_kemasyarakatan ?: '-' }}</td>
+                                    <td class="dl">Kemasyarakatan</td><td class="dc">:</td>
+                                    <td class="dv">{{ $anggota->keaktifan_kemasyarakatan ?: '—' }}</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
                 </table>
 
-                {{-- SEKSI 3: REKAM JEJAK PERKADERAN & KETERANGAN DINAMIS --}}
+                {{-- ▸ SEKSI III: REKAM JEJAK & KETERANGAN --}}
                 @php
-                    $riwayatEvent = $anggota->eventPeserta()->with('event')->get();
+                    $riwayat    = $anggota->eventPeserta()->with('event')->get();
                     $customData = is_array($anggota->custom_fields) ? $anggota->custom_fields : [];
                 @endphp
-                <div class="sec-header sec-header-subsequent"><span>III.</span> Rekam Jejak Perkaderan &amp; Keterangan Tambahan</div>
-                <table class="cardlet-table">
+                <div class="r-sec mt"><span>III.</span> Rekam Jejak Perkaderan &amp; Keterangan Tambahan</div>
+                <table class="dt">
                     <tr>
-                        <td class="c-label">Riwayat Baitul Arqam</td><td class="c-colon">:</td>
-                        <td class="c-val">
-                            @if($riwayatEvent->isNotEmpty())
-                                @foreach($riwayatEvent as $rep)
-                                    <b>{{ $rep->event->nama_event }}</b>@if($rep->status_kelulusan) <span class="tag-pill tag-sky">{{ $rep->status_kelulusan }}</span>@endif;
+                        <td class="dl" style="width:108px;">Riwayat Baitul Arqam</td><td class="dc">:</td>
+                        <td class="dv">
+                            @if($riwayat->isNotEmpty())
+                                @foreach($riwayat as $rep)
+                                    <b>{{ $rep->event->nama_event }}</b>@if($rep->status_kelulusan) <span class="tag tag-sky">{{ $rep->status_kelulusan }}</span>@endif{{ !$loop->last ? '; ' : '' }}
                                 @endforeach
                             @else
-                                <span class="text-slate-400">Belum tercatat riwayat pelatihan Baitul Arqam</span>
+                                <span style="color:#94a3b8;">Belum tercatat riwayat pelatihan Baitul Arqam</span>
                             @endif
                         </td>
                     </tr>
@@ -664,46 +638,44 @@
                             @php
                                 $labelK = ucwords(str_replace('_', ' ', $k));
                                 $pertanyaanObj = \App\Models\FormPertanyaan::where('nama_field', $k)->first();
-                                if ($pertanyaanObj) {
-                                    $labelK = $pertanyaanObj->pertanyaan;
-                                }
-                                $vStr = is_array($v) ? implode(', ', $v) : (string)$v;
+                                if ($pertanyaanObj) { $labelK = $pertanyaanObj->pertanyaan; }
+                                $vStr = is_array($v) ? implode(', ', $v) : (string) $v;
                             @endphp
                             @if(trim($vStr) !== '')
                             <tr>
-                                <td class="c-label">{{ $labelK }}</td><td class="c-colon">:</td>
-                                <td class="c-val"><b>{{ $vStr }}</b></td>
+                                <td class="dl">{{ $labelK }}</td><td class="dc">:</td>
+                                <td class="dv"><b>{{ $vStr }}</b></td>
                             </tr>
                             @endif
                         @endforeach
                     @endif
                 </table>
 
-                {{-- SEKSI 4: LEMBAR PENGESAHAN DOKUMEN --}}
-                <table class="sign-table">
+                {{-- ▸ SEKSI IV: LEMBAR PENGESAHAN --}}
+                <table class="sign">
                     <tr>
-                        <td style="width: 46%;">
+                        <td style="width:46%;">
                             <div class="sign-date">&nbsp;</div>
-                            <div class="sign-role">Kader Yang Bersangkutan,</div>
+                            <div class="sign-role">Kader yang Bersangkutan,</div>
                             <div class="sign-name">{{ $anggota->nama_lengkap }}</div>
-                            <div class="sign-meta">NBM: {{ $anggota->nbm ?: 'Kader Muhammadiyah' }}</div>
+                            <div class="sign-nbm">NBM: {{ $anggota->nbm ?: 'Kader Muhammadiyah' }}</div>
                         </td>
-                        <td style="width: 54%;">
+                        <td style="width:54%;">
                             <div class="sign-date">Karanganyar, {{ now()->translatedFormat('d F Y') }}</div>
-                            <div class="sign-role">
-                                PDM Karanganyar &bull; MPKSDI<br>
-                                Ketua,
-                            </div>
+                            <div class="sign-role">PDM Karanganyar &bull; MPKSDI<br>Ketua,</div>
                             <div class="sign-name">H. Zainudin Ahpandi, S.E.</div>
-                            <div class="sign-meta">NBM: 864.219 &bull; PDM Karanganyar</div>
+                            <div class="sign-nbm">NBM: 864.219 &bull; PDM Kabupaten Karanganyar</div>
                         </td>
                     </tr>
                 </table>
 
-                {{-- CATATAN KAKI DOKUMEN --}}
-                <div class="footer-note">
-                    <b>Pengesahan:</b> Dokumen Curriculum Vitae / Biodata resmi diterbitkan melalui Pangkalan Data Terpadu MPKSDI PDM Karanganyar. Validitas data diverifikasi melalui pemindaian QR Code resmi.
+                {{-- Catatan Kaki --}}
+                <div class="footer">
+                    Dokumen ini diterbitkan secara resmi melalui Pangkalan Data Terpadu MPKSDI PDM Kabupaten Karanganyar &bull;
+                    Keabsahan dokumen dapat diverifikasi melalui pemindaian QR Code &bull;
+                    Dicetak pada {{ now()->translatedFormat('d F Y, H:i') }} WIB
                 </div>
+
             </td>
         </tr>
     </table>

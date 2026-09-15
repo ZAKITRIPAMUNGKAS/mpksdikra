@@ -42,6 +42,21 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-15: Integrasi Pengiriman Pesan Otomatis WhatsApp Gateway (Fonnte API):
+  1. Arsitektur & Konfigurasi:
+     - Menambahkan konfigurasi gateway di `config/services.php` (`services.whatsapp`) dan `.env.example` (`WA_GATEWAY_PROVIDER`, `WA_GATEWAY_TOKEN`, `WA_GATEWAY_ENDPOINT`).
+     - Mengimplementasikan method `WhatsAppNotificationService::kirimOtomatis(string $noWa, string $pesan)` berbasis `Illuminate\Support\Facades\Http` dengan authorization header Fonnte dan form payload (`target`, `message`, `countryCode: 62`).
+     - Toleransi kegagalan (fault tolerance) dengan try-catch dan timeout 6 detik sehingga jika API timeout atau token belum diatur, alur transaksi admin tidak terputus.
+  2. Integrasi Alur Kerja Verifikasi Admin:
+     - `AnggotaController::verify`: Otomatis mengirim pesan verifikasi & kredensial login via WA ke nomor kader saat disetujui.
+     - `AnggotaController::reject`: Otomatis mengirim pesan penolakan & catatan perbaikan via WA ke nomor kader saat berkas ditolak.
+     - `AnggotaController::resetPassword`: Otomatis mengirim kredensial sandi baru via WA ke nomor kader saat admin me-reset sandi.
+     - Sesi cadangan manual `wa_url` (click-to-chat) tetap dipertahankan penuh sebagai fallback aman.
+  3. Indikator UI Admin:
+     - `resources/views/admin/anggota/show.blade.php`: Menampilkan alert dinamis yang membedakan keberhasilan pengiriman otomatis via gateway dan opsi tombol kirim manual cadangan / kirim ulang.
+  4. Verifikasi:
+     - 117 tests lulus 100% (462 assertions) dengan `Http::fake()` pada pengujian suite.
+     - Pint clean, Vite build sukses.
 - 2026-09-15: Rilis Resmi Versi 2.3.0 & Perapian Tampilan Username Kader:
   1. Penjelasan & Penanganan Awalan 62 pada Username:
      - Nomor WhatsApp dinormalisasi ke format internasional E.164 (`628xxx`) di database untuk integrasi API WhatsApp Gateway.

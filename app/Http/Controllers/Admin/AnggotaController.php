@@ -91,10 +91,25 @@ class AnggotaController extends Controller
             'verified_at' => now(),
         ]);
 
-        return redirect()
+        $pesan = WhatsAppNotificationService::pesanVerifikasiSukses($anggota);
+        $waUrl = $this->waUrl($anggota, $pesan);
+
+        $autoStatus = null;
+        if ($anggota->no_wa) {
+            $autoStatus = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        }
+
+        $redirect = redirect()
             ->route('admin.anggota.show', $anggota)
             ->with('success', 'Anggota diverifikasi dan diaktifkan.')
-            ->with('wa_url', $this->waUrl($anggota, WhatsAppNotificationService::pesanVerifikasiSukses($anggota)));
+            ->with('wa_url', $waUrl);
+
+        if ($autoStatus !== null) {
+            $redirect->with('wa_auto_sent', $autoStatus['success'])
+                ->with('wa_auto_message', $autoStatus['message']);
+        }
+
+        return $redirect;
     }
 
     public function reject(Request $request, Anggota $anggota): RedirectResponse
@@ -110,10 +125,25 @@ class AnggotaController extends Controller
             'catatan_verifikasi' => $data['catatan_verifikasi'],
         ]);
 
-        return redirect()
+        $pesan = WhatsAppNotificationService::pesanPerbaikanDitolak($anggota);
+        $waUrl = $this->waUrl($anggota, $pesan);
+
+        $autoStatus = null;
+        if ($anggota->no_wa) {
+            $autoStatus = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        }
+
+        $redirect = redirect()
             ->route('admin.anggota.show', $anggota)
             ->with('success', 'Pendaftaran anggota telah ditolak dengan catatan.')
-            ->with('wa_url', $this->waUrl($anggota, WhatsAppNotificationService::pesanPerbaikanDitolak($anggota)));
+            ->with('wa_url', $waUrl);
+
+        if ($autoStatus !== null) {
+            $redirect->with('wa_auto_sent', $autoStatus['success'])
+                ->with('wa_auto_message', $autoStatus['message']);
+        }
+
+        return $redirect;
     }
 
     public function deactivate(Anggota $anggota): RedirectResponse
@@ -139,16 +169,25 @@ class AnggotaController extends Controller
         ]);
 
         $waUrl = null;
+        $autoStatus = null;
         if ($anggota->no_wa) {
             $pesan = WhatsAppNotificationService::pesanResetPassword($anggota, $defaultPassword);
             $waUrl = WhatsAppNotificationService::makeUrl($anggota->no_wa, $pesan);
+            $autoStatus = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
         }
 
-        return redirect()
+        $redirect = redirect()
             ->route('admin.anggota.show', $anggota)
             ->with('success', "Kata sandi anggota berhasil di-reset menjadi: {$defaultPassword} (Tanggal Lahir)")
             ->with('wa_reset_url', $waUrl)
             ->with('reset_password_value', $defaultPassword);
+
+        if ($autoStatus !== null) {
+            $redirect->with('wa_reset_auto_sent', $autoStatus['success'])
+                ->with('wa_reset_auto_message', $autoStatus['message']);
+        }
+
+        return $redirect;
     }
 
     public function export(Request $request): BinaryFileResponse

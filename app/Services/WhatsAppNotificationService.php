@@ -5,9 +5,82 @@ namespace App\Services;
 use App\Models\Anggota;
 use App\Models\Event;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WhatsAppNotificationService
 {
+    /**
+     * Kirim pesan WhatsApp secara otomatis via Gateway (Fonnte API)
+     *
+     * @return array{success: bool, message: string, detail: mixed}
+     */
+    public static function kirimOtomatis(string $noWa, string $pesan): array
+    {
+        $token = config('services.whatsapp.token');
+        $endpoint = config('services.whatsapp.endpoint', 'https://api.fonnte.com/send');
+
+        if (empty($token)) {
+            return [
+                'success' => false,
+                'message' => 'Token WA Gateway belum diatur.',
+                'detail' => null,
+            ];
+        }
+
+        $target = self::formatNomor($noWa);
+        if (empty($target)) {
+            return [
+                'success' => false,
+                'message' => 'Nomor WhatsApp tujuan tidak valid.',
+                'detail' => null,
+            ];
+        }
+
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders([
+                    'Authorization' => $token,
+                ])
+                ->asForm()
+                ->post($endpoint, [
+                    'target' => $target,
+                    'message' => $pesan,
+                    'countryCode' => '62',
+                ]);
+
+            $json = $response->json();
+            $isOk = $response->successful() && (($json['status'] ?? false) === true || ($json['status'] ?? '') === 'true');
+
+            if ($isOk) {
+                Log::info("Notifikasi WhatsApp otomatis terkirim ke {$target}");
+
+                return [
+                    'success' => true,
+                    'message' => 'Pesan WhatsApp otomatis berhasil dikirim ke nomor kader.',
+                    'detail' => $json,
+                ];
+            }
+
+            $reason = $json['reason'] ?? $json['message'] ?? 'Respons gateway menolak pengiriman.';
+            Log::warning("Gagal mengirim WhatsApp otomatis ke {$target}: {$reason}", ['response' => $json]);
+
+            return [
+                'success' => false,
+                'message' => "Gateway WhatsApp: {$reason}",
+                'detail' => $json,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Pengecualian saat kirim WhatsApp otomatis ke {$target}: {$e->getMessage()}");
+
+            return [
+                'success' => false,
+                'message' => 'Koneksi ke gateway WA gagal: '.$e->getMessage(),
+                'detail' => null,
+            ];
+        }
+    }
+
     /**
      * Bersihkan nomor WA ke format internasional (628xxx)
      */

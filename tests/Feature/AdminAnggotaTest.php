@@ -6,11 +6,20 @@ use App\Exports\AnggotaExport;
 use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AdminAnggotaTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Http::fake([
+            'api.fonnte.com/*' => Http::response(['status' => true, 'id' => 'msg-12345'], 200),
+        ]);
+    }
 
     private function admin(): User
     {
@@ -66,7 +75,8 @@ class AdminAnggotaTest extends TestCase
         $this->actingAs($admin)
             ->post(route('admin.anggota.verify', $a))
             ->assertRedirect(route('admin.anggota.show', $a))
-            ->assertSessionHas('wa_url');
+            ->assertSessionHas('wa_url')
+            ->assertSessionHas('wa_auto_sent', true);
 
         $this->assertStringContainsString('api.whatsapp.com/send', session('wa_url'));
     }
@@ -81,9 +91,27 @@ class AdminAnggotaTest extends TestCase
             ->post(route('admin.anggota.reject', $a), ['catatan_verifikasi' => 'Berkas kurang lengkap.'])
             ->assertRedirect(route('admin.anggota.show', $a))
             ->assertSessionHas('wa_url')
+            ->assertSessionHas('wa_auto_sent', true)
             ->assertSessionHas('success');
 
         $this->assertStringContainsString('api.whatsapp.com/send', session('wa_url'));
+    }
+
+    public function test_admin_reset_password_attempts_auto_whatsapp(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'no_wa' => '081234567890',
+            'tanggal_lahir' => '1990-05-17',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.anggota.reset-password', $a))
+            ->assertRedirect(route('admin.anggota.show', $a))
+            ->assertSessionHas('wa_reset_url')
+            ->assertSessionHas('wa_reset_auto_sent', true);
     }
 
     public function test_admin_can_deactivate_anggota(): void

@@ -95,14 +95,28 @@
 
         {{-- Alert Notifikasi Pasca Reset Password --}}
         @if(session('wa_reset_url'))
-        <div class="mb-6 p-4 rounded-lg bg-emerald-50 border border-emerald-300 text-xs flex items-center justify-between flex-wrap gap-3 shadow-2xs">
-            <div class="flex items-center gap-2.5 text-emerald-950">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Kata sandi baru: <strong class="font-mono text-xs font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">{{ session('reset_password_value') }}</strong></span>
+        <div class="mb-6 p-4 rounded-xl {{ session('wa_reset_auto_sent') ? 'bg-emerald-50 border border-emerald-300' : 'bg-amber-50 border border-amber-300' }} text-xs flex items-center justify-between flex-wrap gap-3 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full {{ session('wa_reset_auto_sent') ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                <div>
+                    <div class="font-semibold {{ session('wa_reset_auto_sent') ? 'text-emerald-950' : 'text-amber-950' }}">
+                        @if(session('wa_reset_auto_sent'))
+                            ✅ Kata sandi baru berhasil di-reset dan otomatis dikirim via WhatsApp ke kader.
+                        @else
+                            Kata sandi baru berhasil di-reset.
+                            @if(session('wa_reset_auto_message'))
+                                <span class="font-normal text-amber-800">({{ session('wa_reset_auto_message') }})</span>
+                            @endif
+                        @endif
+                    </div>
+                    <div class="text-[11px] text-slate-600 mt-0.5">
+                        Kata sandi baru: <strong class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200">{{ session('reset_password_value') }}</strong>
+                    </div>
+                </div>
             </div>
             <a href="{{ session('wa_reset_url') }}" target="_blank" rel="noopener noreferrer"
-               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-2xs flex items-center gap-1.5 transition">
-                <span>💬 Kirim Sandi ke WhatsApp Kader</span>
+               class="px-3.5 py-2 {{ session('wa_reset_auto_sent') ? 'bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-emerald-600 hover:bg-emerald-700 text-white' }} font-semibold rounded-lg shadow-2xs flex items-center gap-1.5 transition text-xs">
+                <span>💬 {{ session('wa_reset_auto_sent') ? 'Kirim Ulang Manual' : 'Kirim Sandi via WhatsApp' }}</span>
                 <span>&rarr;</span>
             </a>
         </div>
@@ -110,15 +124,29 @@
 
         {{-- Alert Notifikasi Verifikasi / Penolakan via WhatsApp --}}
         @if(session('wa_url'))
-        <div class="mb-6 p-4 rounded-lg bg-sky-50 border border-sky-300 text-xs flex items-center justify-between flex-wrap gap-3 shadow-2xs">
-            <div class="flex items-center gap-2.5 text-sky-950">
-                <span class="w-2 h-2 rounded-full bg-sky-500"></span>
-                <span>Notifikasi status pendaftaran siap dikirim ke kader.</span>
+        <div class="mb-6 p-4 rounded-xl {{ session('wa_auto_sent') ? 'bg-emerald-50 border border-emerald-300' : 'bg-sky-50 border border-sky-300' }} text-xs flex items-center justify-between flex-wrap gap-3 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full {{ session('wa_auto_sent') ? 'bg-emerald-500' : 'bg-sky-500' }}"></span>
+                <div>
+                    <div class="font-semibold {{ session('wa_auto_sent') ? 'text-emerald-950' : 'text-sky-950' }}">
+                        @if(session('wa_auto_sent'))
+                            ✅ Pesan notifikasi status pendaftaran berhasil dikirim otomatis ke WhatsApp kader via Fonnte.
+                        @else
+                            Notifikasi status pendaftaran siap dikirim ke nomor WhatsApp kader.
+                            @if(session('wa_auto_message'))
+                                <span class="font-normal text-slate-600">({{ session('wa_auto_message') }})</span>
+                            @endif
+                        @endif
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">
+                        Tujuan: <strong class="font-mono text-slate-700">{{ $anggota->no_wa }}</strong>
+                    </div>
+                </div>
             </div>
             <a href="{{ session('wa_url') }}" target="_blank" rel="noopener noreferrer"
-               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-2xs flex items-center gap-1.5 transition">
+               class="px-3.5 py-2 {{ session('wa_auto_sent') ? 'bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-emerald-600 hover:bg-emerald-700 text-white' }} font-semibold rounded-lg shadow-2xs flex items-center gap-1.5 transition text-xs">
                 <span aria-hidden="true">💬</span>
-                <span>Kirim Notifikasi ke WhatsApp Kader</span>
+                <span>{{ session('wa_auto_sent') ? 'Kirim Ulang Manual' : 'Kirim Notifikasi via WhatsApp' }}</span>
                 <span>&rarr;</span>
             </a>
         </div>

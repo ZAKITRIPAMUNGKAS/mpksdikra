@@ -42,6 +42,11 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Integrasi Sinkronisasi Editor Formulir Dinamis (`/admin/form-kader`) ke Formulir Pendaftaran (`/daftar`) & Profil Portal:
+  1. Helper methods dinamis pada `FormPertanyaan`: `isWajib()`, `isAktif()`, `label()`, `bantuan()`, `placeholder()`, dan auto-cache clearing saat save/delete.
+  2. Request validation dinamis (`FormPertanyaan::applyStandardValidationRules`): Field standar yang di-toggle `is_wajib = true` otomatis menjadi `required` di `AnggotaRegistrationRequest` dan `ProfileController`, dengan custom message bahasa Indonesia. Jika di-set `is_aktif = false`, field menjadi `nullable` dan disembunyikan dari antarmuka.
+  3. UI `/daftar` & `/portal/profile`: Label, tanda bintang merah `*` wajib, teks `(Opsional)`, placeholder, dan bantuan teks kini membaca konfigurasi `FormPertanyaan` langsung secara reaktif. Client-side validation Alpine.js di Tab 1 ikut memeriksa field dinamis yang di-wajibkan.
+  4. Pengujian: 135 tests lulus 100% (547 assertions), Pint clean, Vite production build clean.
 - 2026-09-16: Changelog `/updates` diperbarui ke v2.3.1 untuk validasi server-side pertanyaan custom aktif (wajib, tipe, opsi). Field standar tetap dirender hardcode; pengaturan standar belum terhubung ke form publik/profil. Jangan mengklaim integrasi Google Forms penuh selesai. Filter `is_custom` dipertahankan untuk mencegah duplikasi field inti.
 - 2026-09-16: Rombak Final Desain PDF CV/Biodata Kader → Corporate Executive Profile (1 Lembar Tepat):
   - Template `resources/views/pdf/biodata-kader.blade.php` ditulis ulang dari nol.

@@ -447,24 +447,52 @@
 
                 {{-- Nama Ayah & Nama Ibu Kandung --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    @if(\App\Models\FormPertanyaan::isAktif('nama_ayah'))
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                            Nama Ayah Kandung <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            {{ \App\Models\FormPertanyaan::label('nama_ayah', 'Nama Ayah Kandung') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('nama_ayah'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
-                        <input name="nama_ayah" value="{{ old('nama_ayah') }}" autocomplete="off" placeholder="Contoh: H. Ahmad Syukri"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
-                        <span class="text-xs text-slate-500 mt-1 block">Nama lengkap ayah kandung untuk arsip nasab & silsilah.</span>
+                        <input name="nama_ayah" value="{{ old('nama_ayah') }}" autocomplete="off"
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ayah', 'Contoh: H. Ahmad Syukri') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('nama_ayah') ? 'required' : '' }}
+                            @input="clearError('nama_ayah')"
+                            :class="clientErrors.nama_ayah ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nama_ayah') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
+                        <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('nama_ayah', 'Nama lengkap ayah kandung untuk arsip nasab & silsilah.') }}</span>
+                        <template x-if="clientErrors.nama_ayah">
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nama_ayah"></p>
+                        </template>
                         @error('nama_ayah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
+                    @if(\App\Models\FormPertanyaan::isAktif('nama_ibu'))
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                            Nama Ibu Kandung <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            {{ \App\Models\FormPertanyaan::label('nama_ibu', 'Nama Ibu Kandung') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('nama_ibu'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
-                        <input name="nama_ibu" value="{{ old('nama_ibu') }}" autocomplete="off" placeholder="Contoh: Hj. Siti Maryam"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
-                        <span class="text-xs text-slate-500 mt-1 block">Nama lengkap ibu kandung untuk arsip pangkalan data.</span>
+                        <input name="nama_ibu" value="{{ old('nama_ibu') }}" autocomplete="off"
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ibu', 'Contoh: Hj. Siti Maryam') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('nama_ibu') ? 'required' : '' }}
+                            @input="clearError('nama_ibu')"
+                            :class="clientErrors.nama_ibu ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nama_ibu') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
+                        <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('nama_ibu', 'Nama lengkap ibu kandung untuk arsip pangkalan data.') }}</span>
+                        <template x-if="clientErrors.nama_ibu">
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nama_ibu"></p>
+                        </template>
                         @error('nama_ibu') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 <div>
@@ -555,15 +583,30 @@
                         </template>
                         @error('no_wa') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @if(\App\Models\FormPertanyaan::isAktif('email'))
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                            Alamat Email (Opsional)
+                            {{ \App\Models\FormPertanyaan::label('email', 'Alamat Email') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('email'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Contoh: kader@gmail.com" autocomplete="email"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('email') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
-                        <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Boleh dikosongkan jika tidak memiliki alamat email.</span>
+                        <input type="email" name="email" value="{{ old('email') }}"
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('email', 'Contoh: kader@gmail.com') }}"
+                            autocomplete="email"
+                            {{ \App\Models\FormPertanyaan::isWajib('email') ? 'required' : '' }}
+                            @input="clearError('email')"
+                            :class="clientErrors.email ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('email') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
+                        <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('email', 'Boleh dikosongkan jika tidak memiliki alamat email.') }}</span>
+                        <template x-if="clientErrors.email">
+                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.email"></p>
+                        </template>
                         @error('email') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 {{-- Pasfoto Upload Component with Instant Preview & Proportional Face Fitter --}}
@@ -606,9 +649,15 @@
                     {{-- Langkah 1: Pilih Pendidikan Terakhir Dulu --}}
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                            Pendidikan Terakhir <span class="text-sky-700 text-xs font-normal">(Pilih Terlebih Dahulu)</span>
+                            {{ \App\Models\FormPertanyaan::label('pendidikan_terakhir', 'Pendidikan Terakhir') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('pendidikan_terakhir'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-sky-700 text-xs font-normal">(Pilih Terlebih Dahulu)</span>
+                            @endif
                         </label>
                         <select name="pendidikan_terakhir" x-model="selectedEdu" @change="saveDraft()"
+                            {{ \App\Models\FormPertanyaan::isWajib('pendidikan_terakhir') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-semibold text-slate-900 border-2 border-slate-300 hover:border-sky-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- 1. Pilih Pendidikan Terakhir Anda --</option>
                             @foreach(config('arqam.opsi_form.pendidikan_terakhir') as $k => $label)
@@ -708,66 +757,132 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    @if(\App\Models\FormPertanyaan::isAktif('kemampuan_baca_quran'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Kemampuan Baca Al-Qur'an</label>
-                        <select name="kemampuan_baca_quran" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('kemampuan_baca_quran', 'Kemampuan Baca Al-Qur\'an') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('kemampuan_baca_quran'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="kemampuan_baca_quran" {{ \App\Models\FormPertanyaan::isWajib('kemampuan_baca_quran') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('kemampuan_baca_quran') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Kemampuan --</option>
                             @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
                             <option value="{{ $v }}" @selected(old('kemampuan_baca_quran')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('kemampuan_baca_quran') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
+                    @if(\App\Models\FormPertanyaan::isAktif('hafalan_quran'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Hafalan Al-Qur'an</label>
-                        <select name="hafalan_quran" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('hafalan_quran', 'Hafalan Al-Qur\'an') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('hafalan_quran'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="hafalan_quran" {{ \App\Models\FormPertanyaan::isWajib('hafalan_quran') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('hafalan_quran') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Jumlah Hafalan --</option>
                             @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
                             <option value="{{ $v }}" @selected(old('hafalan_quran')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('hafalan_quran') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    @if(\App\Models\FormPertanyaan::isAktif('aktivitas_sholat_masjid'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Aktivitas Sholat Berjamaah di Masjid</label>
-                        <select name="aktivitas_sholat_masjid" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('aktivitas_sholat_masjid', 'Aktivitas Sholat Berjamaah di Masjid') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('aktivitas_sholat_masjid'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="aktivitas_sholat_masjid" {{ \App\Models\FormPertanyaan::isWajib('aktivitas_sholat_masjid') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('aktivitas_sholat_masjid') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Frekuensi Sholat --</option>
                             @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('aktivitas_sholat_masjid') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
+                    @if(\App\Models\FormPertanyaan::isAktif('aktivitas_kajian_agama'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Aktivitas Mengikuti Kajian</label>
-                        <select name="aktivitas_kajian_agama" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('aktivitas_kajian_agama', 'Aktivitas Mengikuti Kajian') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('aktivitas_kajian_agama'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="aktivitas_kajian_agama" {{ \App\Models\FormPertanyaan::isWajib('aktivitas_kajian_agama') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('aktivitas_kajian_agama') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Frekuensi Kajian --</option>
                             @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('aktivitas_kajian_agama') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    @if(\App\Models\FormPertanyaan::isAktif('jumlah_buku_agama'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Koleksi Buku Agama di Rumah</label>
-                        <select name="jumlah_buku_agama" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('jumlah_buku_agama', 'Koleksi Buku Agama di Rumah') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('jumlah_buku_agama'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="jumlah_buku_agama" {{ \App\Models\FormPertanyaan::isWajib('jumlah_buku_agama') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('jumlah_buku_agama') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Jumlah Buku --</option>
                             @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
                             <option value="{{ $v }}" @selected(old('jumlah_buku_agama')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('jumlah_buku_agama') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
+                    @if(\App\Models\FormPertanyaan::isAktif('langganan_suara_muhammadiyah'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Langganan Majalah Suara Muhammadiyah</label>
-                        <select name="langganan_suara_muhammadiyah" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('langganan_suara_muhammadiyah', 'Langganan Majalah Suara Muhammadiyah') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('langganan_suara_muhammadiyah'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <select name="langganan_suara_muhammadiyah" {{ \App\Models\FormPertanyaan::isWajib('langganan_suara_muhammadiyah') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('langganan_suara_muhammadiyah') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Status Berlangganan --</option>
                             @foreach(config('arqam.opsi_form.langganan_suara_muhammadiyah') as $v)
                             <option value="{{ $v }}" @selected(old('langganan_suara_muhammadiyah')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
+                        @error('langganan_suara_muhammadiyah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 <div>
@@ -807,14 +922,20 @@
             {{-- Tab 3: Organisasi & Kemuhammadiyahan (Desain Jelas & Nyaman) --}}
             <div x-show="tab==='org'" class="space-y-6 sm:space-y-7" style="display: none;">
                 {{-- 1. Keaktifan di Pimpinan Muhammadiyah --}}
+                @if(\App\Models\FormPertanyaan::isAktif('keaktifan_muhammadiyah'))
                 <div class="space-y-2.5">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm sm:text-base font-bold text-slate-900">
-                            1. Keaktifan di Pimpinan Muhammadiyah
+                            1. {{ \App\Models\FormPertanyaan::label('keaktifan_muhammadiyah', 'Keaktifan di Pimpinan Muhammadiyah') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('keaktifan_muhammadiyah'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
                         <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500">Centang tingkatan pimpinan tempat Bapak/Ibu aktif dan isikan amanah/jabatannya:</p>
+                    <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_muhammadiyah', 'Centang tingkatan pimpinan tempat Bapak/Ibu aktif dan isikan amanah/jabatannya:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(config('arqam.opsi_form.keaktifan_muhammadiyah') as $v)
@@ -843,7 +964,9 @@
                         </div>
                         @endforeach
                     </div>
+                    @error('keaktifan_muhammadiyah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
+                @endif
 
                 {{-- 2. Pimpinan Cabang (PCM) & Pimpinan Ranting (PRM) Domisili --}}
                 <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200/90 space-y-4 shadow-2xs">
@@ -860,38 +983,63 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                        @if(\App\Models\FormPertanyaan::isAktif('pcm'))
                         <div>
                             <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                                Pimpinan Cabang Muhammadiyah (PCM)
+                                {{ \App\Models\FormPertanyaan::label('pcm', 'Pimpinan Cabang Muhammadiyah (PCM)') }}
+                                @if(\App\Models\FormPertanyaan::isWajib('pcm'))
+                                    <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                                @else
+                                    <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                                @endif
                             </label>
-                            <select name="pcm" class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <select name="pcm" {{ \App\Models\FormPertanyaan::isWajib('pcm') ? 'required' : '' }}
+                                class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('pcm') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                                 <option value="">-- Pilih Cabang / Kecamatan --</option>
                                 @foreach(config('arqam.opsi_form.cabang_pcm') as $cabang)
                                     <option value="{{ $cabang }}" @selected(old('pcm') === $cabang)>PCM {{ $cabang }}</option>
                                 @endforeach
                                 <option value="Lainnya" @selected(old('pcm') === 'Lainnya')>Lainnya (Luar Karanganyar)</option>
                             </select>
+                            @error('pcm') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                         </div>
+                        @endif
+                        @if(\App\Models\FormPertanyaan::isAktif('prm'))
                         <div>
                             <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
-                                Pimpinan Ranting Muhammadiyah (PRM)
+                                {{ \App\Models\FormPertanyaan::label('prm', 'Pimpinan Ranting Muhammadiyah (PRM)') }}
+                                @if(\App\Models\FormPertanyaan::isWajib('prm'))
+                                    <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                                @else
+                                    <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                                @endif
                             </label>
-                            <input name="prm" value="{{ old('prm') }}" placeholder="Contoh: PRM Lalung / PRM Papahan"
-                                class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
-                            <span class="text-xs text-slate-500 mt-1 block">Dapat berupa nama desa, kelurahan, atau dusun/masjid basis ranting.</span>
+                            <input name="prm" value="{{ old('prm') }}"
+                                placeholder="{{ \App\Models\FormPertanyaan::placeholder('prm', 'Contoh: PRM Lalung / PRM Papahan') }}"
+                                {{ \App\Models\FormPertanyaan::isWajib('prm') ? 'required' : '' }}
+                                class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('prm') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                            <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('prm', 'Dapat berupa nama desa, kelurahan, atau dusun/masjid basis ranting.') }}</span>
+                            @error('prm') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                         </div>
+                        @endif
                     </div>
                 </div>
 
                 {{-- 3. Keaktifan di Organisasi Otonom (ORTOM) --}}
+                @if(\App\Models\FormPertanyaan::isAktif('keaktifan_ortom'))
                 <div class="space-y-2.5">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm sm:text-base font-bold text-slate-900">
-                            3. Keaktifan di Organisasi Otonom (ORTOM)
+                            3. {{ \App\Models\FormPertanyaan::label('keaktifan_ortom', 'Keaktifan di Organisasi Otonom (ORTOM)') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('keaktifan_ortom'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
                         <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500">Centang ortom tempat Bapak/Ibu berkiprah dan isikan jabatan/posisi Anda:</p>
+                    <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_ortom', 'Centang ortom tempat Bapak/Ibu berkiprah dan isikan jabatan/posisi Anda:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(config('arqam.opsi_form.keaktifan_ortom') as $v)
@@ -920,29 +1068,67 @@
                         </div>
                         @endforeach
                     </div>
+                    @error('keaktifan_ortom') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
+                @endif
 
                 {{-- 4. NBM & Pekerjaan Utama --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 pt-1">
+                    @if(\App\Models\FormPertanyaan::isAktif('nbm'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Nomor Baku Muhammadiyah (NBM)</label>
-                        <input name="nbm" value="{{ old('nbm') }}" placeholder="Contoh: 1234567 (Bila sudah ber-NBM)"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
-                        <span class="text-xs text-slate-500 mt-1 block">Kosongkan bila belum memiliki kartu NBM.</span>
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('nbm', 'Nomor Baku Muhammadiyah (NBM)') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('nbm'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <input name="nbm" value="{{ old('nbm') }}"
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('nbm', 'Contoh: 1234567 (Bila sudah ber-NBM)') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('nbm') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('nbm') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('nbm', 'Kosongkan bila belum memiliki kartu NBM.') }}</span>
+                        @error('nbm') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
+                    @if(\App\Models\FormPertanyaan::isAktif('pekerjaan'))
                     <div>
-                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Pekerjaan / Profesi Utama</label>
-                        <input name="pekerjaan" value="{{ old('pekerjaan') }}" placeholder="Contoh: Guru / PNS / Wiraswasta / Karyawan / Nakes"
-                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                            {{ \App\Models\FormPertanyaan::label('pekerjaan', 'Pekerjaan / Profesi Utama') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('pekerjaan'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
+                        </label>
+                        <input name="pekerjaan" value="{{ old('pekerjaan') }}"
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('pekerjaan', 'Contoh: Guru / PNS / Wiraswasta / Karyawan / Nakes') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('pekerjaan') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('pekerjaan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                        @error('pekerjaan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                 </div>
 
                 {{-- 5. Organisasi Lain di Luar Muhammadiyah --}}
+                @if(\App\Models\FormPertanyaan::isAktif('organisasi_lain'))
                 <div>
-                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">Organisasi Lain di Luar Muhammadiyah (Opsional)</label>
-                    <input name="organisasi_lain" value="{{ old('organisasi_lain') }}" placeholder="Contoh: PGRI, IDI, Karang Taruna dll. (kosongkan bila tidak ada)"
-                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 border-slate-300 hover:border-slate-400 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                    <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
+                        {{ \App\Models\FormPertanyaan::label('organisasi_lain', 'Organisasi Lain di Luar Muhammadiyah') }}
+                        @if(\App\Models\FormPertanyaan::isWajib('organisasi_lain'))
+                            <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                        @else
+                            <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                        @endif
+                    </label>
+                    <input name="organisasi_lain" value="{{ old('organisasi_lain') }}"
+                        placeholder="{{ \App\Models\FormPertanyaan::placeholder('organisasi_lain', 'Contoh: PGRI, IDI, Karang Taruna dll. (kosongkan bila tidak ada)') }}"
+                        {{ \App\Models\FormPertanyaan::isWajib('organisasi_lain') ? 'required' : '' }}
+                        class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('organisasi_lain') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
+                    @error('organisasi_lain') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                 </div>
+                @endif
 
                 {{-- Pertanyaan Kustom Seksi Organisasi --}}
                 <x-form-custom-fields :questions="$customQuestions['organisasi'] ?? null" />
@@ -1063,15 +1249,21 @@
                 </div>
 
                 {{-- 1. Aktivitas Jamaah di Masjid --}}
+                @if(\App\Models\FormPertanyaan::isAktif('aktifitas_jamaah_masjid'))
                 <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                             <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
-                                1. Rutinitas Jamaah di Masjid Lingkungan Sekitar
+                                1. {{ \App\Models\FormPertanyaan::label('aktifitas_jamaah_masjid', 'Rutinitas Jamaah di Masjid Lingkungan Sekitar') }}
+                                @if(\App\Models\FormPertanyaan::isWajib('aktifitas_jamaah_masjid'))
+                                    <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                                @else
+                                    <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                                @endif
                             </label>
                             <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">Boleh pilih lebih dari 1</span>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">{{ \App\Models\FormPertanyaan::bantuan('aktifitas_jamaah_masjid', 'Sentuh pilihan di bawah ini yang biasa Bapak/Ibu ikuti:') }}</p>
                     </div>
 
                     {{-- Structured 2-Column Grid --}}
@@ -1097,19 +1289,27 @@
                             Rincian / Catatan Tambahan &amp; Nama Masjid:
                         </label>
                         <textarea name="aktifitas_jamaah_masjid" x-model="masjidText" rows="3"
-                            placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik nama masjid atau kegiatan lain (contoh: Masjid Al-Falah Jetis)..."
-                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('aktifitas_jamaah_masjid', 'Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik nama masjid atau kegiatan lain (contoh: Masjid Al-Falah Jetis)...') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('aktifitas_jamaah_masjid') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 text-base border-2 {{ $errors->has('aktifitas_jamaah_masjid') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300' }} rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
                         @error('aktifitas_jamaah_masjid') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
+                @endif
 
                 {{-- 2. Keaktifan sebagai Takmir Masjid --}}
+                @if(\App\Models\FormPertanyaan::isAktif('keaktifan_takmir'))
                 <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
                         <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
-                            2. Amanah sebagai Pengurus / Takmir Masjid
+                            2. {{ \App\Models\FormPertanyaan::label('keaktifan_takmir', 'Amanah sebagai Pengurus / Takmir Masjid') }}
+                            @if(\App\Models\FormPertanyaan::isWajib('keaktifan_takmir'))
+                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                            @else
+                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                            @endif
                         </label>
-                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_takmir', 'Apakah saat ini Bapak/Ibu diamanahi sebagai takmir atau pengurus masjid/musholla?') }}</p>
                     </div>
 
                     {{-- Symmetrical Side-by-Side Cards on Mobile & Desktop --}}
@@ -1175,17 +1375,24 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- 3. Keaktifan di Kemasyarakatan --}}
+                @if(\App\Models\FormPertanyaan::isAktif('keaktifan_kemasyarakatan'))
                 <div class="p-4 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-4">
                     <div>
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                             <label class="block text-base sm:text-lg font-black text-slate-900 leading-tight">
-                                3. Keaktifan di Lingkungan Kemasyarakatan
+                                3. {{ \App\Models\FormPertanyaan::label('keaktifan_kemasyarakatan', 'Keaktifan di Lingkungan Kemasyarakatan') }}
+                                @if(\App\Models\FormPertanyaan::isWajib('keaktifan_kemasyarakatan'))
+                                    <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
+                                @else
+                                    <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+                                @endif
                             </label>
                             <span class="text-xs sm:text-sm text-sky-800 font-bold bg-sky-100 px-3 py-1 rounded-full border border-sky-200 self-start sm:self-auto">RT / RW / BPD / Karang Taruna dll.</span>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 font-medium">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_kemasyarakatan', 'Sentuh peran masyarakat yang pernah atau sedang Bapak/Ibu jalankan:') }}</p>
                     </div>
 
                     {{-- Structured 2-Column Grid (5 rows x 2 cols) --}}
@@ -1211,11 +1418,13 @@
                             Rincian Peran &amp; Nama Dusun/Wilayah:
                         </label>
                         <textarea name="keaktifan_kemasyarakatan" x-model="masyarakatText" rows="3"
-                            placeholder="Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik rincian RT/RW/Desa (contoh: Ketua RT 02 RW 04 Dusun Dagen)..."
-                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
+                            placeholder="{{ \App\Models\FormPertanyaan::placeholder('keaktifan_kemasyarakatan', 'Pilihan di atas otomatis tertulis di sini. Bapak/Ibu juga dapat mengetik rincian RT/RW/Desa (contoh: Ketua RT 02 RW 04 Dusun Dagen)...') }}"
+                            {{ \App\Models\FormPertanyaan::isWajib('keaktifan_kemasyarakatan') ? 'required' : '' }}
+                            class="w-full px-4 py-3.5 text-base border-2 {{ $errors->has('keaktifan_kemasyarakatan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300' }} rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white resize-none transition leading-relaxed placeholder:text-slate-400 font-medium"></textarea>
                         @error('keaktifan_kemasyarakatan') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                 </div>
+                @endif
 
                 {{-- Informasi Pembuatan Akun Otomatis (Sangat Ramah Kader Senior) --}}
                 <div class="p-5 sm:p-6 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 flex items-start gap-4 shadow-sm">
@@ -1321,7 +1530,7 @@
 <script>
 function registrationForm() {
     return {
-        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto']) ? 'diri' : ($errors->hasAny(['pendidikan_terakhir', 'pendidikan_sd', 'pendidikan_smp', 'pendidikan_sma', 'pendidikan_s1', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'pekerjaan', 'pcm', 'prm', 'keaktifan_muhammadiyah', 'jabatan_muhammadiyah', 'keaktifan_ortom', 'jabatan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
+        tab: '{{ $errors->hasAny(['nama_lengkap', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'no_wa', 'email', 'password', 'password_confirmation', 'foto', 'nama_ayah', 'nama_ibu']) ? 'diri' : ($errors->hasAny(['pendidikan_terakhir', 'pendidikan_sd', 'pendidikan_smp', 'pendidikan_sma', 'pendidikan_s1', 'bahasa_dikuasai', 'kemampuan_baca_quran', 'hafalan_quran', 'aktivitas_sholat_masjid', 'aktivitas_kajian_agama', 'jumlah_buku_agama', 'langganan_suara_muhammadiyah', 'lembaga_zis']) ? 'agama' : ($errors->hasAny(['nbm', 'jabatan_aum', 'pekerjaan', 'pcm', 'prm', 'keaktifan_muhammadiyah', 'jabatan_muhammadiyah', 'keaktifan_ortom', 'jabatan_ortom', 'organisasi_lain']) ? 'org' : ($errors->any() ? 'kemasyarakatan' : 'diri'))) }}',
         showPass: false,
         showConfirmPass: false,
         isSubmitting: false,
@@ -1766,6 +1975,18 @@ function registrationForm() {
             const fotoInput = form.querySelector('input[name="foto"]');
             if (!fotoInput || !fotoInput.files || fotoInput.files.length === 0) {
                 this.clientErrors.foto = 'Pasfoto 3:4 wajib diunggah untuk kelengkapan administrasi.';
+            }
+
+            if ({{ \App\Models\FormPertanyaan::isWajib('nama_ayah') ? 'true' : 'false' }} && !getVal('nama_ayah')) {
+                this.clientErrors.nama_ayah = 'Nama ayah kandung wajib diisi.';
+            }
+
+            if ({{ \App\Models\FormPertanyaan::isWajib('nama_ibu') ? 'true' : 'false' }} && !getVal('nama_ibu')) {
+                this.clientErrors.nama_ibu = 'Nama ibu kandung wajib diisi.';
+            }
+
+            if ({{ \App\Models\FormPertanyaan::isWajib('email') ? 'true' : 'false' }} && !getVal('email')) {
+                this.clientErrors.email = 'Alamat email wajib diisi.';
             }
 
             const pass = getVal('password');

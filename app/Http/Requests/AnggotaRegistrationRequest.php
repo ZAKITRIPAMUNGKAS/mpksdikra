@@ -20,7 +20,7 @@ class AnggotaRegistrationRequest extends FormRequest
     {
         $o = config('arqam.opsi_form');
 
-        return [
+        $baseRules = [
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'alamat_rumah' => ['required', 'string', 'max:255'],
             'jenis_kelamin' => ['required', Rule::in(array_keys($o['jenis_kelamin']))],
@@ -77,7 +77,9 @@ class AnggotaRegistrationRequest extends FormRequest
             'harapan_pcm' => ['nullable', 'string', 'max:2000'],
             'harapan_ba' => ['nullable', 'string', 'max:2000'],
             'custom_fields' => ['nullable', 'array'],
-        ] + FormPertanyaan::activeValidationRules();
+        ];
+
+        return FormPertanyaan::applyStandardValidationRules($baseRules) + FormPertanyaan::activeValidationRules();
     }
 
     public function messages(): array
@@ -89,11 +91,30 @@ class AnggotaRegistrationRequest extends FormRequest
             'nik.unique' => 'NIK ini sudah terdaftar di pangkalan data.',
             'email.unique' => 'Alamat email ini sudah terdaftar sebagai akun.',
             'email.email' => 'Format email tidak valid.',
+            'email.required' => 'Alamat email wajib diisi.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
             'foto.required' => 'Pasfoto 3:4 wajib diunggah untuk kelengkapan administrasi.',
             'foto.image' => 'Berkas pasfoto harus berupa format gambar (JPG, PNG, atau WebP).',
             'foto.max' => 'Ukuran berkas pasfoto maksimal 2MB.',
+            'nama_ayah.required' => 'Nama ayah kandung wajib diisi.',
+            'nama_ibu.required' => 'Nama ibu kandung wajib diisi.',
+            'pekerjaan.required' => 'Pekerjaan / profesi utama wajib diisi.',
+            'nbm.required' => 'Nomor NBM wajib diisi.',
+            'pcm.required' => 'Cabang Muhammadiyah (PCM) wajib dipilih.',
+            'prm.required' => 'Ranting Muhammadiyah (PRM) wajib diisi.',
+            'pendidikan_terakhir.required' => 'Pendidikan terakhir wajib dipilih.',
+            'kemampuan_baca_quran.required' => 'Kemampuan membaca Al-Qur\'an wajib dipilih.',
+            'hafalan_quran.required' => 'Hafalan Al-Qur\'an wajib dipilih.',
+            'aktivitas_sholat_masjid.required' => 'Aktivitas sholat di masjid wajib dipilih.',
+            'aktivitas_kajian_agama.required' => 'Aktivitas kajian agama wajib dipilih.',
+            'jumlah_buku_agama.required' => 'Jumlah buku agama wajib dipilih.',
+            'langganan_suara_muhammadiyah.required' => 'Status langganan Suara Muhammadiyah wajib dipilih.',
+            'keaktifan_muhammadiyah.required' => 'Keaktifan di Muhammadiyah wajib dipilih.',
+            'keaktifan_ortom.required' => 'Keaktifan di ORTOM wajib dipilih.',
+            'aktifitas_jamaah_masjid.required' => 'Aktivitas jamaah di masjid wajib diisi.',
+            'keaktifan_takmir.required' => 'Status keaktifan takmir wajib dipilih.',
+            'keaktifan_kemasyarakatan.required' => 'Keaktifan di kemasyarakatan wajib diisi.',
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 class FormPertanyaan extends Model
@@ -50,6 +51,105 @@ class FormPertanyaan extends Model
         'checkbox' => 'Kotak Centang (Banyak Pilihan)',
         'number' => 'Angka / Bilangan',
     ];
+
+    protected static ?Collection $configCache = null;
+
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            static::clearConfigCache();
+        });
+        static::deleted(function () {
+            static::clearConfigCache();
+        });
+    }
+
+    public static function configMap(): Collection
+    {
+        if (static::$configCache === null) {
+            static::$configCache = static::all()->keyBy('kode');
+        }
+
+        return static::$configCache;
+    }
+
+    public static function clearConfigCache(): void
+    {
+        static::$configCache = null;
+    }
+
+    public static function isWajib(string $kode, bool $default = false): bool
+    {
+        $q = static::configMap()->get($kode);
+
+        return $q ? (bool) $q->is_wajib : $default;
+    }
+
+    public static function isAktif(string $kode, bool $default = true): bool
+    {
+        $q = static::configMap()->get($kode);
+
+        return $q ? (bool) $q->is_aktif : $default;
+    }
+
+    public static function label(string $kode, string $default): string
+    {
+        $q = static::configMap()->get($kode);
+
+        return $q && ! empty($q->label) ? $q->label : $default;
+    }
+
+    public static function bantuan(string $kode, ?string $default = null): ?string
+    {
+        $q = static::configMap()->get($kode);
+
+        return $q && ! empty($q->bantuan) ? $q->bantuan : $default;
+    }
+
+    public static function placeholder(string $kode, ?string $default = null): ?string
+    {
+        $q = static::configMap()->get($kode);
+
+        return $q && ! empty($q->placeholder) ? $q->placeholder : $default;
+    }
+
+    public static function getField(string $kode): ?self
+    {
+        return static::configMap()->get($kode);
+    }
+
+    public static function applyStandardValidationRules(array $baseRules): array
+    {
+        $standardQuestions = static::where('is_custom', false)->get()->keyBy('kode');
+
+        foreach ($standardQuestions as $kode => $q) {
+            if (! isset($baseRules[$kode])) {
+                continue;
+            }
+
+            $ruleList = (array) $baseRules[$kode];
+
+            if ($q->is_wajib) {
+                $ruleList = array_map(fn ($r) => $r === 'nullable' ? 'required' : $r, $ruleList);
+                if (! in_array('required', $ruleList, true)) {
+                    array_unshift($ruleList, 'required');
+                }
+            } else {
+                $coreRequired = ['nama_lengkap', 'nik', 'no_wa', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'status_pernikahan', 'alamat_rumah', 'desa_kelurahan', 'kecamatan', 'kabupaten', 'foto'];
+                if (! in_array($kode, $coreRequired, true)) {
+                    $ruleList = array_map(fn ($r) => $r === 'required' ? 'nullable' : $r, $ruleList);
+                }
+            }
+
+            if (! $q->is_aktif) {
+                $ruleList = array_map(fn ($r) => $r === 'required' ? 'nullable' : $r, $ruleList);
+            }
+
+            $baseRules[$kode] = $ruleList;
+        }
+
+        return $baseRules;
+    }
 
     public function scopeAktif(Builder $query): Builder
     {

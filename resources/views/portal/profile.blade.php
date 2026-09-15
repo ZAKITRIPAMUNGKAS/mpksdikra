@@ -195,16 +195,34 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @if(\App\Models\FormPertanyaan::isAktif('nama_ayah'))
                 <div>
-                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nama Ayah Kandung</label>
-                    <input name="nama_ayah" value="{{ old('nama_ayah', $anggota->nama_ayah) }}" placeholder="Contoh: H. Ahmad Syukri"
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                        {{ \App\Models\FormPertanyaan::label('nama_ayah', 'Nama Ayah Kandung') }}
+                        @if(\App\Models\FormPertanyaan::isWajib('nama_ayah'))
+                            <span class="text-red-500">*</span>
+                        @endif
+                    </label>
+                    <input name="nama_ayah" value="{{ old('nama_ayah', $anggota->nama_ayah) }}"
+                        placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ayah', 'Contoh: H. Ahmad Syukri') }}"
+                        {{ \App\Models\FormPertanyaan::isWajib('nama_ayah') ? 'required' : '' }}
                         class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
+                @endif
+                @if(\App\Models\FormPertanyaan::isAktif('nama_ibu'))
                 <div>
-                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nama Ibu Kandung</label>
-                    <input name="nama_ibu" value="{{ old('nama_ibu', $anggota->nama_ibu) }}" placeholder="Contoh: Hj. Siti Maryam"
+                    <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                        {{ \App\Models\FormPertanyaan::label('nama_ibu', 'Nama Ibu Kandung') }}
+                        @if(\App\Models\FormPertanyaan::isWajib('nama_ibu'))
+                            <span class="text-red-500">*</span>
+                        @endif
+                    </label>
+                    <input name="nama_ibu" value="{{ old('nama_ibu', $anggota->nama_ibu) }}"
+                        placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ibu', 'Contoh: Hj. Siti Maryam') }}"
+                        {{ \App\Models\FormPertanyaan::isWajib('nama_ibu') ? 'required' : '' }}
                         class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

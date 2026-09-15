@@ -6,6 +6,7 @@ use App\Models\FormPertanyaan;
 use App\Models\User;
 use Database\Seeders\FormPertanyaanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
@@ -168,5 +169,63 @@ class FormPertanyaanTest extends TestCase
         $this->actingAs($admin)->delete(route('admin.form-kader.destroy', $pertanyaan))
             ->assertRedirect();
         $this->assertNull(FormPertanyaan::find($pertanyaan->id));
+    }
+
+    public function test_standard_question_wajib_setting_reflects_in_registration_view_and_request(): void
+    {
+        $this->seed(FormPertanyaanSeeder::class);
+
+        // Initially nama_ayah is optional
+        $response = $this->get(route('anggota.register'));
+        $response->assertOk();
+        $response->assertSee('Nama Ayah Kandung');
+        $response->assertSee('(Opsional)');
+
+        // Now set nama_ayah to wajib
+        $q = FormPertanyaan::where('kode', 'nama_ayah')->firstOrFail();
+        $q->update(['is_wajib' => true]);
+
+        $responseWajib = $this->get(route('anggota.register'));
+        $responseWajib->assertOk();
+        $responseWajib->assertSee('Nama Ayah Kandung');
+        $responseWajib->assertSee('title="Wajib diisi"', false);
+
+        // Submitting without nama_ayah should fail validation
+        $payload = [
+            'nama_lengkap' => 'Ahmad Dahlan Uji',
+            'alamat_rumah' => 'Jl. Lawu No. 12',
+            'jenis_kelamin' => 'L',
+            'nik' => '3313998877660001',
+            'tempat_lahir' => 'Karanganyar',
+            'tanggal_lahir' => '1990-01-01',
+            'status_pernikahan' => 'Nikah',
+            'desa_kelurahan' => 'Dagen',
+            'kecamatan' => 'Jaten',
+            'kabupaten' => 'Karanganyar',
+            'no_wa' => '081234567899',
+            'foto' => UploadedFile::fake()->image('foto.jpg', 600, 800),
+        ];
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors('nama_ayah');
+
+        // Submitting with nama_ayah should pass
+        $payload['nama_ayah'] = 'H. Syukri';
+        $resPass = $this->post(route('anggota.register.store'), $payload);
+        $resPass->assertSessionHasNoErrors();
+    }
+
+    public function test_standard_question_hidden_setting_hides_field_from_registration_view(): void
+    {
+        $this->seed(FormPertanyaanSeeder::class);
+
+        // Initially nbm is active
+        $this->get(route('anggota.register'))->assertSee('name="nbm"', false);
+
+        // Hide nbm
+        $q = FormPertanyaan::where('kode', 'nbm')->firstOrFail();
+        $q->update(['is_aktif' => false]);
+
+        $this->get(route('anggota.register'))->assertDontSee('name="nbm"', false);
     }
 }

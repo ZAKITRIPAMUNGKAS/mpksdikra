@@ -127,10 +127,10 @@ class ProfileController extends Controller
 
         $filename = 'cv-biodata-'.Str::slug($anggota->nama_lengkap).'.pdf';
 
-        if (request()->has('stream')) {
-            return $pdf->stream($filename);
+        if (request()->has('download')) {
+            return $pdf->download($filename);
         }
 
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 }

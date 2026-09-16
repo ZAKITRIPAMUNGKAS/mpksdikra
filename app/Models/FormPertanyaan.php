@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\In;
 
 class FormPertanyaan extends Model
 {
@@ -113,6 +114,17 @@ class FormPertanyaan extends Model
         return $q && ! empty($q->placeholder) ? $q->placeholder : $default;
     }
 
+    public static function opsi(string $kode, array $default = []): array
+    {
+        $q = static::configMap()->get($kode);
+
+        if ($q && is_array($q->opsi) && count($q->opsi) > 0) {
+            return $q->opsi;
+        }
+
+        return $default;
+    }
+
     public static function getField(string $kode): ?self
     {
         return static::configMap()->get($kode);
@@ -143,6 +155,22 @@ class FormPertanyaan extends Model
 
             if (! $q->is_aktif) {
                 $ruleList = array_map(fn ($r) => $r === 'required' ? 'nullable' : $r, $ruleList);
+            }
+
+            if ($kode !== 'jenis_kelamin' && $q->opsi && is_array($q->opsi) && count($q->opsi) > 0) {
+                if (in_array($q->tipe, ['select', 'text'], true)) {
+                    $cleanRules = [];
+                    foreach ($ruleList as $rule) {
+                        if ($rule instanceof Rule || $rule instanceof In) {
+                            continue;
+                        }
+                        $cleanRules[] = $rule;
+                    }
+                    $cleanRules[] = Rule::in($q->opsi);
+                    $ruleList = $cleanRules;
+                } elseif ($q->tipe === 'checkbox') {
+                    $baseRules[$kode.'.*'] = [Rule::in($q->opsi)];
+                }
             }
 
             $baseRules[$kode] = $ruleList;

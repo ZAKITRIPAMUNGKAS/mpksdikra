@@ -228,4 +228,54 @@ class FormPertanyaanTest extends TestCase
 
         $this->get(route('anggota.register'))->assertDontSee('name="nbm"', false);
     }
+
+    public function test_admin_updated_options_sync_to_registration_page_and_validation(): void
+    {
+        $this->seed(FormPertanyaanSeeder::class);
+        $admin = $this->createAdminDaerah();
+
+        $q = FormPertanyaan::where('kode', 'keaktifan_ortom')->firstOrFail();
+
+        // Admin updates options via form-kader update route
+        $newOptions = "Pemuda Muhammadiyah\nNasyiatul Aisyiyah\nIkatan Mahasiswa Muhammadiyah (IMM)\nTidak aktif";
+        $this->actingAs($admin)->put(route('admin.form-kader.update', $q), [
+            'label' => 'Keaktifan di Organisasi Otonom (ORTOM)',
+            'opsi_raw' => $newOptions,
+            'is_wajib' => 0,
+            'is_aktif' => 1,
+            'seksi' => 'organisasi',
+        ])->assertRedirect();
+
+        auth()->logout();
+        session()->flush();
+
+        // Verify registration view displays the new option
+        $response = $this->get(route('anggota.register'));
+        $response->assertOk();
+        $response->assertSee('Ikatan Mahasiswa Muhammadiyah (IMM)');
+
+        // Submit form with the newly added option
+        $payload = [
+            'nama_lengkap' => 'Kader Ortom Baru',
+            'alamat_rumah' => 'Jl. Lawu No. 99',
+            'jenis_kelamin' => 'L',
+            'nik' => '3313998877660002',
+            'tempat_lahir' => 'Karanganyar',
+            'tanggal_lahir' => '1995-03-20',
+            'status_pernikahan' => 'Belum Nikah',
+            'desa_kelurahan' => 'Dagen',
+            'kecamatan' => 'Jaten',
+            'kabupaten' => 'Karanganyar',
+            'no_wa' => '081234567888',
+            'foto' => UploadedFile::fake()->image('foto.jpg', 600, 800),
+            'keaktifan_ortom' => ['Ikatan Mahasiswa Muhammadiyah (IMM)'],
+        ];
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('anggota', [
+            'nik' => '3313998877660002',
+        ]);
+    }
 }

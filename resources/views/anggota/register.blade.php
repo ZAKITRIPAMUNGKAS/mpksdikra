@@ -434,7 +434,7 @@
                             :class="clientErrors.status_pernikahan ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('status_pernikahan') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('status_pernikahan') ? 'true' : 'false' }}">
                             <option value="">-- Pilih Status --</option>
-                            @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('status_pernikahan', config('arqam.opsi_form.status_pernikahan')) as $v)
                             <option value="{{ $v }}" @selected(old('status_pernikahan')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -746,7 +746,7 @@
                     </div>
                     <p class="text-xs sm:text-sm text-slate-500 mb-2.5">Sentuh bahasa yang biasa Bapak/Ibu gunakan sehari-hari:</p>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                        @foreach(config('arqam.opsi_form.bahasa_dikuasai') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('bahasa_dikuasai', config('arqam.opsi_form.bahasa_dikuasai')) as $v)
                         <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-slate-800 p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40 bg-white cursor-pointer select-none transition min-h-[50px] shadow-2xs">
                             <input type="checkbox" name="bahasa_dikuasai[]" value="{{ $v }}"
                                 @checked(in_array($v, old('bahasa_dikuasai', []))) class="w-5 h-5 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
@@ -770,7 +770,7 @@
                         <select name="kemampuan_baca_quran" {{ \App\Models\FormPertanyaan::isWajib('kemampuan_baca_quran') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('kemampuan_baca_quran') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Kemampuan --</option>
-                            @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('kemampuan_baca_quran', config('arqam.opsi_form.kemampuan_baca_quran')) as $v)
                             <option value="{{ $v }}" @selected(old('kemampuan_baca_quran')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -790,7 +790,7 @@
                         <select name="hafalan_quran" {{ \App\Models\FormPertanyaan::isWajib('hafalan_quran') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('hafalan_quran') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Jumlah Hafalan --</option>
-                            @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('hafalan_quran', config('arqam.opsi_form.hafalan_quran')) as $v)
                             <option value="{{ $v }}" @selected(old('hafalan_quran')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -813,7 +813,7 @@
                         <select name="aktivitas_sholat_masjid" {{ \App\Models\FormPertanyaan::isWajib('aktivitas_sholat_masjid') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('aktivitas_sholat_masjid') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Frekuensi Sholat --</option>
-                            @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('aktivitas_sholat_masjid', config('arqam.opsi_form.aktivitas_sholat_masjid')) as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -833,7 +833,7 @@
                         <select name="aktivitas_kajian_agama" {{ \App\Models\FormPertanyaan::isWajib('aktivitas_kajian_agama') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('aktivitas_kajian_agama') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Frekuensi Kajian --</option>
-                            @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('aktivitas_kajian_agama', config('arqam.opsi_form.aktivitas_kajian_agama')) as $v)
                             <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -856,7 +856,7 @@
                         <select name="jumlah_buku_agama" {{ \App\Models\FormPertanyaan::isWajib('jumlah_buku_agama') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('jumlah_buku_agama') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Jumlah Buku --</option>
-                            @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('jumlah_buku_agama', config('arqam.opsi_form.jumlah_buku_agama')) as $v)
                             <option value="{{ $v }}" @selected(old('jumlah_buku_agama')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -876,7 +876,7 @@
                         <select name="langganan_suara_muhammadiyah" {{ \App\Models\FormPertanyaan::isWajib('langganan_suara_muhammadiyah') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('langganan_suara_muhammadiyah') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                             <option value="">-- Pilih Status Berlangganan --</option>
-                            @foreach(config('arqam.opsi_form.langganan_suara_muhammadiyah') as $v)
+                            @foreach(\App\Models\FormPertanyaan::opsi('langganan_suara_muhammadiyah', config('arqam.opsi_form.langganan_suara_muhammadiyah')) as $v)
                             <option value="{{ $v }}" @selected(old('langganan_suara_muhammadiyah')===$v)>{{ $v }}</option>
                             @endforeach
                         </select>
@@ -892,7 +892,7 @@
                     </div>
                     <p class="text-xs sm:text-sm text-slate-500 mb-2.5">Sentuh lembaga ZIS tempat biasa Bapak/Ibu menyalurkan zakat/infaq:</p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        @foreach(config('arqam.opsi_form.lembaga_zis') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('lembaga_zis', config('arqam.opsi_form.lembaga_zis')) as $v)
                         <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-slate-800 p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200/90 hover:border-sky-300 hover:bg-sky-50/40 bg-white cursor-pointer select-none transition min-h-[50px] shadow-2xs">
                             <input type="checkbox" name="lembaga_zis[]" value="{{ $v }}"
                                 @checked(in_array($v, old('lembaga_zis', []))) class="w-5 h-5 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
@@ -938,7 +938,7 @@
                     <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_muhammadiyah', 'Centang tingkatan pimpinan tempat Bapak/Ibu aktif dan isikan amanah/jabatannya:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        @foreach(config('arqam.opsi_form.keaktifan_muhammadiyah') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_muhammadiyah', config('arqam.opsi_form.keaktifan_muhammadiyah')) as $v)
                         <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
                              :class="isMuhammadiyahChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
                             <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
@@ -996,7 +996,7 @@
                             <select name="pcm" {{ \App\Models\FormPertanyaan::isWajib('pcm') ? 'required' : '' }}
                                 class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('pcm') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
                                 <option value="">-- Pilih Cabang / Kecamatan --</option>
-                                @foreach(config('arqam.opsi_form.cabang_pcm') as $cabang)
+                                @foreach(\App\Models\FormPertanyaan::opsi('pcm', config('arqam.opsi_form.cabang_pcm')) as $cabang)
                                     <option value="{{ $cabang }}" @selected(old('pcm') === $cabang)>PCM {{ $cabang }}</option>
                                 @endforeach
                                 <option value="Lainnya" @selected(old('pcm') === 'Lainnya')>Lainnya (Luar Karanganyar)</option>
@@ -1042,7 +1042,7 @@
                     <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_ortom', 'Centang ortom tempat Bapak/Ibu berkiprah dan isikan jabatan/posisi Anda:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        @foreach(config('arqam.opsi_form.keaktifan_ortom') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_ortom', config('arqam.opsi_form.keaktifan_ortom')) as $v)
                         <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
                              :class="isOrtomChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
                             <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">

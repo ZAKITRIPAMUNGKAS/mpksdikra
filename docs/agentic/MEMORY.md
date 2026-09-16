@@ -42,6 +42,11 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Sinkronisasi Penuh Opsi Pilihan Form Pertanyaan (Checkbox / Dropdown) ke Formulir & Profil:
+  1. Helper `FormPertanyaan::opsi($kode, $default)`: membaca daftar opsi hasil edit admin di `/admin/form-kader` langsung dari database `form_pertanyaan.opsi`, dengan fallback aman ke `config('arqam.opsi_form')`.
+  2. Rendering dinamis di `register.blade.php` & `portal/profile.blade.php` untuk seluruh opsi: `keaktifan_ortom`, `keaktifan_muhammadiyah`, `kemampuan_baca_quran`, `hafalan_quran`, `aktivitas_sholat_masjid`, `aktivitas_kajian_agama`, `jumlah_buku_agama`, `langganan_suara_muhammadiyah`, `lembaga_zis`, `pcm`, `status_pernikahan`, dan `bahasa_dikuasai`.
+  3. Validasi dinamis server-side (`applyStandardValidationRules`): `Rule::in` otomatis disesuaikan dengan opsi database terkini untuk select dan checkbox array sehingga item baru yang ditambahkan admin tidak ditolak validasi.
+  4. Pengujian: 140 tests lulus 100% (568 assertions), Pint clean, Vite build clean.
 - 2026-09-16: Implementasi Mekanisme Hapus Data Kader:
   1. Route `DELETE /admin/anggota/{anggota}` dengan controller action `AdminAnggotaController::destroy`.
   2. Proteksi integritas data perkaderan: jika kader sudah terdaftar di kegiatan Baitul Arqam (`eventPeserta`), penghapusan ditolak untuk melindungi riwayat nilai dan sertifikat (disarankan nonaktifkan).

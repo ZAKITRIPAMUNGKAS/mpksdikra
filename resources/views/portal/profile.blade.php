@@ -163,7 +163,7 @@
                 <div>
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Status Pernikahan <span class="text-red-500">*</span></label>
                     <select name="status_pernikahan" required class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
-                        @foreach(config('arqam.opsi_form.status_pernikahan') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('status_pernikahan', config('arqam.opsi_form.status_pernikahan')) as $v)
                         <option value="{{ $v }}" @selected(old('status_pernikahan', $anggota->status_pernikahan)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -316,7 +316,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kemampuan Baca Al-Qur'an</label>
                     <select name="kemampuan_baca_quran" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Pilih Kemampuan --</option>
-                        @foreach(config('arqam.opsi_form.kemampuan_baca_quran') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('kemampuan_baca_quran', config('arqam.opsi_form.kemampuan_baca_quran')) as $v)
                         <option value="{{ $v }}" @selected(old('kemampuan_baca_quran', $anggota->kemampuan_baca_quran)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -325,7 +325,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Hafalan Al-Qur'an</label>
                     <select name="hafalan_quran" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Pilih Capaian Hafalan --</option>
-                        @foreach(config('arqam.opsi_form.hafalan_quran') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('hafalan_quran', config('arqam.opsi_form.hafalan_quran')) as $v)
                         <option value="{{ $v }}" @selected(old('hafalan_quran', $anggota->hafalan_quran)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -337,7 +337,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Sholat Berjamaah di Masjid</label>
                     <select name="aktivitas_sholat_masjid" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Frekuensi --</option>
-                        @foreach(config('arqam.opsi_form.aktivitas_sholat_masjid') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('aktivitas_sholat_masjid', config('arqam.opsi_form.aktivitas_sholat_masjid')) as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_sholat_masjid', $anggota->aktivitas_sholat_masjid)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -346,7 +346,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Kehadiran Kajian Keagamaan</label>
                     <select name="aktivitas_kajian_agama" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Frekuensi --</option>
-                        @foreach(config('arqam.opsi_form.aktivitas_kajian_agama') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('aktivitas_kajian_agama', config('arqam.opsi_form.aktivitas_kajian_agama')) as $v)
                         <option value="{{ $v }}" @selected(old('aktivitas_kajian_agama', $anggota->aktivitas_kajian_agama)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -355,7 +355,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Koleksi Buku Agama di Rumah</label>
                     <select name="jumlah_buku_agama" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Jumlah Buku --</option>
-                        @foreach(config('arqam.opsi_form.jumlah_buku_agama') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('jumlah_buku_agama', config('arqam.opsi_form.jumlah_buku_agama')) as $v)
                         <option value="{{ $v }}" @selected(old('jumlah_buku_agama', $anggota->jumlah_buku_agama)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>
@@ -498,7 +498,7 @@
                 <p class="text-xs sm:text-sm text-slate-600 font-medium">Centang tingkatan pimpinan tempat Anda aktif dan isikan amanah/jabatan Anda:</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    @foreach(config('arqam.opsi_form.keaktifan_muhammadiyah') as $v)
+                    @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_muhammadiyah', config('arqam.opsi_form.keaktifan_muhammadiyah')) as $v)
                     <div class="p-3.5 sm:p-4 rounded-2xl border-2 transition-all"
                          :class="isMuhammadiyahChecked('{{ $v }}') ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-300' : 'bg-white border-slate-300 hover:border-slate-400 hover:bg-slate-50'">
                         <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
@@ -547,7 +547,7 @@
                         </label>
                         <select name="pcm" class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[50px]">
                             <option value="">-- Pilih Cabang / Kecamatan --</option>
-                            @foreach(config('arqam.opsi_form.cabang_pcm') as $cabang)
+                            @foreach(\App\Models\FormPertanyaan::opsi('pcm', config('arqam.opsi_form.cabang_pcm')) as $cabang)
                                 <option value="{{ $cabang }}" @selected(old('pcm', $anggota->pcm ?: $anggota->kecamatan) === $cabang)>PCM {{ $cabang }}</option>
                             @endforeach
                             <option value="Lainnya" @selected(old('pcm', $anggota->pcm) === 'Lainnya')>Lainnya (Luar Karanganyar)</option>
@@ -575,7 +575,7 @@
                 <p class="text-xs sm:text-sm text-slate-600 font-medium">Centang ortom tempat Anda berkiprah dan isikan jabatan/posisi Anda:</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    @foreach(config('arqam.opsi_form.keaktifan_ortom') as $v)
+                    @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_ortom', config('arqam.opsi_form.keaktifan_ortom')) as $v)
                     <div class="p-3.5 sm:p-4 rounded-2xl border-2 transition-all"
                          :class="isOrtomChecked('{{ $v }}') ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-300' : 'bg-white border-slate-300 hover:border-slate-400 hover:bg-slate-50'">
                         <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
@@ -608,7 +608,7 @@
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Langganan Majalah Suara Muhammadiyah</label>
                     <select name="langganan_suara_muhammadiyah" class="w-full px-4 py-3.5 text-base bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                         <option value="">-- Status Langganan --</option>
-                        @foreach(config('arqam.opsi_form.langganan_suara_muhammadiyah') as $v)
+                        @foreach(\App\Models\FormPertanyaan::opsi('langganan_suara_muhammadiyah', config('arqam.opsi_form.langganan_suara_muhammadiyah')) as $v)
                         <option value="{{ $v }}" @selected(old('langganan_suara_muhammadiyah', $anggota->langganan_suara_muhammadiyah)===$v)>{{ $v }}</option>
                         @endforeach
                     </select>

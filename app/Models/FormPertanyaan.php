@@ -157,8 +157,14 @@ class FormPertanyaan extends Model
                 $ruleList = array_map(fn ($r) => $r === 'required' ? 'nullable' : $r, $ruleList);
             }
 
-            if ($kode !== 'jenis_kelamin' && $q->opsi && is_array($q->opsi) && count($q->opsi) > 0) {
+            $skipOpsiValidation = ['jenis_kelamin', 'pendidikan_terakhir'];
+
+            if (! in_array($kode, $skipOpsiValidation, true) && $q->opsi && is_array($q->opsi) && count($q->opsi) > 0) {
                 if (in_array($q->tipe, ['select', 'text'], true)) {
+                    $allowedOpsi = $q->opsi;
+                    if ($kode === 'pcm' && ! in_array('Lainnya', $allowedOpsi, true)) {
+                        $allowedOpsi[] = 'Lainnya';
+                    }
                     $cleanRules = [];
                     foreach ($ruleList as $rule) {
                         if ($rule instanceof Rule || $rule instanceof In) {
@@ -166,7 +172,7 @@ class FormPertanyaan extends Model
                         }
                         $cleanRules[] = $rule;
                     }
-                    $cleanRules[] = Rule::in($q->opsi);
+                    $cleanRules[] = Rule::in($allowedOpsi);
                     $ruleList = $cleanRules;
                 } elseif ($q->tipe === 'checkbox') {
                     $baseRules[$kode.'.*'] = [Rule::in($q->opsi)];

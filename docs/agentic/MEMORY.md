@@ -42,6 +42,16 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Perbaikan Tuntas Bug Validasi "validation.in" & Bahasa Indonesia Form Pendaftaran:
+  1. Akar Masalah "validation.in":
+     - `pendidikan_terakhir`: dropdown form mengirim kode jenjang (`SD`, `SMP`, `SMA`, `D3`, `S1`, dll), namun validasi dinamis sebelumnya memaksakan `Rule::in` ke display label panjang dari database (`S1 / D4 (Sarjana)`).
+     - `pcm`: dropdown form menyediakan opsi `Lainnya` (Luar Karanganyar), namun `form_pertanyaan.opsi` hanya memuat 17 nama kecamatan Karanganyar.
+     - Ketiadaan paket bahasa `lang/id/validation.php`: saat rule `in` gagal, Laravel mencetak string mentah `"validation.in"` alih-alih pesan bahasa Indonesia.
+  2. Solusi & Perbaikan:
+     - `FormPertanyaan::applyStandardValidationRules`: `pendidikan_terakhir` dan `jenis_kelamin` dikecualikan dari penimpaan opsi mentah (`skipOpsiValidation`), dan opsi `pcm` otomatis menoleransi `Lainnya`.
+     - `AnggotaRegistrationRequest`: ditambahkan pesan ramah bahasa Indonesia untuk seluruh aturan `*.in`.
+     - Bahasa Aplikasi: diterbitkan `lang/id/validation.php` dan disetel fallback locale `en` di `config/app.php`.
+  3. Pengujian: 142 tests lulus 100% (576 assertions), Pint clean, Vite production build clean.
 - 2026-09-16: Sinkronisasi Penuh Opsi Pilihan Form Pertanyaan (Checkbox / Dropdown) ke Formulir & Profil:
   1. Helper `FormPertanyaan::opsi($kode, $default)`: membaca daftar opsi hasil edit admin di `/admin/form-kader` langsung dari database `form_pertanyaan.opsi`, dengan fallback aman ke `config('arqam.opsi_form')`.
   2. Rendering dinamis di `register.blade.php` & `portal/profile.blade.php` untuk seluruh opsi: `keaktifan_ortom`, `keaktifan_muhammadiyah`, `kemampuan_baca_quran`, `hafalan_quran`, `aktivitas_sholat_masjid`, `aktivitas_kajian_agama`, `jumlah_buku_agama`, `langganan_suara_muhammadiyah`, `lembaga_zis`, `pcm`, `status_pernikahan`, dan `bahasa_dikuasai`.

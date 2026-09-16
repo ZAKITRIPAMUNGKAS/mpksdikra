@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Anggota;
 use App\Models\User;
 use App\Services\NomorWaNormalizer;
+use Database\Seeders\FormPertanyaanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
@@ -287,5 +288,58 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('H. Ahmad Dahlan', $anggota->nama_ayah);
         $this->assertSame('Hj. Siti Walidah', $anggota->nama_ibu);
         $this->assertEquals(['ukuran_kaos' => 'XL', 'riwayat_penyakit' => 'Tidak Ada'], $anggota->custom_fields);
+    }
+
+    public function test_registration_with_seeded_form_and_standard_dropdowns_passes_without_validation_in_error(): void
+    {
+        Storage::fake('local');
+        $this->seed(FormPertanyaanSeeder::class);
+
+        $payload = $this->payload([
+            'nik' => '3313040404980004',
+            'no_wa' => '081255443322',
+            'email' => 'kader.lengkap@example.test',
+            'pendidikan_terakhir' => 'S1',
+            'pcm' => 'Colomadu',
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'keaktifan_muhammadiyah' => ['Pimpinan Ranting Muhammadiyah'],
+            'kemampuan_baca_quran' => 'Lancar dan fasih',
+            'status_pernikahan' => 'Nikah',
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasNoErrors();
+        $res->assertRedirect(route('anggota.register'));
+
+        // Also test with PCM = 'Lainnya'
+        $payloadLainnya = $this->payload([
+            'nik' => '3313040404980005',
+            'no_wa' => '081255443323',
+            'email' => 'kader.luar@example.test',
+            'pendidikan_terakhir' => 'SMA',
+            'pcm' => 'Lainnya',
+        ]);
+
+        $res2 = $this->post(route('anggota.register.store'), $payloadLainnya);
+        $res2->assertSessionHasNoErrors();
+    }
+
+    public function test_invalid_option_shows_human_friendly_error_not_validation_in(): void
+    {
+        Storage::fake('local');
+        $this->seed(FormPertanyaanSeeder::class);
+
+        $payload = $this->payload([
+            'nik' => '3313040404980006',
+            'no_wa' => '081255443324',
+            'status_pernikahan' => 'StatusPalsu123',
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors(['status_pernikahan']);
+
+        $errors = session('errors')->all();
+        $this->assertNotContains('validation.in', $errors);
+        $this->assertContains('Pilihan status pernikahan tidak valid.', $errors);
     }
 }

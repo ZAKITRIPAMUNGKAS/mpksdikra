@@ -144,4 +144,30 @@ class AdminCabangFeatureTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_admin_cabang_can_delete_their_pcm_member(): void
+    {
+        $admin = $this->adminCabang('Tawangmangu');
+        $anggota = $this->anggotaCabang('Tawangmangu', 'aktif');
+
+        $response = $this->actingAs($admin)
+            ->delete(route('admin.anggota.destroy', $anggota));
+
+        $response->assertRedirect(route('admin.anggota.index'))
+            ->assertSessionHas('success');
+
+        $this->assertNull(Anggota::find($anggota->id));
+    }
+
+    public function test_admin_cabang_cannot_delete_member_from_another_pcm(): void
+    {
+        $admin = $this->adminCabang('Tawangmangu');
+        $anggotaOther = $this->anggotaCabang('Colomadu', 'aktif');
+
+        $response = $this->actingAs($admin)
+            ->delete(route('admin.anggota.destroy', $anggotaOther));
+
+        $response->assertForbidden();
+        $this->assertNotNull(Anggota::find($anggotaOther->id));
+    }
 }

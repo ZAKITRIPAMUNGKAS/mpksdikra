@@ -4,9 +4,12 @@ namespace Tests\Feature;
 
 use App\Exports\AnggotaExport;
 use App\Models\Anggota;
+use App\Models\Event;
+use App\Models\EventPeserta;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminAnggotaTest extends TestCase
@@ -274,5 +277,60 @@ class AdminAnggotaTest extends TestCase
         $this->assertStringContainsString('PCM lebih masif mengadakan pengkaderan', $html);
         $this->assertStringContainsString('Baitul Arqam terselenggara rutin', $html);
         $this->assertStringContainsString('Data lengkap terverifikasi', $html);
+    }
+
+    public function test_admin_can_delete_anggota_without_event_participation(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Kader Hapus Uji',
+            'foto' => 'anggota/foto/test_delete.jpg',
+        ]);
+
+        Storage::disk('local')->put('anggota/foto/test_delete.jpg', 'dummy');
+
+        $response = $this->actingAs($admin)
+            ->delete(route('admin.anggota.destroy', $a));
+
+        $response->assertRedirect(route('admin.anggota.index'))
+            ->assertSessionHas('success');
+
+        $this->assertNull(Anggota::find($a->id));
+        $this->assertNull(User::find($user->id));
+        $this->assertFalse(Storage::disk('local')->exists('anggota/foto/test_delete.jpg'));
+    }
+
+    public function test_admin_cannot_delete_anggota_with_event_participation(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Kader Event Uji',
+        ]);
+
+        $event = Event::create([
+            'nama_event' => 'Baitul Arqam Uji Hapus',
+            'tanggal_mulai' => '2026-09-15',
+            'tanggal_selesai' => '2026-09-17',
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+        EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'qr_token' => 'token-test-delete-123',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->delete(route('admin.anggota.destroy', $a));
+
+        $response->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertNotNull(Anggota::find($a->id));
+        $this->assertNotNull(User::find($user->id));
     }
 }

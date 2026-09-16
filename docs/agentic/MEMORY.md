@@ -42,6 +42,13 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-16: Implementasi Mekanisme Hapus Data Kader:
+  1. Route `DELETE /admin/anggota/{anggota}` dengan controller action `AdminAnggotaController::destroy`.
+  2. Proteksi integritas data perkaderan: jika kader sudah terdaftar di kegiatan Baitul Arqam (`eventPeserta`), penghapusan ditolak untuk melindungi riwayat nilai dan sertifikat (disarankan nonaktifkan).
+  3. Transaksi database: melepaskan relasi organisasi pivot, menghapus berkas pasfoto fisik di storage, menghapus record anggota, dan menghapus akun login `users` terkait.
+  4. Otorisasi bertingkat: Admin Daerah memiliki hak akses penuh, Admin Cabang hanya dapat menghapus kader di wilayah PCM-nya (`authorizeCabang`).
+  5. UI: tombol hapus merah dengan dialog konfirmasi JavaScript ganda di tabel pangkalan data (`admin/anggota/index.blade.php`) dan halaman profil kader (`admin/anggota/show.blade.php`).
+  6. Pengujian: 139 tests lulus 100% (563 assertions), Pint clean, Vite production build clean.
 - 2026-09-16: Integrasi Sinkronisasi Editor Formulir Dinamis (`/admin/form-kader`) ke Formulir Pendaftaran (`/daftar`) & Profil Portal:
   1. Helper methods dinamis pada `FormPertanyaan`: `isWajib()`, `isAktif()`, `label()`, `bantuan()`, `placeholder()`, dan auto-cache clearing saat save/delete.
   2. Request validation dinamis (`FormPertanyaan::applyStandardValidationRules`): Field standar yang di-toggle `is_wajib = true` otomatis menjadi `required` di `AnggotaRegistrationRequest` dan `ProfileController`, dengan custom message bahasa Indonesia. Jika di-set `is_aktif = false`, field menjadi `nullable` dan disembunyikan dari antarmuka.

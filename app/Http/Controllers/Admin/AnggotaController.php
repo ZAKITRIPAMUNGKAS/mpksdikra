@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -320,6 +321,35 @@ class AnggotaController extends Controller
         $anggotas = $query->get();
 
         return Excel::download(new AnggotaExport($anggotas, $subTitle, $isCabang ? $pcm : null), $fileName);
+    }
+
+    public function destroy(Anggota $anggota): RedirectResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        if ($anggota->eventPeserta()->exists()) {
+            return back()->with('error', "Kader {$anggota->nama_lengkap} sudah terdaftar dalam kegiatan Baitul Arqam. Gunakan opsi Nonaktifkan agar riwayat nilai dan sertifikat tidak hilang.");
+        }
+
+        $nama = $anggota->nama_lengkap;
+        $user = $anggota->user;
+        $fotoPath = $anggota->foto;
+
+        DB::transaction(function () use ($anggota, $user, $fotoPath) {
+            if ($fotoPath && Storage::disk('local')->exists($fotoPath)) {
+                Storage::disk('local')->delete($fotoPath);
+            }
+
+            $anggota->organisasi()->detach();
+            $anggota->forceDelete();
+
+            if ($user && $user->role === 'anggota') {
+                $user->delete();
+            }
+        });
+
+        return redirect()->route('admin.anggota.index')
+            ->with('success', "Data kader {$nama} berhasil dihapus dari pangkalan data.");
     }
 
     private function authorizeCabang(Anggota $anggota): void

@@ -164,7 +164,10 @@ class EventOutputController extends Controller
                 'no_peserta' => $ep->id,
                 'nama' => $ep->anggota->nama_lengkap,
                 'nbm' => $ep->anggota->nbm,
+                'nik' => $ep->anggota->nik,
                 'pcm' => $ep->anggota->pcm ?: ($ep->anggota->kecamatan ?: '-'),
+                'jabatan' => $ep->anggota->jabatan_aum ?: 'Peserta Baitul Arqam',
+                'qr_token' => $ep->qr_token,
                 'foto' => $fotoDataUri,
                 'qr' => $this->qr->qrPngDataUri($ep, 4, 1),
             ];

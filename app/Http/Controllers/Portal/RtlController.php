@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Rtl;
 use App\Models\RtlJawaban;
 use App\Models\RtlSoal;
+use App\Services\NilaiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,8 @@ class RtlController extends Controller
 
             $rtl->update(['status' => 'terkirim']);
         });
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $anggota->id);
 
         return back()->with('success', 'RTL terkirim.');
     }

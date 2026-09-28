@@ -22,10 +22,9 @@
                     Rekapitulasi Capaian
                 </span>
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Ranking Nilai Akhir Peserta</h1>
-                <p class="text-xs text-slate-600 mt-1 max-w-2xl font-normal leading-relaxed">
-                    NA = 40% Kognitif + 35% Psikomotor + 25% Afektif.
-                    Kognitif = 70% posttest + 30% N-Gain&times;100. Psikomotor = 90% rubrik + 10% keaktifan.
-                    Kehadiran = syarat kelulusan (&ge;75% bersyarat / 100% mutlak).
+                <p class="text-xs text-slate-600 mt-1 max-w-3xl font-normal leading-relaxed">
+                    NA = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Rubrik + 10% Keaktifan) + 25% Afektif.
+                    <span class="block mt-0.5 text-slate-500">Syarat Kelulusan Terpadu: Presensi 100% + Posttest Selesai + RTL Terkirim (Lulus). Presensi 75%–99% atau tugas RTL/Posttest pending dinyatakan Lulus Bersyarat. Presensi &lt;75% dinyatakan Tidak Lulus.</span>
                 </p>
             </div>
                 @if($event->status === 'selesai')

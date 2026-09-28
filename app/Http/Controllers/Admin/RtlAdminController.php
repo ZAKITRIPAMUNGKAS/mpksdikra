@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Rtl;
 use App\Models\RtlSoal;
+use App\Services\NilaiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -61,6 +62,8 @@ class RtlAdminController extends Controller
         $data = $request->validate(['status' => ['required', 'in:disetujui,ditolak']]);
 
         $rtl->update(['status' => $data['status']]);
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $rtl->anggota_id);
 
         return redirect()
             ->route('admin.events.rtl.show', [$event, $rtl])

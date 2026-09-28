@@ -36,7 +36,7 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (153 test hijau per 2026-09-28).
+- `php artisan test` — PHPUnit feature tests (157 test hijau per 2026-09-28).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
@@ -61,8 +61,13 @@ Pola berguna dari referensi:
      - Fitur ekspor lembar distribusi kelompok outbound per regu (nama, gender, PCM) untuk pegangan instruktur lapangan via `GET /admin/events/{event}/outbound/pdf`.
   7. **Transparansi Rekam Keaktifan Peserta di Portal**:
      - Peserta dapat memantau perolehan poin keaktifan (tanya, jawab, kultum, imam, adzan, outbound) beserta rincian forum yang dicatat fasilitator secara transparan.
-  8. **Pengujian & Verifikasi**:
-     - 153 tests lulus 100% (605 assertions). Pint clean, Vite production build clean.
+  8. **Integrasi Kelulusan Terpadu & Sertifikat Resmi Portal**:
+     - `NilaiService::tentukanStatusKelulusan`: Mengintegrasikan 3 pilar syarat kelulusan perkaderan secara harmonis: Kehadiran (>= 100% mutlak, 75%-99% bersyarat, < 75% tidak lulus), Posttest Selesai (jika ada sesi posttest pada event), dan RTL Terkirim/Disetujui (jika event memiliki instrumen RTL).
+     - Jika kehadiran 100% namun posttest belum diselesaikan atau RTL belum dikumpulkan, status kelulusan peserta otomatis berstatus 'Lulus Bersyarat' sampai tugas dilengkapi.
+     - Alur reaktif: Pengumpulan RTL oleh peserta (`RtlController::submit`) dan tinjauan oleh admin (`RtlAdminController::review`) langsung memicu rekalkulasi status kelulusan peserta secara instan.
+     - Sertifikat Portal: Endpoint `portal.sertifikat.download` dimutakhirkan menggunakan template lanskap 2 sisi resmi (Halaman 1: Sertifikat ber-QR verifikasi dinamis; Halaman 2: Transkrip Materi Pelatihan resmi & rincian JP).
+  9. **Pengujian & Verifikasi**:
+     - 157 tests lulus 100% (613 assertions). Pint clean, Vite production build clean.
 - 2026-09-16: Perbaikan Tuntas Bug Validasi "validation.in" & Bahasa Indonesia Form Pendaftaran:
   1. Akar Masalah "validation.in":
      - `pendidikan_terakhir`: dropdown form mengirim kode jenjang (`SD`, `SMP`, `SMA`, `D3`, `S1`, dll), namun validasi dinamis sebelumnya memaksakan `Rule::in` ke display label panjang dari database (`S1 / D4 (Sarjana)`).

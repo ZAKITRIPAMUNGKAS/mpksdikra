@@ -2,16 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Models\Absensi;
 use App\Models\AfektifButir;
 use App\Models\AfektifJawaban;
 use App\Models\AfektifSubAspek;
 use App\Models\Anggota;
 use App\Models\Event;
 use App\Models\EventPeserta;
+use App\Models\EventSesi;
 use App\Models\Keaktifan;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use App\Models\PsikomotorNilai;
 use App\Models\PsikomotorTemplate;
+use App\Models\Rtl;
+use App\Models\RtlSoal;
+use App\Models\SesiTes;
 use App\Models\User;
 use App\Services\NilaiService;
 use App\Services\QrService;
@@ -175,5 +181,170 @@ class NilaiAkhirTest extends TestCase
                 'jenis' => 'tanya',
             ])
             ->assertSessionHas('error');
+    }
+
+    public function test_unified_graduation_lulus_murni(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+
+        $sesi = EventSesi::create([
+            'event_id' => $event->id,
+            'nama_sesi' => 'Materi Sesi 1',
+            'urutan' => 1,
+            'jenis' => 'materi',
+        ]);
+
+        Absensi::create([
+            'event_id' => $event->id,
+            'sesi_id' => $sesi->id,
+            'anggota_id' => $a->id,
+            'waktu_scan' => now(),
+            'scanned_by' => $admin->id,
+            'metode' => 'qr',
+        ]);
+
+        SesiTes::create([
+            'event_id' => $event->id,
+            'tipe' => 'posttest',
+            'durasi_menit' => 30,
+            'is_aktif' => true,
+        ]);
+
+        PesertaTesMulai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => now()->subHour(),
+            'waktu_selesai' => now()->subMinutes(10),
+        ]);
+
+        RtlSoal::create([
+            'event_id' => $event->id,
+            'pertanyaan' => 'Rencana Aksi Anda',
+            'tipe' => 'essay',
+            'urutan' => 1,
+        ]);
+
+        Rtl::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'status' => 'terkirim',
+        ]);
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_posttest' => 85]
+        );
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+        $this->assertEquals(100.0, (float) $p->nilai_kehadiran);
+        $this->assertEquals('Lulus', $p->status_kelulusan);
+    }
+
+    public function test_unified_graduation_bersyarat_when_rtl_missing(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+
+        $sesi = EventSesi::create([
+            'event_id' => $event->id,
+            'nama_sesi' => 'Materi Sesi 1',
+            'urutan' => 1,
+            'jenis' => 'materi',
+        ]);
+
+        Absensi::create([
+            'event_id' => $event->id,
+            'sesi_id' => $sesi->id,
+            'anggota_id' => $a->id,
+            'waktu_scan' => now(),
+            'scanned_by' => $admin->id,
+            'metode' => 'qr',
+        ]);
+
+        SesiTes::create([
+            'event_id' => $event->id,
+            'tipe' => 'posttest',
+            'durasi_menit' => 30,
+            'is_aktif' => true,
+        ]);
+
+        PesertaTesMulai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => now()->subHour(),
+            'waktu_selesai' => now()->subMinutes(10),
+        ]);
+
+        // Event punya pertanyaan RTL tapi peserta belum mengumpulkan
+        RtlSoal::create([
+            'event_id' => $event->id,
+            'pertanyaan' => 'Rencana Aksi Anda',
+            'tipe' => 'essay',
+            'urutan' => 1,
+        ]);
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_posttest' => 85]
+        );
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+        $this->assertEquals(100.0, (float) $p->nilai_kehadiran);
+        $this->assertEquals('Lulus Bersyarat', $p->status_kelulusan);
+    }
+
+    public function test_unified_graduation_tidak_lulus_when_attendance_low(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+
+        // 2 sesi dibuat, tapi peserta hanya hadir 1 sesi (50% < 75%)
+        $sesi1 = EventSesi::create(['event_id' => $event->id, 'nama_sesi' => 'S1', 'urutan' => 1, 'jenis' => 'materi']);
+        EventSesi::create(['event_id' => $event->id, 'nama_sesi' => 'S2', 'urutan' => 2, 'jenis' => 'materi']);
+
+        Absensi::create([
+            'event_id' => $event->id,
+            'sesi_id' => $sesi1->id,
+            'anggota_id' => $a->id,
+            'waktu_scan' => now(),
+            'scanned_by' => $admin->id,
+            'metode' => 'qr',
+        ]);
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_posttest' => 95]
+        );
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+        $this->assertEquals(50.0, (float) $p->nilai_kehadiran);
+        $this->assertEquals('Tidak Lulus', $p->status_kelulusan);
+    }
+
+    public function test_portal_participant_can_download_official_certificate(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+        $userAnggota = $a->user;
+
+        PenilaianAkhir::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'nilai_posttest' => 85,
+            'nilai_kehadiran' => 100,
+            'nilai_akhir' => 85.0,
+            'status_kelulusan' => 'Lulus',
+            'verification_hash' => hash('sha256', 'portal-cert-test'),
+        ]);
+
+        $response = $this->actingAs($userAnggota)->get(route('portal.sertifikat.download', $event));
+
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 }

@@ -9,8 +9,12 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\Keaktifan;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use App\Models\PsikomotorNilai;
 use App\Models\PsikomotorTemplate;
+use App\Models\Rtl;
+use App\Models\RtlSoal;
+use App\Models\SesiTes;
 use Illuminate\Support\Facades\DB;
 
 class NilaiService
@@ -153,7 +157,7 @@ class NilaiService
                 + ((float) $p->nilai_afektif * $bobot['afektif']);
 
             $p->nilai_akhir = round($nilaiAkhir, 2);
-            $p->status_kelulusan = $this->absensi->statusKelulusan((float) $p->nilai_kehadiran);
+            $p->status_kelulusan = $this->tentukanStatusKelulusan($event, $p, $anggotaId);
             $p->verification_hash = hash('sha256', $event->id.'|'.$anggotaId.'|'.config('app.key'));
             $p->save();
         }
@@ -193,5 +197,45 @@ class NilaiService
         }
 
         return round(($posttest - $pretest) / $denominator, 3);
+    }
+
+    public function tentukanStatusKelulusan(Event $event, PenilaianAkhir $p, int $anggotaId): string
+    {
+        $kehadiran = (float) $p->nilai_kehadiran;
+        $batasLulus = (float) config('arqam.kehadiran.lulus', 100);
+        $batasBersyarat = (float) config('arqam.kehadiran.lulus_bersyarat', 75);
+
+        if ($kehadiran < $batasBersyarat) {
+            return 'Tidak Lulus';
+        }
+
+        $hasPosttest = SesiTes::where('event_id', $event->id)->where('tipe', 'posttest')->exists();
+        $posttestSelesai = true;
+        if ($hasPosttest) {
+            $posttestSelesai = PesertaTesMulai::where('event_id', $event->id)
+                ->where('anggota_id', $anggotaId)
+                ->where('tipe', 'posttest')
+                ->whereNotNull('waktu_selesai')
+                ->exists();
+
+            if (! $posttestSelesai && (float) $p->nilai_posttest > 0) {
+                $posttestSelesai = true;
+            }
+        }
+
+        $hasRtl = RtlSoal::where('event_id', $event->id)->exists();
+        $rtlSelesai = true;
+        if ($hasRtl) {
+            $rtlSelesai = Rtl::where('event_id', $event->id)
+                ->where('anggota_id', $anggotaId)
+                ->whereIn('status', ['terkirim', 'disetujui'])
+                ->exists();
+        }
+
+        if ($kehadiran >= $batasLulus && $posttestSelesai && $rtlSelesai) {
+            return 'Lulus';
+        }
+
+        return 'Lulus Bersyarat';
     }
 }

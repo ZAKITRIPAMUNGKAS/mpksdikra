@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\PenilaianAkhir;
+use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class SertifikatController extends Controller
@@ -26,7 +27,14 @@ class SertifikatController extends Controller
         abort_unless($nilai && $nilai->status_kelulusan !== 'Tidak Lulus', 403, 'Sertifikat hanya untuk peserta yang lulus.');
 
         $ep->load('anggota');
-        $pdf = Pdf::loadView('portal.sertifikat-pdf', compact('event', 'ep', 'nilai'));
+        $event->load(['sesi', 'fasilitator']);
+        $peserta = $ep;
+
+        $verifyUrl = route('landing').'?verify='.urlencode($nilai->verification_hash ?? '');
+        $qrPng = app(QrService::class)->qrPngDataUriForText($verifyUrl, 4, 1);
+
+        $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
+            ->setPaper('a4', 'landscape');
 
         return $pdf->download('sertifikat-'.str($ep->anggota->nama_lengkap)->slug().'.pdf');
     }

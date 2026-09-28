@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AfektifJawaban;
 use App\Models\Event;
-use App\Models\JawabanPeserta;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use App\Models\PsikomotorNilai;
 use App\Models\Rtl;
 use App\Models\SesiTes;
@@ -79,13 +79,15 @@ class EventController extends Controller
         $sesiPretest = SesiTes::where('event_id', $event->id)->where('tipe', 'pretest')->first();
         $sesiPosttest = SesiTes::where('event_id', $event->id)->where('tipe', 'posttest')->first();
 
-        $pretestSelesaiCount = JawabanPeserta::where('event_id', $event->id)
+        $pretestSelesaiCount = PesertaTesMulai::where('event_id', $event->id)
             ->where('tipe', 'pretest')
+            ->whereNotNull('waktu_selesai')
             ->distinct('anggota_id')
             ->count('anggota_id');
 
-        $posttestSelesaiCount = JawabanPeserta::where('event_id', $event->id)
+        $posttestSelesaiCount = PesertaTesMulai::where('event_id', $event->id)
             ->where('tipe', 'posttest')
+            ->whereNotNull('waktu_selesai')
             ->distinct('anggota_id')
             ->count('anggota_id');
 

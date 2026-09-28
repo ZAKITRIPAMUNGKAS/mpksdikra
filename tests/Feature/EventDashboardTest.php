@@ -6,6 +6,7 @@ use App\Models\Anggota;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
+use App\Models\PesertaTesMulai;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -49,6 +50,22 @@ class EventDashboardTest extends TestCase
             'urutan' => 1,
             'tanggal' => now()->toDateString(),
             'pemateri' => 'Pimpinan Daerah',
+        ]);
+
+        PesertaTesMulai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'tipe' => 'pretest',
+            'waktu_mulai' => now()->subHour(),
+            'waktu_selesai' => now()->subMinutes(30),
+        ]);
+
+        PesertaTesMulai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => now()->subHour(),
+            'waktu_selesai' => now()->subMinutes(10),
         ]);
 
         $response = $this->actingAs($admin)->get(route('admin.events.show', $event));

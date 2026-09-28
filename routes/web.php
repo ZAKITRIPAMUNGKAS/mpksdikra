@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\FormPertanyaanController;
 use App\Http\Controllers\Admin\KeaktifanController;
 use App\Http\Controllers\Admin\OutboundKelompokController;
 use App\Http\Controllers\Admin\PesertaController;
+use App\Http\Controllers\Admin\PresentasiController;
 use App\Http\Controllers\Admin\PsikomotorController;
 use App\Http\Controllers\Admin\RtlAdminController;
 use App\Http\Controllers\Admin\SesiController;
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/certificates-batch', [EventOutputController::class, 'certificatesBatch'])->middleware('event_access')->name('events.certificates.batch');
         Route::get('/events/{event}/outbound', [OutboundKelompokController::class, 'index'])->middleware('event_access')->name('events.outbound.index');
         Route::get('/events/{event}/outbound-pdf', [OutboundKelompokController::class, 'exportPdf'])->middleware('event_access')->name('events.outbound.pdf');
+        Route::get('/events/{event}/presentasi', [PresentasiController::class, 'show'])->middleware('event_access')->name('events.presentasi');
     });
 
     // Admin Daerah only: anggota import

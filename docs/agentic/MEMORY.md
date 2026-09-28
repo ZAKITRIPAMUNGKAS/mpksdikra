@@ -42,6 +42,12 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-29: Fitur Live PPT / Slideshow Evaluasi & Yudisium (`admin/events/presentasi` & Tab 6 Rekap):
+  1. **Live Presentation Mode (16:9)**: Dibuat controller khusus `App\Http\Controllers\Admin\PresentasiController` dan view `resources/views/admin/events/presentasi.blade.php` untuk menampilkan slide presentasi interaktif layar penuh berformat 16:9 saat penutupan dan yudisium perkaderan.
+  2. **Navigasi & Kontrol Lengkap**: Mendukung remote clicker PPT / keyboard panah (kanan/kiri, spasi, enter), tombol fullscreen (`F`), auto-play timer (8 detik per slide), drawer daftar slide (`O`/`M`), serta ekspor slide ke PDF (`Ctrl+P`).
+  3. **Cakupan 9 Slide**: Cover judul resmi MPKSDI, demografi & profil kader (gender & sebaran PCM), presensi per sesi, evaluasi kognitif CAT (pretest vs posttest & N-Gain), evaluasi psikomotorik (praktik ibadah) & afektif (akhlak), keputusan yudisium kelulusan, penganugerahan 5 kader teladan (top leaderboard), rencana tindak lanjut (RTL), dan penutup/pesan gerakan KH Ahmad Dahlan.
+  4. **Integrasi Tab 6**: Menambahkan kartu emas "Live PPT / Slideshow" di grid dokumen unduhan Tab 6 Rekapitulasi dengan tombol langsung membuka presentasi di tab baru.
+
 - 2026-09-29: Relokasi Sesi Berjalan & Leaderboard Top 5 ke Tab Kronologis (`admin/events/show.blade.php`):
   1. **Relokasi Kartu Sesi Berjalan**: Dipindahkan dari area dashboard atas ke dalam **Tab 2: Jadwal Acara, Berkas Modul & Presensi (Absensi)**, tepat di bawah judul tab sebagai spotlight interaktif dengan tombol cepat *Scanner QR* dan *Lembar Presensi PDF*.
   2. **Relokasi Leaderboard Teratas (Top 5)**: Dipindahkan dari area dashboard atas ke dalam **Tab 6: Rekapitulasi Akhir, Kelulusan & Unduh Dokumen Resmi**, diposisikan tepat di atas pratinjau tabel peringkat nilai lengkap.

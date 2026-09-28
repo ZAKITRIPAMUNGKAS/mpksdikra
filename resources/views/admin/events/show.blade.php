@@ -700,8 +700,26 @@
                 <p class="text-xs text-slate-500 font-normal">Pengolahan nilai akhir terpadu, penetapan status kelulusan peserta, dan penerbitan dokumen resmi berkop MPKSDI.</p>
             </div>
 
-            {{-- 4 Kartu Unduhan Utama Ramping --}}
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {{-- 5 Kartu Unduhan & Presentasi Utama Ramping --}}
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                {{-- Live PPT / Slideshow Evaluasi --}}
+                <div class="p-3.5 rounded-xl border border-amber-300 bg-gradient-to-br from-amber-50/70 to-amber-100/40 flex flex-col justify-between space-y-2.5 shadow-2xs">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-950">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                                <span>Live PPT / Slideshow</span>
+                            </span>
+                            <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-200 text-amber-900 border border-amber-300">Live</span>
+                        </div>
+                        <p class="text-[11px] text-slate-700 mt-1">Presentasi interaktif 16:9 layar penuh untuk penutupan &amp; yudisium. Mendukung remote clicker PPT &amp; ekspor PDF.</p>
+                    </div>
+                    <a href="{{ route('admin.events.presentasi', $event) }}" target="_blank" class="w-full text-center py-1.5 px-2 bg-gradient-to-r from-amber-500 to-[#f8bb00] hover:from-amber-600 hover:to-amber-500 text-slate-950 font-bold rounded-lg text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                        <span>Buka Live PPT</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+
                 {{-- Cetak Semua Sertifikat Massal --}}
                 <div class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/40 flex flex-col justify-between space-y-2.5">
                     <div>

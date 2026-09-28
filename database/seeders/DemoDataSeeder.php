@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Absensi;
 use App\Models\AfektifButir;
+use App\Models\AfektifJawaban;
 use App\Models\AfektifSubAspek;
 use App\Models\Anggota;
 use App\Models\Event;
@@ -15,11 +16,15 @@ use App\Models\OutboundKelompok;
 use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Models\PilihanJawaban;
+use App\Models\PsikomotorNilai;
 use App\Models\PsikomotorTemplate;
+use App\Models\Rtl;
+use App\Models\RtlJawaban;
 use App\Models\RtlSoal;
 use App\Models\SesiTes;
 use App\Models\Soal;
 use App\Models\User;
+use App\Services\NilaiService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -736,17 +741,17 @@ class DemoDataSeeder extends Seeder
         }
 
         // -------------------------------------------------------------
-        // EVENT 3: Persiapan (Baitul Arqam Tenaga Kesehatan RS PKU)
+        // EVENT 3: Berlangsung (Baitul Arqam Tenaga Kesehatan RS PKU)
         // -------------------------------------------------------------
         $eventPersiapan = Event::updateOrCreate(
             ['nama_event' => 'Baitul Arqam Tenaga Kesehatan RS PKU Muhammadiyah Karanganyar'],
             [
-                'tanggal_mulai' => Carbon::now()->addDays(8)->toDateString(),
-                'tanggal_selesai' => Carbon::now()->addDays(10)->toDateString(),
+                'tanggal_mulai' => Carbon::now()->subDay()->toDateString(),
+                'tanggal_selesai' => Carbon::now()->addDays(2)->toDateString(),
                 'lokasi' => 'Auditorium RS PKU Muhammadiyah Karanganyar',
                 'deskripsi' => 'Pelatihan perkaderan Baitul Arqam bagi dokter, perawat, dan tenaga medis guna mewujudkan pelayanan kesehatan bernuansa dakwah dan berorientasi ibadah.',
                 'kuota' => 35,
-                'status' => 'persiapan',
+                'status' => 'berlangsung',
                 'format_nomor_sertifikat' => '{nomor}/BA-PKU-MPKSDI/{bulan_romawi}/{tahun}',
                 'created_by' => $admin->id,
             ]
@@ -755,18 +760,197 @@ class DemoDataSeeder extends Seeder
         if ($fasilitator2) {
             $eventPersiapan->fasilitator()->syncWithoutDetaching([$fasilitator2->id]);
         }
+        if ($fasilitator1) {
+            $eventPersiapan->fasilitator()->syncWithoutDetaching([$fasilitator1->id]);
+        }
 
-        EventSesi::updateOrCreate(
-            ['event_id' => $eventPersiapan->id, 'urutan' => 1],
+        // 5 Sesi Terjadwal Lengkap
+        $sesiListPku = [
+            [1, 'Falsafah Pelayanan Kesehatan Islami Penolong Kesengsaraan Oemoem', 'materi', '08:00', '10:00', 'Dr. Muhammad Ihsan, M.Ag.'],
+            [2, 'Fiqih Ibadah Praktis bagi Pasien & Tenaga Medis', 'materi', '10:15', '12:00', 'Ust. H. Sarilan M.Ali, M.Pd.'],
+            [3, 'Sholat Berjamaah & Bimbingan Ruhiyah Medis', 'sholat', '12:00', '13:00', 'Ust. Fahruddin, S.Ag.'],
+            [4, 'Outbound Dinamika Tim Medis & Sinergi RS PKU', 'outbound', '14:00', '16:30', 'Tim Instruktur MPKSDI'],
+            [5, 'Rencana Tindak Lanjut (RTL) & Komitmen Dakwah', 'materi', '19:30', '21:00', 'dr. H. Adnan Faris, Sp.A.'],
+        ];
+
+        $createdSesiPku = [];
+        foreach ($sesiListPku as [$urutan, $nama, $jenis, $mulai, $selesai, $pemateri]) {
+            $createdSesiPku[] = EventSesi::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'urutan' => $urutan],
+                [
+                    'nama_sesi' => $nama,
+                    'jenis' => $jenis,
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'jam_mulai' => $mulai,
+                    'jam_selesai' => $selesai,
+                    'pemateri' => $pemateri,
+                ]
+            );
+        }
+
+        // Rubrik Penilaian & Soal
+        $this->seedAfektifDefault($eventPersiapan);
+        $this->seedPsikomotorDefault($eventPersiapan);
+        $this->seedRtlDefault($eventPersiapan);
+        $this->seedSoalTes($eventPersiapan);
+
+        // Regu Outbound
+        $reguNames = [
+            'Kelompok 1 - Ibnu Sina (Medis)',
+            'Kelompok 2 - Ar-Razi (Keperawatan)',
+            'Kelompok 3 - Al-Zahrawi (Farmasi & Penunjang)',
+        ];
+        $reguModels = [];
+        foreach ($reguNames as $rName) {
+            $reguModels[] = OutboundKelompok::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'nama_kelompok' => $rName]
+            );
+        }
+
+        // Daftarkan 12 Peserta dari berbagai profesi nakes
+        $pesertaPkuList = array_slice($anggotaList, 4, 12);
+        foreach ($pesertaPkuList as $pIdx => $anggota) {
+            $reguTarget = $reguModels[$pIdx % count($reguModels)];
+            EventPeserta::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id],
+                [
+                    'qr_token' => 'QR-EV'.$eventPersiapan->id.'-AG'.$anggota->id.'-'.strtoupper(bin2hex(random_bytes(4))),
+                    'status_aktif' => true,
+                    'outbound_kelompok_id' => $reguTarget->id,
+                ]
+            );
+        }
+
+        // CBT Sesi Tes (Pretest & Posttest)
+        SesiTes::updateOrCreate(
+            ['event_id' => $eventPersiapan->id, 'tipe' => 'pretest'],
             [
-                'nama_sesi' => 'Falsafah Pelayanan Kesehatan Islami Penolong Kesengsaraan Oemoem',
-                'jenis' => 'materi',
-                'tanggal' => Carbon::now()->addDays(8)->toDateString(),
-                'jam_mulai' => '08:30',
-                'jam_selesai' => '11:30',
-                'pemateri' => 'Dr. Muhammad Ihsan, M.Ag.',
+                'durasi_menit' => 30,
+                'status' => 'tutup',
             ]
         );
+        SesiTes::updateOrCreate(
+            ['event_id' => $eventPersiapan->id, 'tipe' => 'posttest'],
+            [
+                'durasi_menit' => 45,
+                'status' => 'aktif',
+            ]
+        );
+
+        // Presensi & Aktivitas Peserta
+        $appKey = config('app.key');
+        $templatesPsi = PsikomotorTemplate::where('event_id', $eventPersiapan->id)->get();
+        $butirAfk = AfektifButir::whereHas('subAspek', fn ($q) => $q->where('event_id', $eventPersiapan->id))->get();
+        $rtlSoals = RtlSoal::where('event_id', $eventPersiapan->id)->get();
+
+        foreach ($pesertaPkuList as $pIdx => $anggota) {
+            // Sesi 1 hadir semua, Sesi 2 hadir 10 orang
+            Absensi::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'sesi_id' => $createdSesiPku[0]->id, 'anggota_id' => $anggota->id],
+                [
+                    'waktu_scan' => Carbon::now()->setTime(8, 10 + $pIdx),
+                    'scanned_by' => $admin->id,
+                    'metode' => $pIdx % 2 === 0 ? 'qr' : 'manual',
+                ]
+            );
+
+            if ($pIdx < 10) {
+                Absensi::updateOrCreate(
+                    ['event_id' => $eventPersiapan->id, 'sesi_id' => $createdSesiPku[1]->id, 'anggota_id' => $anggota->id],
+                    [
+                        'waktu_scan' => Carbon::now()->setTime(10, 15 + $pIdx),
+                        'scanned_by' => $admin->id,
+                        'metode' => 'qr',
+                    ]
+                );
+            }
+
+            // Keaktifan untuk beberapa peserta
+            if ($pIdx % 3 === 0) {
+                Keaktifan::create([
+                    'event_id' => $eventPersiapan->id,
+                    'anggota_id' => $anggota->id,
+                    'jenis' => 'tanya',
+                    'sesi_id' => $createdSesiPku[0]->id,
+                    'dicatat_oleh' => $admin->id,
+                    'keterangan' => 'Mengajukan pertanyaan etika medis dalam pandangan Majelis Tarjih.',
+                ]);
+            }
+            if ($pIdx % 4 === 0) {
+                Keaktifan::create([
+                    'event_id' => $eventPersiapan->id,
+                    'anggota_id' => $anggota->id,
+                    'jenis' => 'kultum',
+                    'sesi_id' => $createdSesiPku[2]->id,
+                    'dicatat_oleh' => $admin->id,
+                    'keterangan' => 'Memberikan kultum ba\'da Dzuhur tentang keutamaan merawat orang sakit.',
+                ]);
+            }
+
+            // Pengerjaan Tes Mulai & Selesai
+            PesertaTesMulai::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id, 'tipe' => 'pretest'],
+                ['waktu_mulai' => Carbon::now()->subHours(4), 'waktu_selesai' => Carbon::now()->subHours(4)->addMinutes(22)]
+            );
+
+            $preScore = 55.0 + ($pIdx * 3);
+            $postScore = 0.0;
+            if ($pIdx < 8) {
+                PesertaTesMulai::updateOrCreate(
+                    ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id, 'tipe' => 'posttest'],
+                    ['waktu_mulai' => Carbon::now()->subMinutes(25), 'waktu_selesai' => Carbon::now()->subMinutes(5)]
+                );
+                $postScore = min(98.0, 72.0 + ($pIdx * 2.5));
+            }
+
+            // Afektif Nilai
+            foreach ($butirAfk as $b) {
+                AfektifJawaban::updateOrCreate(
+                    ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id, 'butir_id' => $b->id],
+                    ['skor' => ($pIdx + $b->id) % 2 === 0 ? 4 : 3]
+                );
+            }
+
+            // Psikomotor Nilai
+            foreach ($templatesPsi as $t) {
+                PsikomotorNilai::updateOrCreate(
+                    ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id, 'template_id' => $t->id],
+                    ['skor' => 3 + (($pIdx + $t->id) % 2), 'dinilai_oleh' => $admin->id]
+                );
+            }
+
+            // RTL Status & Jawaban
+            $rtlStatus = $pIdx < 4 ? 'disetujui' : ($pIdx < 8 ? 'terkirim' : ($pIdx < 10 ? 'draf' : null));
+            if ($rtlStatus) {
+                $rtl = Rtl::updateOrCreate(
+                    ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id],
+                    ['status' => $rtlStatus]
+                );
+
+                foreach ($rtlSoals as $sIdx => $s) {
+                    RtlJawaban::updateOrCreate(
+                        ['rtl_id' => $rtl->id, 'soal_id' => $s->id],
+                        [
+                            'jawaban' => $s->tipe === 'upload' ? 'uploads/rtl_demo.pdf' : 'Komitmen integrasi dakwah dalam pelayanan medis pasien poli dan rawat inap.',
+                            'file_bukti' => $s->tipe === 'upload' ? 'uploads/rtl_demo.pdf' : null,
+                        ]
+                    );
+                }
+            }
+
+            // Simpan initial scores di PenilaianAkhir sebelum hitungUlang
+            PenilaianAkhir::updateOrCreate(
+                ['event_id' => $eventPersiapan->id, 'anggota_id' => $anggota->id],
+                [
+                    'nilai_pretest' => $preScore,
+                    'nilai_posttest' => $postScore,
+                    'verification_hash' => hash('sha256', $eventPersiapan->id.'|'.$anggota->id.'|'.$appKey),
+                ]
+            );
+        }
+
+        // Jalankan kalkulasi nilai resmi dari NilaiService
+        app(NilaiService::class)->hitungUlang($eventPersiapan);
     }
 
     private function seedAfektifDefault(Event $event): void

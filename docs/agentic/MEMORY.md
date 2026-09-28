@@ -42,6 +42,15 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-29: Kompaktifikasi Dashboard Pelatihan & Data Seeder Uji Coba Lengkap:
+  1. **Kompaktifikasi Layout & Ergonomi Penggunaan (`admin/events/show.blade.php`)**:
+     - Memangkas tinggi vertikal hero card, grid 4 KPI metrics, dan panel spotlight/leaderboard sebesar 30-40% sehingga navigasi tab dan konten utama langsung terlihat (above-the-fold) tanpa scroll berlebih.
+     - Menjadikan Tab Navigation Bar **Sticky (`sticky top-2 z-20`)** dengan latar `bg-white/95 backdrop-blur-md` sehingga admin dapat berpindah antar-langkah pelaksanaan kapan saja saat menelusuri data tabel yang panjang.
+     - Menambahkan fitur interaktif **Live Search Filter Peserta** (`x-model="searchPeserta"`) pada Tab 1 (Pendataan Peserta) untuk menyaring nama kader, NBM, atau cabang secara instan tanpa reload halaman.
+     - Merampingkan kartu sesi jadwal, panel regu outbound, kartu ujian CBT, dan tabel rekapitulasi nilai akhir.
+  2. **Penyempurnaan Seeder Data Uji Coba (`DemoDataSeeder.php`)**:
+     - Mengisi data event "Baitul Arqam Tenaga Kesehatan RS PKU Muhammadiyah Karanganyar" dengan data lengkap siap uji coba: status `berlangsung`, 5 sesi agenda, 12 peserta nakes, 3 regu outbound (Ibnu Sina, Ar-Razi, Al-Zahrawi), sesi CBT pretest (tutup) & posttest (aktif), rekam absensi sesi 1-2, log keaktifan, penilaian rubrik ibadah & afektif, berkas tugas RTL, serta kalkulasi nilai akhir resmi `NilaiService::hitungUlang` yang menghasilkan leaderboard hidup.
+  3. **Verifikasi**: 157 automated feature tests lulus 100% (613 assertions), Laravel Pint passed, Vite production build clean.
 - 2026-09-29: Redesain Hierarki & Tab Navigasi Alur Pelaksanaan Baitul Arqam (`admin/events/show.blade.php`):
   1. **Struktur Hierarki Informasi Atas**:
      - Mengeliminasi 11 deretan tombol/pills tercecer di bawah kartu hero; memindahkan masing-masing aksi ke dalam tab kronologisnya yang relevan.

@@ -7,6 +7,8 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
 use App\Models\PesertaTesMulai;
+use App\Models\SesiTes;
+use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -76,5 +78,51 @@ class EventDashboardTest extends TestCase
         $response->assertSee('Orientasi &amp; Muqaddimah', false);
         $response->assertSee('Kader Teladan');
         $response->assertSee('Cetak ID Card Massal (A4)');
+    }
+
+    public function test_event_dashboard_works_with_active_sesi_tes_and_soal(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'Baitul Arqam RS PKU',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDays(2)->toDateString(),
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+
+        SesiTes::create([
+            'event_id' => $event->id,
+            'tipe' => 'pretest',
+            'status' => 'tutup',
+            'durasi_menit' => 30,
+        ]);
+
+        SesiTes::create([
+            'event_id' => $event->id,
+            'tipe' => 'posttest',
+            'status' => 'aktif',
+            'durasi_menit' => 45,
+        ]);
+
+        Soal::create([
+            'event_id' => $event->id,
+            'tipe' => 'pretest',
+            'teks_soal' => 'Pertanyaan Pretest 1',
+            'urutan' => 1,
+        ]);
+
+        Soal::create([
+            'event_id' => $event->id,
+            'tipe' => 'posttest',
+            'teks_soal' => 'Pertanyaan Posttest 1',
+            'urutan' => 1,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.events.show', $event));
+
+        $response->assertOk();
+        $response->assertSee('Baitul Arqam RS PKU');
+        $response->assertSee('1 Soal');
     }
 }

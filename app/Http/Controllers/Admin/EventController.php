@@ -14,6 +14,7 @@ use App\Models\PsikomotorTemplate;
 use App\Models\Rtl;
 use App\Models\RtlSoal;
 use App\Models\SesiTes;
+use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -111,8 +112,8 @@ class EventController extends Controller
         $keaktifanCount = Keaktifan::where('event_id', $event->id)->count();
         $rtlSoalCount = RtlSoal::where('event_id', $event->id)->count();
         $psikomotorTemplateCount = PsikomotorTemplate::where('event_id', $event->id)->count();
-        $soalPretestCount = $sesiPretest ? $sesiPretest->soal()->count() : 0;
-        $soalPosttestCount = $sesiPosttest ? $sesiPosttest->soal()->count() : 0;
+        $soalPretestCount = Soal::where('event_id', $event->id)->where('tipe', 'pretest')->count();
+        $soalPosttestCount = Soal::where('event_id', $event->id)->where('tipe', 'posttest')->count();
 
         $totalLulus = PenilaianAkhir::where('event_id', $event->id)->where('status_kelulusan', 'Lulus')->count();
         $totalBersyarat = PenilaianAkhir::where('event_id', $event->id)->where('status_kelulusan', 'Lulus Bersyarat')->count();

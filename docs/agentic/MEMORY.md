@@ -42,6 +42,20 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-29: Redesain Hierarki & Tab Navigasi Alur Pelaksanaan Baitul Arqam (`admin/events/show.blade.php`):
+  1. **Struktur Hierarki Informasi Atas**:
+     - Mengeliminasi 11 deretan tombol/pills tercecer di bawah kartu hero; memindahkan masing-masing aksi ke dalam tab kronologisnya yang relevan.
+     - Kartu Hero bersih & institusional memuat status, tanggal, lokasi, kuota, nama event, subjudul resmi, dan tombol enroll/edit/hapus.
+     - Grid 4 KPI Metrics: Kader Peserta, Jadwal Sesi, Tes Kognitif, Rerata Nilai & Kelulusan.
+     - Spotlight Sesi Berlangsung (Countdown/waktu, narasumber, live bar absensi, tombol cepat Buka Scanner QR & Lembar Presensi PDF) + Leaderboard Top 5 Real-Time.
+  2. **Tab Navigasi Alur Kronologis Pelaksanaan Perkaderan (6 Langkah)**:
+     - **Tab 1 (1. Pendataan Peserta)**: Enroll peserta, cetak ID card massal A4 grid 8 kartu, komposisi gender & cabang, daftar peserta aktif, dan penugasan fasilitator/instruktur.
+     - **Tab 2 (2. Jadwal & Presensi)**: Agenda sesi urut, modul materi & slide presentasi, live bar kehadiran per sesi, scanner QR, lembar daftar hadir PDF, dan modal tambah sesi.
+     - **Tab 3 (3. Keaktifan & Outbound)**: Pengacak kelompok outbound berimbang gender/PCM, cetak PDF distribusi regu lapangan, dan pencatatan poin keaktifan forum.
+     - **Tab 4 (4. Asesmen & CBT)**: 4 kartu asesmen terpadu (Pretest CBT, Posttest CBT & Kloning Soal, Input Nilai Praktik Psikomotor Lapangan, dan Instrumen Afektif & Angket).
+     - **Tab 5 (5. Tugas Akhir RTL)**: Monitoring pengumpulan rencana aksi kader, butir pertanyaan RTL, antrean penyerahan tugas, dan review instruktur.
+     - **Tab 6 (6. Rekap & Unduh Data)**: 4 kartu unduhan utama (Unduh Batch Sertifikat PDF 2 sisi, Unduh Laporan PDF berkop resmi, Ekspor Excel XLSX, dan Buka Ranking Lengkap) disertai pratinjau tabel peringkat Top 10 beserta status kelulusan terpadu.
+  3. **Pengujian & Verifikasi**: 157 tests lulus 100% (613 assertions), Pint clean, Vite production build clean.
 - 2026-09-28: Penguatan & Penyempurnaan Komprehensif Subsistem Baitul Arqam (BA):
   1. **Dashboard Khusus Pelatihan (Training Command Center / Mission Control)**:
      - Didesain ulang di `resources/views/admin/events/show.blade.php` dengan Quick Actions Bar (Aksi Cepat), Metrik Real-Time (Total Peserta, Rasio L/P, Sebaran PCM, Progres Tes Pre/Post, Kelengkapan Afektif/RTL/Psikomotor, Rerata Nilai), Spotlight Sesi Berlangsung (Countdown waktu, instruktur, tombol absensi instan), Leaderboard Top 5 Real-Time, serta Tab Navigasi Terpadu (Sesi & Jadwal, Peserta & ID Card, Evaluasi & Kelulusan, Dynamic Outbound).

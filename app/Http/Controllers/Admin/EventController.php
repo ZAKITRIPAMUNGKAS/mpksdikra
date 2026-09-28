@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AfektifJawaban;
 use App\Models\Event;
+use App\Models\Keaktifan;
+use App\Models\OutboundKelompok;
 use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Models\PsikomotorNilai;
+use App\Models\PsikomotorTemplate;
 use App\Models\Rtl;
+use App\Models\RtlSoal;
 use App\Models\SesiTes;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -103,6 +107,30 @@ class EventController extends Controller
             ->distinct('anggota_id')
             ->count('anggota_id');
 
+        $outboundKelompokCount = OutboundKelompok::where('event_id', $event->id)->count();
+        $keaktifanCount = Keaktifan::where('event_id', $event->id)->count();
+        $rtlSoalCount = RtlSoal::where('event_id', $event->id)->count();
+        $psikomotorTemplateCount = PsikomotorTemplate::where('event_id', $event->id)->count();
+        $soalPretestCount = $sesiPretest ? $sesiPretest->soal()->count() : 0;
+        $soalPosttestCount = $sesiPosttest ? $sesiPosttest->soal()->count() : 0;
+
+        $totalLulus = PenilaianAkhir::where('event_id', $event->id)->where('status_kelulusan', 'Lulus')->count();
+        $totalBersyarat = PenilaianAkhir::where('event_id', $event->id)->where('status_kelulusan', 'Lulus Bersyarat')->count();
+        $totalTidakLulus = PenilaianAkhir::where('event_id', $event->id)->where('status_kelulusan', 'Tidak Lulus')->count();
+
+        $rankingPreview = PenilaianAkhir::where('event_id', $event->id)
+            ->with('anggota')
+            ->whereNotNull('ranking')
+            ->orderBy('ranking')
+            ->take(10)
+            ->get();
+
+        $recentRtls = Rtl::where('event_id', $event->id)
+            ->with('anggota')
+            ->latest()
+            ->take(5)
+            ->get();
+
         // Sesi Terkini / Live Session
         $liveSesi = $sesi->first(function ($s) {
             return $s->tanggal && $s->tanggal->isToday();
@@ -138,6 +166,17 @@ class EventController extends Controller
             'afektifSelesaiCount',
             'rtlSelesaiCount',
             'psikomotorDinilaiCount',
+            'outboundKelompokCount',
+            'keaktifanCount',
+            'rtlSoalCount',
+            'psikomotorTemplateCount',
+            'soalPretestCount',
+            'soalPosttestCount',
+            'totalLulus',
+            'totalBersyarat',
+            'totalTidakLulus',
+            'rankingPreview',
+            'recentRtls',
             'liveSesi',
             'leaderboard',
             'rerataNilai'

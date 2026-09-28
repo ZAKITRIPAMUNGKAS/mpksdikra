@@ -42,6 +42,12 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-29: Relokasi Sesi Berjalan & Leaderboard Top 5 ke Tab Kronologis (`admin/events/show.blade.php`):
+  1. **Relokasi Kartu Sesi Berjalan**: Dipindahkan dari area dashboard atas ke dalam **Tab 2: Jadwal Acara, Berkas Modul & Presensi (Absensi)**, tepat di bawah judul tab sebagai spotlight interaktif dengan tombol cepat *Scanner QR* dan *Lembar Presensi PDF*.
+  2. **Relokasi Leaderboard Teratas (Top 5)**: Dipindahkan dari area dashboard atas ke dalam **Tab 6: Rekapitulasi Akhir, Kelulusan & Unduh Dokumen Resmi**, diposisikan tepat di atas pratinjau tabel peringkat nilai lengkap.
+  3. **Dampak UI/UX**: Area atas dashboard kini super ramping (hanya memuat hero card ringkas + 4 strip KPI) sehingga bar navigasi 6 tab langsung tampil tepat di viewport (*above-the-fold*) tanpa perlu scroll.
+  4. **Penyempurnaan Seeder Presensi PKU (`DemoDataSeeder.php`)**: Presensi 12 peserta nakes disebar proporsional pada 5 sesi (100% lulus murni, 80% lulus bersyarat, 60% tidak lulus) sehingga status kelulusan di leaderboard dan tabel rekapitulasi mencerminkan variasi realistis.
+
 - 2026-09-29: Kompaktifikasi Dashboard Pelatihan & Data Seeder Uji Coba Lengkap:
   1. **Kompaktifikasi Layout & Ergonomi Penggunaan (`admin/events/show.blade.php`)**:
      - Memangkas tinggi vertikal hero card, grid 4 KPI metrics, dan panel spotlight/leaderboard sebesar 30-40% sehingga navigasi tab dan konten utama langsung terlihat (above-the-fold) tanpa scroll berlebih.

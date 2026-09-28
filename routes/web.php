@@ -57,6 +57,7 @@ Route::get('/foto/anggota/{anggota}', [FotoController::class, 'show'])
 Route::middleware('auth')->group(function () {
     Route::get('/panduan', [SystemHelpController::class, 'panduan'])->name('panduan');
     Route::get('/updates', [SystemHelpController::class, 'updates'])->name('updates');
+    Route::get('/sesi/{sesi}/materi', [SesiController::class, 'downloadMateri'])->name('sesi.materi.download');
 });
 
 Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->prefix('admin')->name('admin.')->group(function () {
@@ -80,7 +81,10 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/ranking', [EventOutputController::class, 'ranking'])->middleware('event_access')->name('events.ranking');
         Route::get('/events/{event}/report', [EventOutputController::class, 'report'])->middleware('event_access')->name('events.report');
         Route::get('/events/{event}/export-excel', [EventOutputController::class, 'exportExcel'])->middleware('event_access')->name('events.exportExcel');
+        Route::get('/events/{event}/id-cards-batch', [EventOutputController::class, 'idCardsBatch'])->middleware('event_access')->name('events.idcards.batch');
+        Route::get('/events/{event}/certificates-batch', [EventOutputController::class, 'certificatesBatch'])->middleware('event_access')->name('events.certificates.batch');
         Route::get('/events/{event}/outbound', [OutboundKelompokController::class, 'index'])->middleware('event_access')->name('events.outbound.index');
+        Route::get('/events/{event}/outbound-pdf', [OutboundKelompokController::class, 'exportPdf'])->middleware('event_access')->name('events.outbound.pdf');
     });
 
     // Admin Daerah only: anggota import
@@ -140,6 +144,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::delete('/events/{event}/sesi/{sesi}', [SesiController::class, 'destroy'])->name('events.sesi.destroy');
 
         Route::post('/events/{event}/soal/{tipe}', [SoalController::class, 'store'])->name('events.soal.store');
+        Route::post('/events/{event}/soal/{tipe}/clone', [SoalController::class, 'cloneFromEvent'])->name('events.soal.clone');
         Route::delete('/events/{event}/soal/{soal}', [SoalController::class, 'destroy'])->name('events.soal.destroy');
         Route::post('/events/{event}/soal/{tipe}/open', [SoalController::class, 'openSession'])->name('events.soal.open');
         Route::post('/events/{event}/soal/{tipe}/close', [SoalController::class, 'closeSession'])->name('events.soal.close');

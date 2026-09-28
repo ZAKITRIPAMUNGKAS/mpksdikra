@@ -21,6 +21,9 @@ class EventSesi extends Model
         'jam_mulai',
         'jam_selesai',
         'pemateri',
+        'file_materi',
+        'link_materi',
+        'deskripsi',
     ];
 
     protected function casts(): array

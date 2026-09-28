@@ -24,7 +24,22 @@
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Bank Soal {{ ucfirst($tipe) }} ({{ $soal->count() }})</h1>
                 <p class="text-xs text-slate-600 mt-0.5 font-normal">Kelola butir soal pilihan ganda dan status sesi pengerjaan peserta</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 items-center flex-wrap">
+                @if(isset($otherEvents) && $otherEvents->isNotEmpty())
+                <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="flex items-center gap-1.5" onsubmit="return confirm('Salin semua soal {{ $tipe }} dari kegiatan yang dipilih ke kegiatan ini?')">
+                    @csrf
+                    <select name="source_event_id" required class="px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
+                        <option value="">-- Salin dari Kegiatan Lain --</option>
+                        @foreach($otherEvents as $oe)
+                        <option value="{{ $oe->id }}">{{ $oe->nama_event }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-sky-800 border border-slate-200 hover:border-sky-300 text-xs font-semibold rounded-lg transition shadow-2xs">
+                        Salin Soal
+                    </button>
+                </form>
+                @endif
+
                 @if($sesi && $sesi->status === 'aktif')
                     <form method="POST" action="{{ route('admin.events.soal.close', [$event, $tipe]) }}">
                         @csrf

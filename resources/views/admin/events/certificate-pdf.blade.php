@@ -2,48 +2,428 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
+    <title>Sertifikat Baitul Arqam - {{ $peserta->anggota->nama_lengkap }}</title>
     <style>
-        @page { size: A4 landscape; margin: 12mm; }
-        body { font-family: DejaVu Sans, sans-serif; color: #0f172a; margin: 0; }
-        .cert { border: 4px double #005c8a; border-radius: 12px; padding: 26px 40px; height: 142mm; position: relative; background: #ffffff; }
-        .inner-border { border: 1px solid #f8bb00; padding: 20px 30px; height: 130mm; }
-        .org { text-align: center; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: #002b40; font-weight: bold; line-height: 1.4; }
-        h1 { text-align: center; font-size: 26px; margin: 10px 0 2px; letter-spacing: 4px; color: #005c8a; font-weight: 800; }
-        .num { text-align: center; font-size: 10px; color: #64748b; font-weight: 600; }
-        .body { text-align: center; margin-top: 18px; font-size: 12px; line-height: 1.7; color: #334155; }
-        .name { font-size: 22px; font-weight: bold; margin: 10px 0 4px; color: #002b40; }
-        .grade { display: inline-block; margin-top: 8px; padding: 5px 24px; border: 1.5px solid #005c8a; background: #f0f9ff; border-radius: 999px; font-weight: bold; color: #005c8a; font-size: 13px; letter-spacing: 0.5px; }
-        .foot { position: absolute; bottom: 24px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 65px; font-size: 10px; }
-        .verify { font-size: 8px; color: #94a3b8; word-break: break-all; max-width: 40%; font-family: monospace; }
-        .sign { text-align: center; color: #1e293b; }
+        @page {
+            size: A4 landscape;
+            margin: 10mm 12mm 10mm 12mm;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            color: #0f172a;
+            background: #ffffff;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .page {
+            width: 100%;
+            height: 188mm;
+            position: relative;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Border Sertifikat Klasik Muhammadiyah */
+        .cert-border {
+            border: 3px double #002b40;
+            border-radius: 8px;
+            padding: 8mm 12mm;
+            height: 186mm;
+            position: relative;
+            background: #ffffff;
+        }
+        .cert-inner {
+            border: 1px solid #f8bb00;
+            border-radius: 4px;
+            height: 170mm;
+            padding: 5mm 8mm;
+            position: relative;
+        }
+
+        /* Kop Surat */
+        .kop-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .kop-org {
+            font-size: 11pt;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #002b40;
+            line-height: 1.25;
+        }
+        .kop-sub {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #005c8a;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 1mm;
+        }
+        .kop-line {
+            border-bottom: 2px solid #002b40;
+            margin-top: 2.5mm;
+            margin-bottom: 0.8mm;
+        }
+        .kop-line-gold {
+            border-bottom: 1px solid #f8bb00;
+            margin-bottom: 4mm;
+        }
+
+        /* Judul Dokumen */
+        .cert-title {
+            text-align: center;
+            font-size: 22pt;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #002b40;
+            margin-top: 1mm;
+            margin-bottom: 0.5mm;
+        }
+        .cert-nomor {
+            text-align: center;
+            font-size: 8.5pt;
+            color: #475569;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 3.5mm;
+        }
+
+        .cert-statement {
+            text-align: center;
+            font-size: 10pt;
+            color: #334155;
+            margin-bottom: 1.5mm;
+        }
+        .cert-name {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: 900;
+            color: #002b40;
+            letter-spacing: 0.5px;
+            margin: 2mm 0 1.5mm;
+            text-decoration: underline;
+        }
+        .cert-meta {
+            text-align: center;
+            font-size: 8.5pt;
+            color: #475569;
+            margin-bottom: 3mm;
+        }
+
+        .cert-body {
+            text-align: center;
+            font-size: 9.5pt;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 220mm;
+        }
+        .cert-grade {
+            display: inline-block;
+            margin-top: 2mm;
+            padding: 1.5mm 8mm;
+            background: #f0f9ff;
+            border: 1.5px solid #005c8a;
+            border-radius: 999px;
+            font-size: 10.5pt;
+            font-weight: 800;
+            color: #005c8a;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Area Tanda Tangan */
+        .sign-table {
+            width: 100%;
+            border-collapse: collapse;
+            position: absolute;
+            bottom: 4mm;
+            left: 0;
+            right: 0;
+            padding: 0 10mm;
+        }
+        .sign-box {
+            text-align: center;
+            font-size: 8.5pt;
+            color: #1e293b;
+            vertical-align: top;
+        }
+        .sign-space {
+            height: 16mm;
+        }
+        .sign-name {
+            font-weight: 800;
+            color: #002b40;
+            font-size: 9pt;
+            text-decoration: underline;
+        }
+        .sign-nbm {
+            font-size: 7.5pt;
+            color: #475569;
+        }
+
+        .qr-center {
+            text-align: center;
+            width: 35mm;
+        }
+        .qr-img {
+            width: 16mm;
+            height: 16mm;
+            margin: 0 auto 1mm;
+        }
+        .qr-hash {
+            font-size: 5.5pt;
+            color: #94a3b8;
+            font-family: monospace;
+        }
+
+        /* Halaman 2: Transkrip */
+        .trans-header {
+            text-align: center;
+            margin-bottom: 4mm;
+        }
+        .trans-title {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #002b40;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .trans-sub {
+            font-size: 8.5pt;
+            color: #475569;
+            margin-top: 1mm;
+        }
+
+        .bio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 4mm;
+            font-size: 8.5pt;
+        }
+        .bio-table td {
+            padding: 1mm 2mm;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-bottom: 4mm;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #cbd5e1;
+            padding: 1.8mm 2.5mm;
+        }
+        .data-table th {
+            background: #002b40;
+            color: #ffffff;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+        .data-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
     </style>
 </head>
 <body>
-    <div class="cert">
-        <div class="inner-border">
-            <div class="org">Majelis Pembinaan Kader dan Sumber Daya Insani<br>Pimpinan Daerah Muhammadiyah Karanganyar</div>
-            <h1>SERTIFIKAT</h1>
-            <div class="num">Nomor: {{ $event->generateNomorSertifikat($peserta->id) }}</div>
 
-            <div class="body">
-                Diberikan kepada peserta Baitul Arqam<br>
-                <b style="color: #002b40;">{{ $event->nama_event }}</b><br>
-                yang diselenggarakan pada {{ $event->tanggal_mulai->format('d M Y') }} — {{ $event->tanggal_selesai->format('d M Y') }}
-                @if($event->lokasi)di {{ $event->lokasi }}@endif
-                <div class="name">{{ $peserta->anggota->nama_lengkap }}</div>
-                dengan predikat kelulusan
-                <div class="grade">{{ $nilai->status_kelulusan ?? 'Lulus' }}</div>
-            </div>
-
-            <div class="foot">
-                <div class="verify">Kode Verifikasi: {{ substr($nilai->verification_hash ?? '-', 0, 24) }}</div>
-                <div class="sign">
-                    Karanganyar, {{ now()->format('d M Y') }}<br>
-                    Ketua MPKSDI PDM Karanganyar<br><br><br>
-                    <b>(_______________________)</b>
+    {{-- ==================== HALAMAN 1: SERTIFIKAT ==================== --}}
+    <div class="page">
+        <div class="cert-border">
+            <div class="cert-inner">
+                {{-- Kop Resmi --}}
+                <div class="kop-table">
+                    <div class="kop-org">PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR</div>
+                    <div class="kop-sub">Majelis Pembinaan Kader dan Sumber Daya Insani (MPKSDI)</div>
                 </div>
+                <div class="kop-line"></div>
+                <div class="kop-line-gold"></div>
+
+                {{-- Judul & Nomor --}}
+                <div class="cert-title">SERTIFIKAT</div>
+                <div class="cert-nomor">Nomor: {{ $event->generateNomorSertifikat($peserta->id) }}</div>
+
+                <div class="cert-statement">Diberikan kepada:</div>
+                <div class="cert-name">{{ strtoupper($peserta->anggota->nama_lengkap) }}</div>
+                <div class="cert-meta">
+                    NBM: <b>{{ $peserta->anggota->nbm ?: '-' }}</b> &bull;
+                    NIK: <b>{{ substr($peserta->anggota->nik, 0, 6) }}******</b> &bull;
+                    Utusan: <b>PCM {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: 'Karanganyar') }}</b>
+                </div>
+
+                <div class="cert-body">
+                    Telah mengikuti seluruh rangkaian perkaderan utama Persyarikatan Muhammadiyah pada kegiatan:
+                    <br>
+                    <b style="color: #002b40; font-size: 11pt;">{{ strtoupper($event->nama_event) }}</b>
+                    <br>
+                    yang diselenggarakan pada tanggal {{ $event->tanggal_mulai?->translatedFormat('d F Y') }} s.d. {{ $event->tanggal_selesai?->translatedFormat('d F Y') }}
+                    @if($event->lokasi)bertempat di {{ $event->lokasi }}@endif,
+                    dan berdasarkan evaluasi dinyatakan:
+                    <br>
+                    <div class="cert-grade">{{ $nilai->status_kelulusan ?? 'Lulus' }}</div>
+                </div>
+
+                {{-- Tanda Tangan Resmi --}}
+                <table class="sign-table">
+                    <tr>
+                        <td class="sign-box" style="width: 38%;">
+                            Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
+                            <b>Master of Training (MoT)</b>
+                            <div class="sign-space"></div>
+                            <div class="sign-name">{{ $event->fasilitator->first()?->name ?? 'Tim Instruktur MPKSDI' }}</div>
+                            <div class="sign-nbm">Instruktur Utama Perkaderan</div>
+                        </td>
+                        <td class="qr-center">
+                            @if(isset($qrPng))
+                                <img src="{{ $qrPng }}" class="qr-img" alt="QR Verifikasi">
+                            @endif
+                            <div class="qr-hash">Verifikasi Pangkalan Data<br>{{ substr($nilai->verification_hash ?? '-', 0, 16) }}</div>
+                        </td>
+                        <td class="sign-box" style="width: 38%;">
+                            Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
+                            <b>Ketua MPKSDI PDM Karanganyar</b>
+                            <div class="sign-space"></div>
+                            <div class="sign-name">H. Zainudin Ahpandi, S.E.</div>
+                            <div class="sign-nbm">NBM. 864.219</div>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
+
+    {{-- ==================== HALAMAN 2: TRANSKRIP MATERI ==================== --}}
+    <div class="page page-break">
+        <div class="cert-border" style="height: 186mm; padding: 7mm 10mm;">
+            <div class="trans-header">
+                <div class="trans-title">TRANSKRIP MATERI &amp; CAPAIAN KOMPETENSI PERKADERAN</div>
+                <div class="trans-sub">Lampiran Sertifikat Nomor: {{ $event->generateNomorSertifikat($peserta->id) }} &bull; {{ $event->nama_event }}</div>
+            </div>
+
+            <table class="bio-table">
+                <tr>
+                    <td style="width: 18%;"><b>Nama Lengkap</b></td>
+                    <td style="width: 32%;">: {{ $peserta->anggota->nama_lengkap }}</td>
+                    <td style="width: 18%;"><b>Cabang (PCM)</b></td>
+                    <td style="width: 32%;">: {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: '-') }}</td>
+                </tr>
+                <tr>
+                    <td><b>NBM / NIK</b></td>
+                    <td>: {{ $peserta->anggota->nbm ?: '-' }} / {{ substr($peserta->anggota->nik, 0, 6) }}******</td>
+                    <td><b>Nomor Peserta</b></td>
+                    <td>: {{ sprintf('%03d', $peserta->id) }}</td>
+                </tr>
+            </table>
+
+            {{-- 2 Kolom: Kiri Daftar Materi Sesi, Kanan Rekap Aspek Nilai --}}
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 58%; vertical-align: top; padding-right: 3mm;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%;">No</th>
+                                    <th>Mata Pembinaan / Materi Sesi</th>
+                                    <th style="width: 25%;">Narasumber</th>
+                                    <th style="width: 14%;">Jam (JP)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $totalJp = 0; @endphp
+                                @forelse($event->sesi->where('jenis', 'materi') as $idx => $s)
+                                @php $jp = 2; $totalJp += $jp; @endphp
+                                <tr>
+                                    <td style="text-align: center;">{{ $loop->iteration }}</td>
+                                    <td><b>{{ $s->nama_sesi }}</b></td>
+                                    <td>{{ $s->pemateri ?: 'Instruktur PDM' }}</td>
+                                    <td style="text-align: center;">{{ $jp }} JP</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: #94a3b8;">Sesi materi terintegrasi dalam kurikulum Baitul Arqam.</td>
+                                </tr>
+                                @endforelse
+                                <tr style="background: #f1f5f9; font-weight: bold;">
+                                    <td colspan="3" style="text-align: right;">Total Beban Pelatihan:</td>
+                                    <td style="text-align: center;">{{ max($totalJp, 16) }} JP</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                    <td style="width: 42%; vertical-align: top; padding-left: 3mm;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Aspek Penilaian Evaluasi</th>
+                                    <th style="width: 25%;">Skor (0-100)</th>
+                                    <th style="width: 25%;">Predikat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <b>I. Aspek Kognitif</b><br>
+                                        <span style="font-size: 7pt; color: #64748b;">Posttest &amp; N-Gain Pemahaman Ideologi</span>
+                                    </td>
+                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_posttest, 1) }}</td>
+                                    <td style="text-align: center;">{{ $nilai->nilai_posttest >= 80 ? 'Sangat Baik' : ($nilai->nilai_posttest >= 65 ? 'Baik' : 'Cukup') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>II. Aspek Psikomotorik</b><br>
+                                        <span style="font-size: 7pt; color: #64748b;">Praktik Ibadah, Sholat &amp; Keaktifan</span>
+                                    </td>
+                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_psikomotor, 1) }}</td>
+                                    <td style="text-align: center;">{{ $nilai->nilai_psikomotor >= 80 ? 'Sangat Baik' : ($nilai->nilai_psikomotor >= 65 ? 'Baik' : 'Cukup') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>III. Aspek Afektif</b><br>
+                                        <span style="font-size: 7pt; color: #64748b;">Komitmen, Integritas &amp; Sikap</span>
+                                    </td>
+                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_afektif, 1) }}</td>
+                                    <td style="text-align: center;">{{ $nilai->nilai_afektif >= 80 ? 'Sangat Baik' : ($nilai->nilai_afektif >= 65 ? 'Baik' : 'Cukup') }}</td>
+                                </tr>
+                                <tr style="background: #e0f2fe; font-weight: bold;">
+                                    <td><b>NILAI AKHIR KOMPREHENSIF</b></td>
+                                    <td style="text-align: center; font-size: 9pt; color: #002b40;">{{ number_format((float) $nilai->nilai_akhir, 1) }}</td>
+                                    <td style="text-align: center; color: #005c8a;">{{ $nilai->status_kelulusan }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top: 4mm; font-size: 7.5pt; color: #475569; border: 1px dashed #cbd5e1; padding: 2.5mm; border-radius: 4px; background: #fafafa;">
+                            <b>Keterangan Predikat Kelulusan:</b><br>
+                            &bull; 85.0 – 100.0 : Istimewa / Sangat Baik (Mumtaz)<br>
+                            &bull; 70.0 – 84.9 : Baik (Jayyid Jiddan)<br>
+                            &bull; Presensi Wajib Minimal: 75% (Bersyarat) / 100% (Penuh)
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            {{-- Pengesahan Transkrip --}}
+            <div style="margin-top: 4mm; text-align: right; font-size: 8pt; padding-right: 5mm;">
+                Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
+                <b>Ketua MPKSDI PDM Karanganyar</b><br><br><br>
+                <b><u>H. Zainudin Ahpandi, S.E.</u></b><br>
+                <span>NBM. 864.219</span>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

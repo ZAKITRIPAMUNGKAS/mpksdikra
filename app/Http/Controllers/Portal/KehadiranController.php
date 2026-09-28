@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
+use App\Models\Keaktifan;
 use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
@@ -29,7 +30,12 @@ class KehadiranController extends Controller
 
         $qrSvg = $this->qr->qrFor($ep);
 
-        return view('portal.kehadiran', compact('event', 'sesi', 'hadir', 'qrSvg', 'ep'));
+        $keaktifanList = Keaktifan::where('event_id', $event->id)
+            ->where('anggota_id', $ep->anggota_id)
+            ->latest()
+            ->get();
+
+        return view('portal.kehadiran', compact('event', 'sesi', 'hadir', 'qrSvg', 'ep', 'keaktifanList'));
     }
 
     public function idCard(Event $event)

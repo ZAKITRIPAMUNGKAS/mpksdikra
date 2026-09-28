@@ -28,7 +28,65 @@ class SoalController extends Controller
 
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
 
-        return view('admin.events.soal', compact('event', 'tipe', 'soal', 'sesi'));
+        $otherEvents = Event::where('id', '!=', $event->id)
+            ->whereHas('soal', fn ($q) => $q->where('tipe', $tipe))
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('admin.events.soal', compact('event', 'tipe', 'soal', 'sesi', 'otherEvents'));
+    }
+
+    public function cloneFromEvent(Request $request, Event $event, string $tipe): RedirectResponse
+    {
+        if (! in_array($tipe, ['pretest', 'posttest'], true)) {
+            abort(404);
+        }
+
+        $data = $request->validate([
+            'source_event_id' => ['required', 'integer', 'exists:events,id'],
+        ]);
+
+        $sourceEventId = (int) $data['source_event_id'];
+        if ($sourceEventId === (int) $event->id) {
+            return back()->with('error', 'Event sumber tidak boleh sama dengan kegiatan saat ini.');
+        }
+
+        $sourceSoal = Soal::where('event_id', $sourceEventId)
+            ->where('tipe', $tipe)
+            ->with('pilihan')
+            ->orderBy('urutan')
+            ->get();
+
+        if ($sourceSoal->isEmpty()) {
+            return back()->with('error', 'Tidak ditemukan butir soal pada kegiatan sumber.');
+        }
+
+        $copiedCount = 0;
+        DB::transaction(function () use ($event, $tipe, $sourceSoal, &$copiedCount) {
+            $currentMax = (int) Soal::where('event_id', $event->id)->where('tipe', $tipe)->max('urutan');
+
+            foreach ($sourceSoal as $soalAsal) {
+                $currentMax++;
+                $newSoal = Soal::create([
+                    'event_id' => $event->id,
+                    'tipe' => $tipe,
+                    'teks_soal' => $soalAsal->teks_soal,
+                    'urutan' => $currentMax,
+                ]);
+
+                foreach ($soalAsal->pilihan as $pilihanAsal) {
+                    PilihanJawaban::create([
+                        'soal_id' => $newSoal->id,
+                        'label' => $pilihanAsal->label,
+                        'teks' => $pilihanAsal->teks,
+                        'is_benar' => $pilihanAsal->is_benar,
+                    ]);
+                }
+                $copiedCount++;
+            }
+        });
+
+        return back()->with('success', "Berhasil menyalin {$copiedCount} butir soal {$tipe} dari kegiatan sumber.");
     }
 
     public function store(Request $request, Event $event, string $tipe): RedirectResponse

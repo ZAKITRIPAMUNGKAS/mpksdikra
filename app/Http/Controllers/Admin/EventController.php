@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AfektifJawaban;
 use App\Models\Event;
+use App\Models\JawabanPeserta;
+use App\Models\PenilaianAkhir;
+use App\Models\PsikomotorNilai;
+use App\Models\Rtl;
+use App\Models\SesiTes;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,6 +58,8 @@ class EventController extends Controller
         $sesi = $event->sesi;
         $peserta = $event->pesertaAktif;
         $totalSesi = $sesi->count();
+        $totalPeserta = $peserta->count();
+
         $canManage = $user->isAdmin();
         $canOperate = $user->isAdmin() || $user->isFasilitator();
         $assignedFasilitatorIds = $event->fasilitator->pluck('id')->all();
@@ -59,15 +67,78 @@ class EventController extends Controller
             ? User::where('role', 'fasilitator')->where('status', 'aktif')->orderBy('name')->get()
             : collect();
 
+        // Demografi peserta
+        $totalLaki = $peserta->filter(fn ($p) => ($p->anggota->jenis_kelamin ?? 'L') === 'L')->count();
+        $totalPerempuan = $totalPeserta - $totalLaki;
+        $pcmCounts = $peserta->groupBy(fn ($p) => $p->anggota->pcm ?: ($p->anggota->kecamatan ?: 'Lainnya'))
+            ->map->count()
+            ->sortDesc()
+            ->take(5);
+
+        // Status Sesi Tes
+        $sesiPretest = SesiTes::where('event_id', $event->id)->where('tipe', 'pretest')->first();
+        $sesiPosttest = SesiTes::where('event_id', $event->id)->where('tipe', 'posttest')->first();
+
+        $pretestSelesaiCount = JawabanPeserta::where('event_id', $event->id)
+            ->where('tipe', 'pretest')
+            ->distinct('anggota_id')
+            ->count('anggota_id');
+
+        $posttestSelesaiCount = JawabanPeserta::where('event_id', $event->id)
+            ->where('tipe', 'posttest')
+            ->distinct('anggota_id')
+            ->count('anggota_id');
+
+        $afektifSelesaiCount = AfektifJawaban::where('event_id', $event->id)
+            ->distinct('anggota_id')
+            ->count('anggota_id');
+
+        $rtlSelesaiCount = Rtl::where('event_id', $event->id)
+            ->where('status', 'terkirim')
+            ->count();
+
+        $psikomotorDinilaiCount = PsikomotorNilai::where('event_id', $event->id)
+            ->distinct('anggota_id')
+            ->count('anggota_id');
+
+        // Sesi Terkini / Live Session
+        $liveSesi = $sesi->first(function ($s) {
+            return $s->tanggal && $s->tanggal->isToday();
+        }) ?: $sesi->first();
+
+        // Leaderboard Top 5
+        $leaderboard = PenilaianAkhir::where('event_id', $event->id)
+            ->with('anggota')
+            ->whereNotNull('nilai_akhir')
+            ->orderByDesc('nilai_akhir')
+            ->take(5)
+            ->get();
+
+        $rerataNilai = PenilaianAkhir::where('event_id', $event->id)->avg('nilai_akhir') ?? 0;
+
         return view('admin.events.show', compact(
             'event',
             'sesi',
             'peserta',
             'totalSesi',
+            'totalPeserta',
+            'totalLaki',
+            'totalPerempuan',
+            'pcmCounts',
             'canManage',
             'canOperate',
             'fasilitatorOptions',
-            'assignedFasilitatorIds'
+            'assignedFasilitatorIds',
+            'sesiPretest',
+            'sesiPosttest',
+            'pretestSelesaiCount',
+            'posttestSelesaiCount',
+            'afektifSelesaiCount',
+            'rtlSelesaiCount',
+            'psikomotorDinilaiCount',
+            'liveSesi',
+            'leaderboard',
+            'rerataNilai'
         ));
     }
 

@@ -29,16 +29,24 @@
                     </p>
                 </div>
                 @if($kelompoks->isNotEmpty())
-                <form method="POST" action="{{ route('admin.events.outbound.reset', $event) }}"
-                    onsubmit="return confirm('Apakah Anda yakin ingin mereset pembagian kelompok?')">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 bg-white hover:bg-red-50 text-xs font-semibold rounded-lg transition shadow-2xs">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('admin.events.outbound.pdf', $event) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 border border-sky-300 text-sky-800 bg-sky-50 hover:bg-sky-100 text-xs font-semibold rounded-lg transition shadow-2xs">
+                        <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                         </svg>
-                        <span>Reset Kelompok</span>
-                    </button>
-                </form>
+                        <span>Cetak Lembar Kelompok (PDF)</span>
+                    </a>
+                    <form method="POST" action="{{ route('admin.events.outbound.reset', $event) }}"
+                        onsubmit="return confirm('Apakah Anda yakin ingin mereset pembagian kelompok?')">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 bg-white hover:bg-red-50 text-xs font-semibold rounded-lg transition shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            <span>Reset Kelompok</span>
+                        </button>
+                    </form>
+                </div>
                 @endif
             </div>
 

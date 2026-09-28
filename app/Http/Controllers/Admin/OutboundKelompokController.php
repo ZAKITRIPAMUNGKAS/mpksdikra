@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\OutboundKelompok;
 use App\Services\OutboundGroupService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -55,5 +56,25 @@ class OutboundKelompokController extends Controller
         $service->reset($event);
 
         return back()->with('success', 'Pembagian kelompok outbound berhasil direset.');
+    }
+
+    public function exportPdf(Event $event)
+    {
+        $kelompoks = OutboundKelompok::where('event_id', $event->id)
+            ->with(['peserta.anggota'])
+            ->get();
+
+        abort_if($kelompoks->isEmpty(), 404, 'Belum ada kelompok outbound yang dibuat.');
+
+        $pdf = Pdf::loadView('admin.events.outbound-pdf', compact('event', 'kelompoks'))
+            ->setPaper('a4', 'portrait');
+
+        $slug = str($event->nama_event)->slug();
+
+        if (request()->has('download')) {
+            return $pdf->download("kelompok-outbound-{$slug}.pdf");
+        }
+
+        return $pdf->stream("kelompok-outbound-{$slug}.pdf");
     }
 }

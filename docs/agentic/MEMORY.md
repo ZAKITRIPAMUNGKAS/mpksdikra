@@ -36,12 +36,33 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (131 test hijau per 2026-09-16).
+- `php artisan test` — PHPUnit feature tests (153 test hijau per 2026-09-28).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-28: Penguatan & Penyempurnaan Komprehensif Subsistem Baitul Arqam (BA):
+  1. **Dashboard Khusus Pelatihan (Training Command Center / Mission Control)**:
+     - Didesain ulang di `resources/views/admin/events/show.blade.php` dengan Quick Actions Bar (Aksi Cepat), Metrik Real-Time (Total Peserta, Rasio L/P, Sebaran PCM, Progres Tes Pre/Post, Kelengkapan Afektif/RTL/Psikomotor, Rerata Nilai), Spotlight Sesi Berlangsung (Countdown waktu, instruktur, tombol absensi instan), Leaderboard Top 5 Real-Time, serta Tab Navigasi Terpadu (Sesi & Jadwal, Peserta & ID Card, Evaluasi & Kelulusan, Dynamic Outbound).
+  2. **Modul Berkas Materi Sesi Perkaderan**:
+     - Ditambahkan kolom `file_materi`, `link_materi`, `deskripsi` pada tabel `event_sesi`.
+     - Admin dapat mengunggah slide presentasi (PDF/PPTX) dan menyematkan tautan materi luar saat menjadwalkan sesi.
+     - Peserta aktif dapat mengunduh slide materi dan membuka tautan langsung melalui portal kehadiran (`/portal/kegiatan/{event}/kehadiran`).
+  3. **Cetak ID Card Panitia Massal (Batch Printing A4 Grid)**:
+     - Fitur cetak kartu tanda peserta massal format A4 (8 kartu per lembar lengkap dengan garis potong potong presisi, QR code verifikasi kehadiran, foto, dan asal PCM) via `GET /admin/events/{event}/id-cards/batch`.
+  4. **Kloning Bank Soal Antar Event**:
+     - Memungkinkan panitia menduplikasi seluruh soal pretest/posttest dari pelatihan Baitul Arqam sebelumnya ke pelatihan baru dengan 1 klik via `POST /admin/events/{event}/soal/clone`.
+  5. **Sertifikat Resmi 2 Sisi & Cetak Sertifikat Massal**:
+     - Halaman Depan: Sertifikat resmi lengkap kop, nomor seri terverifikasi hash SHA-256, tanda tangan Ketua MPKSDI H. Zainudin Ahpandi, S.E. & Master of Training (MoT), serta QR validasi keaslian.
+     - Halaman Belakang: Transkrip Materi Pelatihan dengan rincian Jam Pelajaran (JP) dan nilai capaian aspek (Kognitif, Afektif, Psikomotor, Keaktifan).
+     - Fitur Cetak Massal: Seluruh sertifikat peserta yang dinyatakan lulus dapat diunduh sekaligus dalam 1 berkas PDF via `GET /admin/events/{event}/sertifikat/batch`.
+  6. **Cetak PDF Lembar Rekap Kelompok Outbound**:
+     - Fitur ekspor lembar distribusi kelompok outbound per regu (nama, gender, PCM) untuk pegangan instruktur lapangan via `GET /admin/events/{event}/outbound/pdf`.
+  7. **Transparansi Rekam Keaktifan Peserta di Portal**:
+     - Peserta dapat memantau perolehan poin keaktifan (tanya, jawab, kultum, imam, adzan, outbound) beserta rincian forum yang dicatat fasilitator secara transparan.
+  8. **Pengujian & Verifikasi**:
+     - 153 tests lulus 100% (605 assertions). Pint clean, Vite production build clean.
 - 2026-09-16: Perbaikan Tuntas Bug Validasi "validation.in" & Bahasa Indonesia Form Pendaftaran:
   1. Akar Masalah "validation.in":
      - `pendidikan_terakhir`: dropdown form mengirim kode jenjang (`SD`, `SMP`, `SMA`, `D3`, `S1`, dll), namun validasi dinamis sebelumnya memaksakan `Rule::in` ke display label panjang dari database (`S1 / D4 (Sarjana)`).

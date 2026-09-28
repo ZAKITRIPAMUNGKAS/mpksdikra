@@ -163,99 +163,7 @@
         </div>
     </div>
 
-    {{-- 4. SPOTLIGHT SESI BERLANGSUNG & LEADERBOARD TOP 5 COMPACT --}}
-    <div class="grid lg:grid-cols-3 gap-3 sm:gap-3.5 items-start">
-        {{-- Live Session Spotlight Card (1 Kolom) --}}
-        <div class="bg-gradient-to-br from-[#002b40] to-[#005c8a] rounded-xl p-3.5 sm:p-4 text-white shadow-2xs relative overflow-hidden">
-            <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-semibold text-amber-300 border border-white/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#f8bb00] animate-ping"></span>
-                    Sesi Berjalan
-                </span>
-                <span class="text-[10px] text-slate-300">{{ now()->translatedFormat('d M Y') }}</span>
-            </div>
-
-            @if($liveSesi)
-            <div class="my-2">
-                <h3 class="text-xs sm:text-sm font-bold leading-snug text-white line-clamp-1" title="{{ $liveSesi->nama_sesi }}">{{ $liveSesi->urutan }}. {{ $liveSesi->nama_sesi }}</h3>
-                <p class="text-[11px] text-slate-200 mt-0.5">
-                    <span class="capitalize font-semibold text-amber-300">[{{ $liveSesi->jenis }}]</span>
-                    @if($liveSesi->pemateri) &bull; {{ $liveSesi->pemateri }}@endif
-                </p>
-                @if($liveSesi->jam_mulai)
-                <p class="text-[10px] text-slate-300">{{ $liveSesi->jam_mulai }} @if($liveSesi->jam_selesai)- {{ $liveSesi->jam_selesai }}@endif WIB</p>
-                @endif
-            </div>
-
-            <div class="bg-white/10 rounded-lg p-2 border border-white/15 my-2.5">
-                <div class="flex items-center justify-between text-[11px] mb-1">
-                    <span class="text-slate-200">Presensi:</span>
-                    <span class="font-bold text-amber-300">{{ $liveSesi->absensi_count }} / {{ $totalPeserta }} Hadir</span>
-                </div>
-                <div class="w-full bg-white/20 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-[#f8bb00] h-1.5 rounded-full transition-all" style="width: {{ $totalPeserta > 0 ? min(100, round(($liveSesi->absensi_count / $totalPeserta) * 100)) : 0 }}%"></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 text-xs">
-                @if($canOperate)
-                <a href="{{ route('admin.events.absensi.scan', [$event, $liveSesi]) }}" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#f8bb00] hover:bg-amber-400 active:bg-amber-500 text-slate-950 font-bold transition shadow-xs text-[11px]">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                    <span>Scanner QR</span>
-                </a>
-                <a href="{{ route('admin.events.absensi.cetak', [$event, $liveSesi]) }}" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-semibold border border-white/20 transition text-[11px]">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    <span>Lembar PDF</span>
-                </a>
-                @endif
-            </div>
-            @else
-            <div class="text-center py-6 text-slate-300">
-                <p class="text-xs">Belum ada sesi yang dijadwalkan.</p>
-            </div>
-            @endif
-        </div>
-
-        {{-- Live Leaderboard Top 5 (2 Kolom) --}}
-        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-                <div>
-                    <h2 class="font-bold text-slate-900 text-xs sm:text-sm tracking-tight">Leaderboard Teratas (Top 5 Peserta)</h2>
-                    <p class="text-[11px] text-slate-500 font-normal">Kalkulasi nilai berbobot kognitif, psikomotorik, &amp; afektif</p>
-                </div>
-                <button type="button" @click="activeTab = 'unduh_data'" class="text-[11px] font-semibold text-sky-600 hover:underline cursor-pointer">
-                    Rekapitulasi &rarr;
-                </button>
-            </div>
-
-            <div class="space-y-1.5">
-                @forelse($leaderboard as $idx => $lead)
-                <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-slate-100 bg-slate-50/60 hover:bg-sky-50/40 transition">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0
-                            {{ $idx === 0 ? 'bg-amber-100 text-amber-900 border border-amber-300' : ($idx === 1 ? 'bg-slate-200 text-slate-800' : ($idx === 2 ? 'bg-amber-700/20 text-amber-900' : 'bg-slate-100 text-slate-600')) }}">
-                            {{ $idx + 1 }}
-                        </span>
-                        <div class="min-w-0">
-                            <p class="text-xs font-semibold text-slate-900 truncate">{{ $lead->anggota->nama_lengkap }}</p>
-                            <p class="text-[10px] text-slate-500 truncate">{{ $lead->anggota->pcm ?: ($lead->anggota->kecamatan ?: '-') }} &bull; {{ $lead->status_kelulusan ?? 'Diproses' }}</p>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <span class="text-xs sm:text-sm font-black text-sky-800">{{ number_format($lead->nilai_akhir, 1) }}</span>
-                        <span class="text-[9px] text-slate-400 block font-normal leading-none">NA</span>
-                    </div>
-                </div>
-                @empty
-                <div class="text-center py-4 text-slate-400 text-xs">
-                    Belum ada nilai akhir yang terhitung. Nilai otomatis tersinkronisasi seiring aktivitas peserta.
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    {{-- 5. KONTROL TABS TERPADU STICKY & KRONOLOGIS (LANGKAH 1 S.D. 6) --}}
+    {{-- 4. KONTROL TABS TERPADU STICKY & KRONOLOGIS (LANGKAH 1 S.D. 6) --}}
     <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
         {{-- TAB HEADERS SESUAI URUTAN PELAKSANAAN DIBUAT STICKY AGAR ENAK DIPAKAI --}}
         <div class="sticky top-2 z-20 border-b border-slate-200 bg-slate-50/95 backdrop-blur-md px-1.5 sm:px-3 flex gap-1 overflow-x-auto text-xs font-semibold scrollbar-none shadow-2xs">
@@ -467,6 +375,55 @@
                 </button>
                 @endif
             </div>
+
+            {{-- Spotlight Sesi Berjalan Terkini --}}
+            @if($liveSesi)
+            <div class="bg-gradient-to-br from-[#002b40] to-[#005c8a] rounded-xl p-3.5 sm:p-4 text-white shadow-2xs relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-semibold text-amber-300 border border-white/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#f8bb00] animate-ping"></span>
+                        Sesi Berjalan / Terkini
+                    </span>
+                    <span class="text-[10px] text-slate-300">{{ now()->translatedFormat('d M Y') }}</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 my-2">
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold leading-snug text-white" title="{{ $liveSesi->nama_sesi }}">
+                            {{ $liveSesi->urutan }}. {{ $liveSesi->nama_sesi }}
+                        </h3>
+                        <p class="text-xs text-slate-200 mt-0.5">
+                            <span class="capitalize font-semibold text-amber-300">[{{ $liveSesi->jenis }}]</span>
+                            @if($liveSesi->pemateri) &bull; {{ $liveSesi->pemateri }}@endif
+                            @if($liveSesi->jam_mulai) &bull; {{ $liveSesi->jam_mulai }} @if($liveSesi->jam_selesai)- {{ $liveSesi->jam_selesai }}@endif WIB @endif
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        @if($canOperate)
+                        <a href="{{ route('admin.events.absensi.scan', [$event, $liveSesi]) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f8bb00] hover:bg-amber-400 active:bg-amber-500 text-slate-950 font-bold transition shadow-xs text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                            <span>Scanner QR</span>
+                        </a>
+                        <a href="{{ route('admin.events.absensi.cetak', [$event, $liveSesi]) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-semibold border border-white/20 transition text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            <span>Lembar Presensi PDF</span>
+                        </a>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="bg-white/10 rounded-lg p-2.5 border border-white/15 mt-2">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-slate-200">Presensi Kader Saat Ini:</span>
+                        <span class="font-bold text-amber-300">{{ $liveSesi->absensi_count }} / {{ $totalPeserta }} Hadir ({{ $totalPeserta > 0 ? round(($liveSesi->absensi_count / $totalPeserta) * 100) : 0 }}%)</span>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                        <div class="bg-[#f8bb00] h-2 rounded-full transition-all" style="width: {{ $totalPeserta > 0 ? min(100, round(($liveSesi->absensi_count / $totalPeserta) * 100)) : 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <div class="space-y-2">
                 @forelse($sesi as $s)
@@ -805,6 +762,50 @@
                     <a href="{{ route('admin.events.ranking', $event) }}" class="w-full text-center py-1.5 px-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-semibold transition shadow-2xs">
                         Buka Halaman Ranking &rarr;
                     </a>
+                </div>
+            </div>
+
+            {{-- Leaderboard Teratas (Top 5 Peserta) Card --}}
+            <div class="bg-slate-50/70 rounded-xl border border-slate-200/90 p-3.5 sm:p-4">
+                <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-200/80">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm tracking-tight">Leaderboard Teratas (Top 5 Peserta)</h3>
+                        <p class="text-[11px] text-slate-500 font-normal">Kalkulasi nilai berbobot kognitif, psikomotorik, &amp; afektif</p>
+                    </div>
+                    <a href="{{ route('admin.events.ranking', $event) }}" class="text-[11px] font-semibold text-sky-600 hover:underline">
+                        Lihat Ranking Penuh &rarr;
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+                    @forelse($leaderboard as $idx => $lead)
+                    <div class="p-2.5 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition shadow-2xs flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0
+                                    {{ $idx === 0 ? 'bg-amber-100 text-amber-900 border border-amber-300' : ($idx === 1 ? 'bg-slate-200 text-slate-800' : ($idx === 2 ? 'bg-amber-700/20 text-amber-900' : 'bg-slate-100 text-slate-600')) }}">
+                                    #{{ $idx + 1 }}
+                                </span>
+                                <span class="text-xs sm:text-sm font-black text-sky-800">{{ number_format($lead->nilai_akhir, 1) }}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-900 line-clamp-1" title="{{ $lead->anggota->nama_lengkap }}">{{ $lead->anggota->nama_lengkap }}</p>
+                            <p class="text-[10px] text-slate-500 truncate">{{ $lead->anggota->pcm ?: ($lead->anggota->kecamatan ?: '-') }}</p>
+                        </div>
+                        <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                            <span class="inline-flex items-center px-1.5 py-0.2 rounded font-semibold text-[9px] uppercase
+                                {{ $lead->status_kelulusan === 'Lulus' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : '' }}
+                                {{ $lead->status_kelulusan === 'Lulus Bersyarat' ? 'bg-amber-50 text-amber-900 border border-amber-300' : '' }}
+                                {{ $lead->status_kelulusan === 'Tidak Lulus' ? 'bg-red-50 text-red-700 border border-red-200' : '' }}">
+                                {{ $lead->status_kelulusan ?? 'Diproses' }}
+                            </span>
+                            <span class="text-slate-400 font-medium">NA</span>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="lg:col-span-5 text-center py-4 text-slate-400 text-xs">
+                        Belum ada nilai akhir yang terhitung. Nilai otomatis tersinkronisasi seiring aktivitas peserta.
+                    </div>
+                    @endforelse
                 </div>
             </div>
 

@@ -844,25 +844,23 @@ class DemoDataSeeder extends Seeder
         $rtlSoals = RtlSoal::where('event_id', $eventPersiapan->id)->get();
 
         foreach ($pesertaPkuList as $pIdx => $anggota) {
-            // Sesi 1 hadir semua, Sesi 2 hadir 10 orang
-            Absensi::updateOrCreate(
-                ['event_id' => $eventPersiapan->id, 'sesi_id' => $createdSesiPku[0]->id, 'anggota_id' => $anggota->id],
-                [
-                    'waktu_scan' => Carbon::now()->setTime(8, 10 + $pIdx),
-                    'scanned_by' => $admin->id,
-                    'metode' => $pIdx % 2 === 0 ? 'qr' : 'manual',
-                ]
-            );
+            // Tentukan jumlah sesi yang dihadiri untuk menghasilkan variasi status kelulusan yang realistis:
+            // 5 peserta teratas hadir 5 sesi (100% = Lulus)
+            // 4 peserta berikutnya hadir 4 sesi (80% = Lulus Bersyarat)
+            // sisanya hadir 3 sesi (60% = Tidak Lulus)
+            $jumlahSesiHadir = $pIdx < 5 ? 5 : ($pIdx < 9 ? 4 : 3);
 
-            if ($pIdx < 10) {
-                Absensi::updateOrCreate(
-                    ['event_id' => $eventPersiapan->id, 'sesi_id' => $createdSesiPku[1]->id, 'anggota_id' => $anggota->id],
-                    [
-                        'waktu_scan' => Carbon::now()->setTime(10, 15 + $pIdx),
-                        'scanned_by' => $admin->id,
-                        'metode' => 'qr',
-                    ]
-                );
+            for ($sIdx = 0; $sIdx < $jumlahSesiHadir; $sIdx++) {
+                if (isset($createdSesiPku[$sIdx])) {
+                    Absensi::updateOrCreate(
+                        ['event_id' => $eventPersiapan->id, 'sesi_id' => $createdSesiPku[$sIdx]->id, 'anggota_id' => $anggota->id],
+                        [
+                            'waktu_scan' => Carbon::now()->setTime(8 + ($sIdx * 2), 10 + $pIdx),
+                            'scanned_by' => $admin->id,
+                            'metode' => $sIdx % 2 === 0 ? 'qr' : 'manual',
+                        ]
+                    );
+                }
             }
 
             // Keaktifan untuk beberapa peserta

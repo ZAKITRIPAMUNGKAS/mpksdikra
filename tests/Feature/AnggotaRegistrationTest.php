@@ -342,4 +342,30 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertNotContains('validation.in', $errors);
         $this->assertContains('Pilihan status pernikahan tidak valid.', $errors);
     }
+
+    public function test_registration_supports_desa_kaling_in_tasikmadu(): void
+    {
+        Storage::fake('local');
+
+        $tasikmaduDesas = config('arqam.opsi_form.wilayah_karanganyar.Tasikmadu', []);
+        $this->assertContains('Kaling', $tasikmaduDesas);
+
+        $payload = $this->payload([
+            'nik' => '3313101234560001',
+            'no_wa' => '081234567888',
+            'email' => 'kader.kaling@example.test',
+            'kecamatan' => 'Tasikmadu',
+            'desa_kelurahan' => 'Kaling',
+            'pcm' => 'Tasikmadu',
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasNoErrors();
+        $res->assertRedirect(route('anggota.register'));
+
+        $anggota = Anggota::where('nik', '3313101234560001')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('Tasikmadu', $anggota->kecamatan);
+        $this->assertSame('Kaling', $anggota->desa_kelurahan);
+    }
 }

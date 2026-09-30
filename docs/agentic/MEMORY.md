@@ -36,12 +36,18 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (157 test hijau per 2026-09-28).
+- `php artisan test` — PHPUnit feature tests (161 test hijau per 2026-09-30).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-09-30: Penyelarasan Penuh Data Wilayah Desa/Kelurahan se-Kabupaten Karanganyar & Penambahan Desa Kaling (`config/arqam.php`):
+  1. **Akar Masalah**: Pendaftar asal Desa Kaling, Kecamatan Tasikmadu mendapati bahwa opsi "Kaling" tidak muncul pada dropdown formulir pendaftaran (`/daftar`). Pada konfigurasi `config/arqam.php`, Desa Kaling sebelumnya terselip secara keliru di Gondangrejo dan Kerjo, sedangkan Kecamatan Tasikmadu kehilangan opsi Kaling dan Pandeyan.
+  2. **Solusi & Penyelarasan Resmi**: Seluruh daftar 17 kecamatan dan 177 desa/kelurahan disinkronkan 100% presisi sesuai data resmi Kementerian Dalam Negeri (Permendagri No. 137 Tahun 2017 & No. 72 Tahun 2019).
+  3. **Kecamatan Tasikmadu**: Kini lengkap memuat 10 desa resmi (Buran, Gaum, Kalijirak, Kaling, Karangmojo, Ngijo, Pandeyan, Papahan, Suruh, Wonolopo) terurut alfabetis.
+  4. **Pengujian**: Ditambahkan automated test `test_registration_supports_desa_kaling_in_tasikmadu` di `AnggotaRegistrationTest.php`. Seluruh 161 automated tests lulus 100% (630 assertions), Pint clean, Vite build clean.
+
 - 2026-09-29: Fitur Live PPT / Slideshow Evaluasi & Yudisium (`admin/events/presentasi` & Tab 6 Rekap):
   1. **Live Presentation Mode (16:9)**: Dibuat controller khusus `App\Http\Controllers\Admin\PresentasiController` dan view `resources/views/admin/events/presentasi.blade.php` untuk menampilkan slide presentasi interaktif layar penuh berformat 16:9 saat penutupan dan yudisium perkaderan.
   2. **Navigasi & Kontrol Lengkap**: Mendukung remote clicker PPT / keyboard panah (kanan/kiri, spasi, enter), tombol fullscreen (`F`), auto-play timer (8 detik per slide), drawer daftar slide (`O`/`M`), serta ekspor slide ke PDF (`Ctrl+P`).

@@ -222,7 +222,7 @@ class EventController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'nama_event' => ['required', 'string', 'max:255'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
@@ -231,6 +231,21 @@ class EventController extends Controller
             'kuota' => ['nullable', 'integer', 'min:1', 'max:65535'],
             'status' => ['required', 'in:persiapan,berlangsung,selesai'],
             'format_nomor_sertifikat' => ['nullable', 'string', 'max:255'],
+            'bobot_kognitif' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'bobot_psikomotor' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'bobot_afektif' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'bobot_keaktifan' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        foreach (['bobot_kognitif', 'bobot_psikomotor', 'bobot_afektif', 'bobot_keaktifan'] as $field) {
+            if (isset($data[$field]) && $data[$field] !== null && $data[$field] !== '') {
+                $val = (float) $data[$field];
+                $data[$field] = $val > 1.0 ? round($val / 100, 4) : round($val, 4);
+            } else {
+                $data[$field] = null;
+            }
+        }
+
+        return $data;
     }
 }

@@ -99,6 +99,63 @@
                         </div>
                     </div>
 
+                    {{-- Pengaturan Bobot Penilaian Dinamis (Opsional) --}}
+                    <div x-data="{
+                        open: {{ (old('bobot_kognitif', isset($event) ? $event->bobot_kognitif : '') !== '' || old('bobot_psikomotor', isset($event) ? $event->bobot_psikomotor : '') !== '') ? 'true' : 'false' }},
+                        kognitif: '{{ old('bobot_kognitif', isset($event) && $event->bobot_kognitif ? ($event->bobot_kognitif > 1 ? $event->bobot_kognitif : $event->bobot_kognitif * 100) : '') }}',
+                        psikomotor: '{{ old('bobot_psikomotor', isset($event) && $event->bobot_psikomotor ? ($event->bobot_psikomotor > 1 ? $event->bobot_psikomotor : $event->bobot_psikomotor * 100) : '') }}',
+                        afektif: '{{ old('bobot_afektif', isset($event) && $event->bobot_afektif ? ($event->bobot_afektif > 1 ? $event->bobot_afektif : $event->bobot_afektif * 100) : '') }}',
+                        setPreset(k, p, a) {
+                            this.kognitif = k;
+                            this.psikomotor = p;
+                            this.afektif = a;
+                        },
+                        resetDefault() {
+                            this.kognitif = '';
+                            this.psikomotor = '';
+                            this.afektif = '';
+                        }
+                    }" class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                        <button type="button" @click="open = !open" class="w-full px-4 py-3 bg-slate-50 flex items-center justify-between text-left hover:bg-slate-100 transition">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs sm:text-sm font-bold text-slate-800">⚖️ Kustomisasi Bobot Nilai Akhir (Opsional)</span>
+                                <span class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-semibold" x-text="open ? 'Tutup' : 'Sesuaikan'"></span>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" class="p-4 bg-white border-t border-slate-200 space-y-3">
+                            <p class="text-xs text-slate-500">
+                                Standar default sistem: <strong>Kognitif 40%</strong> (70% Posttest + 30% N-Gain), <strong>Psikomotor 35%</strong> (90% Rubrik + 10% Keaktifan), <strong>Afektif 25%</strong>. Kosongkan jika ingin menggunakan standar sistem.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                <span class="text-[11px] font-semibold text-slate-500 self-center mr-1">Preset Cepat:</span>
+                                <button type="button" @click="setPreset(40, 35, 25)" class="px-2.5 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Standar MPKSDI (40:35:25)</button>
+                                <button type="button" @click="setPreset(30, 45, 25)" class="px-2.5 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">AUM / Ibadah Praktis (30:45:25)</button>
+                                <button type="button" @click="setPreset(45, 25, 30)" class="px-2.5 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Ideologi & Kepemimpinan (45:25:30)</button>
+                                <button type="button" @click="resetDefault()" class="px-2.5 py-1 text-xs rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium transition">Reset Default</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Bobot Kognitif (%)</label>
+                                    <input type="number" step="0.1" min="0" max="100" name="bobot_kognitif" x-model="kognitif" placeholder="Default: 40"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Bobot Psikomotor (%)</label>
+                                    <input type="number" step="0.1" min="0" max="100" name="bobot_psikomotor" x-model="psikomotor" placeholder="Default: 35"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Bobot Afektif (%)</label>
+                                    <input type="number" step="0.1" min="0" max="100" name="bobot_afektif" x-model="afektif" placeholder="Default: 25"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm font-mono text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                         <a href="{{ isset($event) ? route('admin.events.show', $event) : route('admin.events.index') }}"
                            class="px-4 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 transition shadow-2xs">

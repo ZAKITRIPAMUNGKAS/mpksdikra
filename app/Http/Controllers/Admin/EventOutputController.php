@@ -66,6 +66,47 @@ class EventOutputController extends Controller
         return $pdf->download('laporan-'.str($event->nama_event)->slug().'.pdf');
     }
 
+    public function beritaAcara(Event $event)
+    {
+        $this->nilai->hitungUlang($event);
+        $ranking = PenilaianAkhir::where('event_id', $event->id)
+            ->with('anggota')
+            ->orderBy('ranking')
+            ->get();
+
+        $totalPeserta = $ranking->count();
+        $totalLulus = $ranking->where('status_kelulusan', 'Lulus')->count();
+        $totalBersyarat = $ranking->where('status_kelulusan', 'Lulus Bersyarat')->count();
+        $totalTidakLulus = $ranking->where('status_kelulusan', 'Tidak Lulus')->count();
+        $rerataNA = $ranking->avg('nilai_akhir') ?? 0;
+        $tertinggiNA = $ranking->max('nilai_akhir') ?? 0;
+        $terendahNA = $ranking->min('nilai_akhir') ?? 0;
+        $top5 = $ranking->take(5);
+
+        $event->load(['fasilitator', 'sesi']);
+
+        $pdf = Pdf::loadView('admin.events.berita-acara-pdf', compact(
+            'event',
+            'ranking',
+            'top5',
+            'totalPeserta',
+            'totalLulus',
+            'totalBersyarat',
+            'totalTidakLulus',
+            'rerataNA',
+            'tertinggiNA',
+            'terendahNA'
+        ))->setPaper('a4', 'portrait');
+
+        $slug = str($event->nama_event)->slug();
+
+        if (request()->has('download')) {
+            return $pdf->download("berita-acara-yudisium-{$slug}.pdf");
+        }
+
+        return $pdf->stream("berita-acara-yudisium-{$slug}.pdf");
+    }
+
     public function certificate(Event $event, EventPeserta $peserta)
     {
         abort_unless((int) $peserta->event_id === (int) $event->id, 403);

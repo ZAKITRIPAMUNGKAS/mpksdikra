@@ -20,6 +20,10 @@ class Event extends Model
         'kuota',
         'status',
         'format_nomor_sertifikat',
+        'bobot_kognitif',
+        'bobot_psikomotor',
+        'bobot_afektif',
+        'bobot_keaktifan',
         'created_by',
     ];
 
@@ -29,6 +33,24 @@ class Event extends Model
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
             'kuota' => 'integer',
+            'bobot_kognitif' => 'float',
+            'bobot_psikomotor' => 'float',
+            'bobot_afektif' => 'float',
+            'bobot_keaktifan' => 'float',
+        ];
+    }
+
+    public function getBobotKomposisi(): array
+    {
+        $cfg = config('arqam.bobot', []);
+
+        return [
+            'kognitif' => $this->bobot_kognitif !== null ? (float) $this->bobot_kognitif : (float) ($cfg['kognitif'] ?? 0.30),
+            'psikomotor' => $this->bobot_psikomotor !== null ? (float) $this->bobot_psikomotor : (float) ($cfg['psikomotor'] ?? 0.30),
+            'afektif' => $this->bobot_afektif !== null ? (float) $this->bobot_afektif : (float) ($cfg['afektif'] ?? 0.30),
+            'keaktifan' => $this->bobot_keaktifan !== null ? (float) $this->bobot_keaktifan : (float) ($cfg['keaktifan'] ?? 0.10),
+            'posttest_dalam_kognitif' => (float) ($cfg['posttest_dalam_kognitif'] ?? 0.70),
+            'ngain_dalam_kognitif' => (float) ($cfg['ngain_dalam_kognitif'] ?? 0.30),
         ];
     }
 

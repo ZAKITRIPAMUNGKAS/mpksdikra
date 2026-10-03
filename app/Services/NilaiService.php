@@ -141,7 +141,7 @@ class NilaiService
                 ['event_id' => $event->id, 'anggota_id' => $anggotaId]
             );
 
-            $bobot = config('arqam.bobot');
+            $bobot = $event->getBobotKomposisi();
             $keaktifanCfg = config('arqam.keaktifan');
 
             $ngainScale = $this->nGain((float) $p->nilai_pretest, (float) $p->nilai_posttest) * 100;

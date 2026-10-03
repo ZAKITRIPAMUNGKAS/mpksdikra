@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}', [EventController::class, 'show'])->middleware('event_access')->name('events.show');
         Route::get('/events/{event}/ranking', [EventOutputController::class, 'ranking'])->middleware('event_access')->name('events.ranking');
         Route::get('/events/{event}/report', [EventOutputController::class, 'report'])->middleware('event_access')->name('events.report');
+        Route::get('/events/{event}/berita-acara', [EventOutputController::class, 'beritaAcara'])->middleware('event_access')->name('events.berita-acara');
         Route::get('/events/{event}/export-excel', [EventOutputController::class, 'exportExcel'])->middleware('event_access')->name('events.exportExcel');
         Route::get('/events/{event}/id-cards-batch', [EventOutputController::class, 'idCardsBatch'])->middleware('event_access')->name('events.idcards.batch');
         Route::get('/events/{event}/certificates-batch', [EventOutputController::class, 'certificatesBatch'])->middleware('event_access')->name('events.certificates.batch');

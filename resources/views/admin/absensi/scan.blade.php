@@ -3,7 +3,7 @@
 @section('title', 'Presensi — ' . $sesi->nama_sesi)
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto space-y-6" x-data="scanApp()">
     {{-- Header Banner with Batik Corner --}}
     <div class="bg-white rounded-xl border border-slate-200/90 p-6 sm:p-7 shadow-2xs relative overflow-hidden">
         <x-batik-corner position="top-right" class="w-40 h-40 text-[#005c8a] opacity-[0.20]" />
@@ -20,6 +20,18 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
                         Scanner Aktif
                     </span>
+                    <template x-if="isOnline">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Online
+                        </span>
+                    </template>
+                    <template x-if="!isOnline">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            Luar Jaringan (Offline)
+                        </span>
+                    </template>
                 </div>
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Presensi: {{ $sesi->nama_sesi }}</h1>
                 <p class="text-xs text-slate-500 mt-1 font-normal">Sesi #{{ $sesi->urutan }} &bull; Kategori: <span class="capitalize font-semibold text-slate-700">{{ $sesi->jenis }}</span></p>
@@ -35,7 +47,29 @@
         </div>
     </div>
 
-    <div class="grid md:grid-cols-5 gap-6 items-start" x-data="scanApp()">
+    {{-- Offline Queue Alert Bar --}}
+    <div x-show="queue.length > 0" x-transition class="p-4 rounded-xl bg-amber-50/90 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs" style="display: none;">
+        <div class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <span class="font-semibold">Antrean Presensi Luar Jaringan:</span>
+                Tersimpan <strong x-text="queue.length"></strong> data di memori perangkat ini.
+                <span class="text-amber-700 block sm:inline text-xs mt-0.5 sm:mt-0" x-show="!isOnline">Data aman dan otomatis terkirim saat internet kembali terhubung.</span>
+            </div>
+        </div>
+        <button @click="syncQueue" :disabled="syncing || !isOnline"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:opacity-50 text-white font-semibold rounded-lg shadow-2xs transition shrink-0 text-xs">
+            <svg x-show="syncing" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" style="display: none;">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span x-text="syncing ? 'Menyinkronkan...' : (isOnline ? 'Sinkronkan Sekarang' : 'Menunggu Internet...')"></span>
+        </button>
+    </div>
+
+    <div class="grid md:grid-cols-5 gap-6 items-start">
         {{-- Left: Scanner Console --}}
         <div class="md:col-span-3 bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
             {{-- Target Viewfinder Frame --}}
@@ -103,9 +137,56 @@
 <script>
 function scanApp() {
     return {
-        qr: '', message: '', ok: false,
+        qr: '',
+        message: '',
+        ok: false,
+        isOnline: navigator.onLine,
+        syncing: false,
+        storageKey: 'arqam_attendance_queue_{{ $sesi->id }}',
+        queue: [],
+        init() {
+            try {
+                this.queue = JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+            } catch (e) {
+                this.queue = [];
+            }
+            window.addEventListener('online', () => {
+                this.isOnline = true;
+                this.syncQueue();
+            });
+            window.addEventListener('offline', () => {
+                this.isOnline = false;
+            });
+            this.load();
+            if (this.isOnline && this.queue.length > 0) {
+                this.syncQueue();
+            }
+        },
+        saveQueue() {
+            try {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.queue));
+            } catch (e) {}
+        },
+        enqueue(token) {
+            this.queue.push({
+                qr_code: token,
+                sesi_id: {{ $sesi->id }},
+                timestamp: new Date().toISOString()
+            });
+            this.saveQueue();
+            this.ok = true;
+            this.message = `[Mode Offline] Presensi disimpan ke antrean lokal (${this.queue.length} antrean). Otomatis terunggah saat online.`;
+            this.qr = '';
+        },
         async scan() {
             if (!this.qr.trim()) return;
+            const token = this.qr.trim();
+
+            if (!navigator.onLine) {
+                this.enqueue(token);
+                return;
+            }
+
             try {
                 const res = await fetch('{{ route('admin.events.absensi.process', $event) }}', {
                     method: 'POST',
@@ -114,7 +195,7 @@ function scanApp() {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ qr_code: this.qr, sesi_id: {{ $sesi->id }} })
+                    body: JSON.stringify({ qr_code: token, sesi_id: {{ $sesi->id }} })
                 });
                 const data = await res.json();
                 this.ok = res.ok && data.status !== 'error';
@@ -122,11 +203,55 @@ function scanApp() {
                 this.qr = '';
                 this.load();
             } catch (e) {
-                this.ok = false;
-                this.message = 'Terjadi kesalahan koneksi saat memproses presensi.';
+                this.isOnline = false;
+                this.enqueue(token);
+            }
+        },
+        async syncQueue() {
+            if (this.syncing || this.queue.length === 0 || !navigator.onLine) return;
+            this.syncing = true;
+            let successCount = 0;
+            const remaining = [];
+
+            for (const item of this.queue) {
+                try {
+                    const res = await fetch('{{ route('admin.events.absensi.process', $event) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ qr_code: item.qr_code, sesi_id: item.sesi_id })
+                    });
+                    if (res.ok || res.status === 422) {
+                        successCount++;
+                    } else {
+                        remaining.push(item);
+                    }
+                } catch (err) {
+                    remaining.push(item);
+                }
+            }
+
+            this.queue = remaining;
+            this.saveQueue();
+            this.syncing = false;
+
+            if (successCount > 0) {
+                this.ok = true;
+                this.message = `Berhasil menyinkronkan ${successCount} data presensi lokal ke server!`;
+                this.load();
             }
         },
         async load() {
+            if (!navigator.onLine) {
+                const container = document.getElementById('recent');
+                if (container && (!container.innerHTML || container.innerHTML.includes('Memuat'))) {
+                    container.innerHTML = '<div class="py-8 text-center text-slate-400 font-normal">Riwayat online belum tersedia saat offline.</div>';
+                }
+                return;
+            }
             try {
                 const res = await fetch('{{ route('admin.events.absensi.recent', [$event, $sesi]) }}');
                 const data = await res.json();
@@ -145,8 +270,7 @@ function scanApp() {
                     </div>
                 `).join('');
             } catch (e) {}
-        },
-        init() { this.load(); }
+        }
     }
 }
 </script>

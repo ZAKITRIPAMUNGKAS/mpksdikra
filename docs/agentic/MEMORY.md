@@ -36,12 +36,30 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (161 test hijau per 2026-09-30).
+- `php artisan test` — PHPUnit feature tests (165 test hijau per 2026-10-03).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-03: Peningkatan Vital Subsistem Baitul Arqam (Bobot Penilaian Dinamis, Berita Acara Yudisium PDF Resmi, dan Scanner Presensi Luar Jaringan):
+  1. **Pengaturan Bobot Penilaian Dinamis per Event (`database/migrations/2026_10_03_000001_add_bobot_to_events_table.php`, `Event.php`, `NilaiService.php`, `EventController.php`)**:
+     - Ditambahkan kolom `bobot_kognitif`, `bobot_psikomotor`, `bobot_afektif`, dan `bobot_keaktifan` pada tabel `events`.
+     - Ditambahkan method `Event::getBobotKomposisi(): array` dengan fallback transparan ke `config('arqam.bobot')`.
+     - `NilaiService::hitungNilaiAkhirDanRanking` kini dinamis menggunakan bobot per-event bila ditentukan, sehingga tiap jenis pelatihan (Baitul Arqam Pimpinan/Ideologi 45:25:30 vs Baitul Arqam AUM/Praktik Ibadah 30:45:25 vs Standar MPKSDI 40:35:25) dapat memiliki kurikulum pembobotan yang presisi.
+     - Form event (`admin/events/form.blade.php`) dilengkapi accordion Alpine.js interaktif dengan 4 preset cepat (Standar MPKSDI, AUM/Ibadah, Ideologi/Kepemimpinan, Reset).
+  2. **Dokumen Cetak PDF Resmi: Berita Acara Sidang Pleno Yudisium Kelulusan (`GET /admin/events/{event}/berita-acara`, `admin/events/berita-acara-pdf.blade.php`)**:
+     - Dokumen legal format A4 resmi berkop surat Majelis Pembinaan Kader dan Sumber Daya Insani (MPKSDI) PDM Karanganyar.
+     - Memuat identitas sidang pleno, rekapitulasi statistik kelulusan (lulus murni, bersyarat, tidak lulus), statistik capaian nilai (tertinggi, terendah, rerata), daftar Dewan Instruktur/Narasumber, daftar 5 Lulusan Terbaik (Kader Berprestasi), dan blok 3 penandatangan sah (Master of Training, Imam Training, dan Ketua MPKSDI H. Zainudin Ahpandi, S.E. NBM 883.693).
+     - Terintegrasi langsung di Tab 6 Dashboard Event (`admin/events/show.blade.php`) dalam grid kartu unduhan dokumen resmi.
+  3. **Ketahanan Luar Jaringan (Offline-Resilient / Local Queue) Scanner Presensi QR (`resources/views/admin/absensi/scan.blade.php`)**:
+     - Mengatasi kendala koneksi seluler/Wi-Fi yang fluktuatif di lokasi pelosok atau ruang diklat dengan deteksi otomatis status jaringan (`navigator.onLine`, event `online`/`offline`).
+     - Antrean presensi lokal otomatis tersimpan di `localStorage` (`arqam_attendance_queue_{sesi_id}`) saat perangkat offline atau request presensi gagal karena koneksi terputus.
+     - Indikator visual real-time status jaringan (Hijau: Online, Kuning: Luar Jaringan / Offline) beserta banner counter antrean tertunda dan tombol sinkronisasi otomatis/manual begitu internet pulih.
+  4. **Pengujian & Verifikasi**:
+     - Ditambahkan 4 automated feature test di `tests/Feature/EventBobotAndBeritaAcaraTest.php`.
+     - Seluruh 165 automated tests lulus 100% (643 assertions), Laravel Pint clean, Vite production build clean.
+
 - 2026-09-30: Penyelarasan Penuh Data Wilayah Desa/Kelurahan se-Kabupaten Karanganyar & Penambahan Desa Kaling (`config/arqam.php`):
   1. **Akar Masalah**: Pendaftar asal Desa Kaling, Kecamatan Tasikmadu mendapati bahwa opsi "Kaling" tidak muncul pada dropdown formulir pendaftaran (`/daftar`). Pada konfigurasi `config/arqam.php`, Desa Kaling sebelumnya terselip secara keliru di Gondangrejo dan Kerjo, sedangkan Kecamatan Tasikmadu kehilangan opsi Kaling dan Pandeyan.
   2. **Solusi & Penyelarasan Resmi**: Seluruh daftar 17 kecamatan dan 177 desa/kelurahan disinkronkan 100% presisi sesuai data resmi Kementerian Dalam Negeri (Permendagri No. 137 Tahun 2017 & No. 72 Tahun 2019).

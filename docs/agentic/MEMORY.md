@@ -42,6 +42,23 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-07: Penyempurnaan Algoritma Pembersihan Latar Belakang Pasfoto Peserta (Cutout ID Card) di `ImageCutoutService.php`:
+  1. **Akar Masalah**:
+     - Sebelumnya terdapat sisa busur/lingkaran elips abu-abu di atas kepala/peci peserta karena hard-coded face shield yang terlalu besar.
+     - Terdapat kotak kaku di samping bahu peserta dan kebocoran flood-fill ke dalam baju batik/kemeja berwarna putih/krem.
+     - Koordinat sampling perimeter berpotensi melebihi batas piksel gambar (menghasilkan ValueError/exception dan fallback ke JPEG mentah).
+  2. **Penyempurnaan Algoritma**:
+     - Menghapus pembatas elips kaku di luar kepala dan menggantinya dengan **Inner Core Face Protection** (hanya melindungi area hidung/mata tengah agar peci, jilbab, rambut, dan telinga terpotong presisi alami).
+     - Menambahkan proteksi biometrik warna kulit manusia (`$isSkinTone`) dan peci/rambut hitam (`$bgBrightness > 95 && $r < 55 && $g < 55 && $b < 55`).
+     - Membatasi flood-fill seed queue hanya dari tepi atas (`y = 0`) dan tepi samping atas (`y <= 0.45 * H`) agar kain bahu pada pasfoto portrait tidak dijadikan seed background.
+     - Melindungi area dada tengah (`chestY = 0.58H, chestX = 0.28W..0.72W`) dan menambahkan 2-pass **Hole-Filling** pada area tubuh (`y >= 0.50H`) untuk mencegah motif batik/kemeja putih tembus pandang.
+     - Menggunakan toleransi adaptif netral studio (35) dan despeckle pass untuk membersihkan bintik noise di sekitar leher dan bahu.
+     - Menerapkan soft-edge feathering (alpha 42) dan bottom gradient fade pada 12% terbawah gambar.
+  3. **Verifikasi**:
+     - `Tests\Feature\IdCardBatchTest`: 4 passed (11 assertions).
+     - `Tests\Feature\EndToEndSystemLifecycleTest`: 1 passed (50 assertions).
+     - Verifikasi visual pada sampel foto riil kader (`kader-01.jpg` s.d. `kader-05.jpg`) menunjukkan kontur peci, jilbab, dan kemeja sangat bersih, rapi, dan alami.
+
 - 2026-10-07: Redesign Global Navigasi Event Menjadi Workspace-Style Horizontal Navigation (`show.blade.php`):
   1. **Transformasi Arsitektur Navigasi**:
      - Menggantikan pola wizard/stepper bernomor lama (`1. Pendataan`, `2. Jadwal`, dst.) menjadi **Workspace-Style Horizontal Navigation** ala enterprise modern yang sticky di bagian atas halaman detail event.

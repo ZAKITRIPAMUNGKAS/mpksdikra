@@ -139,13 +139,36 @@
 </head>
 <body>
 @php
-    $bgFront = public_path('assets/2.png');
-    $fgFront = public_path('assets/3.png');
-    $bgBack = public_path('assets/1.png');
-    $defaultPhoto = public_path('aset/ketua-mpksdi-cutout.png');
-    if (! file_exists($defaultPhoto)) {
-        $defaultPhoto = public_path('aset/ketua-mpksdi.png');
-    }
+    $resolveDataUri = function (array $candidates): string {
+        foreach ($candidates as $path) {
+            if ($path && file_exists($path)) {
+                $mime = str_ends_with(strtolower($path), '.jpg') || str_ends_with(strtolower($path), '.jpeg') ? 'image/jpeg' : 'image/png';
+                return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
+            }
+        }
+        return '';
+    };
+
+    $bgFrontDataUri = $resolveDataUri([
+        public_path('aset/idcard/front-bg.png'),
+        public_path('assets/2.png'),
+        public_path('aset/2.png'),
+    ]);
+    $fgFrontDataUri = $resolveDataUri([
+        public_path('aset/idcard/front-overlay.png'),
+        public_path('assets/3.png'),
+        public_path('aset/3.png'),
+    ]);
+    $bgBackDataUri = $resolveDataUri([
+        public_path('aset/idcard/back.png'),
+        public_path('assets/1.png'),
+        public_path('aset/1.png'),
+    ]);
+
+    $defaultPhoto = $resolveDataUri([
+        public_path('aset/ketua-mpksdi-cutout.png'),
+        public_path('aset/ketua-mpksdi.png'),
+    ]);
 @endphp
 
 @foreach($cards as $index => $card)
@@ -168,11 +191,15 @@
 
     <!-- FRONT CARD -->
     <div class="card-page">
-        <img src="{{ $bgFront }}" class="card-bg" alt="Front Background">
+        @if($bgFrontDataUri)
+        <img src="{{ $bgFrontDataUri }}" class="card-bg" alt="">
+        @endif
         <div class="photo-box">
             <img src="{{ $photoSrc }}" class="photo-img" alt="Foto">
         </div>
-        <img src="{{ $fgFront }}" class="card-overlay" alt="Overlay">
+        @if($fgFrontDataUri)
+        <img src="{{ $fgFrontDataUri }}" class="card-overlay" alt="">
+        @endif
         
         <div class="front-status">{{ strtoupper($statusStr) }}</div>
         <div class="front-nama" style="font-size: {{ $frontFontSize }};">{{ $card['nama'] }}</div>
@@ -181,7 +208,9 @@
 
     <!-- BACK CARD -->
     <div class="card-page">
-        <img src="{{ $bgBack }}" class="card-bg" alt="Back Background">
+        @if($bgBackDataUri)
+        <img src="{{ $bgBackDataUri }}" class="card-bg" alt="">
+        @endif
         
         <div class="qr-box">
             <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Code">

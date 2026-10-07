@@ -96,32 +96,41 @@ class ImageCutoutService
             imagecopy($clean, $src, 0, 0, $trimL, $trimT, $workW, $workH);
             imagedestroy($src);
 
-            // 2. Sample perimeter background points
-            $samplePoints = [
-                [4, 4],
-                [(int) ($workW / 4), 4],
-                [(int) ($workW / 2), 4],
-                [(int) ($workW * 3 / 4), 4],
-                [$workW - 5, 4],
-                [4, (int) ($workH * 0.2)],
-                [$workW - 5, (int) ($workH * 0.2)],
-                [4, (int) ($workH * 0.4)],
-                [$workW - 5, (int) ($workH * 0.4)],
-                [4, (int) ($workH * 0.55)],
-                [$workW - 5, (int) ($workH * 0.55)],
-            ];
-
-            $bgColors = [];
-            foreach ($samplePoints as [$px, $py]) {
-                $c = imagecolorat($clean, $px, $py);
-                $bgColors[] = [
-                    ($c >> 16) & 0xFF,
-                    ($c >> 8) & 0xFF,
-                    $c & 0xFF,
-                ];
+            // 2. Sample perimeter background points safely
+            $samplePoints = [];
+            for ($step = 0; $step <= 10; $step++) {
+                $sampleX = (int) min($workW - 1, max(0, (int) ($workW * $step / 10)));
+                $samplePoints[] = [$sampleX, min($workH - 1, 3)];
+            }
+            for ($step = 1; $step <= 8; $step++) {
+                $sy = (int) min($workH - 1, max(0, (int) ($workH * $step * 0.10)));
+                $samplePoints[] = [min($workW - 1, 3), $sy];
+                $samplePoints[] = [max(0, $workW - 4), $sy];
             }
 
-            // 3. Flood-fill queue
+            $bgColors = [];
+            $avgR = 0;
+            $avgG = 0;
+            $avgB = 0;
+            foreach ($samplePoints as [$px, $py]) {
+                $c = imagecolorat($clean, $px, $py);
+                $cr = ($c >> 16) & 0xFF;
+                $cg = ($c >> 8) & 0xFF;
+                $cb = $c & 0xFF;
+                $bgColors[] = [$cr, $cg, $cb];
+                $avgR += $cr;
+                $avgG += $cg;
+                $avgB += $cb;
+            }
+            $sampleCount = max(1, count($bgColors));
+            $avgR /= $sampleCount;
+            $avgG /= $sampleCount;
+            $avgB /= $sampleCount;
+
+            $isNeutralBg = (abs($avgR - $avgG) <= 22 && abs($avgR - $avgB) <= 22 && abs($avgG - $avgB) <= 22);
+            $bgBrightness = ($avgR * 299 + $avgG * 587 + $avgB * 114) / 1000;
+
+            // 3. Flood-fill queue: Seed hanya dari tepi atas dan tepi samping atas (di atas bahu)
             $visited = array_fill(0, $workW * $workH, 0);
             $isBg = array_fill(0, $workW * $workH, false);
             $queue = new SplQueue;
@@ -130,7 +139,7 @@ class ImageCutoutService
                 $visited[$x] = 1;
                 $queue->enqueue($x);
             }
-            $maxSeedY = (int) ($workH * 0.60);
+            $maxSeedY = (int) ($workH * 0.45);
             for ($y = 1; $y < $maxSeedY; $y++) {
                 $idxL = $y * $workW;
                 $idxR = $y * $workW + ($workW - 1);
@@ -140,32 +149,37 @@ class ImageCutoutService
                 $queue->enqueue($idxR);
             }
 
-            // 4. Protection Shields: Face/Head & Lower Torso
+            // 4. Proteksi Biometrik & Anatomis:
+            // a) Lingkaran wajah tepat di tengah (mata & hidung)
             $faceCx = (int) ($workW * 0.50);
-            $faceCy = (int) ($workH * 0.42);
-            $faceRx = (int) ($workW * 0.24);
-            $faceRy = (int) ($workH * 0.25);
+            $faceCy = (int) ($workH * 0.40);
+            $innerCoreRx = max(1, (int) ($workW * 0.10));
+            $innerCoreRy = max(1, (int) ($workH * 0.10));
 
-            $torsoMinY = (int) ($workH * 0.70);
-            $torsoMinX = (int) ($workW * 0.18);
-            $torsoMaxX = (int) ($workW * 0.82);
+            // b) Proteksi Inti Dada Tengah (mencegah kemeja/batik putih di tengah dada tertembus)
+            $chestY = (int) ($workH * 0.58);
+            $chestX1 = (int) ($workW * 0.28);
+            $chestX2 = (int) ($workW * 0.72);
 
-            $tolSq = $tolerance * $tolerance;
+            // Toleransi adaptif: jika background netral studio (ada gradasi bayangan abu-abu),
+            // gunakan toleransi 35 untuk menyapu bersih bayangan abu-abu di sekitar leher & bahu
+            $effectiveTol = $isNeutralBg ? max($tolerance, 35) : $tolerance;
+            $tolSq = $effectiveTol * $effectiveTol;
 
             while (! $queue->isEmpty()) {
                 $idx = $queue->dequeue();
                 $x = $idx % $workW;
                 $y = (int) ($idx / $workW);
 
-                // Face shield protection
-                $dx = ($x - $faceCx) / $faceRx;
-                $dy = ($y - $faceCy) / $faceRy;
+                // Lindungi pusat wajah di tengah
+                $dx = ($x - $faceCx) / $innerCoreRx;
+                $dy = ($y - $faceCy) / $innerCoreRy;
                 if (($dx * $dx + $dy * $dy) < 1.0) {
                     continue;
                 }
 
-                // Torso shield protection
-                if ($y >= $torsoMinY && $x >= $torsoMinX && $x <= $torsoMaxX) {
+                // Lindungi inti dada tengah
+                if ($y >= $chestY && $x >= $chestX1 && $x <= $chestX2) {
                     continue;
                 }
 
@@ -174,12 +188,25 @@ class ImageCutoutService
                 $g = ($rgb >> 8) & 0xFF;
                 $b = $rgb & 0xFF;
 
+                // Proteksi Biometrik 1: Kulit manusia (hangat alami, bukan background merah pekat)
+                $isSkinTone = ($r > $g && $g >= $b && ($r - $b) >= 14 && $r >= 65 && ($r - $g) <= 85 && $b < 205);
+                if ($isSkinTone) {
+                    continue;
+                }
+
+                // Proteksi Biometrik 2: Peci hitam / rambut hitam / jas gelap pada background terang
+                if ($bgBrightness > 95 && $r < 55 && $g < 55 && $b < 55) {
+                    continue;
+                }
+
                 $match = false;
                 foreach ($bgColors as [$br, $bg, $bb]) {
+                    // Jarak persepsi warna standar terbobot
                     $dr = $r - $br;
                     $dg = $g - $bg;
-                    $db = ($b - $bb) * 1.5; // Blue-weighted separation for warm/cool contrast
-                    if (($dr * $dr + $dg * $dg + $db * $db) <= $tolSq) {
+                    $db = $b - $bb;
+                    $distSq = (2 * $dr * $dr) + (4 * $dg * $dg) + (3 * $db * $db);
+                    if ($distSq <= ($tolSq * 9)) {
                         $match = true;
                         break;
                     }
@@ -219,14 +246,66 @@ class ImageCutoutService
                 }
             }
 
-            // 5. Render destination with soft edge anti-aliasing & bottom gradient fade
+            // 5. Hole-filling pass di area tubuh (y >= 0.50H) untuk menutup lubang motif kain/batik
+            for ($pass = 0; $pass < 2; $pass++) {
+                $filledBg = $isBg;
+                $minFillY = (int) ($workH * 0.50);
+                for ($y = $minFillY; $y < $workH - 1; $y++) {
+                    for ($x = 1; $x < $workW - 1; $x++) {
+                        $idx = $y * $workW + $x;
+                        if ($isBg[$idx]) {
+                            $bodyCount = 0;
+                            if (! $isBg[($y - 1) * $workW + ($x - 1)]) { $bodyCount++; }
+                            if (! $isBg[($y - 1) * $workW + $x]) { $bodyCount++; }
+                            if (! $isBg[($y - 1) * $workW + ($x + 1)]) { $bodyCount++; }
+                            if (! $isBg[$y * $workW + ($x - 1)]) { $bodyCount++; }
+                            if (! $isBg[$y * $workW + ($x + 1)]) { $bodyCount++; }
+                            if (! $isBg[($y + 1) * $workW + ($x - 1)]) { $bodyCount++; }
+                            if (! $isBg[($y + 1) * $workW + $x]) { $bodyCount++; }
+                            if (! $isBg[($y + 1) * $workW + ($x + 1)]) { $bodyCount++; }
+                            if ($bodyCount >= 5) {
+                                $filledBg[$idx] = false;
+                            }
+                        }
+                    }
+                }
+                $isBg = $filledBg;
+            }
+
+            // 6. Despeckle / Eliminasi bintik noise di area background
+            $cleanedBg = $isBg;
+            $despeckleLimitY = (int) ($workH * 0.75);
+            for ($y = 1; $y < $despeckleLimitY; $y++) {
+                for ($x = 1; $x < $workW - 1; $x++) {
+                    $idx = $y * $workW + $x;
+                    if (! $isBg[$idx]) {
+                        $bgCount = 0;
+                        if ($isBg[($y - 1) * $workW + ($x - 1)]) { $bgCount++; }
+                        if ($isBg[($y - 1) * $workW + $x]) { $bgCount++; }
+                        if ($isBg[($y - 1) * $workW + ($x + 1)]) { $bgCount++; }
+                        if ($isBg[$y * $workW + ($x - 1)]) { $bgCount++; }
+                        if ($isBg[$y * $workW + ($x + 1)]) { $bgCount++; }
+                        if ($isBg[($y + 1) * $workW + ($x - 1)]) { $bgCount++; }
+                        if ($isBg[($y + 1) * $workW + $x]) { $bgCount++; }
+                        if ($isBg[($y + 1) * $workW + ($x + 1)]) { $bgCount++; }
+
+                        if ($bgCount >= 5) {
+                            $cleanedBg[$idx] = true;
+                        }
+                    }
+                }
+            }
+            $isBg = $cleanedBg;
+
+            // 6. Render destination dengan soft edge anti-aliasing & bottom gradient fade
             $dst = imagecreatetruecolor($workW, $workH);
             imagealphablending($dst, false);
             imagesavealpha($dst, true);
             $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
             imagefill($dst, 0, 0, $transparent);
 
-            $fadeStartY = (int) ($workH * 0.90);
+            $fadeStartY = (int) ($workH * 0.88);
+            $fadeRange = max(1, $workH - 1 - $fadeStartY);
 
             for ($y = 0; $y < $workH; $y++) {
                 for ($x = 0; $x < $workW; $x++) {
@@ -249,13 +328,13 @@ class ImageCutoutService
                             $isEdge = true;
                         }
 
-                        $alpha = $isEdge ? 36 : 0;
+                        $alpha = $isEdge ? 42 : 0;
 
                         // Soft vertical gradient fade at bottom to blend smoothly into card curve
                         if ($y >= $fadeStartY) {
-                            $fadeProgress = ($y - $fadeStartY) / ($workH - $fadeStartY);
+                            $fadeProgress = ($y - $fadeStartY) / $fadeRange;
                             $fadeAlpha = (int) (127 * $fadeProgress);
-                            $alpha = max($alpha, $fadeAlpha);
+                            $alpha = max($alpha, min(127, $fadeAlpha));
                         }
 
                         if ($alpha >= 127) {

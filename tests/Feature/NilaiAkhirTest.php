@@ -347,4 +347,115 @@ class NilaiAkhirTest extends TestCase
         $response->assertOk();
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
+
+    public function test_grade_assigned_when_grade_enabled(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+        $event->update(['gunakan_grade' => true]);
+
+        $tpl = PsikomotorTemplate::create([
+            'event_id' => $event->id,
+            'jenis' => 'ibadah',
+            'nama_aspek' => 'Sholat',
+            'skor_maks' => 4,
+        ]);
+        PsikomotorNilai::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'template_id' => $tpl->id,
+            'skor' => 4,
+            'dinilai_oleh' => $admin->id,
+        ]);
+
+        for ($i = 0; $i < 10; $i++) {
+            Keaktifan::create([
+                'event_id' => $event->id,
+                'anggota_id' => $a->id,
+                'jenis' => 'kultum',
+                'dicatat_oleh' => $admin->id,
+            ]);
+        }
+
+        $sa = AfektifSubAspek::create([
+            'event_id' => $event->id,
+            'nama_sub_aspek' => 'Sikap',
+            'urutan' => 1,
+            'aktif' => true,
+        ]);
+        $butir = AfektifButir::create([
+            'sub_aspek_id' => $sa->id,
+            'teks_butir' => 'Disiplin',
+            'is_positif' => true,
+            'urutan' => 1,
+        ]);
+        AfektifJawaban::create([
+            'event_id' => $event->id,
+            'anggota_id' => $a->id,
+            'butir_id' => $butir->id,
+            'skor' => 4,
+        ]);
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_pretest' => 50, 'nilai_posttest' => 100]
+        );
+
+        $sesi1 = EventSesi::create(['event_id' => $event->id, 'nama_sesi' => 'S1', 'urutan' => 1, 'jenis' => 'materi']);
+        Absensi::create([
+            'event_id' => $event->id,
+            'sesi_id' => $sesi1->id,
+            'anggota_id' => $a->id,
+            'waktu_scan' => now(),
+            'scanned_by' => $admin->id,
+            'metode' => 'qr',
+        ]);
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+
+        $this->assertNotNull($p->grade);
+        $this->assertSame('A', $p->grade);
+    }
+
+    public function test_grade_null_when_grade_disabled(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_pretest' => 50, 'nilai_posttest' => 100, 'nilai_kehadiran' => 100]
+        );
+
+        $sesi1 = EventSesi::create(['event_id' => $event->id, 'nama_sesi' => 'S1', 'urutan' => 1, 'jenis' => 'materi']);
+        Absensi::create([
+            'event_id' => $event->id,
+            'sesi_id' => $sesi1->id,
+            'anggota_id' => $a->id,
+            'waktu_scan' => now(),
+            'scanned_by' => $admin->id,
+            'metode' => 'qr',
+        ]);
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+        $this->assertNull($p->grade);
+    }
+
+    public function test_grade_null_when_tidak_lulus(): void
+    {
+        [$admin, $event, $a] = $this->makeContext();
+        $event->update(['gunakan_grade' => true]);
+
+        PenilaianAkhir::updateOrCreate(
+            ['event_id' => $event->id, 'anggota_id' => $a->id],
+            ['nilai_pretest' => 50, 'nilai_posttest' => 100, 'nilai_akhir' => 90]
+        );
+
+        app(NilaiService::class)->hitungUlangPeserta($event, $a->id);
+
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $a->id)->first();
+        $this->assertNull($p->grade);
+    }
 }

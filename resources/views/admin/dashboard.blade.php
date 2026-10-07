@@ -382,8 +382,15 @@
                         @forelse($latestPending as $p)
                         <div class="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0 flex-1">
-                                <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0 border border-amber-200">
-                                    {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                <div class="relative w-9 h-11 rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
+                                    <img src="{{ route('foto.anggota', $p) }}" 
+                                         alt="{{ $p->nama_lengkap }}" 
+                                         class="w-full h-full object-cover"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                    <div class="hidden w-full h-full bg-amber-50 text-amber-800 font-bold text-xs flex items-center justify-center">
+                                        {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                    </div>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <span class="font-semibold text-slate-900 text-sm truncate block">
@@ -437,8 +444,15 @@
                         @forelse($latestAktif as $akt)
                         <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <div class="w-8 h-8 rounded-lg bg-[#005c8a]/10 text-[#005c8a] font-bold text-xs flex items-center justify-center shrink-0 border border-[#005c8a]/20">
-                                    {{ strtoupper(substr($akt->nama_lengkap, 0, 1)) }}
+                                <div class="relative w-8 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
+                                    <img src="{{ route('foto.anggota', $akt) }}" 
+                                         alt="{{ $akt->nama_lengkap }}" 
+                                         class="w-full h-full object-cover"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                    <div class="hidden w-full h-full bg-[#005c8a]/10 text-[#005c8a] font-bold text-xs flex items-center justify-center">
+                                        {{ strtoupper(substr($akt->nama_lengkap, 0, 1)) }}
+                                    </div>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <span class="font-semibold text-slate-900 text-sm truncate block">
@@ -579,8 +593,15 @@
                         @forelse($latestPending as $p)
                         <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200">
-                                    {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                <div class="relative w-8 h-10 rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
+                                    <img src="{{ route('foto.anggota', $p) }}" 
+                                         alt="{{ $p->nama_lengkap }}" 
+                                         class="w-full h-full object-cover"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                    <div class="hidden w-full h-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
+                                        {{ strtoupper(substr($p->nama_lengkap, 0, 1)) }}
+                                    </div>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <span class="font-semibold text-slate-900 text-sm truncate block">

@@ -186,4 +186,21 @@ class PortalEvaluationTest extends TestCase
             ->assertOk()
             ->assertSee('Tingkat Kelulusan');
     }
+
+    public function test_portal_dashboard_shows_rtl_progress_when_disetujui(): void
+    {
+        $event = $this->ctx['event'];
+        $anggota = $this->ctx['anggota'];
+
+        Rtl::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'status' => 'disetujui',
+        ]);
+
+        $this->actingAs($this->ctx['anggotaUser'])
+            ->get(route('portal.dashboard'))
+            ->assertOk()
+            ->assertSee('RTL Terkirim');
+    }
 }

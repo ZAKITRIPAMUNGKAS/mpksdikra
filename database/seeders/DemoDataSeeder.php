@@ -372,6 +372,8 @@ class DemoDataSeeder extends Seeder
 
         $createdAnggota = [];
 
+        $this->ensureKaderPhotosExist();
+
         foreach ($kaderData as $idx => $d) {
             $user = User::updateOrCreate(
                 ['email' => $d['email']],
@@ -388,6 +390,9 @@ class DemoDataSeeder extends Seeder
             $birthYear = 1980 + ($idx % 20);
             $birthDate = Carbon::create($birthYear, ($idx % 12) + 1, ($idx % 25) + 1);
 
+            $fotoNumber = ($idx % 20) + 1;
+            $fotoPath = 'anggota/foto/'.sprintf('kader-%02d.jpg', $fotoNumber);
+
             $anggota = Anggota::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -396,6 +401,7 @@ class DemoDataSeeder extends Seeder
                     'jenis_kelamin' => $d['gender'],
                     'nik' => $d['nik'],
                     'nbm' => $d['nbm'],
+                    'foto' => $fotoPath,
                     'jabatan_aum' => $d['jabatan_aum'],
                     'pekerjaan' => $d['jabatan_aum'],
                     'pcm' => $d['kecamatan'],
@@ -441,6 +447,98 @@ class DemoDataSeeder extends Seeder
         }
 
         return $createdAnggota;
+    }
+
+    private function ensureKaderPhotosExist(): void
+    {
+        $storageDir = storage_path('app/private/anggota/foto');
+        if (! is_dir($storageDir)) {
+            mkdir($storageDir, 0755, true);
+        }
+
+        $assetsDir = database_path('seeders/assets/kader');
+        if (! is_dir($assetsDir)) {
+            mkdir($assetsDir, 0755, true);
+        }
+
+        $f1 = base_path('foto1.png');
+        $f2 = base_path('foto2.png');
+
+        $grid1 = [
+            'cols' => [[3, 304], [311, 614], [622, 915], [922, 1225], [1232, 1532]],
+            'rows' => [[3, 506], [512, 1020]],
+        ];
+        $grid2 = [
+            'cols' => [[0, 303], [309, 612], [617, 918], [924, 1226], [1232, 1535]],
+            'rows' => [[0, 506], [511, 1023]],
+        ];
+
+        $img1 = null;
+        $img2 = null;
+
+        for ($i = 1; $i <= 20; $i++) {
+            $filename = sprintf('kader-%02d.jpg', $i);
+            $targetPath = $storageDir.DIRECTORY_SEPARATOR.$filename;
+
+            if (file_exists($targetPath)) {
+                continue;
+            }
+
+            $assetPath = $assetsDir.DIRECTORY_SEPARATOR.$filename;
+            if (file_exists($assetPath)) {
+                copy($assetPath, $targetPath);
+
+                continue;
+            }
+
+            if (extension_loaded('gd') && file_exists($f1) && file_exists($f2)) {
+                $img1 ??= @imagecreatefrompng($f1);
+                $img2 ??= @imagecreatefrompng($f2);
+
+                $portraitMap = [
+                    1 => [$img1, $grid1['cols'][0], $grid1['rows'][0]],
+                    2 => [$img1, $grid1['cols'][1], $grid1['rows'][0]],
+                    3 => [$img1, $grid1['cols'][2], $grid1['rows'][0]],
+                    4 => [$img1, $grid1['cols'][4], $grid1['rows'][0]],
+                    5 => [$img1, $grid1['cols'][3], $grid1['rows'][0]],
+                    6 => [$img1, $grid1['cols'][0], $grid1['rows'][1]],
+                    7 => [$img1, $grid1['cols'][1], $grid1['rows'][1]],
+                    8 => [$img1, $grid1['cols'][3], $grid1['rows'][1]],
+                    9 => [$img1, $grid1['cols'][2], $grid1['rows'][1]],
+                    10 => [$img1, $grid1['cols'][4], $grid1['rows'][1]],
+                    11 => [$img2, $grid2['cols'][1], $grid2['rows'][0]],
+                    12 => [$img2, $grid2['cols'][0], $grid2['rows'][0]],
+                    13 => [$img2, $grid2['cols'][2], $grid2['rows'][0]],
+                    14 => [$img2, $grid2['cols'][3], $grid2['rows'][0]],
+                    15 => [$img2, $grid2['cols'][1], $grid2['rows'][1]],
+                    16 => [$img2, $grid2['cols'][0], $grid2['rows'][1]],
+                    17 => [$img2, $grid2['cols'][4], $grid2['rows'][0]],
+                    18 => [$img2, $grid2['cols'][2], $grid2['rows'][1]],
+                    19 => [$img2, $grid2['cols'][3], $grid2['rows'][1]],
+                    20 => [$img2, $grid2['cols'][4], $grid2['rows'][1]],
+                ];
+
+                if (isset($portraitMap[$i]) && $portraitMap[$i][0]) {
+                    [$src, $cRange, $rRange] = $portraitMap[$i];
+                    $x = $cRange[0] + 3;
+                    $y = $rRange[0] + 3;
+                    $srcW = ($cRange[1] - $cRange[0] + 1) - 6;
+                    $srcH = ($rRange[1] - $rRange[0] + 1) - 6;
+                    $dest = imagecreatetruecolor(300, 400);
+                    imagecopyresampled($dest, $src, 0, 0, $x, $y, 300, 400, $srcW, $srcH);
+                    imagejpeg($dest, $assetPath, 94);
+                    imagedestroy($dest);
+                    copy($assetPath, $targetPath);
+                }
+            }
+        }
+
+        if ($img1) {
+            imagedestroy($img1);
+        }
+        if ($img2) {
+            imagedestroy($img2);
+        }
     }
 
     private function seedOrganisasi(array $anggotaList): void

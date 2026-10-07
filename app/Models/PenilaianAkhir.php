@@ -22,6 +22,7 @@ class PenilaianAkhir extends Model
         'ranking',
         'status_kelulusan',
         'verification_hash',
+        'grade',
     ];
 
     protected function casts(): array

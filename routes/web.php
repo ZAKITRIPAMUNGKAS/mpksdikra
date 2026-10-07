@@ -141,6 +141,8 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/enroll', [PesertaController::class, 'search'])->name('events.enroll');
         Route::post('/events/{event}/enroll', [PesertaController::class, 'enroll'])->name('events.enroll.store');
         Route::post('/events/{event}/peserta/{peserta}/remove', [PesertaController::class, 'remove'])->name('events.peserta.remove');
+        Route::post('/events/{event}/peserta/{peserta}/remind-wa', [PesertaController::class, 'remind'])->name('events.peserta.remind-wa');
+        Route::post('/events/{event}/peserta/remind-wa-batch', [PesertaController::class, 'remindBatch'])->name('events.peserta.remind-wa-batch');
 
         Route::post('/events/{event}/sesi', [SesiController::class, 'store'])->name('events.sesi.store');
         Route::put('/events/{event}/sesi/{sesi}', [SesiController::class, 'update'])->name('events.sesi.update');
@@ -188,6 +190,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/sesi/{sesi}/cetak-lembar', [AbsensiController::class, 'cetakLembar'])->name('events.absensi.cetak');
         Route::post('/events/{event}/absensi/process', [AbsensiController::class, 'process'])->name('events.absensi.process');
         Route::post('/events/{event}/absensi/manual', [AbsensiController::class, 'manual'])->name('events.absensi.manual');
+        Route::delete('/events/{event}/sesi/{sesi}/absensi/{absensi}', [AbsensiController::class, 'destroy'])->name('events.absensi.destroy');
     });
 });
 

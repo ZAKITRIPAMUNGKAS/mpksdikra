@@ -63,7 +63,7 @@
             
             {{-- Logo Brand --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 shrink-0 reveal-left reveal-delay-50">
-                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
+                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto" style="max-height: 40px; width: auto;">
                 <div class="flex flex-col">
                     <span class="font-extrabold text-lg tracking-tight text-slate-900 leading-none">MPKSDI<span class="text-sky-500">.</span></span>
                     <span class="text-xs text-slate-400 font-medium tracking-wide uppercase mt-0.5">PDM Karanganyar</span>
@@ -1624,7 +1624,7 @@
                 {{-- Col 1: Brand & Kontak Resmi (5 cols) --}}
                 <div class="md:col-span-2 lg:col-span-5 space-y-4 reveal-left reveal-delay-100">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto">
+                        <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto" style="max-height: 40px; width: auto;">
                         <div class="flex flex-col">
                             <span class="font-extrabold text-xl text-slate-900 tracking-tight leading-none">MPKSDI<span class="text-sky-500">.</span></span>
                             <span class="text-xs text-slate-400 font-bold tracking-wider uppercase mt-1">PDM Kabupaten Karanganyar</span>

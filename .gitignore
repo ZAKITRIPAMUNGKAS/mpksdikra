@@ -21,3 +21,15 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Temporary & mockup files
+/*.png
+/*.zip
+/public/*.zip
+/public/sample-*
+/public/assets/*.png
+/public/aset/1.png
+/public/aset/2.png
+/public/aset/3.png
+/public/aset/*.pdf
+/public/idcard-generator.html

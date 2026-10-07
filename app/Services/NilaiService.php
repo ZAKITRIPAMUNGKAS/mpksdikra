@@ -180,6 +180,7 @@ class NilaiService
 
         foreach ($ranked as $index => $p) {
             $p->ranking = $index + 1;
+            $p->grade = $this->tentukanGrade($event, $p, $index, $ranked->count());
             $p->save();
         }
     }
@@ -237,5 +238,27 @@ class NilaiService
         }
 
         return 'Lulus Bersyarat';
+    }
+
+    public function tentukanGrade(Event $event, PenilaianAkhir $p, int $rankIndex, int $total): ?string
+    {
+        if (! $event->gunakan_grade) {
+            return null;
+        }
+
+        if ($p->status_kelulusan !== 'Lulus') {
+            return null;
+        }
+
+        $na = (float) $p->nilai_akhir;
+
+        if ($na >= 85.0) {
+            return 'A';
+        }
+        if ($na >= 70.0) {
+            return 'B';
+        }
+
+        return 'C';
     }
 }

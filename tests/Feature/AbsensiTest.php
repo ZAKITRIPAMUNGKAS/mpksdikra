@@ -142,4 +142,33 @@ class AbsensiTest extends TestCase
         $this->assertSame('100.00', $p->nilai_kehadiran);
         $this->assertSame('Lulus', $p->status_kelulusan);
     }
+
+    public function test_admin_can_cancel_or_void_attendance(): void
+    {
+        [$admin, $event, $anggota, $ep] = $this->setupEvent(2);
+        $sesiList = $event->sesi()->get();
+        $sesi1 = $sesiList[0];
+        $sesi2 = $sesiList[1];
+        $qr = app(QrService::class)->payload($ep);
+
+        // Hadir 2 sesi (100% Lulus)
+        $this->actingAs($admin)->postJson(route('admin.events.absensi.process', $event), ['qr_code' => $qr, 'sesi_id' => $sesi1->id])->assertOk();
+        $this->actingAs($admin)->postJson(route('admin.events.absensi.process', $event), ['qr_code' => $qr, 'sesi_id' => $sesi2->id])->assertOk();
+
+        $absensi = Absensi::where('sesi_id', $sesi2->id)->where('anggota_id', $anggota->id)->first();
+        $this->assertNotNull($absensi);
+
+        // Batalkan sesi 2
+        $res = $this->actingAs($admin)
+            ->deleteJson(route('admin.events.absensi.destroy', [$event, $sesi2, $absensi]));
+        $res->assertOk()
+            ->assertJson(['status' => 'success']);
+
+        $this->assertDatabaseMissing('absensi', ['id' => $absensi->id]);
+
+        // Kehadiran turun jadi 50% dan status kelulusan dihitung ulang jadi Tidak Lulus (<75%)
+        $p = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first();
+        $this->assertSame('50.00', $p->nilai_kehadiran);
+        $this->assertSame('Tidak Lulus', $p->status_kelulusan);
+    }
 }

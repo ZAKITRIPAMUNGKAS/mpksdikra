@@ -6,6 +6,8 @@ use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -190,5 +192,22 @@ class AuthTest extends TestCase
         ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_csrf_token_mismatch_or_419_redirects_with_friendly_error(): void
+    {
+        Route::post('/test-419-endpoint', function () {
+            throw new HttpException(419, 'Page Expired');
+        });
+
+        $response = $this->from('/login')
+            ->post('/test-419-endpoint', [
+                'login' => '08123456789',
+                'password' => '12051990',
+            ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHas('error');
+        $this->assertEquals('08123456789', session('_old_input.login'));
     }
 }

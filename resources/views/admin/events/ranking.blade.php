@@ -66,6 +66,7 @@
                     <th class="py-3 px-3 text-center">Hadir</th>
                     <th class="py-3 px-4 text-center">NA</th>
                     <th class="py-3 px-4">Kelulusan</th>
+                    <th class="py-3 px-3 text-center">Grade</th>
                     <th class="py-3 px-4 text-right">Aksi</th>
                 </tr>
             </thead>
@@ -100,6 +101,18 @@
                             {{ $p->status_kelulusan ?? '-' }}
                         </span>
                     </td>
+                    <td class="py-3 px-3 text-center">
+                        @if($p->grade)
+                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-black
+                            {{ $p->grade === 'A' ? 'bg-sky-100 text-sky-800 border border-sky-300' : '' }}
+                            {{ $p->grade === 'B' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
+                            {{ $p->grade === 'C' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}">
+                            {{ $p->grade }}
+                        </span>
+                        @else
+                            <span class="text-slate-300">-</span>
+                        @endif
+                    </td>
                     <td class="py-3 px-4 text-right whitespace-nowrap">
                         @if($epId)
                         <a href="{{ route('admin.events.certificate', [$event, $epId]) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 hover:bg-sky-50 hover:text-sky-900 hover:border-sky-300 text-xs font-semibold text-slate-700 transition shadow-2xs">
@@ -109,7 +122,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="12" class="py-10 text-center text-slate-400">Belum ada data penilaian.</td></tr>
+                <tr><td colspan="13" class="py-10 text-center text-slate-400">Belum ada data penilaian.</td></tr>
                 @endforelse
             </tbody>
         </table>

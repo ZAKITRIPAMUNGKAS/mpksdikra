@@ -152,7 +152,7 @@ class WhatsAppNotificationService
     public static function pesanPengingatEvent(Anggota $anggota, Event $event): string
     {
         $nama = $anggota->nama_lengkap;
-        $namaEvent = $event->nama;
+        $namaEvent = $event->nama_event ?: ($event->nama ?: 'Baitul Arqam');
         $tanggal = $event->tanggal_mulai?->translatedFormat('d F Y') ?? '-';
         $lokasi = $event->lokasi ?: 'Gedung Dakwah Muhammadiyah Karanganyar';
         $portalUrl = route('login');

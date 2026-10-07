@@ -418,6 +418,24 @@
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="mb-6 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-950 text-sm flex items-start gap-3 shadow-2xs">
+                    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div class="flex-1">
+                        <span class="font-bold text-amber-900">Perhatian:</span> {{ session('warning') }}
+                        @if(session('wa_url'))
+                            <div class="mt-2">
+                                <a href="{{ session('wa_url') }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-2xs">
+                                    <span>Kirim via WhatsApp Web</span>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             @yield('content')
         </main>
 

@@ -8,6 +8,7 @@ use App\Models\EventPeserta;
 use App\Models\PenilaianAkhir;
 use App\Models\User;
 use App\Services\QrService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -87,6 +88,60 @@ class AdminEventFlowTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertSame(0, EventPeserta::where('event_id', $event->id)->count());
+    }
+
+    public function test_admin_enroll_search_is_paginated_to_twenty_items_per_page(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload() + ['created_by' => $admin->id]);
+
+        // Buat 25 kader aktif
+        for ($i = 0; $i < 25; $i++) {
+            $u = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+            Anggota::factory()->create(['user_id' => $u->id]);
+        }
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.events.enroll', $event));
+
+        $response->assertOk();
+        $response->assertViewHas('kandidat', function ($kandidat) {
+            return $kandidat instanceof LengthAwarePaginator
+                && $kandidat->perPage() === 20
+                && $kandidat->count() === 20
+                && $kandidat->total() === 25;
+        });
+    }
+
+    public function test_admin_enroll_search_filters_by_cabang(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload() + ['created_by' => $admin->id]);
+
+        $uColomadu = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $uColomadu->id,
+            'nama_lengkap' => 'Kader Colomadu',
+            'pcm' => 'Colomadu',
+            'kecamatan' => 'Colomadu',
+        ]);
+
+        $uJaten = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $uJaten->id,
+            'nama_lengkap' => 'Kader Jaten',
+            'pcm' => 'Jaten',
+            'kecamatan' => 'Jaten',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.events.enroll', [$event, 'cabang' => 'Colomadu']));
+
+        $response->assertOk();
+        $response->assertViewHas('kandidat', function ($kandidat) {
+            return $kandidat->total() === 1
+                && $kandidat->first()->nama_lengkap === 'Kader Colomadu';
+        });
     }
 
     public function test_admin_adds_session_and_scan_page_renders(): void

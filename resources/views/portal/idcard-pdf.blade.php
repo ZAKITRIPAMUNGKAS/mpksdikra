@@ -2,10 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>ID Card PVC - {{ $ep->anggota->nama_lengkap }}</title>
+    <title>ID Card Baitul Arqam - {{ $ep->anggota->nama_lengkap }}</title>
     <style>
         @page {
-            size: 54mm 85.6mm;
+            size: 265.75pt 383.75pt;
             margin: 0;
         }
         * {
@@ -13,310 +13,181 @@
             padding: 0;
             box-sizing: border-box;
         }
-        body {
-            font-family: 'DejaVu Sans', sans-serif;
-            background-color: #002147;
-            color: #ffffff;
-            width: 54mm;
-            height: 85.6mm;
-            overflow: hidden;
+        html, body {
+            width: 265.75pt;
+            height: 383.75pt;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #063A60;
             -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .card-page {
-            width: 54mm;
-            height: 85.6mm;
+            width: 265.75pt;
+            height: 383.75pt;
             position: relative;
-            background-color: #002147;
             overflow: hidden;
-            padding: 4mm 3.5mm;
-        }
-
-        .page-break {
+            background: #FFFFFF;
             page-break-after: always;
+            break-after: page;
         }
 
-        /* Front Side Styling */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3mm;
+        .card-page:last-child {
+            page-break-after: avoid;
+            break-after: avoid;
         }
-        .header-table td {
-            vertical-align: top;
+
+        .card-bg, .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 265.75pt;
+            height: 383.75pt;
+            z-index: 1;
         }
-        .org-tag {
-            font-size: 5.5pt;
-            font-weight: bold;
-            color: #f8bb00;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+
+        .card-overlay {
+            z-index: 3;
         }
-        .org-sub {
-            font-size: 4.2pt;
-            color: #bae6fd;
-            letter-spacing: 0.3px;
-        }
-        .muh-tag {
+
+        .photo-box {
+            position: absolute;
+            left: 95.7pt;
+            top: 55.6pt;
+            width: 154.1pt;
+            height: 199.5pt;
             text-align: right;
-            font-size: 5pt;
-            font-weight: bold;
-            color: #ffffff;
-            letter-spacing: 0.5px;
+            z-index: 2;
         }
 
-        .identity-box {
-            margin-top: 1mm;
-            margin-bottom: 2mm;
-            position: relative;
-            z-index: 10;
-        }
-        .name {
-            font-size: 8.5pt;
-            font-weight: bold;
-            color: #ffffff;
-            line-height: 1.15;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            max-height: 8mm;
-            overflow: hidden;
-        }
-        .nbm {
-            font-size: 6pt;
-            font-weight: bold;
-            color: #f8bb00;
-            margin-top: 0.6mm;
-            letter-spacing: 0.3px;
-        }
-        .role-pill {
-            display: inline-block;
-            margin-top: 1mm;
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 0.5px solid rgba(255, 255, 255, 0.25);
-            padding: 0.5mm 1.8mm;
-            border-radius: 2mm;
-            font-size: 4.8pt;
-            font-weight: bold;
-            color: #e0f2fe;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .photo-container {
-            position: absolute;
-            bottom: 3.5mm;
-            left: 3.5mm;
-            right: 3.5mm;
-            height: 47mm;
-            text-align: center;
-            z-index: 10;
-        }
-        .photo-frame {
-            width: 35mm;
-            height: 46mm;
-            margin: 0 auto;
-            border-radius: 4px;
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            background-color: #00365a;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
         .photo-img {
-            width: 35mm;
-            height: 46mm;
-            object-fit: cover;
-            display: block;
-        }
-        .photo-placeholder {
-            line-height: 46mm;
-            font-size: 8pt;
-            font-weight: bold;
-            color: #94a3b8;
-            letter-spacing: 1px;
+            max-width: 100%;
+            max-height: 100%;
+            vertical-align: bottom;
         }
 
-        /* Back Side Styling */
-        .back-head {
-            margin-bottom: 2mm;
-        }
-        .back-title {
-            font-size: 7.5pt;
+        .front-status {
+            position: absolute;
+            left: 53.75pt;
+            top: 245.5pt;
+            width: 125pt;
             font-weight: bold;
-            color: #ffffff;
+            font-size: 8.5pt;
+            color: #063A60;
             text-transform: uppercase;
+            letter-spacing: 0.04em;
+            z-index: 4;
+        }
+
+        .front-nama {
+            position: absolute;
+            left: 53.75pt;
+            top: 281.5pt;
+            width: 138pt;
+            font-weight: bold;
+            color: #063A60;
             line-height: 1.1;
-        }
-        .back-id {
-            font-size: 6pt;
-            font-weight: bold;
-            color: #f8bb00;
-            margin-top: 0.5mm;
+            z-index: 4;
         }
 
-        .rules-box {
-            font-size: 4.2pt;
-            color: #e2e8f0;
-            line-height: 1.35;
-            margin-top: 1.5mm;
-            margin-bottom: 2.5mm;
-            text-align: justify;
-        }
-
-        .serial-strip {
+        .front-nbm {
             position: absolute;
-            left: 2mm;
-            top: 30mm;
-            bottom: 12mm;
-            width: 3mm;
-            font-size: 4pt;
-            color: rgba(255, 255, 255, 0.45);
-            font-family: monospace;
-            letter-spacing: 1px;
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-        }
-
-        .qr-section {
-            margin-left: 4mm;
-            text-align: center;
-            margin-top: 1mm;
-        }
-        .tap-header {
-            font-size: 5pt;
+            left: 53.75pt;
+            top: 318.0pt;
+            width: 138pt;
             font-weight: bold;
-            color: #f8bb00;
-            letter-spacing: 0.5px;
-            margin-bottom: 1mm;
-        }
-        .qr-card-box {
-            display: inline-block;
-            background: #ffffff;
-            padding: 1.5mm;
-            border-radius: 3px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-        .qr-card-img {
-            width: 25mm;
-            height: 25mm;
-            display: block;
+            font-size: 8.5pt;
+            color: #063A60;
+            z-index: 4;
         }
 
-        .back-foot {
+        /* BACK CARD */
+        .qr-box {
             position: absolute;
-            bottom: 2.5mm;
-            left: 3.5mm;
-            right: 3.5mm;
+            left: 104.125pt;
+            top: 64.25pt;
+            width: 57.5pt;
+            height: 57.5pt;
+            z-index: 2;
             text-align: center;
-            font-size: 4.2pt;
-            color: #94a3b8;
-            border-top: 0.5px solid rgba(255, 255, 255, 0.15);
-            padding-top: 1mm;
         }
-        .back-foot b {
-            color: #ffffff;
+
+        .qr-img {
+            width: 57.5pt;
+            height: 57.5pt;
         }
+
+        .back-val {
+            position: absolute;
+            left: 43.75pt;
+            width: 104pt;
+            font-weight: bold;
+            color: #063A60;
+            z-index: 2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .back-nama { top: 194pt; }
+        .back-nbm { top: 221.5pt; font-size: 6.5pt; }
+        .back-status { top: 248.5pt; font-size: 6.5pt; }
+        .back-kegiatan { top: 275.25pt; font-size: 6.5pt; }
+        .back-waktu { top: 302.25pt; font-size: 6.5pt; }
     </style>
 </head>
 <body>
+@php
+    $bgFront = public_path('assets/2.png');
+    $fgFront = public_path('assets/3.png');
+    $bgBack = public_path('assets/1.png');
+    $defaultPhoto = public_path('aset/ketua-mpksdi-cutout.png');
+    if (! file_exists($defaultPhoto)) {
+        $defaultPhoto = public_path('aset/ketua-mpksdi.png');
+    }
 
-    {{-- ============================================================== --}}
-    {{-- MUKA DEPAN (FRONT SIDE)                                         --}}
-    {{-- ============================================================== --}}
-    <div class="card-page">
-        {{-- Batik / Kawung Vector Motif Background --}}
-        <svg style="position: absolute; bottom: -2mm; left: -2mm; width: 58mm; height: 50mm; opacity: 0.22; pointer-events: none; z-index: 1;" viewBox="0 0 200 160">
-            <g fill="#38bdf8">
-                <path d="M 40,20 C 40,35 25,50 10,50 C 25,50 40,65 40,80 C 40,65 55,50 70,50 C 55,50 40,35 40,20 Z" />
-                <circle cx="40" cy="50" r="4" fill="#f8bb00" />
-                <path d="M 160,20 C 160,35 145,50 130,50 C 145,50 160,65 160,80 C 160,65 175,50 190,50 C 175,50 160,35 160,20 Z" />
-                <circle cx="160" cy="50" r="4" fill="#f8bb00" />
-                <path d="M 100,70 C 100,85 85,100 70,100 C 85,100 100,115 100,130 C 100,115 115,100 130,100 C 115,100 100,85 100,70 Z" />
-                <circle cx="100" cy="100" r="4" fill="#f8bb00" />
-            </g>
-        </svg>
+    $nama = $ep->anggota->nama_lengkap;
+    $namaLen = mb_strlen($nama);
+    if ($namaLen > 34) {
+        $frontFontSize = '6.5pt';
+        $backFontSize = '5.5pt';
+    } elseif ($namaLen > 24) {
+        $frontFontSize = '7.5pt';
+        $backFontSize = '6pt';
+    } else {
+        $frontFontSize = '8.5pt';
+        $backFontSize = '6.5pt';
+    }
+    $photoSrc = $fotoDataUri ?: $defaultPhoto;
+@endphp
 
-        {{-- Top Header Logos --}}
-        <table class="header-table">
-            <tr>
-                <td style="width: 65%;">
-                    <div class="org-tag">MPKSDI KARANGANYAR</div>
-                    <div class="org-sub">Pimpinan Daerah Muhammadiyah</div>
-                </td>
-                <td style="width: 35%; text-align: right;">
-                    <div class="muh-tag">MUHAMMADIYAH</div>
-                </td>
-            </tr>
-        </table>
+<!-- FRONT CARD -->
+<div class="card-page">
+    <img src="{{ $bgFront }}" class="card-bg" alt="Front Background">
+    <div class="photo-box">
+        <img src="{{ $photoSrc }}" class="photo-img" alt="Foto">
+    </div>
+    <img src="{{ $fgFront }}" class="card-overlay" alt="Overlay">
+    
+    <div class="front-status">PESERTA</div>
+    <div class="front-nama" style="font-size: {{ $frontFontSize }};">{{ $nama }}</div>
+    <div class="front-nbm">{{ $ep->anggota->nbm ?: '-' }}</div>
+</div>
 
-        {{-- Name & Identity Details --}}
-        <div class="identity-box">
-            <div class="name">{{ $ep->anggota->nama_lengkap }}</div>
-            <div class="nbm">
-                @if($ep->anggota->nbm) NBM {{ $ep->anggota->nbm }} @else ID #{{ sprintf('%03d', $ep->id) }} @endif
-                &bull; {{ $ep->anggota->pcm ?: ($ep->anggota->kecamatan ?: 'Karanganyar') }}
-            </div>
-            <div class="role-pill">PESERTA BAITUL ARQAM</div>
-        </div>
-
-        {{-- Portrait Photo Frame --}}
-        <div class="photo-container">
-            <div class="photo-frame">
-                @if(!empty($fotoDataUri))
-                    <img class="photo-img" src="{{ $fotoDataUri }}" alt="Pasfoto">
-                @else
-                    <div class="photo-placeholder">PASFOTO</div>
-                @endif
-            </div>
-        </div>
+<!-- BACK CARD -->
+<div class="card-page">
+    <img src="{{ $bgBack }}" class="card-bg" alt="Back Background">
+    
+    <div class="qr-box">
+        <img src="{{ $qrPng }}" class="qr-img" alt="QR Code">
     </div>
 
-    {{-- PAGE BREAK UNTUK CETAK 2 SISI --}}
-    <div class="page-break"></div>
-
-    {{-- ============================================================== --}}
-    {{-- MUKA BELAKANG (BACK SIDE)                                      --}}
-    {{-- ============================================================== --}}
-    <div class="card-page">
-        {{-- Batik Motif Background --}}
-        <svg style="position: absolute; bottom: 0; right: 0; width: 50mm; height: 45mm; opacity: 0.15; pointer-events: none; z-index: 1;" viewBox="0 0 200 160">
-            <g fill="#38bdf8">
-                <path d="M 100,30 C 100,50 80,70 60,70 C 80,70 100,90 100,110 C 100,90 120,70 140,70 C 120,70 100,50 100,30 Z" />
-                <circle cx="100" cy="70" r="5" fill="#f8bb00" />
-            </g>
-        </svg>
-
-        {{-- Header Belakang --}}
-        <div class="back-head">
-            <div class="back-title">{{ $ep->anggota->nama_lengkap }}</div>
-            <div class="back-id">
-                ID PESERTA: #{{ sprintf('%03d', $ep->id) }} @if($ep->anggota->nbm)&bull; NBM: {{ $ep->anggota->nbm }}@endif
-            </div>
-        </div>
-
-        {{-- Ketentuan Penggunaan Kartu --}}
-        <div class="rules-box">
-            Penggunaan kartu ini diatur menurut tata tertib perkaderan Baitul Arqam MPKSDI PDM Karanganyar. Pemegang kartu wajib mengenakan tanda pengenal ini selama kegiatan. Tunjukkan kode QR di bawah untuk verifikasi kehadiran digital di setiap sesi materi dan ibadah. Jika kartu ini ditemukan, mohon diserahkan ke Panitia MPKSDI Karanganyar.
-        </div>
-
-        {{-- Vertical Token / Serial on Left --}}
-        <div class="serial-strip">
-            {{ $ep->qr_token ?? ('ARQAM-EV'.$event->id.'-AG'.$ep->anggota_id) }}
-        </div>
-
-        {{-- QR Code Presensi Scanner --}}
-        <div class="qr-section">
-            <div class="tap-header">&bull; PRESENSI DIGITAL &bull;</div>
-            <div class="qr-card-box">
-                <img class="qr-card-img" src="{{ $qrPng }}" alt="QR Presensi">
-            </div>
-        </div>
-
-        {{-- Footer Diterbitkan oleh --}}
-        <div class="back-foot">
-            Diterbitkan oleh <b>MPKSDI PDM Karanganyar</b><br>
-            Sistem Informasi Perkaderan Arqam
-        </div>
-    </div>
-
+    <div class="back-val back-nama" style="font-size: {{ $backFontSize }};">{{ $nama }}</div>
+    <div class="back-val back-nbm">{{ $ep->anggota->nbm ?: '-' }}</div>
+    <div class="back-val back-status">Peserta</div>
+    <div class="back-val back-kegiatan">{{ $event->nama_event ?: 'Baitul Arqam' }}</div>
+    <div class="back-val back-waktu">{{ $event->lokasi ?: 'Karanganyar' }}, {{ $event->tanggal_mulai ? $event->tanggal_mulai->format('Y') : date('Y') }}</div>
+</div>
 </body>
 </html>

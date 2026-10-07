@@ -235,6 +235,7 @@ class EventController extends Controller
             'bobot_psikomotor' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_afektif' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_keaktifan' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'gunakan_grade' => ['boolean'],
         ]);
 
         foreach (['bobot_kognitif', 'bobot_psikomotor', 'bobot_afektif', 'bobot_keaktifan'] as $field) {

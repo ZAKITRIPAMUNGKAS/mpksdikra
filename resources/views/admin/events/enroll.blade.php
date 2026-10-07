@@ -4,10 +4,15 @@
 
 @section('content')
 <div x-data="{
-    selected: [],
+    selected: JSON.parse(sessionStorage.getItem('arqam_enroll_{{ $event->id }}') || '[]'),
     candidates: {{ json_encode($kandidat->pluck('id')->values()->all()) }},
     kuota: {{ (int) ($event->kuota ?? 0) }},
     currentEnrolled: {{ (int) ($event->peserta_aktif_count ?? 0) }},
+    init() {
+        this.$watch('selected', (val) => {
+            sessionStorage.setItem('arqam_enroll_{{ $event->id }}', JSON.stringify(val));
+        });
+    },
     get remainingQuota() {
         if (!this.kuota) return 999999;
         return Math.max(0, this.kuota - this.currentEnrolled);
@@ -16,11 +21,15 @@
         if (!this.kuota) return false;
         return this.selected.length > this.remainingQuota;
     },
+    get allOnPageSelected() {
+        return this.candidates.length > 0 && this.candidates.every(id => this.selected.includes(id));
+    },
     toggleAll() {
-        if (this.selected.length === this.candidates.length) {
-            this.selected = [];
+        if (this.allOnPageSelected) {
+            this.selected = this.selected.filter(id => !this.candidates.includes(id));
         } else {
-            this.selected = [...this.candidates];
+            const set = new Set([...this.selected, ...this.candidates]);
+            this.selected = Array.from(set);
         }
     },
     isSelected(id) {
@@ -28,6 +37,7 @@
     },
     clearSelection() {
         this.selected = [];
+        sessionStorage.removeItem('arqam_enroll_{{ $event->id }}');
     }
 }" class="space-y-6">
 
@@ -56,26 +66,53 @@
                             Registrasi &amp; Penugasan Peserta
                         </span>
                         <span class="text-slate-300">&bull;</span>
-                        <span class="text-xs text-slate-500 font-medium">{{ $kandidat->count() }} Anggota Aktif Tersedia</span>
+                        <span class="text-xs text-slate-500 font-medium">
+                            {{ $kandidat->total() }} Anggota Aktif Tersedia
+                            @if(!empty($cabang))
+                                &bull; Wilayah PCM {{ $cabang }}
+                            @endif
+                            @if($kandidat->hasPages())
+                                &bull; Halaman {{ $kandidat->currentPage() }} dari {{ $kandidat->lastPage() }}
+                            @endif
+                        </span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Enroll Peserta Kegiatan</h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl font-normal">
                         Pilih kader aktif terverifikasi untuk didaftarkan secara resmi ke agenda perkaderan ini.
                     </p>
 
-                    {{-- Search Input Bar --}}
-                    <form method="GET" action="{{ route('admin.events.enroll', $event) }}" class="mt-5 flex gap-2 flex-wrap sm:flex-nowrap">
-                        <div class="relative flex-1 min-w-[220px]">
+                    {{-- Search & Filter Bar --}}
+                    <form method="GET" action="{{ route('admin.events.enroll', $event) }}" class="mt-5 flex gap-2.5 flex-wrap sm:flex-nowrap">
+                        <div class="relative flex-1 min-w-[200px]">
                             <input type="text" name="q" value="{{ $query }}" placeholder="Cari nama lengkap atau NIK kader…"
                                 class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition shadow-2xs">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
+
+                        {{-- Filter Cabang / PCM --}}
+                        <div class="relative min-w-[170px] sm:w-56 shrink-0">
+                            <select name="cabang" onchange="this.form.submit()"
+                                class="w-full pl-3 pr-8 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer appearance-none">
+                                <option value="">Semua Cabang (PCM)</option>
+                                @foreach($pcmList as $item)
+                                    <option value="{{ $item }}" {{ $cabang === $item ? 'selected' : '' }}>
+                                        PCM {{ $item }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+
                         <button type="submit" class="px-5 py-2.5 bg-[#005c8a] hover:bg-[#00486d] active:bg-[#003855] text-white text-xs font-semibold rounded-lg shadow-2xs transition shrink-0">
-                            Cari Kader
+                            Cari
                         </button>
-                        @if(!empty($query))
+                        @if(!empty($query) || !empty($cabang))
                         <a href="{{ route('admin.events.enroll', $event) }}" class="px-3.5 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-lg transition shrink-0">
                             Reset
                         </a>
@@ -89,10 +126,10 @@
                 {{-- Toolbar Action Bar --}}
                 <div class="p-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between gap-3 flex-wrap">
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" :checked="candidates.length > 0 && selected.length === candidates.length" @change="toggleAll"
+                        <input type="checkbox" :checked="allOnPageSelected" @change="toggleAll"
                             class="w-4 h-4 rounded border-slate-300 text-[#005c8a] focus:ring-[#005c8a]/30">
                         <span class="text-xs font-bold text-slate-700">
-                            Pilih Semua (<span x-text="candidates.length"></span> Kandidat)
+                            Pilih Semua di Halaman Ini (<span x-text="candidates.length"></span> Kandidat)
                         </span>
                     </label>
 
@@ -110,18 +147,33 @@
                 </div>
 
                 {{-- Candidate Cards Form --}}
-                <form method="POST" action="{{ route('admin.events.enroll.store', $event) }}" id="enroll-form" class="p-4 space-y-2.5">
+                <form method="POST" action="{{ route('admin.events.enroll.store', $event) }}" id="enroll-form" 
+                      @submit="sessionStorage.removeItem('arqam_enroll_{{ $event->id }}')" 
+                      class="p-4 space-y-2.5">
                     @csrf
+
+                    {{-- Hidden inputs for selected candidates on other pages --}}
+                    <template x-for="id in selected.filter(id => !candidates.includes(id))" :key="id">
+                        <input type="hidden" name="anggota_ids[]" :value="id">
+                    </template>
                     @forelse($kandidat as $k)
                     <label class="flex items-center gap-3.5 p-3.5 rounded-xl border transition-all duration-150 cursor-pointer select-none group"
                            :class="isSelected({{ $k->id }}) ? 'border-[#005c8a] bg-sky-50/50 ring-1 ring-[#005c8a]/30 shadow-2xs' : 'border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/50'">
                         <input type="checkbox" name="anggota_ids[]" value="{{ $k->id }}" x-model.number="selected"
                                class="w-4 h-4 rounded border-slate-300 text-[#005c8a] focus:ring-[#005c8a]/30">
                         
-                        {{-- Candidate Avatar --}}
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition shadow-2xs"
-                             :class="isSelected({{ $k->id }}) ? 'bg-[#005c8a] text-white' : 'bg-slate-100 text-slate-700 group-hover:bg-slate-200'">
-                            {{ strtoupper(substr($k->nama_lengkap, 0, 1)) }}
+                        {{-- Candidate Avatar / Foto Profil --}}
+                        <div class="relative w-9 h-11 rounded-lg overflow-hidden border bg-slate-100 shrink-0 shadow-2xs transition"
+                             :class="isSelected({{ $k->id }}) ? 'border-[#005c8a] ring-2 ring-[#005c8a]/40' : 'border-slate-200 group-hover:border-slate-300'">
+                            <img src="{{ route('foto.anggota', $k) }}"
+                                 alt="{{ $k->nama_lengkap }}"
+                                 class="w-full h-full object-cover"
+                                 loading="lazy"
+                                 onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                            <div class="hidden w-full h-full flex items-center justify-center font-bold text-xs"
+                                 :class="isSelected({{ $k->id }}) ? 'bg-[#005c8a] text-white' : 'bg-slate-100 text-slate-700'">
+                                {{ strtoupper(substr($k->nama_lengkap, 0, 1)) }}
+                            </div>
                         </div>
 
                         {{-- Details --}}
@@ -129,9 +181,10 @@
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="font-bold text-slate-900 text-xs sm:text-sm truncate block">{{ $k->nama_lengkap }}</span>
                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">Aktif</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-[#005c8a] border border-sky-200 shrink-0">PCM {{ $k->pcm ?: $k->kecamatan }}</span>
                             </div>
                             <p class="text-xs text-slate-500 font-normal mt-0.5">
-                                {{ $k->desa_kelurahan }}, Kec. {{ $k->kecamatan }} &bull; NIK: <span class="font-mono text-slate-700 font-medium">{{ substr($k->nik, 0, 6) }}****</span>
+                                {{ $k->desa_kelurahan ? $k->desa_kelurahan . ', ' : '' }}Kec. {{ $k->kecamatan }} &bull; NIK: <span class="font-mono text-slate-700 font-medium">{{ substr($k->nik, 0, 6) }}****</span>
                             </p>
                         </div>
                     </label>
@@ -144,9 +197,13 @@
                         </div>
                         <h3 class="text-sm font-bold text-slate-800">Tidak ada kandidat kader yang ditemukan</h3>
                         <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto font-normal">
-                            Semua anggota aktif mungkin sudah terdaftar di kegiatan ini atau kata kunci pencarian tidak cocok.
+                            @if(!empty($cabang))
+                                Tidak ada anggota aktif di PCM {{ $cabang }} yang cocok atau semua sudah terdaftar di kegiatan ini.
+                            @else
+                                Semua anggota aktif mungkin sudah terdaftar di kegiatan ini atau kata kunci pencarian tidak cocok.
+                            @endif
                         </p>
-                        @if(!empty($query))
+                        @if(!empty($query) || !empty($cabang))
                         <a href="{{ route('admin.events.enroll', $event) }}" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-[#005c8a] hover:bg-sky-50 transition">
                             Tampilkan Semua Kandidat
                         </a>
@@ -154,6 +211,12 @@
                     </div>
                     @endforelse
                 </form>
+
+                @if($kandidat->hasPages())
+                <div class="px-5 py-3.5 border-t border-slate-200/80 bg-slate-50/60">
+                    {{ $kandidat->links() }}
+                </div>
+                @endif
             </div>
         </div>
 

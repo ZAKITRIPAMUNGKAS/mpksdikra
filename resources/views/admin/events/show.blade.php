@@ -3,7 +3,15 @@
 @section('title', 'Dashboard Pelatihan — ' . $event->nama_event)
 
 @section('content')
-<div class="space-y-3.5 sm:space-y-4" x-data="{ activeTab: '{{ request('tab', 'peserta') }}', modalSesi: false, editSesi: null, searchPeserta: '' }">
+<div class="space-y-3.5 sm:space-y-4" x-data="{ 
+    activeTab: '{{ in_array(request('tab'), ['evaluasi', 'cbt']) ? 'cbt' : (in_array(request('tab'), ['unduh_data', 'laporan']) ? 'laporan' : request('tab', 'peserta')) }}', 
+    subTabCbt: '{{ request('sub', 'tes') }}', 
+    subTabOutbound: 'regu', 
+    subTabLaporan: 'rekap', 
+    modalSesi: false, 
+    editSesi: null, 
+    searchPeserta: '' 
+}">
 
     {{-- 1. TOP BAR & BREADCRUMB COMPACT --}}
     <div class="flex items-center justify-between flex-wrap gap-2">
@@ -163,74 +171,79 @@
         </div>
     </div>
 
-    {{-- 4. KONTROL TABS TERPADU STICKY & KRONOLOGIS (LANGKAH 1 S.D. 6) --}}
+    {{-- WORKSPACE-STYLE HORIZONTAL MODULE NAVIGATION --}}
     <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
-        {{-- TAB HEADERS SESUAI URUTAN PELAKSANAAN DIBUAT STICKY AGAR ENAK DIPAKAI --}}
-        <div class="sticky top-2 z-20 border-b border-slate-200 bg-slate-50/95 backdrop-blur-md px-1.5 sm:px-3 flex gap-1 overflow-x-auto text-xs font-semibold scrollbar-none shadow-2xs">
-            {{-- Tab 1: Pendataan Peserta --}}
+        {{-- LEVEL 1: GLOBAL MODULE NAVIGATION (STICKY) --}}
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 sm:px-6 flex items-center gap-6 sm:gap-8 overflow-x-auto whitespace-nowrap scrollbar-none shadow-xs">
+            {{-- 1. Peserta --}}
             <button type="button" @click="activeTab = 'peserta'"
-                :class="activeTab === 'peserta' ? 'border-sky-600 text-sky-900 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'peserta' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700'">1</span>
-                <span>Pendataan Peserta</span>
-                <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'peserta' ? 'bg-sky-100 text-sky-800' : 'bg-slate-200 text-slate-600'">{{ $totalPeserta }}</span>
+                :class="(activeTab === 'peserta') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span>Peserta</span>
             </button>
 
-            {{-- Tab 2: Jadwal & Presensi (Absensi) --}}
+            {{-- 2. Sesi & Presensi --}}
             <button type="button" @click="activeTab = 'sesi'"
-                :class="activeTab === 'sesi' ? 'border-sky-600 text-sky-900 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'sesi' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700'">2</span>
-                <span>Jadwal &amp; Presensi</span>
-                <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'sesi' ? 'bg-sky-100 text-sky-800' : 'bg-slate-200 text-slate-600'">{{ $totalSesi }}</span>
+                :class="(activeTab === 'sesi') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Sesi &amp; Presensi</span>
             </button>
 
-            {{-- Tab 3: Keaktifan & Outbound --}}
+            {{-- 3. CBT & Asesmen --}}
+            <button type="button" @click="activeTab = 'cbt'"
+                :class="(activeTab === 'cbt' || activeTab === 'evaluasi') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                <span>CBT &amp; Asesmen</span>
+            </button>
+
+            {{-- 4. Keaktifan & Outbound --}}
             <button type="button" @click="activeTab = 'outbound'"
-                :class="activeTab === 'outbound' ? 'border-sky-600 text-sky-900 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'outbound' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700'">3</span>
+                :class="(activeTab === 'outbound') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
                 <span>Keaktifan &amp; Outbound</span>
-                @if($outboundKelompokCount > 0)
-                <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800">{{ $outboundKelompokCount }} Regu</span>
-                @endif
             </button>
 
-            {{-- Tab 4: Asesmen & Ujian CBT --}}
-            <button type="button" @click="activeTab = 'evaluasi'"
-                :class="activeTab === 'evaluasi' ? 'border-sky-600 text-sky-900 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'evaluasi' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700'">4</span>
-                <span>Asesmen &amp; CBT</span>
-                <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'evaluasi' ? 'bg-sky-100 text-sky-800' : 'bg-slate-200 text-slate-600'">{{ $posttestSelesaiCount }}/{{ $totalPeserta }}</span>
-            </button>
-
-            {{-- Tab 5: Rencana Tindak Lanjut (RTL) --}}
+            {{-- 5. RTL --}}
             <button type="button" @click="activeTab = 'rtl'"
-                :class="activeTab === 'rtl' ? 'border-sky-600 text-sky-900 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'rtl' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700'">5</span>
-                <span>Tugas Akhir RTL</span>
-                <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'rtl' ? 'bg-sky-100 text-sky-800' : 'bg-slate-200 text-slate-600'">{{ $rtlSelesaiCount }}</span>
+                :class="(activeTab === 'rtl') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>RTL</span>
             </button>
 
-            {{-- Tab 6: Rekapitulasi & Unduh Data --}}
-            <button type="button" @click="activeTab = 'unduh_data'"
-                :class="activeTab === 'unduh_data' ? 'border-emerald-600 text-emerald-950 bg-white shadow-2xs font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'"
-                class="py-2.5 px-2.5 sm:px-3 border-b-2 transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-t-lg ml-auto">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" :class="activeTab === 'unduh_data' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'">6</span>
-                <span class="text-emerald-700 font-bold">Rekap &amp; Unduh Data</span>
+            {{-- 6. Laporan --}}
+            <button type="button" @click="activeTab = 'laporan'"
+                :class="(activeTab === 'laporan' || activeTab === 'unduh_data') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Laporan</span>
             </button>
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 1: PENDATAAN PESERTA & ID CARD (LANGKAH 1)             --}}
+        {{-- PAGE TAB: PESERTA                                              --}}
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'peserta'" class="p-4 sm:p-5 space-y-4">
-            {{-- Header Tab 1 --}}
+            {{-- Header Tab Peserta --}}
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                 <div>
-                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">1. Pendataan Peserta &amp; Penugasan Instruktur</h2>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Peserta</h2>
                     <p class="text-xs text-slate-500 font-normal">Pendaftaran kader, penerbitan tanda peserta (ID Card), dan penetapan fasilitator pendamping.</p>
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap">
@@ -239,6 +252,17 @@
                         <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                         <span>Cetak ID Card Massal (A4)</span>
                     </a>
+                    @if($canManage)
+                    <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" onsubmit="return confirm('Kirim notifikasi pengingat kegiatan via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                            </svg>
+                            <span>Broadcast Pengingat WA</span>
+                        </button>
+                    </form>
+                    @endif
                     @endif
                     @if($canManage)
                     <a href="{{ route('admin.events.enroll', $event) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold transition shadow-2xs">
@@ -300,6 +324,16 @@
 
                         @if($canManage)
                         <div class="flex items-center gap-1 shrink-0">
+                            @if($p->anggota->no_wa)
+                            <form method="POST" action="{{ route('admin.events.peserta.remind-wa', [$event, $p]) }}">
+                                @csrf
+                                <button type="submit" title="Kirim Pengingat WA ke peserta ini" class="p-1 rounded-md border border-emerald-300 text-emerald-700 bg-emerald-50/60 hover:bg-emerald-100 text-xs font-semibold transition shadow-2xs">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    </svg>
+                                </button>
+                            </form>
+                            @endif
                             <a href="{{ route('admin.events.certificate', [$event, $p]) }}" class="px-2 py-1 rounded-md border border-slate-200 hover:bg-sky-50 hover:text-sky-900 text-xs font-semibold text-slate-700 transition shadow-2xs">
                                 Sertifikat
                             </a>
@@ -361,13 +395,13 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 2: JADWAL SESI & PRESENSI (LANGKAH 2)                  --}}
+        {{-- PAGE TAB: SESI & PRESENSI                                      --}}
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'sesi'" class="p-4 sm:p-5 space-y-3.5">
             <div class="flex items-center justify-between flex-wrap gap-2 pb-2.5 border-b border-slate-100">
                 <div>
-                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">2. Jadwal Acara, Berkas Modul &amp; Presensi (Absensi)</h2>
-                    <p class="text-xs text-slate-500">Agenda materi pelatihan, narasumber, berkas modul presentasi, dan pemindaian presensi QR.</p>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Sesi &amp; Presensi</h2>
+                    <p class="text-xs text-slate-500 font-normal">Agenda materi pelatihan, narasumber, berkas modul presentasi, dan pemindaian presensi QR.</p>
                 </div>
                 @if($canManage)
                 <button type="button" @click="modalSesi = true" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold shadow-2xs transition">
@@ -484,17 +518,260 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 3: KEAKTIFAN & OUTBOUND (LANGKAH 3)                    --}}
+        {{-- PAGE TAB 3: CBT & ASESMEN                                      --}}
         {{-- ============================================================== --}}
-        <div x-show="activeTab === 'outbound'" class="p-4 sm:p-5 space-y-4">
-            <div class="pb-2.5 border-b border-slate-100">
-                <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">3. Dinamika Kelompok Outbound &amp; Rekam Keaktifan Forum</h2>
-                <p class="text-xs text-slate-500 font-normal">Pembagian regu outbound yang berimbang dan pencatatan keikutsertaan aktif kader di setiap sesi perkaderan.</p>
+        <div x-show="activeTab === 'cbt' || activeTab === 'evaluasi'" class="p-4 sm:p-5 space-y-4">
+            {{-- Header Tab CBT & Asesmen --}}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">CBT &amp; Asesmen</h2>
+                    <p class="text-xs text-slate-500 font-normal">Evaluasi komprehensif kader: tes kognitif CBT, praktik psikomotorik, penilaian sikap afektif, dan pembobotan AHP–SAW.</p>
+                </div>
+                @php
+                    $tahapSelesai = 0;
+                    if ($pretestSelesaiCount > 0) $tahapSelesai++;
+                    if ($posttestSelesaiCount > 0) $tahapSelesai++;
+                    if ($psikomotorDinilaiCount > 0) $tahapSelesai++;
+                    if ($afektifSelesaiCount > 0) $tahapSelesai++;
+                @endphp
+                <div class="flex items-center gap-2.5">
+                    <div class="text-right">
+                        <span class="text-xs font-semibold text-slate-700 block">Progress Asesmen: {{ $tahapSelesai }} dari 4 tahapan aktif</span>
+                        <span class="text-[11px] text-slate-400 font-normal">{{ round(($tahapSelesai / 4) * 100) }}% kelengkapan instrumen</span>
+                    </div>
+                    <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden shrink-0 border border-slate-200/80">
+                        <div class="h-full bg-emerald-600 rounded-full transition-all duration-300" style="width: {{ ($tahapSelesai / 4) * 100 }}%"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-3.5">
-                {{-- Panel 1: Dinamika Kelompok Outbound --}}
-                <div class="bg-slate-50/60 rounded-xl border border-slate-200 p-4 space-y-3">
+            {{-- LEVEL 2: CBT & ASESMEN SUB-NAVIGATION --}}
+            <div class="border-b border-slate-200/90 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-none text-xs">
+                <button type="button" @click="subTabCbt = 'tes'"
+                    :class="subTabCbt === 'tes' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Pretest &amp; Posttest
+                </button>
+                <button type="button" @click="subTabCbt = 'psikomotor'"
+                    :class="subTabCbt === 'psikomotor' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Psikomotor
+                </button>
+                <button type="button" @click="subTabCbt = 'afektif'"
+                    :class="subTabCbt === 'afektif' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Afektif
+                </button>
+                <button type="button" @click="subTabCbt = 'angket'"
+                    :class="subTabCbt === 'angket' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Self Assessment
+                </button>
+                <button type="button" @click="subTabCbt = 'ahp_saw'"
+                    :class="subTabCbt === 'ahp_saw' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    AHP–SAW
+                </button>
+            </div>
+
+            {{-- SUB-TAB 1: PRETEST & POSTTEST --}}
+            <div x-show="subTabCbt === 'tes'" class="space-y-3">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs divide-y divide-slate-100 overflow-hidden">
+                    {{-- Pretest Kognitif --}}
+                    <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition duration-150">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                                CBT
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-slate-900 text-sm">Pretest Kognitif</h3>
+                                    @if($sesiPretest?->status === 'sedang_berlangsung' || $sesiPretest?->status === 'aktif')
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Sesi Aktif"></span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-slate-500">Evaluasi pemahaman awal sebelum pemaparan materi perkaderan</p>
+                                <div class="text-[11px] text-slate-600 pt-1 flex items-center gap-2 font-medium">
+                                    <span>{{ $pretestSelesaiCount }} dari {{ $totalPeserta }} peserta selesai</span>
+                                    <span class="text-slate-300">&bull;</span>
+                                    <span class="text-slate-500">{{ $soalPretestCount }} Soal CBT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shrink-0 flex items-center">
+                            <a href="{{ route('admin.events.soal.index', [$event, 'pretest']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
+                                <span>Kelola Pretest</span>
+                                <span class="text-sky-600">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Posttest Kognitif --}}
+                    <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition duration-150">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                                CBT
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-slate-900 text-sm">Posttest Kognitif</h3>
+                                    @if($sesiPosttest?->status === 'sedang_berlangsung' || $sesiPosttest?->status === 'aktif')
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Sesi Aktif"></span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-slate-500">Evaluasi pemahaman peserta setelah seluruh materi perkaderan selesai</p>
+                                <div class="text-[11px] text-slate-600 pt-1 flex items-center gap-2 font-medium">
+                                    <span>{{ $posttestSelesaiCount }} dari {{ $totalPeserta }} peserta selesai</span>
+                                    <span class="text-slate-300">&bull;</span>
+                                    <span class="text-slate-500">{{ $soalPosttestCount }} Soal CBT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shrink-0 flex items-center">
+                            <a href="{{ route('admin.events.soal.index', [$event, 'posttest']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
+                                <span>Kelola Posttest</span>
+                                <span class="text-sky-600">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SUB-TAB 2: PSIKOMOTOR --}}
+            <div x-show="subTabCbt === 'psikomotor'" class="space-y-3">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="font-bold text-slate-900 text-sm">Praktik Psikomotor &amp; Keterampilan</h3>
+                            <p class="text-xs text-slate-500">Penilaian praktik ibadah, keterampilan dakwah, khutbah, dan penugasan lapangan peserta</p>
+                            <div class="text-[11px] text-slate-600 pt-1 flex items-center gap-2 font-medium">
+                                <span>{{ $psikomotorDinilaiCount }} dari {{ $totalPeserta }} peserta dinilai</span>
+                                <span class="text-slate-300">&bull;</span>
+                                <span class="text-slate-500">{{ $psikomotorTemplateCount }} rubrik penilaian aktif</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shrink-0 flex items-center">
+                        <a href="{{ route('admin.events.psikomotor', $event) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs transition">
+                            <span>Input Nilai Praktik</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SUB-TAB 3: AFEKTIF --}}
+            <div x-show="subTabCbt === 'afektif'" class="space-y-3">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-800 border border-purple-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="font-bold text-slate-900 text-sm">Penilaian Sikap Afektif</h3>
+                            <p class="text-xs text-slate-500">Observasi kedisiplinan, integritas, akhlak, dan kepatuhan ibadah kader selama karantina perkaderan</p>
+                            <div class="text-[11px] text-slate-600 pt-1 flex items-center gap-2 font-medium">
+                                <span>{{ $afektifSelesaiCount }} dari {{ $totalPeserta }} peserta terobservasi</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shrink-0 flex items-center">
+                        <a href="{{ route('admin.events.afektif', $event) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-2xs transition">
+                            <span>Input Nilai Sikap</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SUB-TAB 4: SELF ASSESSMENT (ANGKET EVALUASI) --}}
+            <div x-show="subTabCbt === 'angket'" class="space-y-3">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="font-bold text-slate-900 text-sm">Self Assessment &amp; Angket Evaluasi</h3>
+                            <p class="text-xs text-slate-500">Evaluasi mandiri peserta dan feedback komprehensif terhadap materi, narasumber, serta fasilitas Baitul Arqam</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 flex items-center">
+                        <a href="{{ route('admin.events.angket', $event) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
+                            <span>Kelola Angket Evaluasi</span>
+                            <span class="text-sky-600">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SUB-TAB 5: AHP-SAW --}}
+            <div x-show="subTabCbt === 'ahp_saw'" class="space-y-3">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="font-bold text-slate-900 text-sm">Metode Keputusan AHP–SAW</h3>
+                            <p class="text-xs text-slate-500">Kombinasi Analytical Hierarchy Process (bobot kriteria kognitif, afektif, psikomotor, presensi, keaktifan) &amp; Simple Additive Weighting (perankingan kelulusan).</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 flex items-center">
+                        <a href="{{ route('admin.events.ranking', $event) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-2xs transition">
+                            <span>Buka Matriks &amp; Ranking</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ============================================================== --}}
+        {{-- PAGE TAB 4: KEAKTIFAN & OUTBOUND                               --}}
+        {{-- ============================================================== --}}
+        <div x-show="activeTab === 'outbound'" class="p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Keaktifan &amp; Outbound</h2>
+                    <p class="text-xs text-slate-500 font-normal">Pembagian regu outbound yang berimbang dan pencatatan keikutsertaan aktif kader di setiap sesi perkaderan.</p>
+                </div>
+            </div>
+
+            {{-- LEVEL 2: KEAKTIFAN & OUTBOUND SUB-NAVIGATION --}}
+            <div class="border-b border-slate-200/90 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-none text-xs">
+                <button type="button" @click="subTabOutbound = 'regu'"
+                    :class="subTabOutbound === 'regu' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Regu Outbound
+                </button>
+                <button type="button" @click="subTabOutbound = 'keaktifan'"
+                    :class="subTabOutbound === 'keaktifan' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Poin Keaktifan Forum
+                </button>
+            </div>
+
+            {{-- SUB-TAB 1: REGU OUTBOUND --}}
+            <div x-show="subTabOutbound === 'regu'" class="space-y-3">
+                <div class="bg-slate-50/60 rounded-xl border border-slate-200 p-4 sm:p-5 space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-xs font-semibold">
                             <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -503,7 +780,7 @@
                         <span class="text-xs font-bold text-slate-700">{{ $outboundKelompokCount }} Kelompok Terbentuk</span>
                     </div>
 
-                    <p class="text-xs text-slate-600 leading-relaxed">
+                    <p class="text-xs text-slate-600 leading-relaxed max-w-2xl">
                         Sistem membagi kader ke dalam regu outbound secara otomatis dengan menyeimbangkan rasio gender (putra/putri) dan asal cabang PCM untuk membangun ukhuwah persyarikatan.
                     </p>
 
@@ -520,9 +797,11 @@
                         @endif
                     </div>
                 </div>
+            </div>
 
-                {{-- Panel 2: Poin Keaktifan Peserta --}}
-                <div class="bg-slate-50/60 rounded-xl border border-slate-200 p-4 space-y-3">
+            {{-- SUB-TAB 2: POIN KEAKTIFAN FORUM --}}
+            <div x-show="subTabOutbound === 'keaktifan'" class="space-y-3">
+                <div class="bg-slate-50/60 rounded-xl border border-slate-200 p-4 sm:p-5 space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-900 border border-sky-200 text-xs font-semibold">
                             <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
@@ -531,8 +810,8 @@
                         <span class="text-xs font-bold text-slate-700">{{ $keaktifanCount }} Aksi Dicatat</span>
                     </div>
 
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Fasilitator mencatat keikutsertaan aktif kader di setiap sesi: bertanya, menjawab, kultum, imam, adzan, dan prestasi regu outbound (1 poin/aksi, terkap bonus maks 10 poin).
+                    <p class="text-xs text-slate-600 leading-relaxed max-w-2xl">
+                        Fasilitator mencatat keikutsertaan aktif kader di setiap sesi: bertanya, menjawab, kultum, imam, adzan, dan dinamika keaktifan forum (1 poin/aksi, terkap bonus maks 10 poin).
                     </p>
 
                     <div class="pt-1">
@@ -546,94 +825,13 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 4: ASESMEN & UJIAN CBT (LANGKAH 4)                     --}}
-        {{-- ============================================================== --}}
-        <div x-show="activeTab === 'evaluasi'" class="p-4 sm:p-5 space-y-4">
-            <div class="pb-2.5 border-b border-slate-100">
-                <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">4. Asesmen Kompetensi (Kognitif, Praktik Psikomotor &amp; Afektif)</h2>
-                <p class="text-xs text-slate-500 font-normal">Evaluasi penguasaan materi (Pretest &amp; Posttest), penilaian praktik ibadah/akhlak lapangan, dan angket evaluasi.</p>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {{-- 1. Pretest CBT --}}
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-bold text-slate-900">Pretest Kognitif</span>
-                            <span class="px-2 py-0.2 rounded text-[10px] font-semibold {{ ($sesiPretest?->status === 'sedang_berlangsung' || $sesiPretest?->status === 'aktif') ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600' }}">
-                                {{ ($sesiPretest?->status === 'sedang_berlangsung' || $sesiPretest?->status === 'aktif') ? 'Aktif' : 'Tutup' }}
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">{{ $soalPretestCount }} Soal &bull; Selesai: <b>{{ $pretestSelesaiCount }}/{{ $totalPeserta }}</b></p>
-                    </div>
-                    <a href="{{ route('admin.events.soal.index', [$event, 'pretest']) }}" class="w-full text-center py-1.5 px-2 bg-white hover:bg-sky-50 text-sky-800 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                        Kelola Soal Pretest &rarr;
-                    </a>
-                </div>
-
-                {{-- 2. Posttest CBT --}}
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-bold text-slate-900">Posttest Kognitif</span>
-                            <span class="px-2 py-0.2 rounded text-[10px] font-semibold {{ ($sesiPosttest?->status === 'sedang_berlangsung' || $sesiPosttest?->status === 'aktif') ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600' }}">
-                                {{ ($sesiPosttest?->status === 'sedang_berlangsung' || $sesiPosttest?->status === 'aktif') ? 'Aktif' : 'Tutup' }}
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">{{ $soalPosttestCount }} Soal &bull; Selesai: <b>{{ $posttestSelesaiCount }}/{{ $totalPeserta }}</b></p>
-                    </div>
-                    <a href="{{ route('admin.events.soal.index', [$event, 'posttest']) }}" class="w-full text-center py-1.5 px-2 bg-white hover:bg-sky-50 text-sky-800 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                        Kelola Soal Posttest &rarr;
-                    </a>
-                </div>
-
-                {{-- 3. Praktik Psikomotor --}}
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-bold text-slate-900">Praktik Psikomotor</span>
-                            <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                                {{ $psikomotorTemplateCount }} Rubrik
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">Ibadah &bull; Dinilai: <b>{{ $psikomotorDinilaiCount }}/{{ $totalPeserta }}</b></p>
-                    </div>
-                    <a href="{{ route('admin.events.psikomotor', $event) }}" class="w-full text-center py-1.5 px-2 bg-white hover:bg-sky-50 text-sky-800 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                        Input Nilai Praktik &rarr;
-                    </a>
-                </div>
-
-                {{-- 4. Afektif & Angket --}}
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-bold text-slate-900">Afektif &amp; Angket</span>
-                            <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-sky-100 text-sky-800">
-                                Sikap
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-500">Survei &bull; Mengisi: <b>{{ $afektifSelesaiCount }}/{{ $totalPeserta }}</b></p>
-                    </div>
-                    <div class="flex gap-1.5">
-                        <a href="{{ route('admin.events.afektif', $event) }}" class="w-1/2 text-center py-1.5 px-1 bg-white hover:bg-sky-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                            Afektif
-                        </a>
-                        <a href="{{ route('admin.events.angket', $event) }}" class="w-1/2 text-center py-1.5 px-1 bg-white hover:bg-sky-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                            Angket
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- ============================================================== --}}
-        {{-- PAGE TAB 5: TUGAS AKHIR RTL (LANGKAH 5)                         --}}
+        {{-- PAGE TAB 5: RTL                                                --}}
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'rtl'" class="p-4 sm:p-5 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-slate-100">
                 <div>
-                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">5. Penugasan Rencana Tindak Lanjut (RTL)</h2>
-                    <p class="text-xs text-slate-500 font-normal">Monitoring penugasan rencana aksi paska pelatihan untuk mengabdi di Cabang, Ranting, atau AUM.</p>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">RTL</h2>
+                    <p class="text-xs text-slate-500 font-normal">Rencana Tindak Lanjut Peserta — Monitoring penugasan rencana aksi paska pelatihan untuk mengabdi di Cabang, Ranting, atau AUM.</p>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
                     @if($canManage)
@@ -692,112 +890,38 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 6: REKAPITULASI & UNDUH DATA (LANGKAH 6)               --}}
+        {{-- PAGE TAB 6: LAPORAN                                            --}}
         {{-- ============================================================== --}}
-        <div x-show="activeTab === 'unduh_data'" class="p-4 sm:p-5 space-y-4">
-            <div class="pb-2.5 border-b border-slate-100">
-                <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">6. Rekapitulasi Akhir, Kelulusan &amp; Unduh Dokumen Resmi</h2>
-                <p class="text-xs text-slate-500 font-normal">Pengolahan nilai akhir terpadu, penetapan status kelulusan peserta, dan penerbitan dokumen resmi berkop MPKSDI.</p>
-            </div>
-
-            {{-- 6 Kartu Unduhan & Presentasi Utama Ramping --}}
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-                {{-- Live PPT / Slideshow Evaluasi --}}
-                <div class="p-3.5 rounded-xl border border-amber-300 bg-gradient-to-br from-amber-50/70 to-amber-100/40 flex flex-col justify-between space-y-2.5 shadow-2xs">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-950">
-                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                                <span>Live PPT / Slideshow</span>
-                            </span>
-                            <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-200 text-amber-900 border border-amber-300">Live</span>
-                        </div>
-                        <p class="text-[11px] text-slate-700 mt-1">Presentasi interaktif 16:9 layar penuh untuk penutupan &amp; yudisium. Mendukung remote clicker PPT &amp; ekspor PDF.</p>
-                    </div>
-                    <a href="{{ route('admin.events.presentasi', $event) }}" target="_blank" class="w-full text-center py-1.5 px-2 bg-gradient-to-r from-amber-500 to-[#f8bb00] hover:from-amber-600 hover:to-amber-500 text-slate-950 font-bold rounded-lg text-xs shadow-xs transition flex items-center justify-center gap-1.5">
-                        <span>Buka Live PPT</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                </div>
-
-                {{-- Berita Acara Yudisium PDF --}}
-                <div class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/40 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold text-rose-950">
-                            <svg class="w-4 h-4 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Berita Acara Yudisium</span>
-                        </span>
-                        <p class="text-[11px] text-slate-600 mt-0.5">Dokumen legalitas sidang pleno kelulusan resmi ber-kop PDM, statistik kelulusan, &amp; 3 tanda tangan.</p>
-                    </div>
-                    <a href="{{ route('admin.events.berita-acara', $event) }}" target="_blank" class="w-full text-center py-1.5 px-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
-                        Cetak Berita Acara
-                    </a>
-                </div>
-
-                {{-- Cetak Semua Sertifikat Massal --}}
-                <div class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/40 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold text-indigo-900">
-                            <svg class="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                            <span>Sertifikat Resmi 2 Sisi</span>
-                        </span>
-                        <p class="text-[11px] text-slate-600 mt-0.5">Unduh seluruh sertifikat kader lulus sekaligus dalam 1 PDF (Hal 1: Sertifikat QR; Hal 2: Transkrip JP).</p>
-                    </div>
-                    @if($event->status === 'selesai')
-                    <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-1.5 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
-                        Unduh Batch Sertifikat (PDF)
-                    </a>
-                    @else
-                    <span class="w-full text-center py-1.5 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
-                        Tersedia Saat Status Selesai
-                    </span>
-                    @endif
-                </div>
-
-                {{-- Laporan Evaluasi PDF --}}
-                <div class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/40 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold text-sky-900">
-                            <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Laporan Evaluasi (PDF)</span>
-                        </span>
-                        <p class="text-[11px] text-slate-600 mt-0.5">Laporan resmi berkop PDM Karanganyar, metadata, rekapitulasi 14 kolom, &amp; lembar tanda tangan.</p>
-                    </div>
-                    <a href="{{ route('admin.events.report', $event) }}" class="w-full text-center py-1.5 px-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
-                        Unduh Laporan PDF
-                    </a>
-                </div>
-
-                {{-- Ekspor Excel --}}
-                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/40 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-900">
-                            <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            <span>Ekspor Data Lengkap (Excel)</span>
-                        </span>
-                        <p class="text-[11px] text-slate-600 mt-0.5">Spreadsheet XLSX terformat rapi memuat rincian aspek nilai, presensi %, NA, dan ranking.</p>
-                    </div>
-                    <a href="{{ route('admin.events.exportExcel', $event) }}" class="w-full text-center py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
-                        Unduh Excel (XLSX)
-                    </a>
-                </div>
-
-                {{-- Halaman Ranking Interaktif --}}
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-2.5">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-900">
-                            <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                            <span>Tabel Ranking Penuh</span>
-                        </span>
-                        <p class="text-[11px] text-slate-600 mt-0.5">Buka halaman rekapitulasi ranking nilai penuh beserta aksi cetak sertifikat perorangan.</p>
-                    </div>
-                    <a href="{{ route('admin.events.ranking', $event) }}" class="w-full text-center py-1.5 px-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-semibold transition shadow-2xs">
-                        Buka Halaman Ranking &rarr;
-                    </a>
+        <div x-show="activeTab === 'laporan' || activeTab === 'unduh_data'" class="p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Laporan</h2>
+                    <p class="text-xs text-slate-500 font-normal">Pengolahan nilai akhir terpadu, penetapan status kelulusan peserta, dan penerbitan dokumen resmi berkop MPKSDI.</p>
                 </div>
             </div>
 
-            {{-- Leaderboard Teratas (Top 5 Peserta) Card --}}
+            {{-- LEVEL 2: LAPORAN SUB-NAVIGATION --}}
+            <div class="border-b border-slate-200/90 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-none text-xs">
+                <button type="button" @click="subTabLaporan = 'rekap'"
+                    :class="subTabLaporan === 'rekap' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Rekap
+                </button>
+                <button type="button" @click="subTabLaporan = 'export'"
+                    :class="subTabLaporan === 'export' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Export Data
+                </button>
+                <button type="button" @click="subTabLaporan = 'dokumen'"
+                    :class="subTabLaporan === 'dokumen' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer">
+                    Laporan &amp; Dokumen Resmi
+                </button>
+            </div>
+
+                        {{-- SUB-TAB 1: REKAP --}}
+            <div x-show="subTabLaporan === 'rekap'" class="space-y-4">
+                {{-- Leaderboard Teratas (Top 5 Peserta) Card --}}
             <div class="bg-slate-50/70 rounded-xl border border-slate-200/90 p-3.5 sm:p-4">
                 <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-200/80">
                     <div>
@@ -863,6 +987,7 @@
                                 <th class="py-2 px-2 text-center">Presensi</th>
                                 <th class="py-2 px-3 text-center">NA</th>
                                 <th class="py-2 px-3">Status Kelulusan</th>
+                                <th class="py-2 px-2 text-center">Grade</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -884,14 +1009,131 @@
                                         {{ $r->status_kelulusan ?? '-' }}
                                     </span>
                                 </td>
+                                <td class="py-2 px-2 text-center">
+                                    @if($r->grade)
+                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black
+                                        {{ $r->grade === 'A' ? 'bg-sky-100 text-sky-800 border border-sky-300' : '' }}
+                                        {{ $r->grade === 'B' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
+                                        {{ $r->grade === 'C' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}">
+                                        {{ $r->grade }}
+                                    </span>
+                                    @else
+                                        <span class="text-slate-300 text-[10px]">-</span>
+                                    @endif
+                                </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="9" class="py-6 text-center text-slate-400 text-xs">Belum ada data nilai akhir yang terhitung.</td>
+                                <td colspan="10" class="py-6 text-center text-slate-400 text-xs">Belum ada data nilai akhir yang terhitung.</td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+            </div>
+            </div>
+
+            {{-- SUB-TAB 2: EXPORT DATA --}}
+            <div x-show="subTabLaporan === 'export'" class="space-y-4">
+                <div class="grid sm:grid-cols-2 gap-3.5">
+                    {{-- Ekspor Excel --}}
+                    <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900">
+                                <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span>Ekspor Data Lengkap (Excel)</span>
+                            </span>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Spreadsheet XLSX terformat rapi memuat rincian aspek nilai, presensi %, nilai akhir, dan peringkat seluruh kader.</p>
+                        </div>
+                        <a href="{{ route('admin.events.exportExcel', $event) }}" class="w-full text-center py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
+                            Unduh Excel (XLSX)
+                        </a>
+                    </div>
+
+                    {{-- Laporan Evaluasi PDF --}}
+                    <div class="p-4 rounded-xl border border-sky-200 bg-sky-50/40 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-900">
+                                <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Laporan Evaluasi Lengkap (PDF)</span>
+                            </span>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Laporan resmi berkop PDM Karanganyar, metadata penyelenggaraan, rekapitulasi 14 kolom, dan lembar pengesahan tanda tangan.</p>
+                        </div>
+                        <a href="{{ route('admin.events.report', $event) }}" class="w-full text-center py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
+                            Unduh Laporan PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SUB-TAB 3: LAPORAN & DOKUMEN RESMI --}}
+            <div x-show="subTabLaporan === 'dokumen'" class="space-y-4">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    {{-- Live PPT / Slideshow Evaluasi --}}
+                    <div class="p-4 rounded-xl border border-amber-300 bg-gradient-to-br from-amber-50/70 to-amber-100/40 flex flex-col justify-between space-y-3 shadow-2xs">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-950">
+                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                                    <span>Live PPT / Slideshow</span>
+                                </span>
+                                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-200 text-amber-900 border border-amber-300">Live</span>
+                            </div>
+                            <p class="text-[11px] text-slate-700 mt-1">Presentasi interaktif 16:9 layar penuh untuk penutupan &amp; yudisium. Mendukung remote clicker PPT &amp; ekspor PDF.</p>
+                        </div>
+                        <a href="{{ route('admin.events.presentasi', $event) }}" target="_blank" class="w-full text-center py-2 px-2 bg-gradient-to-r from-amber-500 to-[#f8bb00] hover:from-amber-600 hover:to-amber-500 text-slate-950 font-bold rounded-lg text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+                            <span>Buka Live PPT</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+
+                    {{-- Berita Acara Yudisium PDF --}}
+                    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/40 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-rose-950">
+                                <svg class="w-4 h-4 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Berita Acara Yudisium</span>
+                            </span>
+                            <p class="text-[11px] text-slate-600 mt-1">Dokumen legalitas sidang pleno kelulusan resmi berkop PDM, statistik kelulusan, &amp; 3 tanda tangan.</p>
+                        </div>
+                        <a href="{{ route('admin.events.berita-acara', $event) }}" target="_blank" class="w-full text-center py-2 px-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
+                            Cetak Berita Acara
+                        </a>
+                    </div>
+
+                    {{-- Cetak Semua Sertifikat Massal --}}
+                    <div class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/40 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-indigo-900">
+                                <svg class="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
+                                <span>Sertifikat Resmi 2 Sisi</span>
+                            </span>
+                            <p class="text-[11px] text-slate-600 mt-1">Unduh seluruh sertifikat kader lulus sekaligus dalam 1 PDF (Hal 1: Sertifikat QR; Hal 2: Transkrip JP).</p>
+                        </div>
+                        @if($event->status === 'selesai')
+                        <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
+                            Unduh Batch Sertifikat
+                        </a>
+                        @else
+                        <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
+                            Status Selesai Diperlukan
+                        </span>
+                        @endif
+                    </div>
+
+                    {{-- Halaman Ranking Interaktif --}}
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-900">
+                                <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                <span>Tabel Ranking Penuh</span>
+                            </span>
+                            <p class="text-[11px] text-slate-600 mt-1">Buka halaman rekapitulasi ranking nilai penuh beserta aksi cetak sertifikat perorangan.</p>
+                        </div>
+                        <a href="{{ route('admin.events.ranking', $event) }}" class="w-full text-center py-2 px-2 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-semibold transition shadow-2xs">
+                            Buka Halaman Ranking &rarr;
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

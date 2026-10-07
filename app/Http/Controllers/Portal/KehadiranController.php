@@ -8,14 +8,17 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
 use App\Models\Keaktifan;
+use App\Services\ImageCutoutService;
 use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class KehadiranController extends Controller
 {
-    public function __construct(private readonly QrService $qr) {}
+    public function __construct(
+        private readonly QrService $qr,
+        private readonly ImageCutoutService $cutout
+    ) {}
 
     public function index(Event $event): View
     {
@@ -47,13 +50,13 @@ class KehadiranController extends Controller
         $qrPng = $this->qr->qrPngDataUri($ep);
 
         $fotoDataUri = null;
-        if ($ep->anggota->foto && Storage::disk('local')->exists($ep->anggota->foto)) {
-            $mime = Storage::disk('local')->mimeType($ep->anggota->foto) ?: 'image/jpeg';
-            $content = Storage::disk('local')->get($ep->anggota->foto);
-            $fotoDataUri = 'data:'.$mime.';base64,'.base64_encode($content);
+        if ($ep->anggota->foto) {
+            $fotoDataUri = $this->cutout->getCutoutDataUriForStorageFile($ep->anggota->foto);
         }
+        $fotoDataUri = $fotoDataUri ?: $this->cutout->getDefaultPhotoDataUri();
 
-        $pdf = Pdf::loadView('portal.idcard-pdf', compact('event', 'ep', 'qrPng', 'fotoDataUri'));
+        $pdf = Pdf::loadView('portal.idcard-pdf', compact('event', 'ep', 'qrPng', 'fotoDataUri'))
+            ->setPaper([0, 0, 265.75, 383.75], 'portrait');
 
         return $pdf->download('id-card-'.str($ep->anggota->nama_lengkap)->slug().'.pdf');
     }

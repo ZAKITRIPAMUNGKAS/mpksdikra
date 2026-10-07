@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\Event;
 use App\Models\EventSesi;
 use App\Services\AbsensiService;
+use App\Services\NilaiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,10 @@ class AbsensiController extends Controller
             abort(403);
         }
 
-        return view('admin.absensi.scan', compact('event', 'sesi'));
+        $totalPeserta = $event->pesertaAktif()->count();
+        $totalHadir = Absensi::where('sesi_id', $sesi->id)->count();
+
+        return view('admin.absensi.scan', compact('event', 'sesi', 'totalPeserta', 'totalHadir'));
     }
 
     public function process(Request $request): JsonResponse
@@ -63,16 +67,21 @@ class AbsensiController extends Controller
         $records = Absensi::where('sesi_id', $sesi->id)
             ->with('anggota:id,nama_lengkap')
             ->latest('waktu_scan')
-            ->limit(20)
+            ->limit(50)
             ->get()
             ->map(fn ($a) => [
                 'id' => $a->id,
                 'nama' => $a->anggota->nama_lengkap,
-                'waktu' => $a->waktu_scan->format('H:i:s'),
+                'waktu' => $a->waktu_scan->format('H:i'),
                 'metode' => $a->metode,
             ]);
 
-        return response()->json(['records' => $records]);
+        $total = Absensi::where('sesi_id', $sesi->id)->count();
+
+        return response()->json([
+            'records' => $records,
+            'total' => $total,
+        ]);
     }
 
     public function cetakLembar(Event $event, EventSesi $sesi)
@@ -93,5 +102,23 @@ class AbsensiController extends Controller
         $slug = Str::slug($event->nama_event);
 
         return $pdf->download("lembar-presensi-{$slug}-sesi-{$sesi->urutan}.pdf");
+    }
+
+    public function destroy(Event $event, EventSesi $sesi, Absensi $absensi): JsonResponse
+    {
+        if ((int) $sesi->event_id !== (int) $event->id || (int) $absensi->sesi_id !== (int) $sesi->id) {
+            abort(403);
+        }
+
+        $anggotaId = (int) $absensi->anggota_id;
+        $absensi->delete();
+
+        $this->absensi->recalculateAttendance($event->id, $anggotaId);
+        app(NilaiService::class)->hitungUlangPeserta($event, $anggotaId);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Presensi berhasil dibatalkan.',
+        ]);
     }
 }

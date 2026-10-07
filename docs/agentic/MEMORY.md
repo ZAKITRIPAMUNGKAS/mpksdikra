@@ -36,12 +36,216 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (165 test hijau per 2026-10-03).
+- `php artisan test` — PHPUnit feature tests (173 test hijau per 2026-10-04).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-07: Redesign Global Navigasi Event Menjadi Workspace-Style Horizontal Navigation (`show.blade.php`):
+  1. **Transformasi Arsitektur Navigasi**:
+     - Menggantikan pola wizard/stepper bernomor lama (`1. Pendataan`, `2. Jadwal`, dst.) menjadi **Workspace-Style Horizontal Navigation** ala enterprise modern yang sticky di bagian atas halaman detail event.
+     - Struktur bertingkat hierarkis (Level 1: 6 Modul Utama, Level 2: Sub-Navigasi per modul aktif) untuk memangkas cognitive load admin.
+  2. **Level 1 (Global Horizontal Module Navigation)**:
+     - Urutan wajib 6 modul utama:
+       1. `Peserta` (daftar peserta, registrasi, kuota, detail)
+       2. `Sesi & Presensi` (jadwal kegiatan, kehadiran, attendance display)
+       3. `CBT & Asesmen` (ditempatkan sebelum Keaktifan & Outbound)
+       4. `Keaktifan & Outbound` (ditempatkan sesudah CBT & Asesmen)
+       5. `RTL` (Rencana Tindak Lanjut)
+       6. `Laporan` (rekap, ekspor data, dokumen resmi)
+     - Desain visual: Underline indicator 2–3px `#063A60`, font weight 600 saat aktif, neutral slate 450–500 saat inaktif, tanpa nomor urut, tanpa pill besar, tanpa rounded badge sembarangan, sticky `top-0 z-30` dengan overflow-x horizontal scrollable.
+  3. **Level 2 (Secondary Sub-Navigation)**:
+     - **CBT & Asesmen**: 5 Sub-tabs (`Pretest & Posttest`, `Psikomotor`, `Afektif`, `Self Assessment`, `AHP–SAW`).
+     - **Keaktifan & Outbound**: 2 Sub-tabs (`Regu Outbound`, `Poin Keaktifan Forum`).
+     - **RTL**: Header bersih tanpa sub-tab berlebih, subtitle penugasan paska pelatihan.
+     - **Laporan**: 3 Sub-tabs (`Rekap`, `Export Data`, `Laporan & Dokumen Resmi`).
+  4. **Integritas Sistem**:
+     - 100% routes, permissions, data binding, modal Alpine.js, dan fungsionalitas backend dipertahankan tanpa regresi.
+     - Verifikasi automated test PHPUnit (`AbsensiTest`, `AdminEventFlowTest`) dan build Vite lulus 100%.
+
+- 2026-10-07: Redesign Menyeluruh Live Attendance Display (`scan.blade.php`) & Penataan Ulang Tab Stepper Asesmen & CBT (`show.blade.php`):
+  1. **Redesign Halaman Presensi / Scanner (`resources/views/admin/absensi/scan.blade.php`)**:
+     - Ditransformasikan dari tampilan dashboard admin 50:50 konfigurasional menjadi **Digital Attendance Display / Check-in Screen 16:9** yang dioptimalkan untuk proyektor/TV di depan ruangan Baitul Arqam (jarak pandang audiens beberapa meter).
+     - **Elemen Tidak Relevan Dihapus**: Menghilangkan tombol cetak PDF, badge teknis (Scanner Aktif/Online), kotak preview QR gelap, instruksi USB barcode, card-card kecil admin, tombol submit "Proses Presensi", dan aksi delete/edit individu di layar publik.
+     - **Alur Scanner Tanpa Klik**: Scanner barcode USB/Bluetooth bertindak sebagai keyboard input yang langsung mentrigger validasi saat mengirimkan `Enter`. Input field berukuran besar (56–64px, 18–20px font) dengan autofocus bawaan, auto-refocus saat blur atau klik layar, dan pembersihan otomatis tanpa tombol submit.
+     - **Success State Sangat Menonjol**: Confirmation panel/overlay besar di tengah layar (durasi 3.5 detik) dengan nama peserta raksasa (36–48px), tanda checkmark hijau tenang `#0D7A5F`, judul sesi, dan waktu presensi. Otomatis kembali ke scanner input.
+     - **Penanganan Duplicate Lembut**: Banner amber/orange subtle (*"PRESENSI SUDAH TERCATAT"*, waktu terakhir tercatat) tanpa error merah agresif.
+     - **Invalid State Ringan**: Alert merah subtle (*"QR CODE TIDAK DIKENALI"*, auto-refocus 2.5s).
+     - **Live Attendance List 3 Kolom**: Menampilkan waktu (`09:12`), nama peserta, dan status `Berhasil ✓`. Terurut terbaru di atas dengan highlight hijau lembut 1.5 detik pada peserta baru. Empty state berbobot tipis tanpa card raksasa.
+     - **Fitur Proyektor**: Jam digital real-time, toggle layar penuh (Fullscreen F11 API), dan watermark tipis motif geometris Muhammadiyah (opacity 2.5%).
+  2. **Penataan Stepper Kronologis & Tab Asesmen & CBT (`resources/views/admin/events/show.blade.php`)**:
+     - **Urutan Kronologis Stepper**:
+       1. Pendataan Peserta
+       2. Jadwal & Presensi
+       3. **Asesmen & CBT** (*dipindah sebelum Keaktifan & Outbound*)
+       4. **Keaktifan & Outbound** (*dipindah sesudah Asesmen & CBT*)
+       5. Tugas Akhir RTL
+       6. Rekap & Unduh Data
+     - **Redesign Tab Asesmen & CBT**:
+       - Mengganti layout 4 card paralel menjadi **SATU container putih tenang (`bg-white rounded-xl border border-slate-200/90 shadow-2xs divide-y divide-slate-100`)**.
+       - Menampilkan 4 alur tahapan bernomor vertikal (`01 Pretest Kognitif`, `02 Posttest Kognitif`, `03 Praktik Psikomotor`, `04 Afektif & Evaluasi`).
+       - Header tab menyertakan indikator progress instrumen aktif/selesai dengan mini progress bar.
+       - Progressive disclosure untuk Afektif & Evaluasi via menu dropdown terpadu (*"Penilaian Sikap Afektif"* & *"Angket Evaluasi Kegiatan"*).
+       - Menghilangkan badge status berisik ("Tutup", "0 Rubrik", "Sikap") dan menggantinya dengan teks status tenang berbobot proporsional.
+  3. **Verifikasi**:
+     - `php artisan test tests/Feature/AbsensiTest.php tests/Feature/AdminEventFlowTest.php` lulus 100% (17 passed, 51 assertions).
+     - `vendor/bin/pint --test` lulus tanpa pelanggaran style formatting.
+
+- 2026-10-07: Penyempurnaan Tuntas Cutout Pasfoto ID Card (Eliminasi Wajah/Mata/Jilbab Bolong & Kotak Border 1px):
+  1. **Akar Masalah**:
+     - Pada foto kader berlatar belakang studio cokelat/beige muda dengan jilbab berwarna senada (misal Novi Kartikasari, `kader-18.jpg`), algoritma flood-fill sebelumnya dengan toleransi statis 38 menembus jilbab, pipi kanan, dan bola mata sehingga motif gedung/kuning Layer 1 tembus pandang ke wajah peserta.
+     - Pembagian grid kolase foto (`foto1.png`, `foto2.png`) sebelumnya menyisakan 1px garis pembatas putih di sisi atas dan kiri, yang tidak terhapus dan tampak sebagai garis kotak bingkai persegi tipis di atas gedung ID Card.
+     - Bagian bawah dada/baju terpotong flat di atas kurva putih foreground Layer 3.
+  2. **Solusi & Rekayasa Presisi**:
+     - `app/Services/ImageCutoutService.php`:
+       * Menambahkan *Automatic Border Artifact Trimming*: mendeteksi kontras tepi 1-2px dari grid divider dan memangkasnya otomatis.
+       * *Face & Inner Head Protection Shield*: perlindungan elips area wajah inti (`x=0.50w, y=0.42h, rx=0.24w, ry=0.25h`) dan proteksi tubuh tengah bawah (`y>=0.70h, x=0.18w..0.82w`) sehingga mata, hidung, pipi, bibir, dan dada TIDAK PERNAH bisa termakan transparansi.
+       * *Weighted Color Separation*: pembobotan kanal Blue (1.5x) yang membedakan kertas studio bersuhu hangat (yellowish) dengan jilbab/busana bersuhu dingin (cool mauve/grey).
+       * *Tolerance Calibration*: toleransi terkalibrasi aman ke 15-16, mencegah kebocoran warna.
+       * *Soft Silhouette Anti-Aliasing*: transparansi tepi semi-transparan (alpha 36-40) sehingga kontur rambut/jilbab/bahu halus tanpa efek tangga bergerigi.
+       * *Soft Bottom Gradient Fade*: gradien transparansi lembut pada 10% terbawah foto sehingga baju menyatu alami dengan kurva foreground kartu.
+     - `database/seeders/DemoDataSeeder.php`: ekstraksi grid 20 pasfoto diperbarui dengan margin inset +3px sehingga seluruh foto profil kader bebas dari garis kisi.
+     - Pembersihan cache `storage/app/private/cutouts/` dan regenerasi 20 pasfoto lokal.
+  3. **Verifikasi**:
+     - Visual QA terverifikasi pada PDF `public/sample-idcard-novi-fixed.pdf`: wajah, mata, pipi, dan jilbab 100% utuh solid, latar belakang transparan sempurna, gedung MPKSDI Layer 1 terlihat bersih tanpa kotak garis abu-abu.
+     - Seluruh 180 feature tests lulus 100% (688 assertions). Pint clean.
+
+- 2026-10-07: Halaman Error Kustom Profesional & Elegan (403 Akses Dibatasi/Sertifikat, 404, 419, 500):
+  1. **Akar Masalah**:
+     - Saat sistem memanggil `abort(403, 'Sertifikat tersedia setelah event selesai.')` atau pengecualian hak akses lainnya, Laravel sebelumnya merender halaman error default minimal tanpa styling, tanpa logo, dan tanpa navigasi kembali.
+  2. **Implementasi Sistem Halaman Error Terpadu**:
+     - `resources/views/errors/layout.blade.php`: Layout induk konsisten berstandar resmi MPKSDI PDM Karanganyar dengan dual logo Muhammadiyah & MPKSDI, styling latar belakang bersih gradien slate, font Plus Jakarta Sans, dan footer resmi.
+     - `resources/views/errors/403.blade.php`: Halaman 403 adaptif cerdas:
+       - Mendeteksi konteks pesan otomatis (misalnya penundaan unduh sertifikat, kelulusan, atau hak akses).
+       - Menampilkan badge status amber/gold, ikon sertifikat/gembok elegan, judul yang bersahabat (*"Sertifikat Belum Dapat Diunduh"*), dan kotak penjelasan sistem yang jelas.
+       - Menyediakan tombol aksi cepat: *"Kembali ke Halaman Sebelumnya"* (`window.history.back()`) dan *"Buka Dashboard"* sesuai role akun (Portal Peserta / Dashboard Admin).
+     - Menyiapkan halaman `404.blade.php` (Halaman Tidak Ditemukan), `419.blade.php` (Sesi Kedaluwarsa), dan `500.blade.php` (Kendala Sistem).
+  3. **Verifikasi**:
+     - Ditambahkan pengujian automated `tests/Feature/ErrorPagesTest.php`. Lulus 100%.
+
+- 2026-10-07: Otomatisasi Penghapusan Latar Belakang (Remove Background / Cutout) Pasfoto Cetak ID Card Massal:
+  1. **Akar Masalah Foto Tidak Transparan pada PDF Massal**:
+     - Prototipe web sebelumnya (`idcard-generator.html`) menerapkan chroma-key flood-fill berbasis JavaScript Canvas di sisi klien browser (`removeBackgroundCanvas`).
+     - Saat panitia mencetak ID Card massal melalui backend Laravel (`/admin/events/{event}/id-cards-batch`) atau peserta mengunduh di portal, foto peserta diambil langsung dari penyimpanan (`Storage::disk('local')`) dan di-encode mentah sebagai data URI JPEG tanpa proses pembersihan background server-side.
+     - DomPDF tidak menjalankan skrip JavaScript Canvas klien, sehingga foto pasfoto kader yang berlatar belakang polos (biru, merah, putih/abu) tampil sebagai kotak persegi masif yang menutupi gambar masjid/gedung MPKSDI di Layer 1 (`2.png`).
+  2. **Implementasi Layanan `ImageCutoutService`** (`app/Services/ImageCutoutService.php`):
+     - Dibuat engine pemrosesan gambar cerdas berbasis PHP GD dengan algoritma flood-fill multi-sample perimeter:
+       - Mengambil sampel warna latar belakang di perimeter tepi atas dan sisi atas.
+       - Melakukan penelusuran Breadth-First Search (BFS) menggunakan `SplQueue` untuk mendeteksi piksel background terhubung dari tepi berdasarkan batas toleransi warna Euclidean.
+       - Mengubah piksel latar belakang menjadi kanal alfa transparan murni (`imagecolorallocatealpha` alfa 127).
+       - Menjaga wajah, pakaian, dan badan peserta tetap 100% opak (alpha 0) tanpa terpengaruh oleh warna kulit atau baju.
+       - Penskalaan proporsional otomatis (maksimal 600×800 px) untuk efisiensi memori, kecepatan komputasi kilat (~35–50 ms/foto), dan mencegah ukuran berkas PDF membengkak.
+       - Menyimpan hasil cutout PNG secara permanen ke cache disk lokal (`cutouts/{hash}.png`) sehingga permintaan cetak berulang berlangsung instan (~0–9 ms).
+       - Deteksi aman untuk foto yang sudah memiliki transparansi (PNG dengan alfa channel) dan penanganan graceful fallback ke berkas asli jika berkas bukan gambar valid.
+  3. **Integrasi ke Generator PDF ID Card**:
+     - `EventOutputController::idCardsBatch`: Menggunakan `ImageCutoutService` untuk setiap foto kader aktif yang diikutsertakan dalam batch PDF.
+     - `KehadiranController::idCard`: Menerapkan `ImageCutoutService` pada unduh ID Card perorangan kader di portal.
+     - Fallback default photo: Menyiapkan aset transparan `public/aset/ketua-mpksdi-cutout.png` jika kader belum memiliki pasfoto, sehingga foto pengganti pun menyatu alami di atas background kartu.
+  4. **Verifikasi & Pengujian**:
+     - Ditambahkan uji fitur pada `tests/Feature/IdCardBatchTest.php` mencakup pemotongan latar belakang menjadi transparan, keutuhan badan/wajah, penyimpanan cache, dan integrasi penuh batch cetak PDF DomPDF.
+     - Seluruh 178 pengujian PHPUnit lulus hijau (680 assertions).
+     - Format kode diverifikasi bersih dengan `vendor/bin/pint`.
+
+- 2026-10-07: Penanganan Orphaned Vite Hot File & Graceful Handling Error 419 (Page Expired):
+  1. **Aset CSS/JS Landing & Layout Tidak Memuat**:
+     - File `public/hot` tertinggal dari sesi dev sebelumnya sehingga Laravel mengarahkan asset ke `http://[::1]:5173`.
+     - Dilakukan penghapusan `public/hot`, rebuild aset produksi `npm run build`, dan penambahan pengaman ukuran inline pada logo MPKSDI navbar & footer di `resources/views/landing/index.blade.php`.
+  2. **Penanganan Elegan HTTP 419 Page Expired** (`bootstrap/app.php`, `tests/Feature/AuthTest.php`):
+     - Laravel 12 mengonversi `TokenMismatchException` menjadi `HttpException(419)` di `prepareException()` sebelum render callbacks dijalankan, sehingga handler lama tidak terpanggil dan menampilkan layar error hitam-putih mentah 419.
+     - Handler diperbarui menangani `HttpException` dengan status code 419 dan `TokenMismatchException`: otomatis redirect back ke referer / `/login`, mempertahankan input form lama, dan menampilkan banner pesan "Pemberitahuan Sesi" yang ramah pengguna.
+     - Ditambahkan automated test pada `AuthTest`.
+  3. **Tampilan Pasfoto Profil & Avatar Kandidat Peserta** (`resources/views/admin/events/enroll.blade.php`, `resources/views/admin/dashboard.blade.php`):
+     - Menggantikan kotak inisial huruf tunggal dengan pasfoto resmi kader 3:4 (`w-9 h-11`) terhubung ke `route('foto.anggota', $k)` pada halaman Enroll Peserta Kegiatan Baitul Arqam.
+     - Dilengkapi efek ring highlight saat kartu kandidat dipilih (`isSelected`), lazy loading, dan fallback otomatis ke inisial jika foto belum diunggah atau gagal dimuat.
+     - Diterapkan juga pada antrean verifikasi dan pendaftar aktif terbaru di Dashboard Admin.
+  4. **Paginasi 20 Kandidat per Halaman & Cross-Page Selection** (`PesertaController::search`, `resources/views/admin/events/enroll.blade.php`, `AdminEventFlowTest`):
+     - Mengganti pembatasan statis 50 record menjadi paginasi standar 20 data per halaman (`paginate(20)->withQueryString()`).
+     - Menyediakan navigasi halaman `{{ $kandidat->links() }}` di bawah formulir kandidat.
+     - Integrasi state Alpine.js dengan `sessionStorage` dan hidden input array dinamis sehingga pilihan kader tidak hilang saat panitia berpindah ke halaman berikutnya (halaman 2, 3, dst).
+     - Ditambahkan automated test `test_admin_enroll_search_is_paginated_to_twenty_items_per_page`.
+  5. **Filter Cabang (PCM) pada Enroll Peserta** (`PesertaController::search`, `resources/views/admin/events/enroll.blade.php`, `AdminEventFlowTest`):
+     - Menambahkan dropdown pilihan cabang (`cabang`) yang memuat seluruh 17 PCM resmi se-Karanganyar (`config('arqam.opsi_form.cabang_pcm')`).
+     - Mendukung filtering instan `onchange="this.form.submit()"`, kombinasi pencarian kata kunci + cabang, chip badge PCM pada tiap kartu kader (`PCM Colomadu`, dll), indikator wilayah di header, dan tombol reset.
+     - Ditambahkan automated test `test_admin_enroll_search_filters_by_cabang`.
+
+- 2026-10-05: Redesain Implementasi Generator ID Card Baitul Arqam Berbasis 3 Asset PNG (1063 × 1535 px B4 Canvas):
+  1. **Source of Truth Desain Berbasis 3 Berkas PNG Resmi (`1.png`, `2.png`, `3.png`)**:
+     - Menghentikan pembuatan ulang motif batik/curve/frame via CSS tiruan. Artwork PNG asli dijadikan acuan absolut (Source of Truth).
+     - Berkas aset: `1.png` (Desain Belakang ID Card), `2.png` (Background Depan ID Card), dan `3.png` (Foreground/Overlay Depan ID Card dengan transparansi atas).
+     - Rasio kanvas absolut 1063 × 1535 px dipertahankan di seluruh preview dan print engine tanpa stretch/squash.
+  2. **Arsitektur Layer Sisi Depan (Front Card)**:
+     - Layer 1 (`2.png`, z-index: 1): Background lanskap Gedung MPKSDI PDM Karanganyar & masjid biru dengan ornamen batik.
+     - Layer 2 (`foto peserta`, z-index: 2): Portrait peserta (cutout natural tanpa bingkai kotak). Dikalibrasi presisi dengan pergeseran optimal ke sisi kanan:
+       - Parameter wrapper: `left: 36%`, `top: 14.5%`, `width: 58%`, `height: 52%`, alignment: `right bottom` (`photo_x = 525-530px`, `photo_y = 226px`, ujung kanan `999px`).
+       - Menggunakan *cutout* solid alami 100% tanpa crop atau feathering di sisi kanan/kiri (photo_x = 530px, photo_y = 226px), mempertahankan bentuk asli bahu/lengan peserta.
+       - Wajah berada di horizontal canvas ~70% (`face center X ~760px`, `Y ~390-420px`), kepala/peci membingkai lingkaran kuning halo di latar belakang dan memiliki negative space di bawah batik atas.
+       - Kompleks bangunan (gedung, masjid kubah biru) di sisi kiri tampak 100% utuh dan bebas halangan.
+       - Badan bagian bawah masuk secara natural di balik kurva wave putih foreground `3.png` pada dada bawah/upper torso (`y ~940-950px`), menghasilkan efek 3D cutout alami tanpa menutupi leher/dagu atau memperlihatkan pinggang berlebih.
+       - Teruji sempurna pada 3 varian foto: Pria pakai peci (Ahmad Fathoni, S.T.), Wanita berhijab (Siti Nurjanah, S.Pd.I.), dan Pria tanpa peci (Bambang Kusuma Wardana, M.M.).
+     - Layer 3 (`3.png`, z-index: 3, pointer-events: none): Foreground kurva putih dengan 3 rounded box kuning resmi dan aksen batik sudut kanan bawah.
+     - Layer 4 (`dynamic text`, z-index: 4): Dynamic value langsung di atas kotak artwork tanpa label/icon tiruan tambahan:
+       - Posisi horizontal teks diselaraskan ke `left: 20.2%` (`x = 215px`, padding 38px dari garis pemisah icon `x = 177px`), melenyapkan ruang kosong canggung selebar 80px yang sebelumnya memisahkan teks dari ikon:
+         - Kotak 1 (Status): Center Y = 1001 (optikal tengah kotak putih, CSS `top: 62.4%`), Montserrat 800 uppercase, warna `#063A60`.
+         - Kotak 2 (Nama Peserta): Center Y = 1146 (optikal tengah kotak putih, CSS `top: 71.85%`), Montserrat 800, warna `#063A60`, dengan penskalaan responsif otomatis (<=18 kar: 38px, 19–28 kar: 30px, 29–36 kar: 26px, >36 kar: 22px).
+         - Kotak 3 (NBM): Center Y = 1291 (optikal tengah kotak putih, CSS `top: 81.3%`), Montserrat 700, warna `#063A60`.
+  3. **Arsitektur Sisi Belakang (Back Card)**:
+     - Layer 1 (`1.png`): Background artwork penuh.
+     - Layer 2 (Dynamic Content):
+       - QR Code presensi scannable level H (warna `#063A60`, 230 × 230 px) diletakkan presisi di antara 4 corner brackets di atas label "QR ABSENSI" dengan quiet-zone putih murni.
+       - Teks nilai peserta langsung diisi ke dalam 5 kotak putih yang telah tersedia di artwork: Nama Lengkap (`top: 49.9%`), NBM (`top: 57.07%`), Status (`top: 64.10%`), Kegiatan (`top: 71.07%`), Waktu & Tempat (`top: 78.11%`) dengan font Inter / Plus Jakarta Sans 700 `#063A60`.
+  4. **Pembaruan Aplikasi Generator Web & Templating Laravel**:
+     - `public/idcard-generator.html` & `scratch/idcard-b3-package/idcard-baitul-arqam-b3.html`: Generator interaktif lengkap dengan Mode Tunggal & Massal (Batch), preset visual QA 3 kader uji (Peci, Hijab, Non-Peci), direct Canvas 2D export 1063 × 1535 px (1x) dan 2126 × 3070 px (2x HQ), dan batch downloader.
+     - `idcard-batch-pdf.blade.php`, `portal/idcard-pdf.blade.php`: Templating DomPDF diselaraskan ke koordinat terkalibrasi kanvas presisi 265.75 × 383.75 pt (1063 × 1535 px ratio).
+  5. **Pengujian & Verifikasi**:
+     - `IdCardBatchTest` lulus 100%, Laravel Pint passed 100%.
+     - Visual QA front card terverifikasi pada `public/sample-idcard-front.png`, back card pada `public/sample-idcard-back.png`, dan DomPDF pada `public/sample-idcard.pdf`.
+     - File zip portabel `public/baitul_arqam_idcard_b3_package.zip` (6.6 MB) siap pakai.
+
+- 2026-10-04: Penyempurnaan Operasional Baitul Arqam (Fitur Cabut/Batal Presensi, Siaran Pengingat Acara WhatsApp, dan Toleransi Status RTL Disetujui):
+  1. **Fitur Batalkan / Cabut Presensi (Void / Undo Attendance)** (`AbsensiController::destroy`, `scan.blade.php`, `web.php`):
+     - Menambahkan endpoint `DELETE /admin/events/{event}/sesi/{sesi}/absensi/{absensi}` yang menghapus record presensi yang keliru di-scan atau salah input manual.
+     - Otomatis memicu `AbsensiService::recalculateAttendance` dan `NilaiService::hitungUlangPeserta`, sehingga persentase kehadiran dan status kelulusan peserta ter-update secara instan.
+     - Antarmuka riwayat kehadiran pada `scan.blade.php` dilengkapi tombol batalkan interaktif dengan konfirmasi nama kader dan pembaruan dinamis.
+  2. **Pengingat Acara WhatsApp Gateway (Broadcast & Individual Reminder)** (`PesertaController::remind`, `PesertaController::remindBatch`, `WhatsAppNotificationService`, `show.blade.php`):
+     - Memperbaiki pembacaan atribut `$event->nama_event` pada `WhatsAppNotificationService::pesanPengingatEvent`.
+     - Menambahkan fitur broadcast pengingat acara massal (`POST /admin/events/{event}/peserta/remind-wa-batch`) pada Tab 1 (Pendataan Peserta) untuk menyiarkan pesan pengingat jadwal, tanggal, dan lokasi ke seluruh kader aktif sekaligus.
+     - Menambahkan tombol aksi pengingat perorangan (`POST /admin/events/{event}/peserta/{peserta}/remind-wa`) di setiap baris peserta dengan fallback URL WhatsApp Web saat gateway belum aktif.
+     - Penanganan alert `session('warning')` dan `session('wa_url')` ditambahkan pada `app.blade.php`.
+  3. **Penyelarasan Status Progres RTL di Portal Kader** (`Portal\DashboardController.php`):
+     - Memperbarui pengecekan progres RTL dari `where('status', 'terkirim')` menjadi `whereIn('status', ['terkirim', 'disetujui'])` agar kader yang tugasnya telah disetujui admin tetap melihat chip progres "RTL Terkirim" berwarna hijau.
+  4. **Pengujian & Verifikasi**:
+     - Ditambahkan 1 unit test di `PortalEvaluationTest`, 1 unit test di `AbsensiTest`, dan suite baru `PengingatWaEventTest` (3 feature tests).
+     - Seluruh 173 automated feature tests lulus 100% (664 assertions), Laravel Pint passed 100%, Vite production build clean.
+
+- 2026-10-04: Redesain Total ID Card / Name Tag B3 Baitul Arqam Muhammadiyah Karanganyar (85 × 110 mm, Standar Cetak 300 DPI, Mode Massal, dan Template PDF):
+  1. **Redesain Komprehensif Generator Web (`scratch/idcard-b3-package/idcard-baitul-arqam-b3.html`, `public/idcard-generator.html`, `baitul_arqam_idcard_b3_package.zip`)**:
+     - Format fisik insert name tag B3 vertikal presisi 85 × 110 mm (rasio 85:110).
+     - Palet warna resmi: Deep Navy (`#063A60`), Primary Blue (`#0869A7`), Bright Blue (`#0B78B5`), Gold (`#F5C33B`), Soft Gold (`#FFD966`), White (`#FFFFFF`), Dark Text (`#102D45`).
+     - Aksen Batik Nusantara resmi: Berbasis PNG transparan resolusi tinggi (Kawung/Surya) dengan opacity 16–18%, diletakkan di sudut kanan atas dan bingkai belakang. Mengeliminasi motif CSS murahan/artificial.
+     - Foto Peserta: Cutout portrait dengan visual weight 35–40% di sisi kanan kartu, masking halus menyatu ke pembatas diagonal emas tanpa memotong kepala atau menabrak nama.
+     - Hirarki Muka (Front): Level 1 Nama Peserta (Montserrat 900) dengan penskalaan responsif otomatis (<=18 kar, 19–26 kar, 27–35 kar, >35 kar), Level 2 Baitul Arqam 2026, Level 3 Status Pill Badge (Gold), Level 4 NBM, Level 5 Identitas MPKSDI PDM Karanganyar.
+     - Hirarki Belakang (Back): Berfokus pada Presensi Digital + QR Code scannable (level H) dengan quiet-zone putih murni tanpa ornamen latar belakang, kode token, grid data peserta ringkas editorial (bukan tabel database), serta kutipan resmi "Fastabiqul khairat".
+     - Fitur Lengkap: Mode Tunggal (Single) + Mode Massal (Batch) 5 kader demo, navigasi antar-peserta, pengujian cepat responsif nama panjang, ekspor PNG 300 DPI (1004 × 1299 px), dan print engine `@page { size: 85mm 110mm; margin: 0; }`.
+  2. **Penyelarasan Template Cetak PDF Laravel (`idcard-batch-pdf.blade.php`, `portal/idcard-pdf.blade.php`, `EventOutputController.php`, `KehadiranController.php`)**:
+     - Menghilangkan bug cetak kartu kecil di pojok A4; seluruh ekspor PDF disetel ke ukuran presisi `85mm × 110mm` (`[0, 0, 240.945, 311.811]` pt).
+     - Cetak massal menghasilkan halaman individual 85 × 110 mm per kartu (Page 1 Depan P1, Page 2 Belakang P1, Page 3 Depan P2, Page 4 Belakang P2, dst) tanpa label teks di luar artwork.
+  3. **Verifikasi**:
+     - Seluruh 168 feature tests lulus 100% (647 assertions), Laravel Pint passed, Vite production build clean.
+
+- 2026-10-04: Ekstraksi & Integrasi Pasfoto Profil Asli Peserta dari foto1.png dan foto2.png ke Seeder & Database:
+  1. **Ekstraksi Grid Pasfoto Resmi 3:4 (`database/seeders/assets/kader/kader-01.jpg` s.d. `kader-20.jpg`)**:
+     - Membaca 2 berkas kolase foto `foto1.png` dan `foto2.png` (masing-masing 1536×1024 px berisi grid 2 baris × 5 kolom = 10 wajah).
+     - Mengidentifikasi koordinat garis pembatas (border divider) antarsel dan memotong 20 pasfoto portrait rasio standar 3:4 (300×400 px) beresolusi tinggi dengan proporsi kepala, peci/hijab, dan pundak yang presisi.
+     - Komposisi gender pasfoto (11 Pria berpeci/batik/jas dan 9 Wanita berhijab/pin matahari) terbukti 100% selaras dengan 20 data kader aktif di `DemoDataSeeder`.
+  2. **Integrasi Otomatis pada `DemoDataSeeder.php`**:
+     - Menambahkan method `ensureKaderPhotosExist()` yang otomatis menyalin pasfoto dari asset folder `database/seeders/assets/kader/` ke storage lokal `storage/app/private/anggota/foto/` (dengan fallback pemotongan dinamis via GD jika asset belum ada).
+     - Menugaskan foto spesifik (`anggota/foto/kader-XX.jpg`) yang relevan dengan profesi dan gender masing-masing peserta pada `seedAnggota()`.
+  3. **Pembaruan Database Aktif**:
+     - Seluruh 25 kader dalam database langsung dimutakhirkan dengan path foto yang valid, sehingga pasfoto langsung tampil pada Dashboard Portal, Profil, ID Card PDF, Lembar Biodata Kader, dan Daftar Peserta Admin.
+  4. **Verifikasi**:
+     - 168 tests passed 100% (647 assertions), Laravel Pint passed 100%.
+
 - 2026-10-03: Peningkatan Vital Subsistem Baitul Arqam (Bobot Penilaian Dinamis, Berita Acara Yudisium PDF Resmi, dan Scanner Presensi Luar Jaringan):
   1. **Pengaturan Bobot Penilaian Dinamis per Event (`database/migrations/2026_10_03_000001_add_bobot_to_events_table.php`, `Event.php`, `NilaiService.php`, `EventController.php`)**:
      - Ditambahkan kolom `bobot_kognitif`, `bobot_psikomotor`, `bobot_afektif`, dan `bobot_keaktifan` pada tabel `events`.

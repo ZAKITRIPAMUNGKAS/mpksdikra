@@ -272,7 +272,12 @@
                     @if($event->lokasi)bertempat di {{ $event->lokasi }}@endif,
                     dan berdasarkan evaluasi dinyatakan:
                     <br>
-                    <div class="cert-grade">{{ $nilai->status_kelulusan ?? 'Lulus' }}</div>
+                    <div class="cert-grade">
+                    {{ $nilai->status_kelulusan ?? 'Lulus' }}
+                    @if($nilai->grade)
+                        — Grade {{ $nilai->grade }}
+                    @endif
+                </div>
                 </div>
 
                 {{-- Tanda Tangan Resmi --}}
@@ -400,7 +405,12 @@
                                 <tr style="background: #e0f2fe; font-weight: bold;">
                                     <td><b>NILAI AKHIR KOMPREHENSIF</b></td>
                                     <td style="text-align: center; font-size: 9pt; color: #002b40;">{{ number_format((float) $nilai->nilai_akhir, 1) }}</td>
-                                    <td style="text-align: center; color: #005c8a;">{{ $nilai->status_kelulusan }}</td>
+                                    <td style="text-align: center; color: #005c8a;">
+                                        {{ $nilai->status_kelulusan }}
+                                        @if($nilai->grade)
+                                            / Grade {{ $nilai->grade }}
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

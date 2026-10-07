@@ -24,7 +24,7 @@ class DashboardController extends Controller
             $ep->progress = [
                 'pretest' => PesertaTesMulai::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->where('tipe', 'pretest')->whereNotNull('waktu_selesai')->exists(),
                 'posttest' => PesertaTesMulai::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->where('tipe', 'posttest')->whereNotNull('waktu_selesai')->exists(),
-                'rtl' => Rtl::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->where('status', 'terkirim')->exists(),
+                'rtl' => Rtl::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->whereIn('status', ['terkirim', 'disetujui'])->exists(),
             ];
         }
 

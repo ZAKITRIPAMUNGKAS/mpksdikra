@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\PenilaianAkhir;
 use App\Services\QrService;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,21 +21,39 @@ class PesertaController extends Controller
     public function search(Request $request, Event $event): View
     {
         $query = $request->string('q')->toString();
+        $cabang = $request->string('cabang')->toString();
 
         $enrolled = EventPeserta::where('event_id', $event->id)->pluck('anggota_id')->all();
 
         $kandidat = Anggota::whereHas('user', fn ($q) => $q->where('status', 'aktif'))
             ->when($query, function ($q) use ($query) {
-                $q->where('nama_lengkap', 'like', "%{$query}%")
-                    ->orWhere('nik', 'like', "%{$query}%");
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('nama_lengkap', 'like', "%{$query}%")
+                        ->orWhere('nik', 'like', "%{$query}%");
+                });
+            })
+            ->when($cabang, function ($q) use ($cabang) {
+                $q->where(function ($sub) use ($cabang) {
+                    $sub->where('pcm', $cabang)
+                        ->orWhere('kecamatan', $cabang);
+                });
             })
             ->whereNotIn('id', $enrolled)
-            ->limit(50)
-            ->get();
+            ->paginate(20)
+            ->withQueryString();
 
         $event->loadCount('pesertaAktif');
 
-        return view('admin.events.enroll', compact('event', 'kandidat', 'query'));
+        $pcmList = collect(config('arqam.opsi_form.cabang_pcm', []))
+            ->merge(Anggota::whereNotNull('pcm')->pluck('pcm'))
+            ->merge(Anggota::whereNotNull('kecamatan')->pluck('kecamatan'))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        return view('admin.events.enroll', compact('event', 'kandidat', 'query', 'cabang', 'pcmList'));
     }
 
     public function enroll(Request $request, Event $event): RedirectResponse
@@ -86,5 +105,70 @@ class PesertaController extends Controller
         $peserta->update(['status_aktif' => false]);
 
         return back()->with('success', 'Peserta dinonaktifkan.');
+    }
+
+    public function remind(Event $event, EventPeserta $peserta): RedirectResponse
+    {
+        if ((int) $peserta->event_id !== (int) $event->id) {
+            abort(403);
+        }
+
+        $anggota = $peserta->anggota;
+        if (! $anggota || ! $anggota->no_wa) {
+            return back()->with('error', 'Peserta tidak memiliki nomor WhatsApp yang valid.');
+        }
+
+        $pesan = WhatsAppNotificationService::pesanPengingatEvent($anggota, $event);
+        $result = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        $waUrl = WhatsAppNotificationService::makeUrl($anggota->no_wa, $pesan);
+
+        if ($result['success']) {
+            return back()->with('success', "Pesan pengingat WhatsApp berhasil dikirim ke {$anggota->nama_lengkap}.");
+        }
+
+        return back()
+            ->with('warning', "Gateway WA: {$result['message']}. Anda dapat mengirim secara manual via WhatsApp Web.")
+            ->with('wa_url', $waUrl)
+            ->with('wa_nama', $anggota->nama_lengkap);
+    }
+
+    public function remindBatch(Event $event): RedirectResponse
+    {
+        $pesertaAktif = $event->pesertaAktif()->with('anggota')->get();
+
+        if ($pesertaAktif->isEmpty()) {
+            return back()->with('error', 'Tidak ada peserta aktif pada kegiatan ini.');
+        }
+
+        $sukses = 0;
+        $gagal = 0;
+
+        foreach ($pesertaAktif as $p) {
+            $anggota = $p->anggota;
+            if (! $anggota || ! $anggota->no_wa) {
+                $gagal++;
+
+                continue;
+            }
+
+            $pesan = WhatsAppNotificationService::pesanPengingatEvent($anggota, $event);
+            $res = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+
+            if ($res['success']) {
+                $sukses++;
+            } else {
+                $gagal++;
+            }
+        }
+
+        if ($sukses > 0 && $gagal === 0) {
+            return back()->with('success', "Pesan pengingat WhatsApp berhasil dikirim ke seluruh {$sukses} peserta.");
+        }
+
+        if ($sukses > 0 && $gagal > 0) {
+            return back()->with('warning', "Pengingat WA terkirim ke {$sukses} peserta. Sebanyak {$gagal} peserta tidak terkirim.");
+        }
+
+        return back()->with('error', 'Gagal mengirim pengingat WA ke seluruh peserta. Pastikan token WhatsApp Gateway sudah aktif di konfigurasi.');
     }
 }

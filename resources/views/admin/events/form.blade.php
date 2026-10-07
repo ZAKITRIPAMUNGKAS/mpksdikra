@@ -156,6 +156,20 @@
                         </div>
                     </div>
 
+                    {{-- Toggle Grade A/B/C --}}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+                        <div>
+                            <span class="text-xs font-bold text-slate-800">🏷️ Gunakan Grade A/B/C</span>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Grade A (&#8805;85), B (&#8805;70), C (&#60;70). Hanya untuk peserta lulus. Kosongkan jika tidak digunakan.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="hidden" name="gunakan_grade" value="0">
+                            <input type="checkbox" name="gunakan_grade" value="1" class="sr-only peer"
+                                @checked(old('gunakan_grade', isset($event) ? $event->gunakan_grade : false))>
+                            <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-sky-600 peer-focus:ring-2 peer-focus:ring-sky-300 transition-all after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                        </label>
+                    </div>
+
                     <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                         <a href="{{ isset($event) ? route('admin.events.show', $event) : route('admin.events.index') }}"
                            class="px-4 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 transition shadow-2xs">

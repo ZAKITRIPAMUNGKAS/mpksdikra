@@ -1,66 +1,157 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/aset/logo-mpksdi.webp" width="80" alt="Logo MPKSDI Karanganyar">
 </p>
 
-## About Laravel
+<h1 align="center">ARQAM — Sistem Perkaderan Terpadu Baitul Arqam</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <strong>Majelis Pembinaan Kader dan Sumber Daya Insani (MPKSDI)<br>Pimpinan Daerah Muhammadiyah Karanganyar</strong>
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777bb3?logo=php" alt="PHP">
+  <img src="https://img.shields.io/badge/Laravel-12-red?logo=laravel" alt="Laravel">
+  <img src="https://img.shields.io/badge/Tests-168%20passed-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Tentang
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Sistem operasional Baitul Arqam untuk pendaftaran, pelaksanaan, penilaian, dan pelaporan perkaderan di bawah MPKSDI PDM Karanganyar.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Pengguna
+- **Admin Daerah** — konfigurasi event, kelola data kader, akses, dan keluaran dokumen resmi
+- **Admin Cabang (PCM)** — verifikasi dan pangkalan data kader di wilayah PCM-nya
+- **Fasilitator** — menjalankan sesi, presensi, dan penilaian sesuai tugas event
+- **Peserta** — pendaftaran, profil, ujian CBT, angket, RTL, unduh sertifikat & ID card
+- **Executive** — dashboard analitik dan laporan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Struktur
+1. **Landing Page MPKSDI** — profil organisasi, program, peta 17 PCM, FAQ, kontak
+2. **Portal Master Anggota** — pendaftaran mandiri kader Muhammadiyah Karanganyar dengan verifikasi admin; multi-organisasi & jabatan
+3. **Portal BA** — event perkaderan; peserta di-enroll admin dari master anggota; akun sama
 
-## Laravel Sponsors
+## Fitur Utama
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- 🧾 Pendaftaran anggota dengan form bertahap 4 langkah dan pasfoto auto-fit 3:4
+- 🏷️ Verifikasi & validasi kader oleh admin daerah / admin cabang
+- 📅 Event Baitul Arqam: persiapan, berlangsung, selesai
+- 🔐 Login kader: username = No WA, password = tanggal lahir (DDMMYYYY)
+- 📸 Scanner presensi QR dengan fallback offline (localStorage queue)
+- ✍️ Penilaian 4 aspek: Kognitif (pretest/posttest + N-Gain), Psikomotor, Afektif, Keaktifan
+- 🧮 Bobot penilaian dinamis per event
+- 🏆 Ranking nilai akhir dengan tiebreaker bertingkat
+- 🏅 Grade A/B/C opsional per event (≥85 / ≥70 / <70)
+- 📝 CBT ujian online dengan timer, navigasi grid soal, anti-resubmission
+- 🎯 Kelompok outbound diacak dengan kriteria gender/PCM
+- 📄 Output: ID Card QR batch A4, Sertifikat 2 sisi + QR verifikasi, Laporan PDF + Excel, Berita Acara Yudisium, Lembar Presensi
+- 🖥️ Live slideshow presentasi yudisium 16:9
+- 📊 Dashboard analitik dengan Chart.js (tren pendaftaran, distribusi status, lulus)
+- 📱 Notifikasi WhatsApp click-to-chat untuk verifikasi, reset sandi, undangan
+- 🗺️ Peta interaktif 17 PCM se-Karanganyar (Leaflet + OpenStreetMap)
 
-### Premium Partners
+## Tech Stack
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+| Layer | Teknologi |
+|-------|-----------|
+| Backend | PHP 8.2+, Laravel 12 |
+| Database | MySQL / MariaDB |
+| Frontend | Blade, Tailwind CSS 4, Alpine.js |
+| Build | Vite |
+| Chart | Chart.js |
+| PDF | DomPDF, Simple QR Code (Bacon) |
+| Excel | Laravel Excel (maatwebsite/excel) |
+| Peta | Leaflet + OpenStreetMap |
 
-## Contributing
+## Quick Start (Lokal)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prasyarat
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- MariaDB / MySQL (database: `arqam`)
 
-## Code of Conduct
+### Instalasi
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+git clone https://github.com/ZAKITRIPAMUNGKAS/mpksdikra.git
+cd mpksdikra
 
-## Security Vulnerabilities
+composer install
+cp .env.example .env
+# Edit .env: DB_DATABASE=arqam, DB_USERNAME=root, DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+php artisan key:generate
+php artisan migrate --seed
+npm install && npm run build
+php artisan serve
+```
 
-## License
+Login admin: `admin@mpksdi.test` / password dari env `ADMIN_PASSWORD` (default: `ubah-segera`).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Perintah berguna
+
+```bash
+php artisan test                    # PHPUnit (168 tests)
+vendor/bin/pint                     # Format code
+npm run build                       # Vite production build
+php artisan migrate:fresh --seed    # Reset DB + seed
+php artisan ba:siapkan-materi {id}  # Isi rubrik/angket/RTL untuk event
+```
+
+## Deployment (cPanel)
+
+1. Upload seluruh folder proyek ke `public_html/` atau subdomain
+2. Set document root ke `public/`
+3. Konfigurasi `.env`: `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+4. Jalankan via SSH (jika tersedia) atau buka `/migrate-seed` sekali untuk migrasi
+5. Setup cron job untuk queue (opsional):
+   ```
+   * * * * * php /path/to/project/artisan schedule:run >> /dev/null 2>&1
+   ```
+6. Build frontend di lokal: `npm run build`, upload folder `public/build/`
+
+Lihat `docs/deploy.md` untuk panduan lengkap.
+
+## Testing
+
+```bash
+php artisan test
+```
+
+165+ test meliputi:
+- Autentikasi & role
+- Pendaftaran anggota (validasi, stepper, draf localStorage)
+- Verifikasi & penolakan admin
+- Admin cabang (scoping wilayah)
+- Event CRUD, sesi, enroll peserta
+- Absensi & presensi (QR, offline queue)
+- Keaktifan, psikomotor, afektif, angket
+- Ujian CBT (timer, resubmission, deadline)
+- RTL (submit & review)
+- Nilai akhir, ranking, grade
+- Sertifikat & laporan PDF/Excel
+- ID Card batch, Berita Acara Yudisium
+
+## Keputusan Bisnis
+
+Lihat `docs/agentic/PRD.md` untuk daftar keputusan yang sudah dan belum dibuat.
+
+Beberapa hal masih menunggu keputusan:
+- Rumus nilai akhir definitif (sudah ada bobot dinamis, tinggal final approval)
+- Template final pamflet
+- Integrasi WhatsApp API gateway (Fonnte/Wablas)
+- Integrasi SIMPEKA
+- Aturan penyeimbangan kelompok outbound yang definitif
+
+## Lisensi
+
+MIT License. Hak milik MPKSDI PDM Karanganyar.
+
+---
+
+<p align="center">
+  <sub>Developed by <a href="https://instagram.com/gemala.dev">gemala.dev</a> • Bumi Intanpari, Karanganyar</sub>
+</p>

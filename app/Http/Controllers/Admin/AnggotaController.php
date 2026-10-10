@@ -334,10 +334,14 @@ class AnggotaController extends Controller
         $nama = $anggota->nama_lengkap;
         $user = $anggota->user;
         $fotoPath = $anggota->foto;
+        $cutoutPath = $anggota->foto_cutout_path;
 
-        DB::transaction(function () use ($anggota, $user, $fotoPath) {
+        DB::transaction(function () use ($anggota, $user, $fotoPath, $cutoutPath) {
             if ($fotoPath && Storage::disk('local')->exists($fotoPath)) {
                 Storage::disk('local')->delete($fotoPath);
+            }
+            if ($cutoutPath && Storage::disk('local')->exists($cutoutPath)) {
+                Storage::disk('local')->delete($cutoutPath);
             }
 
             $anggota->organisasi()->detach();
@@ -350,6 +354,36 @@ class AnggotaController extends Controller
 
         return redirect()->route('admin.anggota.index')
             ->with('success', "Data kader {$nama} berhasil dihapus dari pangkalan data.");
+    }
+
+    public function updateFotoMode(Request $request, Anggota $anggota): RedirectResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        $validated = $request->validate([
+            'foto_mode' => ['required', 'string', 'in:cutout,original'],
+        ]);
+
+        $anggota->update([
+            'foto_mode' => $validated['foto_mode'],
+        ]);
+
+        return back()->with('success', 'Mode tampilan pasfoto ID Card berhasil diperbarui menjadi '.ucfirst($validated['foto_mode']).'.');
+    }
+
+    public function destroyCutout(Anggota $anggota): RedirectResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+            Storage::disk('local')->delete($anggota->foto_cutout_path);
+        }
+
+        $anggota->update([
+            'foto_cutout_path' => null,
+        ]);
+
+        return back()->with('success', 'Foto cutout klien berhasil dihapus. Sistem akan menggunakan pemrosesan cutout GD otomatis.');
     }
 
     private function authorizeCabang(Anggota $anggota): void

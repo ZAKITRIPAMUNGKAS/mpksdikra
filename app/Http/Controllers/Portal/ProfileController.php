@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\FormPertanyaan;
+use App\Rules\ValidCutoutPng;
 use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -51,6 +52,15 @@ class ProfileController extends Controller
             'pcm' => ['nullable', 'string', 'max:255'],
             'prm' => ['nullable', 'string', 'max:255'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'foto_cutout' => [
+                'nullable',
+                'file',
+                'max:2048',
+                new ValidCutoutPng(
+                    $request->file('foto') ?: ($anggota->foto ? Storage::disk('local')->path($anggota->foto) : null)
+                ),
+            ],
+            'foto_mode' => ['nullable', 'string', 'in:cutout,original'],
             'jabatan_aum' => ['nullable', 'string', 'max:255'],
             'pendidikan_terakhir' => ['nullable', 'string', 'max:50'],
             'pendidikan_sd' => ['nullable', 'string', 'max:255'],
@@ -98,7 +108,27 @@ class ProfileController extends Controller
             if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
                 Storage::disk('local')->delete($anggota->foto);
             }
+            if ($anggota->foto_cutout_path && ! $request->hasFile('foto_cutout') && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+                Storage::disk('local')->delete($anggota->foto_cutout_path);
+                $data['foto_cutout_path'] = null;
+            }
             $data['foto'] = $request->file('foto')->store('anggota/foto', 'local');
+        }
+
+        if ($request->hasFile('foto_cutout')) {
+            if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+                Storage::disk('local')->delete($anggota->foto_cutout_path);
+            }
+            $cutoutFilename = 'cutout_'.Str::random(40).'.png';
+            $targetPath = Storage::disk('local')->path('anggota/cutouts/'.$cutoutFilename);
+            if (ValidCutoutPng::reencodePng($request->file('foto_cutout'), $targetPath)) {
+                $data['foto_cutout_path'] = 'anggota/cutouts/'.$cutoutFilename;
+            }
+        }
+        unset($data['foto_cutout']);
+
+        if ($request->filled('foto_mode')) {
+            $data['foto_mode'] = $request->input('foto_mode');
         }
 
         $anggota->update($data);

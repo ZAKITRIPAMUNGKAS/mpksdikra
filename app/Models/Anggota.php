@@ -39,6 +39,8 @@ class Anggota extends Model
         'no_wa',
         'email',
         'foto',
+        'foto_cutout_path',
+        'foto_mode',
         'catatan_verifikasi',
         'pendidikan_terakhir',
         'pendidikan_sd',

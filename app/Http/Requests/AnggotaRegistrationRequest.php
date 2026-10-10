@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\FormPertanyaan;
+use App\Rules\ValidCutoutPng;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -42,6 +43,8 @@ class AnggotaRegistrationRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
             'foto' => ['required', 'image', 'max:2048'],
+            'foto_cutout' => ['nullable', 'file', 'max:2048', new ValidCutoutPng($this->file('foto'))],
+            'foto_mode' => ['nullable', 'string', 'in:cutout,original'],
             'pendidikan_terakhir' => ['nullable', 'string', 'max:50'],
             'pendidikan_sd' => ['nullable', 'string', 'max:255'],
             'pendidikan_smp' => ['nullable', 'string', 'max:255'],

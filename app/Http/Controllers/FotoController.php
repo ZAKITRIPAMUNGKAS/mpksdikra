@@ -22,6 +22,15 @@ class FotoController extends Controller
 
         abort_unless($canView, 403, 'Akses foto tidak diizinkan.');
 
+        if (request('type') === 'cutout') {
+            if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+                return Storage::disk('local')->response($anggota->foto_cutout_path, null, [
+                    'Cache-Control' => 'private, max-age=86400',
+                ]);
+            }
+            abort(404, 'Foto cutout tidak ditemukan.');
+        }
+
         if (! $anggota->foto || ! Storage::disk('local')->exists($anggota->foto)) {
             return $this->placeholderSvg($anggota->nama_lengkap);
         }

@@ -368,4 +368,127 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('Tasikmadu', $anggota->kecamatan);
         $this->assertSame('Kaling', $anggota->desa_kelurahan);
     }
+
+    private function createSyntheticPng(int $width, int $height, float $transparencyRatio): UploadedFile
+    {
+        $img = imagecreatetruecolor($width, $height);
+        imagealphablending($img, false);
+        imagesavealpha($img, true);
+
+        $trans = imagecolorallocatealpha($img, 0, 0, 0, 127);
+        $opaque = imagecolorallocatealpha($img, 20, 50, 80, 0);
+
+        $transPixels = (int) round($width * $height * $transparencyRatio);
+        $count = 0;
+
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                imagesetpixel($img, $x, $y, ($count < $transPixels) ? $trans : $opaque);
+                $count++;
+            }
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'cutout_test_').'.png';
+        imagepng($img, $tmp);
+        imagedestroy($img);
+
+        return new UploadedFile($tmp, 'cutout.png', 'image/png', null, true);
+    }
+
+    public function test_registration_with_valid_cutout_png_is_persisted(): void
+    {
+        Storage::fake('local');
+
+        $sourcePhoto = UploadedFile::fake()->image('foto.jpg', 400, 600);
+        $cutoutPhoto = $this->createSyntheticPng(400, 600, 0.35);
+
+        $payload = $this->payload([
+            'nik' => '3313109999990001',
+            'no_wa' => '081299990001',
+            'email' => 'cutout.valid@example.test',
+            'foto' => $sourcePhoto,
+            'foto_cutout' => $cutoutPhoto,
+            'foto_mode' => 'cutout',
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasNoErrors();
+        $res->assertRedirect(route('anggota.register'));
+
+        $anggota = Anggota::where('nik', '3313109999990001')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('cutout', $anggota->foto_mode);
+        $this->assertNotNull($anggota->foto_cutout_path);
+
+        Storage::disk('local')->assertExists($anggota->foto);
+        Storage::disk('local')->assertExists($anggota->foto_cutout_path);
+    }
+
+    public function test_registration_rejects_fake_png_with_invalid_magic_bytes(): void
+    {
+        Storage::fake('local');
+
+        $tmp = tempnam(sys_get_temp_dir(), 'fake_png_');
+        file_put_contents($tmp, 'NOT_A_REAL_PNG_HEADER_TEST');
+        $fakeCutout = new UploadedFile($tmp, 'fake.png', 'image/png', null, true);
+
+        $payload = $this->payload([
+            'nik' => '3313109999990002',
+            'foto_cutout' => $fakeCutout,
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors(['foto_cutout']);
+    }
+
+    public function test_registration_rejects_cutout_with_too_little_transparency(): void
+    {
+        Storage::fake('local');
+
+        $sourcePhoto = UploadedFile::fake()->image('foto.jpg', 400, 600);
+        $solidCutout = $this->createSyntheticPng(400, 600, 0.02); // 2% transparent (< 5%)
+
+        $payload = $this->payload([
+            'nik' => '3313109999990003',
+            'foto' => $sourcePhoto,
+            'foto_cutout' => $solidCutout,
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors(['foto_cutout']);
+    }
+
+    public function test_registration_rejects_cutout_with_too_much_transparency(): void
+    {
+        Storage::fake('local');
+
+        $sourcePhoto = UploadedFile::fake()->image('foto.jpg', 400, 600);
+        $emptyCutout = $this->createSyntheticPng(400, 600, 0.95); // 95% transparent (> 90%)
+
+        $payload = $this->payload([
+            'nik' => '3313109999990004',
+            'foto' => $sourcePhoto,
+            'foto_cutout' => $emptyCutout,
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors(['foto_cutout']);
+    }
+
+    public function test_registration_rejects_cutout_with_mismatched_aspect_ratio(): void
+    {
+        Storage::fake('local');
+
+        $sourcePhoto = UploadedFile::fake()->image('foto.jpg', 400, 600); // 2:3 aspect
+        $mismatchedCutout = $this->createSyntheticPng(600, 400, 0.35); // 3:2 landscape aspect
+
+        $payload = $this->payload([
+            'nik' => '3313109999990005',
+            'foto' => $sourcePhoto,
+            'foto_cutout' => $mismatchedCutout,
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasErrors(['foto_cutout']);
+    }
 }

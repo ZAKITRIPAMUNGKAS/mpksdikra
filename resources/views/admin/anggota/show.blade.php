@@ -169,6 +169,103 @@
             </div>
         </div>
 
+        {{-- Card Pasfoto & Cutout ID Card (K5) --}}
+        <div class="mb-6 p-4 sm:p-5 rounded-xl border border-slate-200/90 bg-slate-50/70 shadow-2xs">
+            <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-200/80 mb-4">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#063A60] flex items-center gap-2">
+                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Pengaturan Pasfoto & Cutout ID Card</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Pratinjau foto sumber dan hasil cutout transparan untuk kartu tanda anggota/ID Card Baitul Arqam.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-semibold text-slate-500">Mode Aktif:</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold {{ $anggota->foto_mode === 'original' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $anggota->foto_mode === 'original' ? 'bg-amber-500' : 'bg-emerald-500' }}"></span>
+                        {{ $anggota->foto_mode === 'original' ? 'Original (Berbingkai)' : 'Cutout (Transparan)' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-start">
+                {{-- 1. Foto Sumber Asli --}}
+                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs text-center flex flex-col items-center">
+                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">1. Foto Sumber (Asli)</span>
+                    <div class="w-24 h-32 rounded-lg border border-slate-200 overflow-hidden bg-slate-100 shadow-2xs flex items-center justify-center">
+                        <img src="{{ route('foto.anggota', $anggota) }}"
+                             alt="Foto Sumber"
+                             class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-2">Format pasfoto resmi kader</span>
+                </div>
+
+                {{-- 2. Foto Cutout Klien --}}
+                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs text-center flex flex-col items-center">
+                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">2. Hasil Cutout Klien</span>
+                    @if($anggota->foto_cutout_path)
+                        <div class="w-24 h-32 rounded-lg border border-slate-300 overflow-hidden shadow-2xs flex items-center justify-center bg-[linear-gradient(45deg,#f1f5f9_25%,transparent_25%),linear-gradient(-45deg,#f1f5f9_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f1f5f9_75%),linear-gradient(-45deg,transparent_75%,#f1f5f9_75%)] [background-size:12px_12px] [background-position:0_0,0_6px,6px_-6px,-6px_0]">
+                            <img src="{{ route('foto.anggota', [$anggota, 'type' => 'cutout']) }}"
+                                 alt="Foto Cutout"
+                                 class="w-full h-full object-contain">
+                        </div>
+                        <div class="mt-2 flex items-center gap-1.5">
+                            <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Tersedia di Server</span>
+                        </div>
+                    @else
+                        <div class="w-24 h-32 rounded-lg border border-dashed border-slate-300 flex flex-col items-center justify-center p-2 text-center bg-slate-50">
+                            <svg class="w-6 h-6 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            <span class="text-[10px] text-slate-400 font-medium">Tidak ada cutout klien</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-2">Fallback otomatis ke engine GD v2</span>
+                    @endif
+                </div>
+
+                {{-- 3. Aksi Manajemen Admin --}}
+                <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between h-full space-y-3">
+                    <div>
+                        <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Aksi Tampilan ID Card</span>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            Bila cutout browser kurang rapi atau user mengenakan pakaian khusus, Admin dapat beralih ke mode <strong>Original</strong> berbingkai rapi atau menghapus cutout agar fallback ke GD.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        <form method="POST" action="{{ route('admin.anggota.foto-mode', $anggota) }}" class="flex items-center gap-2">
+                            @csrf
+                            @method('PATCH')
+                            @if($anggota->foto_mode === 'original')
+                                <input type="hidden" name="foto_mode" value="cutout">
+                                <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-2xs flex items-center justify-center gap-1.5">
+                                    <span>Ganti ke Mode Cutout</span>
+                                </button>
+                            @else
+                                <input type="hidden" name="foto_mode" value="original">
+                                <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-2xs flex items-center justify-center gap-1.5">
+                                    <span>Ganti ke Mode Original</span>
+                                </button>
+                            @endif
+                        </form>
+
+                        @if($anggota->foto_cutout_path)
+                        <form method="POST" action="{{ route('admin.anggota.cutout.destroy', $anggota) }}" onsubmit="return confirm('Hapus file cutout klien? Sistem akan membuat cutout otomatis dengan GD v2 saat pencetakan ID Card.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition shadow-2xs flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                <span>Hapus Cutout Klien</span>
+                            </button>
+                        </form>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Banner Informasi Status Nonaktif --}}
         @if($anggota->user->status === 'nonaktif')
         <div class="mb-6 p-4 sm:p-5 rounded-xl bg-slate-900 text-white flex items-center justify-between flex-wrap gap-4 shadow-md border border-slate-800">

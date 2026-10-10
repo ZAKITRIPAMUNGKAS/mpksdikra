@@ -104,6 +104,9 @@
                     @change="handleFileSelect($event)"
                     class="sr-only">
 
+                <input type="hidden" name="foto_cutout" id="{{ $inputId }}-cutout" :value="cutoutDataUrl">
+                <input type="hidden" name="foto_mode" id="{{ $inputId }}-mode" :value="fotoMode">
+
                 {{-- Action options once photo is ready --}}
                 <template x-if="rawImageSrc && !isProcessing">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -315,8 +318,11 @@ document.addEventListener('alpine:init', () => {
         modalOpen: false,
         rawImageSrc: null,
         photoPreview: config.currentPhoto || null,
+        cutoutDataUrl: '',
+        fotoMode: 'cutout',
         isCropped: !!config.currentPhoto,
         isProcessing: false,
+        isSegmenting: false,
 
         // Image & Dimensions
         img: null,
@@ -701,7 +707,28 @@ document.addEventListener('alpine:init', () => {
             const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
             this.photoPreview = croppedDataUrl;
             this.isCropped = true;
+            this.fotoMode = 'cutout';
             this.modalOpen = false;
+
+            // Trigger client-side background cutout if supported (K1, K3, K7)
+            if (window.IdCardCutout && typeof window.IdCardCutout.generateCutout === 'function') {
+                this.isSegmenting = true;
+                window.IdCardCutout.generateCutout(canvas)
+                    .then((cutoutPng) => {
+                        if (cutoutPng) {
+                            this.cutoutDataUrl = cutoutPng;
+                        } else {
+                            this.cutoutDataUrl = '';
+                        }
+                    })
+                    .catch((err) => {
+                        console.warn('Browser cutout unavailable, using fallback:', err);
+                        this.cutoutDataUrl = '';
+                    })
+                    .finally(() => {
+                        this.isSegmenting = false;
+                    });
+            }
 
             canvas.toBlob((blob) => {
                 if (!blob) return;
@@ -823,6 +850,8 @@ document.addEventListener('alpine:init', () => {
         useOriginal() {
             this.photoPreview = this.rawImageSrc;
             this.isCropped = false;
+            this.cutoutDataUrl = '';
+            this.fotoMode = 'original';
             this.modalOpen = false;
         },
 
@@ -862,6 +891,8 @@ document.addEventListener('alpine:init', () => {
         clearPhoto() {
             this.photoPreview = null;
             this.rawImageSrc = null;
+            this.cutoutDataUrl = '';
+            this.fotoMode = 'cutout';
             this.isCropped = false;
             const fileInput = document.getElementById(this.inputId);
             if (fileInput) {

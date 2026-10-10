@@ -223,4 +223,109 @@ if (document.readyState === 'loading') {
     initScrollSpy();
 }
 
+// ID Card Cutout Engine (MediaPipe + pure mask algorithms)
+import { FilesetResolver, ImageSegmenter } from '@mediapipe/tasks-vision';
+import {
+    applyThreshold,
+    findLargestConnectedComponent,
+    featherAlpha,
+    calculateTransparencyRatio,
+    compositeCutout
+} from './idcard-mask.js';
+
+let segmenterInstance = null;
+
+async function getSegmenter() {
+    if (!segmenterInstance) {
+        try {
+            const vision = await FilesetResolver.forVisionTasks('/vendor/mediapipe/wasm');
+            segmenterInstance = await ImageSegmenter.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: '/models/selfie_segmenter.tflite',
+                },
+                runningMode: 'IMAGE',
+                outputCategoryMask: false,
+                outputConfidenceMasks: true,
+            });
+        } catch (err) {
+            console.warn('Failed to initialize MediaPipe ImageSegmenter:', err);
+            return null;
+        }
+    }
+    return segmenterInstance;
+}
+
+async function generateCutout(canvas) {
+    try {
+        const segmenter = await getSegmenter();
+        if (!segmenter) return null;
+
+        const segmentationResult = await segmenter.segment(canvas);
+        const confidenceMasks = segmentationResult.confidenceMasks;
+        if (!confidenceMasks || confidenceMasks.length < 2) {
+            return null;
+        }
+
+        const fgMask = confidenceMasks[1];
+        const maskData = fgMask.getAsFloat32Array();
+        const width = fgMask.width;
+        const height = fgMask.height;
+
+        const binaryMask = applyThreshold(maskData, 0.5);
+        const cleanedMask = findLargestConnectedComponent(binaryMask, width, height);
+        const alphaMask = featherAlpha(cleanedMask, width, height, 2);
+        const transRatio = calculateTransparencyRatio(alphaMask, 15);
+
+        if (transRatio < 0.05 || transRatio > 0.90) {
+            console.warn(`Cutout transparency ratio ${transRatio.toFixed(3)} outside acceptable range (5%-90%)`);
+            return null;
+        }
+
+        const cutoutCanvas = document.createElement('canvas');
+        cutoutCanvas.width = canvas.width;
+        cutoutCanvas.height = canvas.height;
+        const ctx = cutoutCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, 0);
+
+        if (width === canvas.width && height === canvas.height) {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            compositeCutout(imgData, alphaMask);
+            ctx.putImageData(imgData, 0, 0);
+        } else {
+            const maskCanvas = document.createElement('canvas');
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            const mCtx = maskCanvas.getContext('2d');
+            const mImgData = mCtx.createImageData(width, height);
+            for (let i = 0; i < alphaMask.length; i++) {
+                mImgData.data[i * 4 + 0] = 0;
+                mImgData.data[i * 4 + 1] = 0;
+                mImgData.data[i * 4 + 2] = 0;
+                mImgData.data[i * 4 + 3] = alphaMask[i];
+            }
+            mCtx.putImageData(mImgData, 0, 0);
+
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        return cutoutCanvas.toDataURL('image/png');
+    } catch (err) {
+        console.warn('Cutout generation failed or unsupported in this browser:', err);
+        return null;
+    }
+}
+
+window.IdCardCutout = {
+    getSegmenter,
+    generateCutout,
+    applyThreshold,
+    findLargestConnectedComponent,
+    featherAlpha,
+    calculateTransparencyRatio,
+    compositeCutout
+};
+
+
 

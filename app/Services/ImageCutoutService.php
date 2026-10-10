@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Anggota;
+use finfo;
 use Illuminate\Support\Facades\Storage;
 use SplQueue;
 use Throwable;
@@ -517,5 +519,68 @@ class ImageCutoutService
         }
 
         return null;
+    }
+
+    /**
+     * Resolve photo data URI and active rendering mode for an Anggota.
+     *
+     * @return array{dataUri: ?string, mode: string}
+     */
+    public function resolveForAnggota(Anggota $anggota): array
+    {
+        $mode = $anggota->foto_mode === 'original' ? 'original' : 'cutout';
+
+        if ($mode === 'original') {
+            if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+                $raw = Storage::disk('local')->get($anggota->foto);
+                $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+
+                return [
+                    'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                    'mode' => 'original',
+                ];
+            }
+
+            return [
+                'dataUri' => $this->getDefaultPhotoDataUri(),
+                'mode' => 'cutout',
+            ];
+        }
+
+        // Priority 1: Client cutout PNG
+        if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+            $raw = Storage::disk('local')->get($anggota->foto_cutout_path);
+
+            return [
+                'dataUri' => 'data:image/png;base64,'.base64_encode($raw),
+                'mode' => 'cutout',
+            ];
+        }
+
+        // Priority 2: GD v2 server cutout of source photo
+        if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+            $cutoutUri = $this->getCutoutDataUriForStorageFile($anggota->foto, 'local');
+            if ($cutoutUri) {
+                return [
+                    'dataUri' => $cutoutUri,
+                    'mode' => 'cutout',
+                ];
+            }
+
+            // Priority 3: Raw source photo fallback (mode: original)
+            $raw = Storage::disk('local')->get($anggota->foto);
+            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+
+            return [
+                'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                'mode' => 'original',
+            ];
+        }
+
+        // Priority 4: Default leader photo
+        return [
+            'dataUri' => $this->getDefaultPhotoDataUri(),
+            'mode' => 'cutout',
+        ];
     }
 }

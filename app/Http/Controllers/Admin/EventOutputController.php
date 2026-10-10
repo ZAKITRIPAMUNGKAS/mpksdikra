@@ -193,13 +193,8 @@ class EventOutputController extends Controller
 
         abort_if($peserta->isEmpty(), 404, 'Belum ada peserta aktif pada kegiatan ini.');
 
-        $defaultPhotoDataUri = $this->cutout->getDefaultPhotoDataUri();
-
-        $cards = $peserta->map(function ($ep) use ($defaultPhotoDataUri) {
-            $fotoDataUri = null;
-            if ($ep->anggota->foto) {
-                $fotoDataUri = $this->cutout->getCutoutDataUriForStorageFile($ep->anggota->foto);
-            }
+        $cards = $peserta->map(function ($ep) {
+            $photoInfo = $this->cutout->resolveForAnggota($ep->anggota);
 
             return [
                 'id' => $ep->id,
@@ -210,7 +205,8 @@ class EventOutputController extends Controller
                 'pcm' => $ep->anggota->pcm ?: ($ep->anggota->kecamatan ?: '-'),
                 'jabatan' => $ep->anggota->jabatan_aum ?: 'Peserta Baitul Arqam',
                 'qr_token' => $ep->qr_token,
-                'foto' => $fotoDataUri ?: $defaultPhotoDataUri,
+                'foto' => $photoInfo['dataUri'],
+                'foto_mode' => $photoInfo['mode'],
                 'qr' => $this->qr->qrPngDataUri($ep, 4, 1),
             ];
         });

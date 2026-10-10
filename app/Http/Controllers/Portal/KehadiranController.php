@@ -49,13 +49,11 @@ class KehadiranController extends Controller
 
         $qrPng = $this->qr->qrPngDataUri($ep);
 
-        $fotoDataUri = null;
-        if ($ep->anggota->foto) {
-            $fotoDataUri = $this->cutout->getCutoutDataUriForStorageFile($ep->anggota->foto);
-        }
-        $fotoDataUri = $fotoDataUri ?: $this->cutout->getDefaultPhotoDataUri();
+        $photoInfo = $this->cutout->resolveForAnggota($ep->anggota);
+        $fotoDataUri = $photoInfo['dataUri'];
+        $fotoMode = $photoInfo['mode'];
 
-        $pdf = Pdf::loadView('portal.idcard-pdf', compact('event', 'ep', 'qrPng', 'fotoDataUri'))
+        $pdf = Pdf::loadView('portal.idcard-pdf', compact('event', 'ep', 'qrPng', 'fotoDataUri', 'fotoMode'))
             ->setPaper([0, 0, 265.75, 383.75], 'portrait');
 
         return $pdf->download('id-card-'.str($ep->anggota->nama_lengkap)->slug().'.pdf');

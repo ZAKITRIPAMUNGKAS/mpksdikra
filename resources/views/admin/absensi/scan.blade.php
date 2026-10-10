@@ -27,6 +27,9 @@
       @click="refocusInput($event)"
       @keydown="handleGlobalKey($event)">
 
+    {{-- Global Page Transition & Smooth Preloader --}}
+    <x-page-loader />
+
     {{-- Subtle Institutional Watermark Pattern (Opacity 2.5%) --}}
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-[0.025]" aria-hidden="true">
         <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">

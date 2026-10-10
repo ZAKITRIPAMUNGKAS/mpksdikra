@@ -42,6 +42,26 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-10: Implementasi Transisi Halaman Mulus & Indikator Loading Lingkaran Global (*Smooth Circular Preloader*):
+  1. **Latar Belakang & Masalah**:
+     - Navigasi antar-halaman pada aplikasi MPA terasa kasar / patah (*stutter*) saat browser menunggu aset CSS/JS dan parsing DOM di jaringan/perangkat tertentu.
+  2. **Solusi & Desain Arsitektur**:
+     - Komponen Blade `<x-page-loader />` di `resources/views/components/page-loader.blade.php`:
+       - Dual-ring spinner berputar elegan dengan palet identitas resmi MPKSDI: Lingkaran luar Cerulean `#005c8a` dan lingkaran dalam Saffron Gold `#f8bb00` (counter-rotating).
+       - Badge emblem logo MPKSDI di pusat lingkaran dengan fallback aman.
+       - Backdrop transparan berkabut (`bg-white/85 backdrop-blur-md`) dan tipografi institusional: *"Menyiapkan Halaman — Memuat data dan aset sistem..."*.
+     - Mesin Transisi di `resources/js/app.js` (`initPageLoader()`):
+       - Menangkap klik navigasi tautan internal `<a>` (same-origin, non-download, non-hash, non-external, non-modified click).
+       - Pengecualian otomatis untuk unduhan berkas (ekstensi `.pdf`, `.xlsx`, `.zip`, route segmen `download`, `export`, `batch`, `cetak-lembar`, dll.).
+       - Menangani form submissions non-dialog.
+       - Kompatibilitas BFCache via event `pageshow` dan auto-fade saat `DOMContentLoaded`/`load`.
+       - Safety fallback timeout 8 detik agar layar tidak pernah terkunci jika terjadi latensi ekstrem.
+     - Dipasang di seluruh layout utama (`layouts/app.blade.php`, `layouts/guest.blade.php`, `landing/index.blade.php`, `errors/layout.blade.php`, `admin/absensi/scan.blade.php`, `admin/events/presentasi.blade.php`).
+  3. **Verifikasi**:
+     - `php artisan test`: 181 passed (738 assertions), durasi 76.16s.
+     - `vendor/bin/pint`: 100% lulus.
+     - `npm run build`: Kompilasi Vite berhasil dalam 4.11s.
+
 - 2026-10-07: Penyempurnaan Algoritma Pembersihan Latar Belakang Pasfoto Peserta (Cutout ID Card) di `ImageCutoutService.php`:
   1. **Akar Masalah**:
      - Sebelumnya terdapat sisa busur/lingkaran elips abu-abu di atas kepala/peci peserta karena hard-coded face shield yang terlalu besar.

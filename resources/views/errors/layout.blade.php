@@ -16,6 +16,9 @@
     </style>
 </head>
 <body class="bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-slate-800 min-h-screen flex flex-col justify-between selection:bg-[#002b40] selection:text-white">
+    {{-- Global Page Transition & Smooth Preloader --}}
+    <x-page-loader />
+
     {{-- Top Decorative Bar --}}
     <div class="h-1.5 w-full bg-gradient-to-r from-[#002b40] via-[#0869a7] to-[#f8bb00]"></div>
 

@@ -319,3 +319,12 @@ html, body {
     background-size: 140px 140px;
 }
 
+/* Page Loader Smooth Reveal */
+@keyframes loaderAppear {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-loader-appear {
+    animation: loaderAppear 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

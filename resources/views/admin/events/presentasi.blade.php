@@ -107,6 +107,9 @@
 </head>
 <body x-data="livePresentation()" x-init="init()" @keydown.window="handleKeydown($event)">
 
+    {{-- Global Page Transition & Smooth Preloader --}}
+    <x-page-loader />
+
     {{-- TOP PRESENTATION TOOLBAR --}}
     <header id="top-controls" class="fixed top-0 left-0 right-0 z-50 px-4 py-2.5 flex items-center justify-between bg-slate-950/85 backdrop-blur-md border-b border-white/10 text-white transition-opacity duration-300 hover:opacity-100 opacity-80">
         <div class="flex items-center gap-3 min-w-0">

@@ -49,6 +49,9 @@
 </head>
 <body class="antialiased bg-white text-slate-800 selection:bg-sky-500 selection:text-white">
 
+    {{-- Global Page Transition & Smooth Preloader --}}
+    <x-page-loader />
+
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[1000] focus:px-4 focus:py-2 focus:bg-sky-600 focus:text-white focus:rounded-full focus:text-sm focus:font-bold">Lewati ke konten utama</a>
 
     {{-- Global Scroll Progress Indicator --}}

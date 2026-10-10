@@ -255,14 +255,30 @@ class ImageCutoutService
                         $idx = $y * $workW + $x;
                         if ($isBg[$idx]) {
                             $bodyCount = 0;
-                            if (! $isBg[($y - 1) * $workW + ($x - 1)]) { $bodyCount++; }
-                            if (! $isBg[($y - 1) * $workW + $x]) { $bodyCount++; }
-                            if (! $isBg[($y - 1) * $workW + ($x + 1)]) { $bodyCount++; }
-                            if (! $isBg[$y * $workW + ($x - 1)]) { $bodyCount++; }
-                            if (! $isBg[$y * $workW + ($x + 1)]) { $bodyCount++; }
-                            if (! $isBg[($y + 1) * $workW + ($x - 1)]) { $bodyCount++; }
-                            if (! $isBg[($y + 1) * $workW + $x]) { $bodyCount++; }
-                            if (! $isBg[($y + 1) * $workW + ($x + 1)]) { $bodyCount++; }
+                            if (! $isBg[($y - 1) * $workW + ($x - 1)]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[($y - 1) * $workW + $x]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[($y - 1) * $workW + ($x + 1)]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[$y * $workW + ($x - 1)]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[$y * $workW + ($x + 1)]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[($y + 1) * $workW + ($x - 1)]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[($y + 1) * $workW + $x]) {
+                                $bodyCount++;
+                            }
+                            if (! $isBg[($y + 1) * $workW + ($x + 1)]) {
+                                $bodyCount++;
+                            }
                             if ($bodyCount >= 5) {
                                 $filledBg[$idx] = false;
                             }
@@ -280,14 +296,30 @@ class ImageCutoutService
                     $idx = $y * $workW + $x;
                     if (! $isBg[$idx]) {
                         $bgCount = 0;
-                        if ($isBg[($y - 1) * $workW + ($x - 1)]) { $bgCount++; }
-                        if ($isBg[($y - 1) * $workW + $x]) { $bgCount++; }
-                        if ($isBg[($y - 1) * $workW + ($x + 1)]) { $bgCount++; }
-                        if ($isBg[$y * $workW + ($x - 1)]) { $bgCount++; }
-                        if ($isBg[$y * $workW + ($x + 1)]) { $bgCount++; }
-                        if ($isBg[($y + 1) * $workW + ($x - 1)]) { $bgCount++; }
-                        if ($isBg[($y + 1) * $workW + $x]) { $bgCount++; }
-                        if ($isBg[($y + 1) * $workW + ($x + 1)]) { $bgCount++; }
+                        if ($isBg[($y - 1) * $workW + ($x - 1)]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[($y - 1) * $workW + $x]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[($y - 1) * $workW + ($x + 1)]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[$y * $workW + ($x - 1)]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[$y * $workW + ($x + 1)]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[($y + 1) * $workW + ($x - 1)]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[($y + 1) * $workW + $x]) {
+                            $bgCount++;
+                        }
+                        if ($isBg[($y + 1) * $workW + ($x + 1)]) {
+                            $bgCount++;
+                        }
 
                         if ($bgCount >= 5) {
                             $cleanedBg[$idx] = true;

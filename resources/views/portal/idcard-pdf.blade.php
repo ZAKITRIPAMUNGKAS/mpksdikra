@@ -62,9 +62,27 @@
         }
 
         .photo-img {
+            vertical-align: bottom;
+        }
+
+        .photo-img-cutout {
             max-width: 100%;
             max-height: 100%;
-            vertical-align: bottom;
+            display: inline-block;
+        }
+
+        .photo-box-original {
+            text-align: right;
+        }
+
+        .photo-img-original {
+            width: 112pt;
+            height: 149.3pt;
+            border-radius: 8pt;
+            border: 2pt solid #FFFFFF;
+            margin-top: 28pt;
+            margin-right: 12pt;
+            display: inline-block;
         }
 
         .front-status {
@@ -182,6 +200,7 @@
         $frontFontSize = '8.5pt';
         $backFontSize = '6.5pt';
     }
+    $photoMode = $fotoMode ?? 'cutout';
     $photoSrc = $fotoDataUri ?: $defaultPhoto;
 @endphp
 
@@ -190,8 +209,8 @@
     @if($bgFrontDataUri)
     <img src="{{ $bgFrontDataUri }}" class="card-bg" alt="">
     @endif
-    <div class="photo-box">
-        <img src="{{ $photoSrc }}" class="photo-img" alt="Foto">
+    <div class="photo-box photo-box-{{ $photoMode }}">
+        <img src="{{ $photoSrc }}" class="photo-img photo-img-{{ $photoMode }}" alt="Foto">
     </div>
     @if($fgFrontDataUri)
     <img src="{{ $fgFrontDataUri }}" class="card-overlay" alt="">

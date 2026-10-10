@@ -62,9 +62,27 @@
         }
 
         .photo-img {
+            vertical-align: bottom;
+        }
+
+        .photo-img-cutout {
             max-width: 100%;
             max-height: 100%;
-            vertical-align: bottom;
+            display: inline-block;
+        }
+
+        .photo-box-original {
+            text-align: right;
+        }
+
+        .photo-img-original {
+            width: 112pt;
+            height: 149.3pt;
+            border-radius: 8pt;
+            border: 2pt solid #FFFFFF;
+            margin-top: 28pt;
+            margin-right: 12pt;
+            display: inline-block;
         }
 
         .front-status {
@@ -186,6 +204,7 @@
         }
         $statusStr = $card['status'] ?? 'PESERTA';
         $statusTitle = ucfirst(strtolower($statusStr));
+        $cardMode = $card['foto_mode'] ?? 'cutout';
         $photoSrc = $card['foto'] ?: $defaultPhoto;
     @endphp
 
@@ -194,8 +213,8 @@
         @if($bgFrontDataUri)
         <img src="{{ $bgFrontDataUri }}" class="card-bg" alt="">
         @endif
-        <div class="photo-box">
-            <img src="{{ $photoSrc }}" class="photo-img" alt="Foto">
+        <div class="photo-box photo-box-{{ $cardMode }}">
+            <img src="{{ $photoSrc }}" class="photo-img photo-img-{{ $cardMode }}" alt="Foto">
         </div>
         @if($fgFrontDataUri)
         <img src="{{ $fgFrontDataUri }}" class="card-overlay" alt="">

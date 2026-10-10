@@ -30,3 +30,5 @@ yarn-error.log
 /public/sample-*
 /public/aset/*.pdf
 /public/idcard-generator.html
+/tmp_visual_verification/
+/storage/app/tmp_visual_verification/

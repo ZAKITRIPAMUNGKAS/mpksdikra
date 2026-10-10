@@ -42,6 +42,40 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-10: Implementasi ID Card Cutout V2 & Multi-Tier Background Removal:
+  1. **Model Segmentasi Terpilih (Browser-Side)**:
+     - Model terpilih: `selfie_segmenter.tflite` (249 KB) vs `selfie_multiclass_256x256.tflite` (16.37 MB).
+     - Alasan pemilihan:
+       * Ukuran berkas sangat ringan (249 KB vs 16.37 MB, efisiensi bandwidth 65x lebih hemat).
+       * Membaca kontur peci hitam dan jilbab/busana secara utuh sebagai foreground tunggal probabilitas kontinu tanpa artefak kuantisasi antar-kelas.
+       * Waktu pemuatan awal instan (<50ms) dan konsumsi memori WebGL/WASM rendah di perangkat seluler peserta.
+  2. **Lokasi Aset WASM & Model Self-Hosted**:
+     - Direktori WASM: `public/vendor/mediapipe/wasm/` (`vision_wasm_internal.wasm`, `vision_wasm_nosimd_internal.wasm`, dll.).
+     - Direktori Model: `public/models/selfie_segmenter.tflite`.
+     - Bebas ketergantungan CDN runtime pihak ketiga untuk keamanan intranet/offline dan kepatuhan CSP.
+  3. **Aturan Validasi Cutout Server-Side (`ValidCutoutPng`)**:
+     - Magic bytes PNG wajib: `\x89PNG\r\n\x1a\n`.
+     - Proporsi transparansi: piksel transparan (GD alpha >= 120) wajib berada di antara 5% dan 90%.
+     - Dimensi dan rasio aspek identik dengan foto sumber asli (toleransi ±1px).
+     - Server wajib me-reencode PNG melalui GD (`imagesavealpha` + `imagepng`) sebelum disimpan ke disk private; byte mentah dari klien tidak pernah disimpan langsung.
+  4. **Hierarki Resolusi Sumber Foto ID Card (`ImageCutoutService::resolveForAnggota`)**:
+     - Jika `foto_mode === 'original'`: gunakan foto sumber asli dengan bingkai rounded (fallback default photo).
+     - Jika `foto_mode !== 'original'` (mode cutout aktif):
+       1. Cutout valid dari klien browser (`foto_cutout_path` di disk private).
+       2. Fallback server-side GD v2 dari foto sumber asli (`cutouts/v2_{hash}.png`).
+       3. Foto asli sumber (mode `original`).
+       4. Foto default pimpinan MPKSDI (`ketua-mpksdi-cutout.png`).
+  5. **Algoritma Server Fallback GD v2 (`v2_` cache)**:
+     - Cache key v2: `$hash = md5($binary.'|v2|'.$tolerance); $cachePath = "cutouts/v2_{$hash}.png";`.
+     - Metrik jarak warna YCbCr dengan bobot luminance rendah: $\sqrt{0.25 \times \Delta Y^2 + 1.25 \times \Delta Cb^2 + 1.25 \times \Delta Cr^2}$.
+     - Sobel edge barrier pada channel Y (threshold ~55) untuk mencegah flood-fill menembus batas subjek.
+     - Pertumbuhan wilayah (region growing) relatif terhadap tetangga lokal.
+     - Pembersihan komponen terhubung terbesar (largest connected component) untuk mengeliminasi pulau bintik noise di sudut/tepi latar.
+     - Blur alpha 2px (5x5 separable box blur) untuk tepi anti-aliasing alami tanpa gradient fade bawah (transisi gelombang ditangani oleh overlay artwork).
+  6. **Tampilan Admin & Kontrol Pasfoto**:
+     - Thumbnail foto asli dan cutout ditampilkan berdampingan di detail anggota admin dengan indikator mode aktif.
+     - Admin dapat mengubah mode menjadi `original` atau menghapus cutout (memicu fallback otomatis ke GD v2).
+
 - 2026-10-10: Implementasi Transisi Halaman Mulus & Indikator Loading Lingkaran Global (*Smooth Circular Preloader*):
   1. **Latar Belakang & Masalah**:
      - Navigasi antar-halaman pada aplikasi MPA terasa kasar / patah (*stutter*) saat browser menunggu aset CSS/JS dan parsing DOM di jaringan/perangkat tertentu.

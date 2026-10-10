@@ -20,71 +20,94 @@
 
 ---
 
-### Task 1: Persist and validate selected photo mode
+### Task 1: Persist and validate selected photo mode (K4 & K5)
 
 **Files:**
 - Create: `database/migrations/2026_10_10_000001_add_idcard_photo_fields_to_anggota_table.php`
-- Create: `app/Rules/TransparentPng.php`
+- Create: `app/Rules/ValidCutoutPng.php` (replaces basic TransparentPng with K4 validation)
 - Modify: `app/Models/Anggota.php`, `app/Http/Requests/AnggotaRegistrationRequest.php`, `app/Http/Controllers/AnggotaRegistrationController.php`, `app/Http/Controllers/Portal/ProfileController.php`, `app/Http/Controllers/Admin/AnggotaController.php`
-- Test: `tests/Feature/AnggotaRegistrationTest.php`, `tests/Feature/PortalProfileTest.php`
+- Modify: `resources/views/admin/anggota/show.blade.php`, `resources/views/admin/anggota/edit.blade.php`
+- Test: `tests/Feature/AnggotaRegistrationTest.php`, `tests/Feature/PortalProfileTest.php`, `tests/Feature/AdminAnggotaCutoutTest.php`
 
-**Interfaces:** Produces `Anggota::$foto_cutout_path`, `Anggota::$foto_mode`, and `TransparentPng` that accepts a real PNG containing at least one alpha value above zero.
+**Interfaces:** Produces `Anggota::$foto_cutout_path`, `Anggota::$foto_mode` (enum: 'cutout', 'original', default: 'cutout'), server re-encodes PNG via GD, validates magic bytes, 5%-90% alpha transparency (alpha >= 120), aspect ratio match with source (+-1px). Admin can view side-by-side thumbnails and change mode or delete cutout.
 
-- [ ] Write a failing registration test for a transparent PNG accepted with `foto_mode=cutout`, and tests for JPEG/non-alpha PNG rejection.
-- [ ] Run the focused tests and confirm the missing fields/rule cause the expected failure.
-- [ ] Add the nullable columns and fillable properties; add `TransparentPng`; validate `foto_cutout` as optional PNG up to 2 MB and dimensions 100–2000px; store it privately only for cutout mode.
-- [ ] Extend profile replacement and admin deletion to delete the paired cutout path.
-- [ ] Run focused tests and commit `feat: persist validated id card cutouts`.
+- [ ] Write failing registration/profile tests for valid cutout PNG, invalid mime, out-of-range transparency (<5% or >90%), aspect ratio mismatch, and GD re-encoding.
+- [ ] Run focused tests and confirm expected failures.
+- [ ] Implement migration for `foto_cutout_path` and `foto_mode` on `anggota`.
+- [ ] Implement `ValidCutoutPng` rule with magic bytes check, transparency ratio 5%-90%, aspect ratio verification against source photo, and GD re-encoding helper.
+- [ ] Update `AnggotaRegistrationController`, `ProfileController`, and `AnggotaController` with storage, re-encoding, replacement, and deletion logic.
+- [ ] Add side-by-side thumbnail display and mode switch/cutout deletion in admin anggota views.
+- [ ] Run focused tests, Pint, full PHPUnit, view:cache, and commit `feat: persist validated id card cutouts`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
 
-### Task 2: Resolve PDF photo sources and improve GD fallback
+### Task 2a: ImageCutoutService GD v2 Fallback (K6)
+
+**Files:**
+- Modify: `app/Services/ImageCutoutService.php`
+- Test: `tests/Feature/ImageCutoutServiceV2Test.php`
+
+**Interfaces:** `ImageCutoutService::removeBackground()` upgrades to v2 algorithm: YCbCr with lower luminance weight, neighbour-relative region growing, Sobel edge barriers, largest connected component cleanup, 2px alpha blur, no lower fade, cache key `v2`.
+
+- [ ] Write failing tests for synthetic images: gradient background with shadow -> alpha 127; central subject -> alpha 0; no small isolated foreground islands; cache key v2 separation from v1.
+- [ ] Implement GD v2 algorithm in `ImageCutoutService`.
+- [ ] Run focused tests and verify GD v2 behavior.
+- [ ] Run Pint, full PHPUnit suite, view:cache, and commit `fix: add id card cutout v2 fallback`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
+
+### Task 2b: Resolve PDF Photo Sources in Controllers (K6)
 
 **Files:**
 - Modify: `app/Services/ImageCutoutService.php`, `app/Http/Controllers/Portal/KehadiranController.php`, `app/Http/Controllers/Admin/EventOutputController.php`
-- Test: `tests/Feature/IdCardBatchTest.php`
+- Test: `tests/Feature/IdCardBatchTest.php`, `tests/Feature/PortalEvaluationTest.php`
 
-**Interfaces:** `ImageCutoutService::resolveForAnggota(Anggota $anggota): array{dataUri:?string,mode:string}` returns client cutout, GD v2 cutout, or original source in that order according to mode.
+**Interfaces:** `ImageCutoutService::resolveForAnggota(Anggota $anggota): array{dataUri:?string,mode:string}` returns client cutout, GD v2 cutout, or original source in that order according to `foto_mode`.
 
-- [ ] Write failing image tests for a gradient/shadow background, no small foreground islands, v2 cache key, client-cutout priority, and original-mode fallback.
-- [ ] Run the focused test class; confirm failures reflect absent v2 resolution/mask behavior.
-- [ ] Replace fixed-alpha/fade logic with YCbCr local region-growing, Sobel barriers, largest-component cleanup, and 2px alpha blur; retain safety fallback and scaling.
-- [ ] Make both controllers consume `resolveForAnggota` without changing authorization or QR calls.
-- [ ] Run focused tests and commit `fix: add id card cutout v2 fallback`.
+- [ ] Write failing tests verifying resolution priority (client cutout -> GD v2 -> original when mode=cutout; directly original when mode=original).
+- [ ] Implement `resolveForAnggota` in `ImageCutoutService` and integrate into both `KehadiranController` and `EventOutputController`.
+- [ ] Run Pint, full PHPUnit suite, view:cache, and commit `fix: resolve id card photo sources`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
 
-### Task 3: Add progressive browser segmentation and source choice
+### Task 3: Progressive Browser Segmentation & Source Choice (K1, K2, K3, K7)
 
 **Files:**
 - Modify: `package.json`, `package-lock.json`, `resources/js/app.js`, `resources/views/components/pasfoto-fitter.blade.php`, `resources/views/anggota/register.blade.php`, `resources/views/portal/profile.blade.php`
-- Create: `resources/js/idcard-segmenter.js`
-- Create: `public/models/selfie_segmenter.tflite`
+- Create: `resources/js/idcard-mask.js` (pure functions: mask threshold, largest connected component, 2px feathering, transparency ratio calculation)
+- Create: `tests/unit/idcard-mask.test.js` (Vitest unit tests)
+- Create: `resources/js/idcard-segmenter.js` (MediaPipe loader and wrapper)
+- Asset: `public/models/selfie_segmenter.tflite` or chosen vision model asset
+- Test: Vitest test suite (`npx vitest run`)
 
-**Interfaces:** The fitter maintains hidden form fields `foto_mode` and `foto_cutout`; it never prevents the source photo upload when `segmentPhoto()` rejects.
+**Interfaces:** `idcard-mask.js` exports pure helper functions. Fitter triggers segmentation on cropped canvas output (`K3`), updates hidden fields `foto_cutout` and `foto_mode`, provides cutout preview/toggle. Fallback is graceful and non-blocking if WASM/WebGL fails.
 
-- [ ] Write a DOM-level test or extract pure mask helpers so largest-component and feathering assertions can fail independently.
-- [ ] Run the frontend test/build path and confirm the helper is missing before implementation.
-- [ ] Add the pinned Apache-2.0 MediaPipe dependency and lazy module; generate transparent PNG from mask; update hidden file input through `DataTransfer`; expose cutout/original controls and mockup preview.
-- [ ] Ensure failure leaves original existing crop intact and shows non-blocking fallback copy.
-- [ ] Run `npm run build` and commit `feat: segment id card photos in browser`.
+- [ ] Install Vitest and write unit tests for `idcard-mask.js`.
+- [ ] Implement pure mask helpers in `resources/js/idcard-mask.js` and verify passing `npx vitest run`.
+- [ ] Add `@mediapipe/tasks-vision`, download model asset to `public/models/`, and implement `idcard-segmenter.js`.
+- [ ] Integrate into `pasfoto-fitter.blade.php` to run segmentation on cropped output, maintaining identical dimensions.
+- [ ] Add UI controls for cutout/original toggle with live preview.
+- [ ] Run `npx vitest run`, `npm run build`, Pint, full PHPUnit suite, view:cache, and commit `feat: segment id card photos in browser`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
 
-### Task 4: Render source modes cleanly in both PDFs
+### Task 4: Render Source Modes Cleanly in Both PDFs & Visual Verification
 
 **Files:**
 - Modify: `resources/views/portal/idcard-pdf.blade.php`, `resources/views/admin/events/idcard-batch-pdf.blade.php`, both output controllers
 - Test: `tests/Feature/IdCardBatchTest.php`, `tests/Feature/PortalEvaluationTest.php`
 
-**Interfaces:** Templates receive `fotoDataUri`/card `foto` and `fotoMode`; original mode applies `photo-img-original`, cutout mode applies `photo-img-cutout`.
+**Interfaces:** PDF templates support `photo-img-cutout` and `photo-img-original` (with rounded border/frame). Photo box positioned behind overlay coverage so lower edge is clean. DomPDF DPI set to 180.
 
-- [ ] Write failing response/PDF tests asserting source mode is passed to each view.
-- [ ] Remove lower fade dependency, move the photo box behind overlay coverage, add rounded original photo frame, and set DomPDF DPI to 180.
-- [ ] Generate single and batch fixture PDFs, render the first page to PNG, and inspect placement against status/name/NBM.
-- [ ] Run focused tests and commit `fix: render id card photo modes cleanly`.
+- [ ] Update PDF templates for photo mode styling and positioning.
+- [ ] Generate single and batch test PDFs with synthetic photos for client cutout, GD v2, and original modes.
+- [ ] Convert rendered PDFs to PNGs in an ignored temporary directory and verify visually against all visual criteria.
+- [ ] Run Pint, full PHPUnit suite, view:cache, and commit `fix: render id card photo modes cleanly`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
 
-### Task 5: Regression verification and project memory
+### Task 5: Regression Verification, Memory Docs, and Final Report
 
 **Files:**
 - Modify: `docs/agentic/MEMORY.md`
-- Test: full PHPUnit suite and visual artifacts under ignored temporary directory
 
-- [ ] Run `vendor/bin/pint --test`, `php artisan test`, `npm run build`, and `php artisan view:cache`.
-- [ ] Record only permanent photo-source/caching decisions in project memory.
-- [ ] Confirm no private photo, token, NIK, or user upload is included in tests or artifacts.
+- [ ] Run all verification commands: `vendor/bin/pint --test`, `php artisan test`, `npm run build`, `npx vitest run`, `php artisan view:cache`.
+- [ ] Update `docs/agentic/MEMORY.md` with permanent decisions.
 - [ ] Commit `test: verify id card cutout v2 flow`.
+- [ ] Push to `origin/feat/idcard-cutout-v2`.
+- [ ] Present comprehensive final report.

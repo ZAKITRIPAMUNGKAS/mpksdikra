@@ -9,7 +9,7 @@ use Throwable;
 class ImageCutoutService
 {
     /**
-     * Remove background from image binary data and return PNG data URI.
+     * Remove background from image binary data and return PNG data URI (GD v2 algorithm).
      */
     public function removeBackgroundDataUri(?string $binary, int $tolerance = 15): ?string
     {
@@ -17,8 +17,8 @@ class ImageCutoutService
             return null;
         }
 
-        $hash = md5($binary.'|'.$tolerance);
-        $cachePath = "cutouts/{$hash}.png";
+        $hash = md5($binary.'|v2|'.$tolerance);
+        $cachePath = "cutouts/v2_{$hash}.png";
 
         if (Storage::disk('local')->exists($cachePath)) {
             $cached = Storage::disk('local')->get($cachePath);
@@ -96,33 +96,70 @@ class ImageCutoutService
             imagecopy($clean, $src, 0, 0, $trimL, $trimT, $workW, $workH);
             imagedestroy($src);
 
-            // 2. Sample perimeter background points safely
+            // 2. Precompute YCbCr planes
+            $yPlane = array_fill(0, $workW * $workH, 0.0);
+            $cbPlane = array_fill(0, $workW * $workH, 0.0);
+            $crPlane = array_fill(0, $workW * $workH, 0.0);
+
+            for ($y = 0; $y < $workH; $y++) {
+                $rowOffset = $y * $workW;
+                for ($x = 0; $x < $workW; $x++) {
+                    $rgb = imagecolorat($clean, $x, $y);
+                    $r = ($rgb >> 16) & 0xFF;
+                    $g = ($rgb >> 8) & 0xFF;
+                    $b = $rgb & 0xFF;
+
+                    $idx = $rowOffset + $x;
+                    $yPlane[$idx] = 0.299 * $r + 0.587 * $g + 0.114 * $b;
+                    $cbPlane[$idx] = 128.0 - 0.168736 * $r - 0.331264 * $g + 0.5 * $b;
+                    $crPlane[$idx] = 128.0 + 0.5 * $r - 0.418688 * $g - 0.081312 * $b;
+                }
+            }
+
+            // 3. Compute Sobel Edge Barrier on Y channel
+            $sobel = array_fill(0, $workW * $workH, 0.0);
+            for ($y = 1; $y < $workH - 1; $y++) {
+                $rowAbove = ($y - 1) * $workW;
+                $rowCurr = $y * $workW;
+                $rowBelow = ($y + 1) * $workW;
+                for ($x = 1; $x < $workW - 1; $x++) {
+                    $gx = ($yPlane[$rowAbove + $x + 1] + 2.0 * $yPlane[$rowCurr + $x + 1] + $yPlane[$rowBelow + $x + 1])
+                        - ($yPlane[$rowAbove + $x - 1] + 2.0 * $yPlane[$rowCurr + $x - 1] + $yPlane[$rowBelow + $x - 1]);
+                    $gy = ($yPlane[$rowBelow + $x - 1] + 2.0 * $yPlane[$rowBelow + $x] + $yPlane[$rowBelow + $x + 1])
+                        - ($yPlane[$rowAbove + $x - 1] + 2.0 * $yPlane[$rowAbove + $x] + $yPlane[$rowAbove + $x + 1]);
+
+                    $sobel[$rowCurr + $x] = sqrt($gx * $gx + $gy * $gy) / 4.0;
+                }
+            }
+
+            // 4. Sample perimeter background points
             $samplePoints = [];
             for ($step = 0; $step <= 10; $step++) {
                 $sampleX = (int) min($workW - 1, max(0, (int) ($workW * $step / 10)));
-                $samplePoints[] = [$sampleX, min($workH - 1, 3)];
+                $samplePoints[] = [$sampleX, min($workH - 1, 2)];
             }
-            for ($step = 1; $step <= 8; $step++) {
-                $sy = (int) min($workH - 1, max(0, (int) ($workH * $step * 0.10)));
-                $samplePoints[] = [min($workW - 1, 3), $sy];
-                $samplePoints[] = [max(0, $workW - 4), $sy];
+            for ($step = 1; $step <= 6; $step++) {
+                $sy = (int) min($workH - 1, max(0, (int) ($workH * $step * 0.05)));
+                $samplePoints[] = [min($workW - 1, 2), $sy];
+                $samplePoints[] = [max(0, $workW - 3), $sy];
             }
 
-            $bgColors = [];
+            $bgSamples = [];
             $avgR = 0;
             $avgG = 0;
             $avgB = 0;
             foreach ($samplePoints as [$px, $py]) {
+                $idx = $py * $workW + $px;
                 $c = imagecolorat($clean, $px, $py);
                 $cr = ($c >> 16) & 0xFF;
                 $cg = ($c >> 8) & 0xFF;
                 $cb = $c & 0xFF;
-                $bgColors[] = [$cr, $cg, $cb];
                 $avgR += $cr;
                 $avgG += $cg;
                 $avgB += $cb;
+                $bgSamples[] = [$yPlane[$idx], $cbPlane[$idx], $crPlane[$idx]];
             }
-            $sampleCount = max(1, count($bgColors));
+            $sampleCount = max(1, count($samplePoints));
             $avgR /= $sampleCount;
             $avgG /= $sampleCount;
             $avgB /= $sampleCount;
@@ -130,7 +167,16 @@ class ImageCutoutService
             $isNeutralBg = (abs($avgR - $avgG) <= 22 && abs($avgR - $avgB) <= 22 && abs($avgG - $avgB) <= 22);
             $bgBrightness = ($avgR * 299 + $avgG * 587 + $avgB * 114) / 1000;
 
-            // 3. Flood-fill queue: Seed hanya dari tepi atas dan tepi samping atas (di atas bahu)
+            // YCbCr distance with low luminance weight
+            $ycbcrDistSq = function (float $y1, float $cb1, float $cr1, float $y2, float $cb2, float $cr2): float {
+                $dy = $y1 - $y2;
+                $dcb = $cb1 - $cb2;
+                $dcr = $cr1 - $cr2;
+
+                return (0.25 * $dy * $dy) + (1.25 * $dcb * $dcb) + (1.25 * $dcr * $dcr);
+            };
+
+            // 5. Seeds & Flood-fill Queue (neighbour-relative region growing)
             $visited = array_fill(0, $workW * $workH, 0);
             $isBg = array_fill(0, $workW * $workH, false);
             $queue = new SplQueue;
@@ -143,42 +189,44 @@ class ImageCutoutService
             for ($y = 1; $y < $maxSeedY; $y++) {
                 $idxL = $y * $workW;
                 $idxR = $y * $workW + ($workW - 1);
-                $visited[$idxL] = 1;
-                $queue->enqueue($idxL);
-                $visited[$idxR] = 1;
-                $queue->enqueue($idxR);
+                if (! $visited[$idxL]) {
+                    $visited[$idxL] = 1;
+                    $queue->enqueue($idxL);
+                }
+                if (! $visited[$idxR]) {
+                    $visited[$idxR] = 1;
+                    $queue->enqueue($idxR);
+                }
             }
 
-            // 4. Proteksi Biometrik & Anatomis:
-            // a) Lingkaran wajah tepat di tengah (mata & hidung)
+            // Anatomical protection bounds
             $faceCx = (int) ($workW * 0.50);
             $faceCy = (int) ($workH * 0.40);
             $innerCoreRx = max(1, (int) ($workW * 0.10));
             $innerCoreRy = max(1, (int) ($workH * 0.10));
 
-            // b) Proteksi Inti Dada Tengah (mencegah kemeja/batik putih di tengah dada tertembus)
             $chestY = (int) ($workH * 0.58);
             $chestX1 = (int) ($workW * 0.28);
             $chestX2 = (int) ($workW * 0.72);
 
-            // Toleransi adaptif: jika background netral studio (ada gradasi bayangan abu-abu),
-            // gunakan toleransi 35 untuk menyapu bersih bayangan abu-abu di sekitar leher & bahu
-            $effectiveTol = $isNeutralBg ? max($tolerance, 35) : $tolerance;
-            $tolSq = $effectiveTol * $effectiveTol;
+            $effectiveTol = $isNeutralBg ? max($tolerance, 35) : max($tolerance, 25);
+            $maxSeedDistSq = $effectiveTol * $effectiveTol;
+            $maxStepDistSq = 22 * 22;
+            $sobelBarrierThreshold = 55.0;
 
             while (! $queue->isEmpty()) {
                 $idx = $queue->dequeue();
                 $x = $idx % $workW;
                 $y = (int) ($idx / $workW);
 
-                // Lindungi pusat wajah di tengah
+                // Face protection
                 $dx = ($x - $faceCx) / $innerCoreRx;
                 $dy = ($y - $faceCy) / $innerCoreRy;
                 if (($dx * $dx + $dy * $dy) < 1.0) {
                     continue;
                 }
 
-                // Lindungi inti dada tengah
+                // Chest protection
                 if ($y >= $chestY && $x >= $chestX1 && $x <= $chestX2) {
                     continue;
                 }
@@ -188,25 +236,25 @@ class ImageCutoutService
                 $g = ($rgb >> 8) & 0xFF;
                 $b = $rgb & 0xFF;
 
-                // Proteksi Biometrik 1: Kulit manusia (hangat alami, bukan background merah pekat)
+                // Skin tone protection
                 $isSkinTone = ($r > $g && $g >= $b && ($r - $b) >= 14 && $r >= 65 && ($r - $g) <= 85 && $b < 205);
                 if ($isSkinTone) {
                     continue;
                 }
 
-                // Proteksi Biometrik 2: Peci hitam / rambut hitam / jas gelap pada background terang
+                // Dark peci / hair on bright background
                 if ($bgBrightness > 95 && $r < 55 && $g < 55 && $b < 55) {
                     continue;
                 }
 
+                // Match with seed samples
+                $curY = $yPlane[$idx];
+                $curCb = $cbPlane[$idx];
+                $curCr = $crPlane[$idx];
+
                 $match = false;
-                foreach ($bgColors as [$br, $bg, $bb]) {
-                    // Jarak persepsi warna standar terbobot
-                    $dr = $r - $br;
-                    $dg = $g - $bg;
-                    $db = $b - $bb;
-                    $distSq = (2 * $dr * $dr) + (4 * $dg * $dg) + (3 * $db * $db);
-                    if ($distSq <= ($tolSq * 9)) {
+                foreach ($bgSamples as [$sy, $scb, $scr]) {
+                    if ($ycbcrDistSq($curY, $curCb, $curCr, $sy, $scb, $scr) <= $maxSeedDistSq) {
                         $match = true;
                         break;
                     }
@@ -215,38 +263,40 @@ class ImageCutoutService
                 if ($match) {
                     $isBg[$idx] = true;
 
+                    // Neighbors (up, down, left, right)
+                    $neighbors = [];
                     if ($y > 0) {
-                        $n = ($y - 1) * $workW + $x;
-                        if (! $visited[$n]) {
-                            $visited[$n] = 1;
-                            $queue->enqueue($n);
-                        }
+                        $neighbors[] = ($y - 1) * $workW + $x;
                     }
                     if ($y < $workH - 1) {
-                        $n = ($y + 1) * $workW + $x;
-                        if (! $visited[$n]) {
-                            $visited[$n] = 1;
-                            $queue->enqueue($n);
-                        }
+                        $neighbors[] = ($y + 1) * $workW + $x;
                     }
                     if ($x > 0) {
-                        $n = $y * $workW + ($x - 1);
-                        if (! $visited[$n]) {
-                            $visited[$n] = 1;
-                            $queue->enqueue($n);
-                        }
+                        $neighbors[] = $y * $workW + ($x - 1);
                     }
                     if ($x < $workW - 1) {
-                        $n = $y * $workW + ($x + 1);
-                        if (! $visited[$n]) {
-                            $visited[$n] = 1;
-                            $queue->enqueue($n);
+                        $neighbors[] = $y * $workW + ($x + 1);
+                    }
+
+                    foreach ($neighbors as $nIdx) {
+                        if (! $visited[$nIdx]) {
+                            // Check Sobel barrier: do not cross strong edge unless very close to seed
+                            if ($sobel[$nIdx] >= $sobelBarrierThreshold) {
+                                continue;
+                            }
+
+                            // Check neighbor relative step continuity
+                            $stepDistSq = $ycbcrDistSq($curY, $curCb, $curCr, $yPlane[$nIdx], $cbPlane[$nIdx], $crPlane[$nIdx]);
+                            if ($stepDistSq <= $maxStepDistSq) {
+                                $visited[$nIdx] = 1;
+                                $queue->enqueue($nIdx);
+                            }
                         }
                     }
                 }
             }
 
-            // 5. Hole-filling pass di area tubuh (y >= 0.50H) untuk menutup lubang motif kain/batik
+            // 6. Hole-filling pass on body region to close fabric/batik gaps
             for ($pass = 0; $pass < 2; $pass++) {
                 $filledBg = $isBg;
                 $minFillY = (int) ($workH * 0.50);
@@ -288,93 +338,134 @@ class ImageCutoutService
                 $isBg = $filledBg;
             }
 
-            // 6. Despeckle / Eliminasi bintik noise di area background
-            $cleanedBg = $isBg;
-            $despeckleLimitY = (int) ($workH * 0.75);
-            for ($y = 1; $y < $despeckleLimitY; $y++) {
-                for ($x = 1; $x < $workW - 1; $x++) {
-                    $idx = $y * $workW + $x;
-                    if (! $isBg[$idx]) {
-                        $bgCount = 0;
-                        if ($isBg[($y - 1) * $workW + ($x - 1)]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[($y - 1) * $workW + $x]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[($y - 1) * $workW + ($x + 1)]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[$y * $workW + ($x - 1)]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[$y * $workW + ($x + 1)]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[($y + 1) * $workW + ($x - 1)]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[($y + 1) * $workW + $x]) {
-                            $bgCount++;
-                        }
-                        if ($isBg[($y + 1) * $workW + ($x + 1)]) {
-                            $bgCount++;
-                        }
+            // 7. Largest Connected Component Foreground Cleanup
+            // Any foreground pixel not part of the main subject component is turned into background
+            $labels = array_fill(0, $workW * $workH, 0);
+            $currentLabel = 0;
+            $componentSizes = [];
 
-                        if ($bgCount >= 5) {
-                            $cleanedBg[$idx] = true;
+            for ($y = 0; $y < $workH; $y++) {
+                for ($x = 0; $x < $workW; $x++) {
+                    $idx = $y * $workW + $x;
+                    if (! $isBg[$idx] && $labels[$idx] === 0) {
+                        $currentLabel++;
+                        $size = 0;
+                        $compQ = new SplQueue;
+                        $compQ->enqueue($idx);
+                        $labels[$idx] = $currentLabel;
+
+                        while (! $compQ->isEmpty()) {
+                            $p = $compQ->dequeue();
+                            $size++;
+                            $px = $p % $workW;
+                            $py = (int) ($p / $workW);
+
+                            $nbrs = [];
+                            if ($px > 0) {
+                                $nbrs[] = $p - 1;
+                            }
+                            if ($px < $workW - 1) {
+                                $nbrs[] = $p + 1;
+                            }
+                            if ($py > 0) {
+                                $nbrs[] = $p - $workW;
+                            }
+                            if ($py < $workH - 1) {
+                                $nbrs[] = $p + $workW;
+                            }
+
+                            foreach ($nbrs as $nIdx) {
+                                if (! $isBg[$nIdx] && $labels[$nIdx] === 0) {
+                                    $labels[$nIdx] = $currentLabel;
+                                    $compQ->enqueue($nIdx);
+                                }
+                            }
+                        }
+                        $componentSizes[$currentLabel] = $size;
+                    }
+                }
+            }
+
+            if (! empty($componentSizes)) {
+                arsort($componentSizes);
+                $maxLabel = key($componentSizes);
+                $maxSize = current($componentSizes);
+
+                for ($y = 0; $y < $workH; $y++) {
+                    for ($x = 0; $x < $workW; $x++) {
+                        $idx = $y * $workW + $x;
+                        $lbl = $labels[$idx];
+                        if ($lbl > 0) {
+                            $isMain = ($lbl === $maxLabel);
+                            $isLargeBody = ($componentSizes[$lbl] >= (0.15 * $maxSize) && $x >= (0.2 * $workW) && $x <= (0.8 * $workW));
+                            if (! $isMain && ! $isLargeBody) {
+                                $isBg[$idx] = true;
+                            }
                         }
                     }
                 }
             }
-            $isBg = $cleanedBg;
 
-            // 6. Render destination dengan soft edge anti-aliasing & bottom gradient fade
+            // 8. 2px Alpha Blur (5x5 separable box blur, without bottom fade)
+            $rawAlpha = array_fill(0, $workW * $workH, 0);
+            for ($i = 0; $i < $workW * $workH; $i++) {
+                $rawAlpha[$i] = $isBg[$i] ? 127 : 0;
+            }
+
+            $hBlurred = array_fill(0, $workW * $workH, 0.0);
+            for ($y = 0; $y < $workH; $y++) {
+                $rowOffset = $y * $workW;
+                for ($x = 0; $x < $workW; $x++) {
+                    $sum = 0;
+                    $cnt = 0;
+                    for ($k = -2; $k <= 2; $k++) {
+                        $kx = $x + $k;
+                        if ($kx >= 0 && $kx < $workW) {
+                            $sum += $rawAlpha[$rowOffset + $kx];
+                            $cnt++;
+                        }
+                    }
+                    $hBlurred[$rowOffset + $x] = $sum / $cnt;
+                }
+            }
+
+            $finalAlpha = array_fill(0, $workW * $workH, 0);
+            for ($x = 0; $x < $workW; $x++) {
+                for ($y = 0; $y < $workH; $y++) {
+                    $sum = 0;
+                    $cnt = 0;
+                    for ($k = -2; $k <= 2; $k++) {
+                        $ky = $y + $k;
+                        if ($ky >= 0 && $ky < $workH) {
+                            $sum += $hBlurred[$ky * $workW + $x];
+                            $cnt++;
+                        }
+                    }
+                    $finalAlpha[$y * $workW + $x] = (int) round($sum / $cnt);
+                }
+            }
+
+            // 9. Render destination PNG with alpha
             $dst = imagecreatetruecolor($workW, $workH);
             imagealphablending($dst, false);
             imagesavealpha($dst, true);
             $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
             imagefill($dst, 0, 0, $transparent);
 
-            $fadeStartY = (int) ($workH * 0.88);
-            $fadeRange = max(1, $workH - 1 - $fadeStartY);
-
             for ($y = 0; $y < $workH; $y++) {
+                $rowOffset = $y * $workW;
                 for ($x = 0; $x < $workW; $x++) {
-                    $idx = $y * $workW + $x;
-                    if ($isBg[$idx]) {
+                    $idx = $rowOffset + $x;
+                    $alpha = max(0, min(127, $finalAlpha[$idx]));
+                    if ($alpha >= 127) {
                         imagesetpixel($dst, $x, $y, $transparent);
                     } else {
                         $origC = imagecolorat($clean, $x, $y);
                         $r = ($origC >> 16) & 0xFF;
                         $g = ($origC >> 8) & 0xFF;
                         $b = $origC & 0xFF;
-
-                        // Soft perimeter anti-aliasing
-                        $isEdge = false;
-                        if ($x === 0 || $x === $workW - 1 || $y === 0 ||
-                            ($y > 0 && $isBg[($y - 1) * $workW + $x]) ||
-                            ($y < $workH - 1 && $isBg[($y + 1) * $workW + $x]) ||
-                            ($x > 0 && $isBg[$y * $workW + ($x - 1)]) ||
-                            ($x < $workW - 1 && $isBg[$y * $workW + ($x + 1)])) {
-                            $isEdge = true;
-                        }
-
-                        $alpha = $isEdge ? 42 : 0;
-
-                        // Soft vertical gradient fade at bottom to blend smoothly into card curve
-                        if ($y >= $fadeStartY) {
-                            $fadeProgress = ($y - $fadeStartY) / $fadeRange;
-                            $fadeAlpha = (int) (127 * $fadeProgress);
-                            $alpha = max($alpha, min(127, $fadeAlpha));
-                        }
-
-                        if ($alpha >= 127) {
-                            imagesetpixel($dst, $x, $y, $transparent);
-                        } else {
-                            $cWithAlpha = imagecolorallocatealpha($dst, $r, $g, $b, $alpha);
-                            imagesetpixel($dst, $x, $y, $cWithAlpha);
-                        }
+                        $cWithAlpha = imagecolorallocatealpha($dst, $r, $g, $b, $alpha);
+                        imagesetpixel($dst, $x, $y, $cWithAlpha);
                     }
                 }
             }

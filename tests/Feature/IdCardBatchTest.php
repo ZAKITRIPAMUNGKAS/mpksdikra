@@ -152,7 +152,7 @@ class IdCardBatchTest extends TestCase
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
 
         // Verify the cutout was cached in storage
-        $hash = md5($jpegData.'|15');
-        $this->assertTrue(Storage::disk('local')->exists("cutouts/{$hash}.png"));
+        $hash = md5($jpegData.'|v2|15');
+        $this->assertTrue(Storage::disk('local')->exists("cutouts/v2_{$hash}.png"));
     }
 }

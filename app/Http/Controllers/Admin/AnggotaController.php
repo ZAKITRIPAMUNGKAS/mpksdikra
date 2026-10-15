@@ -77,7 +77,7 @@ class AnggotaController extends Controller
     public function show(Anggota $anggota): View
     {
         $this->authorizeCabang($anggota);
-        $anggota->load(['user', 'organisasi']);
+        $anggota->load(['user', 'organisasi', 'eventPeserta.event', 'penilaianAkhir']);
 
         return view('admin.anggota.show', ['anggota' => $anggota]);
     }

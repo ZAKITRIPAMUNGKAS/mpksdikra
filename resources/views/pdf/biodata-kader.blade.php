@@ -75,6 +75,7 @@
     $educationDetail = $anggota->pendidikan_s1 ?: ($anggota->pendidikan_sma ?: ($anggota->pendidikan_smp ?: $anggota->pendidikan_sd));
     $history = $anggota->eventPeserta()->with('event')->get();
     $custom = is_array($anggota->custom_fields) ? $anggota->custom_fields : [];
+    unset($custom['riwayat_ba']);
 @endphp
 
 <img class="watermark" src="{{ public_path('aset/logo-mpksdi.png') }}" alt="">

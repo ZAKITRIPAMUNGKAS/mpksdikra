@@ -373,13 +373,14 @@
                     <span>Buka Chat WA</span>
                 </a>
                 @if($anggota->user->status === 'aktif')
-                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi akun aktif secara otomatis via WhatsApp Gateway ke {{ $anggota->nama_lengkap }}?');">
+                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi akun aktif secara otomatis via WhatsApp Gateway (Fonnte) ke {{ $anggota->nama_lengkap }}?');">
                     @csrf
-                    <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    <button type="submit" title="Kirim otomatis melalui Fonnte WhatsApp Gateway API" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.04 20.16C10.66 20.16 9.3 19.8 8.1 19.09L7.81 18.92L4.69 19.74L5.52 16.7L5.33 16.4C4.55 15.16 4.14 13.72 4.14 11.91C4.14 7.37 7.84 3.67 12.05 3.67M9.27 7.15C9.07 7.15 8.74 7.22 8.47 7.51C8.2 7.8 7.43 8.53 7.43 10.01C7.43 11.49 8.51 12.92 8.66 13.12C8.81 13.32 10.78 16.36 13.8 17.66C14.52 17.97 15.08 18.16 15.52 18.3C16.24 18.53 16.9 18.5 17.42 18.42C18 18.33 19.2 17.69 19.45 16.99C19.7 16.29 19.7 15.69 19.63 15.56C19.55 15.44 19.35 15.36 19.05 15.21C18.75 15.06 17.27 14.33 17 14.23C16.72 14.13 16.52 14.08 16.32 14.38C16.12 14.68 15.55 15.36 15.37 15.56C15.2 15.76 15.02 15.78 14.72 15.63C14.42 15.48 13.45 15.16 12.3 14.14C11.4 13.34 10.8 12.36 10.62 12.06C10.45 11.75 10.6 11.59 10.75 11.44C10.89 11.3 11.05 11.09 11.2 10.91C11.35 10.74 11.4 10.61 11.5 10.41C11.6 10.21 11.55 10.04 11.47 9.89C11.4 9.74 10.8 8.26 10.55 7.66C10.3 7.07 10.05 7.15 9.87 7.14C9.7 7.13 9.5 7.13 9.27 7.15Z"/>
                         </svg>
                         <span>Kirim Notifikasi Akun Aktif</span>
+                        <span class="text-[9.5px] uppercase font-bold tracking-wider bg-emerald-800/80 text-emerald-100 px-1.5 py-0.5 rounded shadow-2xs">Fonnte</span>
                     </button>
                 </form>
                 <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanVerifikasiSukses($anggota)) }}"
@@ -392,13 +393,14 @@
                     </svg>
                 </a>
                 @elseif($anggota->user->status === 'ditolak')
-                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi catatan revisi secara otomatis via WhatsApp Gateway ke {{ $anggota->nama_lengkap }}?');">
+                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi catatan revisi secara otomatis via WhatsApp Gateway (Fonnte) ke {{ $anggota->nama_lengkap }}?');">
                     @csrf
-                    <button type="submit" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    <button type="submit" title="Kirim otomatis melalui Fonnte WhatsApp Gateway API" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.04 20.16C10.66 20.16 9.3 19.8 8.1 19.09L7.81 18.92L4.69 19.74L5.52 16.7L5.33 16.4C4.55 15.16 4.14 13.72 4.14 11.91C4.14 7.37 7.84 3.67 12.05 3.67M9.27 7.15C9.07 7.15 8.74 7.22 8.47 7.51C8.2 7.8 7.43 8.53 7.43 10.01C7.43 11.49 8.51 12.92 8.66 13.12C8.81 13.32 10.78 16.36 13.8 17.66C14.52 17.97 15.08 18.16 15.52 18.3C16.24 18.53 16.9 18.5 17.42 18.42C18 18.33 19.2 17.69 19.45 16.99C19.7 16.29 19.7 15.69 19.63 15.56C19.55 15.44 19.35 15.36 19.05 15.21C18.75 15.06 17.27 14.33 17 14.23C16.72 14.13 16.52 14.08 16.32 14.38C16.12 14.68 15.55 15.36 15.37 15.56C15.2 15.76 15.02 15.78 14.72 15.63C14.42 15.48 13.45 15.16 12.3 14.14C11.4 13.34 10.8 12.36 10.62 12.06C10.45 11.75 10.6 11.59 10.75 11.44C10.89 11.3 11.05 11.09 11.2 10.91C11.35 10.74 11.4 10.61 11.5 10.41C11.6 10.21 11.55 10.04 11.47 9.89C11.4 9.74 10.8 8.26 10.55 7.66C10.3 7.07 10.05 7.15 9.87 7.14C9.7 7.13 9.5 7.13 9.27 7.15Z"/>
                         </svg>
                         <span>Kirim Catatan Revisi</span>
+                        <span class="text-[9.5px] uppercase font-bold tracking-wider bg-red-800/80 text-red-100 px-1.5 py-0.5 rounded shadow-2xs">Fonnte</span>
                     </button>
                 </form>
                 <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanPerbaikanDitolak($anggota)) }}"
@@ -529,14 +531,103 @@
             </div>
             @endif
 
-            @if(!empty($anggota->custom_fields) && is_array($anggota->custom_fields) && count($anggota->custom_fields) > 0)
+            {{-- Riwayat Keikutsertaan Baitul Arqam & Perkaderan --}}
+            @php
+                $riwayatEvents = $anggota->eventPeserta ?? collect();
+                $riwayatCustom = $anggota->custom_fields['riwayat_ba'] ?? [];
+                $penilaianMap = $anggota->penilaianAkhir ? $anggota->penilaianAkhir->keyBy('event_id') : collect();
+            @endphp
+            @if($riwayatEvents->isNotEmpty() || !empty($riwayatCustom))
+            <div class="sm:col-span-2 pt-4 border-t border-slate-200">
+                <span class="font-bold text-[#063A60] uppercase tracking-wider block mb-3 text-xs flex items-center justify-between">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                        <span>Riwayat Keikutsertaan Perkaderan / Baitul Arqam</span>
+                    </span>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        {{ $riwayatEvents->count() ?: count($riwayatCustom) }} Kegiatan Tercatat
+                    </span>
+                </span>
+
+                <div class="space-y-2.5">
+                    @forelse($riwayatEvents as $ep)
+                        @php
+                            $ev = $ep->event;
+                            $penilaian = $penilaianMap->get($ep->event_id);
+                            $statusLulus = $penilaian?->status_kelulusan ?? ($ep->status_kelulusan ?? 'Terdaftar');
+                            $isLulus = strtolower($statusLulus) === 'lulus';
+                        @endphp
+                        <div class="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-slate-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-slate-900 text-sm">{{ $ev?->nama_event ?? 'Kegiatan Perkaderan' }}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        {{ $ev?->lokasi ?? '-' }}
+                                    </span>
+                                    <span>&bull;</span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        {{ $ev?->tanggal_mulai?->format('d M Y') ?? '-' }}
+                                        @if($ev?->tanggal_selesai && $ev->tanggal_selesai->ne($ev->tanggal_mulai))
+                                            - {{ $ev->tanggal_selesai->format('d M Y') }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 self-start sm:self-center">
+                                @if($isLulus)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Lulus
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                        {{ ucfirst($statusLulus) }}
+                                    </span>
+                                @endif
+                                @if($ev)
+                                    <a href="{{ route('admin.events.show', $ev) }}" class="text-xs text-sky-600 hover:text-sky-800 hover:underline font-medium">Detail Event &rarr;</a>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        @foreach($riwayatCustom as $rc)
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="space-y-1">
+                                    <div class="font-bold text-slate-900 text-sm">{{ $rc['nama_event'] ?? 'Baitul Arqam' }}</div>
+                                    <div class="text-xs text-slate-500">{{ $rc['lokasi'] ?? '-' }} &bull; {{ $rc['tanggal'] ?? '-' }}</div>
+                                </div>
+                                <div>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        {{ $rc['status'] ?? 'Lulus' }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endforelse
+                </div>
+            </div>
+            @endif
+
+            @php
+                $validCustomFields = collect($anggota->custom_fields ?? [])
+                    ->filter(fn($val, $key) => $key !== 'riwayat_ba' && filled($val))
+                    ->all();
+            @endphp
+            @if(!empty($validCustomFields) && count($validCustomFields) > 0)
                 <div class="sm:col-span-2 pt-3 border-t border-slate-200">
                     <span class="font-bold text-sky-900 uppercase tracking-wider block mb-2 text-xs flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Data Pertanyaan Tambahan Formulir (Kustom):</span>
                     </span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        @foreach($anggota->custom_fields as $kode => $jawaban)
+                        @foreach($validCustomFields as $kode => $jawaban)
                             @php
                                 $pertanyaanModel = \App\Models\FormPertanyaan::where('kode', $kode)->first();
                                 $labelTampil = $pertanyaanModel ? $pertanyaanModel->label : ucwords(str_replace(['custom_', '_'], ['', ' '], $kode));

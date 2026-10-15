@@ -26,6 +26,7 @@ yarn-error.log
 # Temporary & mockup files
 /*.png
 /*.zip
+/*.xlsx
 /public/*.zip
 /public/sample-*
 /public/aset/*.pdf

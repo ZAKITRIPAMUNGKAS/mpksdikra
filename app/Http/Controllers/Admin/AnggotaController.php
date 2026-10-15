@@ -280,6 +280,42 @@ class AnggotaController extends Controller
         return $redirect;
     }
 
+    public function kirimWa(Anggota $anggota): RedirectResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        if (empty($anggota->no_wa)) {
+            return redirect()
+                ->route('admin.anggota.show', $anggota)
+                ->with('error', 'Nomor WhatsApp anggota tidak tersedia.');
+        }
+
+        if ($anggota->user->status === 'ditolak') {
+            $pesan = WhatsAppNotificationService::pesanPerbaikanDitolak($anggota);
+            $label = 'Catatan revisi pendaftaran';
+        } else {
+            $pesan = WhatsAppNotificationService::pesanVerifikasiSukses($anggota);
+            $label = 'Notifikasi akun aktif';
+        }
+
+        $waUrl = $this->waUrl($anggota, $pesan);
+        $result = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+
+        $redirect = redirect()
+            ->route('admin.anggota.show', $anggota)
+            ->with('wa_url', $waUrl)
+            ->with('wa_auto_sent', $result['success'])
+            ->with('wa_auto_message', $result['message']);
+
+        if ($result['success']) {
+            $redirect->with('success', "{$label} berhasil dikirim otomatis via WhatsApp Gateway ke {$anggota->nama_lengkap}.");
+        } else {
+            $redirect->with('warning', "Gagal kirim otomatis ({$result['message']}). Silakan gunakan tombol Buka Chat WA untuk mengirim manual.");
+        }
+
+        return $redirect;
+    }
+
     public function export(Request $request): BinaryFileResponse
     {
         $user = auth()->user();

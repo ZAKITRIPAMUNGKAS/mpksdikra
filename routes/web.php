@@ -108,6 +108,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::post('/anggota/{anggota}/deactivate', [AdminAnggotaController::class, 'deactivate'])->name('anggota.deactivate');
         Route::post('/anggota/{anggota}/activate', [AdminAnggotaController::class, 'activate'])->name('anggota.activate');
         Route::post('/anggota/{anggota}/reset-password', [AdminAnggotaController::class, 'resetPassword'])->name('anggota.reset-password');
+        Route::post('/anggota/{anggota}/kirim-wa', [AdminAnggotaController::class, 'kirimWa'])->name('anggota.kirim-wa');
         Route::patch('/anggota/{anggota}/foto-mode', [AdminAnggotaController::class, 'updateFotoMode'])->name('anggota.foto-mode');
         Route::delete('/anggota/{anggota}/cutout', [AdminAnggotaController::class, 'destroyCutout'])->name('anggota.cutout.destroy');
         Route::delete('/anggota/{anggota}', [AdminAnggotaController::class, 'destroy'])->name('anggota.destroy');

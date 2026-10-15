@@ -104,10 +104,16 @@ function initPageLoader() {
         loader.classList.add('opacity-100', 'pointer-events-auto');
         loader.setAttribute('aria-hidden', 'false');
 
-        // Safety fallback: auto-hide after 8s if navigation is slow or blocked
+        // Progress bar visual cue
+        const progressBar = document.getElementById('scroll-progress-bar');
+        if (progressBar) {
+            progressBar.style.width = '75%';
+        }
+
+        // Safety fallback: auto-hide after 6s if navigation is slow or blocked
         timeoutId = setTimeout(() => {
             hideLoader();
-        }, 8000);
+        }, 6000);
     };
 
     const hideLoader = () => {
@@ -118,14 +124,23 @@ function initPageLoader() {
         loader.classList.remove('opacity-100', 'pointer-events-auto');
         loader.classList.add('opacity-0', 'pointer-events-none');
         loader.setAttribute('aria-hidden', 'true');
+
+        const progressBar = document.getElementById('scroll-progress-bar');
+        if (progressBar && progressBar.style.width === '75%') {
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 180);
+        }
     };
 
-    // 1. Initial page load finished -> smooth fade out
-    if (document.readyState === 'complete') {
+    // 1. Initial page load finished -> smooth & instant fade out as soon as DOM is ready
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
         hideLoader();
     } else {
-        window.addEventListener('load', hideLoader, { once: true });
+        document.addEventListener('DOMContentLoaded', hideLoader, { once: true });
     }
+    window.addEventListener('load', hideLoader, { once: true });
 
     // 2. Handle browser Back/Forward Cache (bfcache)
     window.addEventListener('pageshow', () => {
@@ -209,15 +224,56 @@ function initPageLoader() {
     });
 }
 
+// Lightweight Instant Link Prefetch Engine (Speeds up internal page navigation)
+function initLinkPrefetch() {
+    const prefetched = new Set();
+    const canPrefetch = 'connection' in navigator ? !navigator.connection.saveData : true;
+    if (!canPrefetch) return;
+
+    const prefetch = (href) => {
+        if (prefetched.has(href)) return;
+        prefetched.add(href);
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = href;
+        link.as = 'document';
+        document.head.appendChild(link);
+    };
+
+    document.addEventListener('pointerenter', (e) => {
+        const link = e.target.closest('a');
+        if (!link || !link.href) return;
+        if (link.target === '_blank' || link.hasAttribute('download') || link.dataset.noPrefetch === 'true') return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+            return;
+        }
+
+        try {
+            const url = new URL(link.href, window.location.href);
+            if (url.origin === window.location.origin && url.pathname !== window.location.pathname) {
+                const lower = url.pathname.toLowerCase();
+                const skip = ['logout', 'download', 'export', 'batch', 'scan', 'cetak', 'delete'];
+                if (!skip.some(s => lower.includes(s))) {
+                    prefetch(url.href);
+                }
+            }
+        } catch (_) {}
+    }, { passive: true });
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initPageLoader();
+        initLinkPrefetch();
         initScrollReveal();
         initScrollProgress();
         initScrollSpy();
     });
 } else {
     initPageLoader();
+    initLinkPrefetch();
     initScrollReveal();
     initScrollProgress();
     initScrollSpy();

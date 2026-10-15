@@ -70,23 +70,49 @@ class DashboardController extends Controller
         $genderL = (clone $anggotaQuery)->where('jenis_kelamin', 'L')->count();
         $genderP = (clone $anggotaQuery)->where('jenis_kelamin', 'P')->count();
 
-        // 5. Sebaran Kader: Jika cabang, top desa/kelurahan di PCM tsb. Jika daerah, top kecamatan se-Kabupaten
+        // 5. Sebaran Kader: Jika cabang, seluruh desa/kelurahan di PCM tsb. Jika daerah, seluruh 17 Cabang PCM se-Kabupaten
         if ($isCabang && $pcm) {
             $topKecamatan = (clone $anggotaQuery)->select('desa_kelurahan as kecamatan', DB::raw('count(*) as total'))
                 ->whereNotNull('desa_kelurahan')
                 ->where('desa_kelurahan', '!=', '')
                 ->groupBy('desa_kelurahan')
                 ->orderByDesc('total')
-                ->limit(7)
                 ->get();
         } else {
-            $topKecamatan = Anggota::select('kecamatan', DB::raw('count(*) as total'))
+            $cabangPcmList = config('arqam.opsi_form.cabang_pcm', []);
+            $kaderCounts = Anggota::select('kecamatan', DB::raw('count(*) as total'))
                 ->whereNotNull('kecamatan')
                 ->where('kecamatan', '!=', '')
                 ->groupBy('kecamatan')
-                ->orderByDesc('total')
-                ->limit(7)
-                ->get();
+                ->pluck('total', 'kecamatan')
+                ->all();
+
+            $matched = [];
+            $sebaran = collect($cabangPcmList)->map(function ($cabang) use ($kaderCounts, &$matched) {
+                $total = 0;
+                foreach ($kaderCounts as $key => $count) {
+                    if (strcasecmp(trim($key), trim($cabang)) === 0 || strcasecmp(trim($key), 'PCM '.trim($cabang)) === 0) {
+                        $total += $count;
+                        $matched[$key] = true;
+                    }
+                }
+
+                return (object) [
+                    'kecamatan' => $cabang,
+                    'total' => $total,
+                ];
+            });
+
+            foreach ($kaderCounts as $key => $count) {
+                if (! isset($matched[$key])) {
+                    $sebaran->push((object) [
+                        'kecamatan' => $key,
+                        'total' => $count,
+                    ]);
+                }
+            }
+
+            $topKecamatan = $sebaran->sortByDesc('total')->values();
         }
 
         // 6. Kegiatan Baitul Arqam Terkini (Maks 6)

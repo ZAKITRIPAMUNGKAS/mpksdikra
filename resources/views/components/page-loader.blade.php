@@ -1,6 +1,6 @@
 {{-- Global Page Transition & Smooth Loading Screen --}}
 <div id="page-loader"
-     class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 ease-out select-none"
+     class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white/92 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-150 ease-out select-none"
      aria-hidden="true"
      role="status"
      aria-live="polite">

@@ -373,16 +373,42 @@
                     <span>Buka Chat WA</span>
                 </a>
                 @if($anggota->user->status === 'aktif')
+                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi akun aktif secara otomatis via WhatsApp Gateway ke {{ $anggota->nama_lengkap }}?');">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        <span>Kirim Notifikasi Akun Aktif</span>
+                    </button>
+                </form>
                 <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanVerifikasiSukses($anggota)) }}"
                    target="_blank" rel="noopener noreferrer"
-                   class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
-                    <span>Kirim Notifikasi Akun Aktif</span>
+                   title="Kirim manual via WhatsApp Web"
+                   class="px-2.5 py-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-medium transition flex items-center gap-1 shadow-2xs">
+                    <span>Manual</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
                 </a>
                 @elseif($anggota->user->status === 'ditolak')
+                <form action="{{ route('admin.anggota.kirim-wa', $anggota) }}" method="POST" class="inline" onsubmit="return confirm('Kirim notifikasi catatan revisi secara otomatis via WhatsApp Gateway ke {{ $anggota->nama_lengkap }}?');">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        <span>Kirim Catatan Revisi</span>
+                    </button>
+                </form>
                 <a href="{{ \App\Services\WhatsAppNotificationService::makeUrl($anggota->no_wa, \App\Services\WhatsAppNotificationService::pesanPerbaikanDitolak($anggota)) }}"
                    target="_blank" rel="noopener noreferrer"
-                   class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
-                    <span>Kirim Catatan Revisi</span>
+                   title="Kirim manual via WhatsApp Web"
+                   class="px-2.5 py-2 bg-white hover:bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-medium transition flex items-center gap-1 shadow-2xs">
+                    <span>Manual</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
                 </a>
                 @endif
             </div>

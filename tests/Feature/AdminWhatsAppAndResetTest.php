@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\WhatsAppNotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AdminWhatsAppAndResetTest extends TestCase
@@ -67,5 +68,51 @@ class AdminWhatsAppAndResetTest extends TestCase
 
         $noSertifikat = $event->generateNomorSertifikat(7);
         $this->assertSame('007/BA-MPKSDI/IX/2026', $noSertifikat);
+    }
+
+    public function test_admin_can_send_wa_notification_automatically(): void
+    {
+        Http::fake([
+            'https://api.fonnte.com/*' => Http::response(['status' => true], 200),
+        ]);
+
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Kader Uji Notifikasi',
+            'no_wa' => '081234567890',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.anggota.kirim-wa', $anggota));
+
+        $response->assertRedirect(route('admin.anggota.show', $anggota))
+            ->assertSessionHas('success')
+            ->assertSessionHas('wa_auto_sent', true);
+    }
+
+    public function test_admin_handles_wa_gateway_failure_gracefully(): void
+    {
+        Http::fake([
+            'https://api.fonnte.com/*' => Http::response(['status' => false, 'reason' => 'device disconnected'], 200),
+        ]);
+
+        $admin = $this->admin();
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'ditolak']);
+        $anggota = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Kader Uji Ditolak',
+            'no_wa' => '081234567890',
+            'catatan_verifikasi' => 'Foto buram',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.anggota.kirim-wa', $anggota));
+
+        $response->assertRedirect(route('admin.anggota.show', $anggota))
+            ->assertSessionHas('warning')
+            ->assertSessionHas('wa_auto_sent', false)
+            ->assertSessionHas('wa_url');
     }
 }

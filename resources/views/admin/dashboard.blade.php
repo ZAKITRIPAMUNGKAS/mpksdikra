@@ -645,24 +645,26 @@
                             {{ $isCabang ? ('Sebaran Kader per Desa / Kelurahan (PCM ' . $cabangNama . ')') : 'Sebaran Kader per Cabang (PCM)' }}
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            {{ $isCabang ? ('Konsentrasi kader di wilayah PCM ' . $cabangNama) : 'Konsentrasi kader terbanyak di Karanganyar' }}
+                            {{ $isCabang ? ('Konsentrasi kader di wilayah PCM ' . $cabangNama) : 'Sebaran kader di 17 Cabang se-Karanganyar' }}
                         </p>
                     </div>
-                    <span class="text-xs font-semibold text-slate-400">Top Wilayah</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                        {{ $isCabang ? 'Seluruh Desa' : '17 Cabang' }}
+                    </span>
                 </div>
 
-                <div class="mt-4 space-y-3">
+                <div class="mt-4 max-h-[460px] overflow-y-auto pr-1.5 space-y-3 scrollbar-thin">
                     @forelse($topKecamatan as $kec)
                     @php
                         $persenKec = $totalAnggota > 0 ? round(($kec->total / $totalAnggota) * 100, 1) : 0;
                     @endphp
                     <div>
                         <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-semibold text-slate-800">{{ $isCabang ? 'Desa/Kel. ' : 'PCM ' }}{{ $kec->kecamatan }}</span>
+                            <span class="font-semibold text-slate-800">{{ $isCabang ? 'Desa/Kel. ' : (str_starts_with($kec->kecamatan, 'PCM ') ? '' : 'PCM ') }}{{ $kec->kecamatan }}</span>
                             <span class="font-medium text-slate-600 tabular-nums">{{ $kec->total }} Kader <span class="text-xs text-slate-400">({{ $persenKec }}%)</span></span>
                         </div>
                         <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-[#005c8a] rounded-full" style="width: {{ max($persenKec, 4) }}%;"></div>
+                            <div class="h-full bg-[#005c8a] rounded-full transition-all duration-300" style="width: {{ $kec->total > 0 ? max($persenKec, 4) : 0 }}%;"></div>
                         </div>
                     </div>
                     @empty

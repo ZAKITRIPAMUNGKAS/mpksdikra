@@ -451,22 +451,14 @@
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                             {{ \App\Models\FormPertanyaan::label('nama_ayah', 'Nama Ayah Kandung') }}
-                            @if(\App\Models\FormPertanyaan::isWajib('nama_ayah'))
-                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
-                            @else
-                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
-                            @endif
+                            <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                         </label>
                         <input name="nama_ayah" value="{{ old('nama_ayah') }}" autocomplete="off"
                             placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ayah', 'Contoh: H. Ahmad Syukri') }}"
-                            {{ \App\Models\FormPertanyaan::isWajib('nama_ayah') ? 'required' : '' }}
                             @input="clearError('nama_ayah')"
                             :class="clientErrors.nama_ayah ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nama_ayah') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
                         <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('nama_ayah', 'Nama lengkap ayah kandung untuk arsip nasab & silsilah.') }}</span>
-                        <template x-if="clientErrors.nama_ayah">
-                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nama_ayah"></p>
-                        </template>
                         @error('nama_ayah') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     @endif
@@ -474,22 +466,14 @@
                     <div>
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                             {{ \App\Models\FormPertanyaan::label('nama_ibu', 'Nama Ibu Kandung') }}
-                            @if(\App\Models\FormPertanyaan::isWajib('nama_ibu'))
-                                <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
-                            @else
-                                <span class="text-xs font-normal text-slate-500">(Opsional)</span>
-                            @endif
+                            <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                         </label>
                         <input name="nama_ibu" value="{{ old('nama_ibu') }}" autocomplete="off"
                             placeholder="{{ \App\Models\FormPertanyaan::placeholder('nama_ibu', 'Contoh: Hj. Siti Maryam') }}"
-                            {{ \App\Models\FormPertanyaan::isWajib('nama_ibu') ? 'required' : '' }}
                             @input="clearError('nama_ibu')"
                             :class="clientErrors.nama_ibu ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nama_ibu') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]">
                         <span class="text-xs text-slate-500 mt-1 block">{{ \App\Models\FormPertanyaan::bantuan('nama_ibu', 'Nama lengkap ibu kandung untuk arsip pangkalan data.') }}</span>
-                        <template x-if="clientErrors.nama_ibu">
-                            <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold flex items-center gap-1" x-text="clientErrors.nama_ibu"></p>
-                        </template>
                         @error('nama_ibu') <p class="text-rose-600 text-xs sm:text-sm mt-1.5 font-bold">{{ $message }}</p> @enderror
                     </div>
                     @endif
@@ -2135,14 +2119,6 @@ function registrationForm() {
             const fotoInput = form.querySelector('input[name="foto"]');
             if (!fotoInput || !fotoInput.files || fotoInput.files.length === 0) {
                 this.clientErrors.foto = 'Pasfoto 3:4 wajib diunggah untuk kelengkapan administrasi.';
-            }
-
-            if ({{ \App\Models\FormPertanyaan::isWajib('nama_ayah') ? 'true' : 'false' }} && !getVal('nama_ayah')) {
-                this.clientErrors.nama_ayah = 'Nama ayah kandung wajib diisi.';
-            }
-
-            if ({{ \App\Models\FormPertanyaan::isWajib('nama_ibu') ? 'true' : 'false' }} && !getVal('nama_ibu')) {
-                this.clientErrors.nama_ibu = 'Nama ibu kandung wajib diisi.';
             }
 
             if ({{ \App\Models\FormPertanyaan::isWajib('email') ? 'true' : 'false' }} && !getVal('email')) {

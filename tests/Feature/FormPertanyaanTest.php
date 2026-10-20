@@ -175,22 +175,22 @@ class FormPertanyaanTest extends TestCase
     {
         $this->seed(FormPertanyaanSeeder::class);
 
-        // Initially nama_ayah is optional
+        // Initially pekerjaan is optional
         $response = $this->get(route('anggota.register'));
         $response->assertOk();
-        $response->assertSee('Nama Ayah Kandung');
+        $response->assertSee('Pekerjaan / Profesi Utama');
         $response->assertSee('(Opsional)');
 
-        // Now set nama_ayah to wajib
-        $q = FormPertanyaan::where('kode', 'nama_ayah')->firstOrFail();
+        // Now set pekerjaan to wajib
+        $q = FormPertanyaan::where('kode', 'pekerjaan')->firstOrFail();
         $q->update(['is_wajib' => true]);
 
         $responseWajib = $this->get(route('anggota.register'));
         $responseWajib->assertOk();
-        $responseWajib->assertSee('Nama Ayah Kandung');
+        $responseWajib->assertSee('Pekerjaan / Profesi Utama');
         $responseWajib->assertSee('title="Wajib diisi"', false);
 
-        // Submitting without nama_ayah should fail validation
+        // Submitting without pekerjaan should fail validation
         $payload = [
             'nama_lengkap' => 'Ahmad Dahlan Uji',
             'alamat_rumah' => 'Jl. Lawu No. 12',
@@ -207,12 +207,50 @@ class FormPertanyaanTest extends TestCase
         ];
 
         $res = $this->post(route('anggota.register.store'), $payload);
-        $res->assertSessionHasErrors('nama_ayah');
+        $res->assertSessionHasErrors('pekerjaan');
 
-        // Submitting with nama_ayah should pass
-        $payload['nama_ayah'] = 'H. Syukri';
+        // Submitting with pekerjaan should pass
+        $payload['pekerjaan'] = 'Guru / Pendidik';
         $resPass = $this->post(route('anggota.register.store'), $payload);
         $resPass->assertSessionHasNoErrors();
+    }
+
+    public function test_nama_orang_tua_is_always_optional(): void
+    {
+        $this->seed(FormPertanyaanSeeder::class);
+
+        // Even if updated in database to true
+        FormPertanyaan::whereIn('kode', ['nama_ayah', 'nama_ibu'])->update(['is_wajib' => true]);
+        FormPertanyaan::clearConfigCache();
+
+        $this->assertFalse(FormPertanyaan::isWajib('nama_ayah'));
+        $this->assertFalse(FormPertanyaan::isWajib('nama_ibu'));
+
+        $response = $this->get(route('anggota.register'));
+        $response->assertOk();
+        $response->assertSee('Nama Ayah Kandung');
+        $response->assertSee('Nama Ibu Kandung');
+        $response->assertDontSee('Nama Ayah Kandung *');
+        $response->assertDontSee('Nama Ibu Kandung *');
+
+        // Submitting registration without parent names succeeds
+        $payload = [
+            'nama_lengkap' => 'Kader Uji Coba',
+            'alamat_rumah' => 'Jl. Lawu No. 99',
+            'jenis_kelamin' => 'L',
+            'nik' => '3313998877660002',
+            'tempat_lahir' => 'Karanganyar',
+            'tanggal_lahir' => '1990-01-01',
+            'status_pernikahan' => 'Nikah',
+            'desa_kelurahan' => 'Dagen',
+            'kecamatan' => 'Jaten',
+            'kabupaten' => 'Karanganyar',
+            'no_wa' => '081234567891',
+            'foto' => UploadedFile::fake()->image('foto.jpg', 600, 800),
+        ];
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionDoesntHaveErrors(['nama_ayah', 'nama_ibu']);
     }
 
     public function test_standard_question_hidden_setting_hides_field_from_registration_view(): void

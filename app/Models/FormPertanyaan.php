@@ -81,6 +81,10 @@ class FormPertanyaan extends Model
 
     public static function isWajib(string $kode, bool $default = false): bool
     {
+        if (in_array($kode, ['nama_ayah', 'nama_ibu'], true)) {
+            return false;
+        }
+
         $q = static::configMap()->get($kode);
 
         return $q ? (bool) $q->is_wajib : $default;
@@ -136,6 +140,12 @@ class FormPertanyaan extends Model
 
         foreach ($standardQuestions as $kode => $q) {
             if (! isset($baseRules[$kode])) {
+                continue;
+            }
+
+            if (in_array($kode, ['nama_ayah', 'nama_ibu'], true)) {
+                $baseRules[$kode] = ['nullable', 'string', 'max:255'];
+
                 continue;
             }
 

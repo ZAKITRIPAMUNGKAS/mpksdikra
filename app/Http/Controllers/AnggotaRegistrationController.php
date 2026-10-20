@@ -59,7 +59,7 @@ class AnggotaRegistrationController extends Controller
                 'no_wa' => $noWa,
             ]);
 
-            $anggotaData = collect($data)->except(['password', 'password_confirmation', 'foto_cutout'])->all();
+            $anggotaData = collect($data)->except(['password', 'password_confirmation', 'foto_cutout', 'nama_aum_custom', 'jabatan_aum_custom'])->all();
             $anggotaData['user_id'] = $user->id;
             $anggotaData['no_wa'] = $noWa;
             $anggotaData['foto'] = $fotoPath;
@@ -67,8 +67,39 @@ class AnggotaRegistrationController extends Controller
             $anggotaData['foto_mode'] = $fotoMode;
             $anggotaData['umur'] = Carbon::parse($data['tanggal_lahir'])->age;
 
-            if (empty($anggotaData['jabatan_aum']) && ! empty($anggotaData['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
-                $anggotaData['jabatan_aum'] = $anggotaData['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'];
+            $namaAum = $data['nama_aum'] ?? null;
+            if ($namaAum === 'Lainnya' && ! empty($data['nama_aum_custom'])) {
+                $namaAum = trim($data['nama_aum_custom']);
+            }
+            $jabatanAum = $data['jabatan_aum'] ?? null;
+            if ($jabatanAum === 'Lainnya' && ! empty($data['jabatan_aum_custom'])) {
+                $jabatanAum = trim($data['jabatan_aum_custom']);
+            }
+            $anggotaData['nama_aum'] = $namaAum;
+            $anggotaData['jabatan_aum'] = $jabatanAum;
+
+            if (! empty($data['jabatan_ortom']) && is_array($data['jabatan_ortom'])) {
+                $cleanedOrtom = [];
+                foreach ($data['jabatan_ortom'] as $ortomKey => $val) {
+                    if (is_array($val)) {
+                        $tingkat = $val['tingkat'] ?? null;
+                        $periode = $val['periode'] ?? null;
+                        $jabatan = $val['jabatan'] ?? null;
+                        if ($jabatan === 'Lainnya' && ! empty($val['jabatan_custom'])) {
+                            $jabatan = trim($val['jabatan_custom']);
+                        }
+                        if ($tingkat || $periode || $jabatan) {
+                            $cleanedOrtom[$ortomKey] = [
+                                'tingkat' => $tingkat,
+                                'periode' => $periode,
+                                'jabatan' => $jabatan,
+                            ];
+                        }
+                    } elseif (is_string($val) && trim($val) !== '') {
+                        $cleanedOrtom[$ortomKey] = trim($val);
+                    }
+                }
+                $anggotaData['jabatan_ortom'] = ! empty($cleanedOrtom) ? $cleanedOrtom : null;
             }
 
             Anggota::create($anggotaData);

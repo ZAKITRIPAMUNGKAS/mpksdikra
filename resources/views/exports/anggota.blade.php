@@ -76,6 +76,7 @@
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Ranting (PRM)</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Kabupaten</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pekerjaan / Profesi</th>
+            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Nama AUM</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Jabatan di AUM</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan Terakhir</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left; border: 1px solid #001f30;">Pendidikan SD / Sederajat</th>
@@ -132,7 +133,7 @@
             $aktifOrtom = [];
             if (is_array($a->keaktifan_ortom)) {
                 foreach ($a->keaktifan_ortom as $item) {
-                    $jab = $a->jabatan_ortom[$item] ?? null;
+                    $jab = $a->formatJabatanOrtom($item);
                     $aktifOrtom[] = $jab ? "{$item} ({$jab})" : $item;
                 }
             } elseif (!empty($a->keaktifan_ortom)) {
@@ -182,6 +183,7 @@
             <td style="border: 1px solid #cbd5e1;">{{ $a->prm ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->kabupaten ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->pekerjaan ?? '-' }}</td>
+            <td style="border: 1px solid #cbd5e1;">{{ $a->nama_aum ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->jabatan_aum ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $labelEdu }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->pendidikan_sd ?? '-' }}</td>

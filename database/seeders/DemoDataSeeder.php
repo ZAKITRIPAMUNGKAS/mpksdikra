@@ -393,6 +393,50 @@ class DemoDataSeeder extends Seeder
             $fotoNumber = ($idx % 20) + 1;
             $fotoPath = 'anggota/foto/'.sprintf('kader-%02d.jpg', $fotoNumber);
 
+            $rawJabatan = $d['jabatan_aum'] ?? null;
+            $namaAum = null;
+            $jabatanAum = null;
+
+            if (! empty($d['nama_aum'])) {
+                $namaAum = $d['nama_aum'];
+                $jabatanAum = $d['jabatan_aum'] ?? null;
+            } elseif ($rawJabatan) {
+                if (str_contains($rawJabatan, 'SMK Muh 2')) {
+                    $namaAum = 'SMK Muhammadiyah 2 Karanganyar';
+                    $jabatanAum = 'Kepala Lab Komputer';
+                } elseif (str_contains($rawJabatan, 'MIM')) {
+                    $namaAum = 'MIM Karanganyar';
+                    $jabatanAum = 'Guru / Pendidik';
+                } elseif (str_contains($rawJabatan, 'SMA Muh 1')) {
+                    $namaAum = 'SMA Muhammadiyah 1 Karanganyar';
+                    $jabatanAum = 'Tenaga Kependidikan / Administrasi / TU';
+                } elseif (str_contains($rawJabatan, 'Klinik PKU')) {
+                    $namaAum = 'Klinik PKU Muhammadiyah Karanganyar';
+                    $jabatanAum = 'Tenaga Medis / Kesehatan (Dokter, Perawat, Bidan, Nakes)';
+                } elseif (str_contains($rawJabatan, 'RS PKU')) {
+                    $namaAum = 'RS PKU Muhammadiyah Karanganyar';
+                    $jabatanAum = 'Tenaga Medis / Kesehatan (Dokter, Perawat, Bidan, Nakes)';
+                } elseif (str_contains($rawJabatan, 'SMK Muhammadiyah 6')) {
+                    $namaAum = 'SMK Muhammadiyah 6 Karanganyar';
+                    $jabatanAum = 'Guru / Pendidik';
+                } elseif (str_contains($rawJabatan, 'Lazismu')) {
+                    $namaAum = 'LAZISMU Karanganyar';
+                    $jabatanAum = 'Karyawan / Staf';
+                } elseif (str_contains($rawJabatan, 'BTM')) {
+                    $namaAum = 'BMT / BTM Muhammadiyah Karanganyar';
+                    $jabatanAum = 'Karyawan / Staf';
+                } elseif (str_contains($rawJabatan, 'Sekolah')) {
+                    $namaAum = 'SMA Muhammadiyah 2 Karanganyar';
+                    $jabatanAum = 'Wakil Kepala Sekolah / Madrasah';
+                } elseif (str_contains($rawJabatan, 'SD Muhammadiyah')) {
+                    $namaAum = 'SD Muhammadiyah 1 Karanganyar';
+                    $jabatanAum = 'Guru / Pendidik';
+                } else {
+                    $namaAum = null;
+                    $jabatanAum = $rawJabatan;
+                }
+            }
+
             $anggota = Anggota::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -402,8 +446,9 @@ class DemoDataSeeder extends Seeder
                     'nik' => $d['nik'],
                     'nbm' => $d['nbm'],
                     'foto' => $fotoPath,
-                    'jabatan_aum' => $d['jabatan_aum'],
-                    'pekerjaan' => $d['jabatan_aum'],
+                    'nama_aum' => $namaAum,
+                    'jabatan_aum' => $jabatanAum ?: $rawJabatan,
+                    'pekerjaan' => $rawJabatan,
                     'pcm' => $d['kecamatan'],
                     'prm' => 'PRM '.$d['desa'],
                     'tempat_lahir' => 'Karanganyar',
@@ -425,10 +470,9 @@ class DemoDataSeeder extends Seeder
                     'sumber_info_muhammadiyah' => ['Kajian yang diikuti', 'Internet/Media sosial'],
                     'langganan_suara_muhammadiyah' => 'Rutin beli',
                     'lembaga_zis' => ['LAZISMU'],
-                    'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah', 'Amal Usaha Muhammadiyah'],
+                    'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah'],
                     'jabatan_muhammadiyah' => [
                         'Pimpinan Cabang Muhammadiyah' => 'Anggota Majelis',
-                        'Amal Usaha Muhammadiyah' => $d['jabatan_aum'],
                     ],
                     'keaktifan_ortom' => [$d['gender'] === 'L' ? 'Pemuda Muhammadiyah' : 'Nasyiatul Aisyiyah'],
                     'jabatan_ortom' => [

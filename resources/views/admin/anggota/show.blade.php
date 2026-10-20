@@ -488,13 +488,27 @@
             </div>
             @endif
 
+            @if(!empty($anggota->nama_aum) || !empty($anggota->jabatan_aum))
+            <div class="sm:col-span-2 p-3.5 rounded-lg bg-sky-50/70 border border-sky-200/80">
+                <span class="font-semibold text-sky-800 uppercase tracking-wider block mb-1.5 text-xs">Amal Usaha Muhammadiyah (AUM):</span>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-slate-900 text-sm">{{ $anggota->nama_aum ?: 'Amal Usaha Muhammadiyah' }}</span>
+                    @if($anggota->jabatan_aum)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md bg-white border border-sky-200 text-xs text-sky-900 font-semibold">
+                            Amanah / Jabatan: {{ $anggota->jabatan_aum }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+            @endif
+
             @if(!empty($anggota->keaktifan_ortom))
             <div class="sm:col-span-2 p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/60">
                 <span class="font-semibold text-slate-500 uppercase tracking-wider block mb-1.5 text-xs">Keaktifan di ORTOM:</span>
                 <div class="flex flex-wrap gap-2">
                     @foreach($anggota->keaktifan_ortom as $item)
                         @php
-                            $jab = $anggota->jabatan_ortom[$item] ?? null;
+                            $jab = $anggota->formatJabatanOrtom($item);
                         @endphp
                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-800">
                             <strong>{{ $item }}</strong>

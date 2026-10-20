@@ -23,6 +23,7 @@ class Anggota extends Model
         'jenis_kelamin',
         'nik',
         'nbm',
+        'nama_aum',
         'jabatan_aum',
         'nama_ayah',
         'nama_ibu',
@@ -104,5 +105,45 @@ class Anggota extends Model
     public function penilaianAkhir()
     {
         return $this->hasMany(PenilaianAkhir::class);
+    }
+
+    public function formatJabatanOrtom(string $ortom): ?string
+    {
+        $raw = $this->jabatan_ortom[$ortom] ?? null;
+        if (! $raw) {
+            return null;
+        }
+
+        if (is_string($raw)) {
+            return $raw;
+        }
+
+        if (is_array($raw)) {
+            $tingkat = $raw['tingkat'] ?? null;
+            $periode = $raw['periode'] ?? null;
+            $jabatan = $raw['jabatan'] ?? null;
+
+            $parts = [];
+            if ($jabatan) {
+                $parts[] = $jabatan;
+            }
+            if ($tingkat) {
+                $parts[] = $tingkat;
+            }
+            if ($periode) {
+                $parts[] = 'Periode '.$periode;
+            }
+
+            return ! empty($parts) ? implode(' - ', $parts) : null;
+        }
+
+        return null;
+    }
+
+    public function formatAum(): ?string
+    {
+        $parts = array_filter([$this->nama_aum, $this->jabatan_aum]);
+
+        return ! empty($parts) ? implode(' (', $parts).')' : null;
     }
 }

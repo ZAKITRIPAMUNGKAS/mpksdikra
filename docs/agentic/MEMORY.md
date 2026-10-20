@@ -36,12 +36,44 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (173 test hijau per 2026-10-04).
+- `php artisan test` — PHPUnit feature tests (210 test hijau per 2026-10-20).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-20: Peningkatan Input Organisasi Otonom (ORTOM) Menjadi 3 Dropdown Terstruktur (Tingkat, Periode, Jabatan):
+  1. **Tingkat ORTOM (Dropdown 1)**: Opsi mencakup hirarki lengkap ortom: Pimpinan Pusat (PP), Pimpinan Wilayah (PW), Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW), Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW), Pimpinan Ranting (PR / DPR / Kolat TS / Qobilah HW), Pimpinan Komisariat (PK / Rayon), dan Lainnya (`config('arqam.opsi_form.tingkat_ortom')`).
+  2. **Periode Kepengurusan (Dropdown 2)**: Opsi periode muktamar/musyda: 2022 - 2027, 2018 - 2022, 2015 - 2018, 2010 - 2015, dan Lainnya (`config('arqam.opsi_form.periode_ortom')`).
+  3. **Jabatan / Amanah (Dropdown 3 + Teks Kustom)**: Opsi jabatan standar (Ketua Umum / Ketua, Wakil Ketua, Sekretaris, Bendahara, Koordinator Bidang, Anggota Bidang, Anggota Biasa, Lainnya) dengan input teks kustom otomatis bila memilih "Lainnya" (`config('arqam.opsi_form.jabatan_ortom_standar')`).
+  4. **Backend & Validasi**:
+     - `AnggotaRegistrationRequest` & `ProfileController`: Mengizinkan struktur array `jabatan_ortom.*` (`tingkat`, `periode`, `jabatan`, `jabatan_custom`) serta string legacy tanpa error validasi.
+     - `AnggotaRegistrationController` & `ProfileController`: Sanitasi dan pembersihan data jabatan ORTOM agar tersimpan rapi sebagai array terstruktur di kolom JSON `jabatan_ortom`.
+     - `Anggota::formatJabatanOrtom()`: Helper otomatis memformat data array menjadi string yang rapi (`Jabatan - Tingkat - Periode Tahun`) atau mengembalikan string legacy secara transparan.
+  5. **Tampilan & Ekspor**:
+     - `register.blade.php` dan `portal/profile.blade.php`: Antarmuka interaktif 3 dropdown per ortom yang dicentang.
+     - `admin/anggota/show.blade.php`, `pdf/biodata-kader.blade.php`, dan `exports/anggota.blade.php`: Menggunakan `formatJabatanOrtom()` sehingga aman dari warning `Array to string conversion` dan tampil elegan di PDF serta Excel.
+- 2026-10-20: Pemisahan Tegas 3 Pilar Organisasi (Pimpinan Muhammadiyah, AUM, ORTOM) & Filter / Sorting Multi-Kategori:
+  1. **Pemisahan 3 Pilar**:
+     - Pilar 1: Pimpinan Muhammadiyah (`keaktifan_muhammadiyah`, `jabatan_muhammadiyah`, `pcm`, `prm`).
+     - Pilar 2: Amal Usaha Muhammadiyah (AUM) dengan 2 Dropdown terpisah:
+       * Dropdown 1: Nama AUM (`nama_aum`) dengan opsi dari `config('arqam.opsi_form.nama_aum')`, plus opsi 'Lainnya' yang memunculkan input teks kustom (`nama_aum_custom`).
+       * Dropdown 2: Jabatan / Amanah di AUM (`jabatan_aum`) dengan opsi dari `config('arqam.opsi_form.jabatan_aum')`, plus opsi 'Lainnya' yang memunculkan input teks kustom (`jabatan_aum_custom`).
+     - Pilar 3: Organisasi Otonom (ORTOM) (`keaktifan_ortom`, `jabatan_ortom`).
+  2. **Dukungan Form Pendaftaran & Profil**:
+     - `resources/views/anggota/register.blade.php`: Tab 3 Data Organisasi ditata ulang menjadi 3 pilar yang jelas dan modern. State 2 dropdown AUM terintegrasi dengan pemulihan draf (localStorage).
+     - `resources/views/portal/profile.blade.php`: Mendukung pembaruan nama AUM dan jabatan AUM dengan 2 dropdown dan input teks kustom.
+     - `app/Models/FormPertanyaan.php`: Menambahkan `nama_aum` dan `jabatan_aum` ke `$skipOpsiValidation` agar kader dapat memilih dari dropdown maupun menginput nama AUM kustom tanpa terhalang strict `Rule::in`.
+  3. **Filter & Sorting Multi-Kategori**:
+     - `AnggotaController::index` & `resources/views/admin/anggota/index.blade.php`: Menambahkan filter pilar (Semua/AUM/ORTOM/Muhammadiyah), filter spesifik nama AUM, filter spesifik ORTOM, filter cabang PCM, dan sorting (nama A-Z/Z-A, nama AUM A-Z, cabang PCM A-Z). Tabel menampilkan kolom Kategori & Afiliasi lengkap dengan badge AUM, ORTOM, dan Cabang.
+     - `PesertaController::search` & `resources/views/admin/events/enroll.blade.php`: Mendukung pencarian, filter pilar, filter spesifik AUM, filter ORTOM, filter cabang, dan sorting sehingga panitia Baitul Arqam AUM atau ORTOM dapat menyaring kader dari unit bersangkutan secara instan untuk di-enroll massal.
+  4. **Ekspor & Cetak Biodata**:
+     - `resources/views/exports/anggota.blade.php`: Kolom `Nama AUM` dan `Jabatan di AUM` diekspor secara terpisah ke Excel.
+     - `resources/views/pdf/biodata-kader.blade.php` & `resources/views/admin/anggota/show.blade.php`: Menampilkan data AUM secara terstruktur dan jelas.
+  5. **Verifikasi**:
+     - 208 automated feature tests lulus 100% (854 assertions).
+     - Laravel Pint lulus 100%.
+     - Vite production build berhasil.
 - 2026-10-10: Implementasi ID Card Cutout V2 & Multi-Tier Background Removal:
   1. **Model Segmentasi Terpilih (Browser-Side)**:
      - Model terpilih: `selfie_segmenter.tflite` (249 KB) vs `selfie_multiclass_256x256.tflite` (16.37 MB).

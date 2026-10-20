@@ -22,6 +22,10 @@ class PesertaController extends Controller
     {
         $query = $request->string('q')->toString();
         $cabang = $request->string('cabang')->toString();
+        $kategori = $request->string('kategori')->toString();
+        $aum = $request->string('aum')->toString();
+        $ortom = $request->string('ortom')->toString();
+        $sort = $request->string('sort')->toString();
 
         $enrolled = EventPeserta::where('event_id', $event->id)->pluck('anggota_id')->all();
 
@@ -29,8 +33,36 @@ class PesertaController extends Controller
             ->when($query, function ($q) use ($query) {
                 $q->where(function ($sub) use ($query) {
                     $sub->where('nama_lengkap', 'like', "%{$query}%")
-                        ->orWhere('nik', 'like', "%{$query}%");
+                        ->orWhere('nik', 'like', "%{$query}%")
+                        ->orWhere('nbm', 'like', "%{$query}%")
+                        ->orWhere('nama_aum', 'like', "%{$query}%")
+                        ->orWhere('jabatan_aum', 'like', "%{$query}%");
                 });
+            })
+            ->when($kategori === 'muhammadiyah', function ($q) {
+                $q->whereNotNull('keaktifan_muhammadiyah')
+                    ->where('keaktifan_muhammadiyah', '!=', '[]')
+                    ->whereJsonDoesntContain('keaktifan_muhammadiyah', 'Tidak aktif');
+            })
+            ->when($kategori === 'aum', function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where(function ($s2) {
+                        $s2->whereNotNull('nama_aum')->where('nama_aum', '!=', '');
+                    })->orWhere(function ($s2) {
+                        $s2->whereNotNull('jabatan_aum')->where('jabatan_aum', '!=', '');
+                    });
+                });
+            })
+            ->when($kategori === 'ortom', function ($q) {
+                $q->whereNotNull('keaktifan_ortom')
+                    ->where('keaktifan_ortom', '!=', '[]')
+                    ->whereJsonDoesntContain('keaktifan_ortom', 'Tidak aktif');
+            })
+            ->when($aum, function ($q) use ($aum) {
+                $q->where('nama_aum', $aum);
+            })
+            ->when($ortom, function ($q) use ($ortom) {
+                $q->whereJsonContains('keaktifan_ortom', $ortom);
             })
             ->when($cabang, function ($q) use ($cabang) {
                 $q->where(function ($sub) use ($cabang) {
@@ -38,6 +70,11 @@ class PesertaController extends Controller
                         ->orWhere('kecamatan', $cabang);
                 });
             })
+            ->when($sort === 'nama_asc', fn ($q) => $q->orderBy('nama_lengkap', 'asc'))
+            ->when($sort === 'nama_desc', fn ($q) => $q->orderBy('nama_lengkap', 'desc'))
+            ->when($sort === 'aum_asc', fn ($q) => $q->orderByRaw("CASE WHEN nama_aum IS NULL OR nama_aum = '' THEN 1 ELSE 0 END, nama_aum ASC"))
+            ->when($sort === 'cabang_asc', fn ($q) => $q->orderByRaw("COALESCE(NULLIF(pcm, ''), kecamatan) ASC"))
+            ->when(! $sort || $sort === 'terbaru', fn ($q) => $q->latest())
             ->whereNotIn('id', $enrolled)
             ->paginate(20)
             ->withQueryString();
@@ -53,7 +90,20 @@ class PesertaController extends Controller
             ->values()
             ->all();
 
-        return view('admin.events.enroll', compact('event', 'kandidat', 'query', 'cabang', 'pcmList'));
+        $aumList = collect(config('arqam.opsi_form.nama_aum', []))
+            ->merge(Anggota::whereNotNull('nama_aum')->where('nama_aum', '!=', '')->pluck('nama_aum'))
+            ->filter(fn ($x) => ! in_array($x, ['Lainnya', ''], true))
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        $ortomList = collect(config('arqam.opsi_form.keaktifan_ortom', []))
+            ->filter(fn ($x) => $x !== 'Tidak aktif')
+            ->values()
+            ->all();
+
+        return view('admin.events.enroll', compact('event', 'kandidat', 'query', 'cabang', 'kategori', 'aum', 'ortom', 'sort', 'pcmList', 'aumList', 'ortomList'));
     }
 
     public function enroll(Request $request, Event $event): RedirectResponse

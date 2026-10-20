@@ -64,10 +64,11 @@ class PortalProfileTest extends TestCase
                 'pekerjaan' => 'Guru Muhammadiyah',
                 'pcm' => 'Tasikmadu',
                 'prm' => 'PRM Papahan',
-                'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah', 'Amal Usaha Muhammadiyah'],
+                'nama_aum' => 'SMA Muhammadiyah 1 Karanganyar',
+                'jabatan_aum' => 'Kepala Sekolah',
+                'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah'],
                 'jabatan_muhammadiyah' => [
                     'Pimpinan Cabang Muhammadiyah' => 'Wakil Ketua PCM',
-                    'Amal Usaha Muhammadiyah' => 'Kepala Sekolah',
                 ],
                 'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
                 'jabatan_ortom' => [
@@ -206,5 +207,55 @@ class PortalProfileTest extends TestCase
         $this->assertNull($fresh->foto_cutout_path);
         Storage::disk('local')->assertMissing($oldCutoutPath);
         Storage::disk('local')->assertExists($fresh->foto);
+    }
+
+    public function test_portal_profile_updates_structured_ortom_with_dropdowns(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'jabatan_ortom' => ['Pemuda Muhammadiyah' => 'Ketua Ranting Lama'],
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('portal.profile.update'), [
+                'nama_lengkap' => $a->nama_lengkap,
+                'alamat_rumah' => $a->alamat_rumah,
+                'tempat_lahir' => $a->tempat_lahir,
+                'tanggal_lahir' => $a->tanggal_lahir->format('Y-m-d'),
+                'status_pernikahan' => $a->status_pernikahan,
+                'desa_kelurahan' => $a->desa_kelurahan,
+                'kecamatan' => $a->kecamatan,
+                'kabupaten' => $a->kabupaten,
+                'keaktifan_ortom' => ['Pemuda Muhammadiyah', 'Hizbul Wathon'],
+                'jabatan_ortom' => [
+                    'Pemuda Muhammadiyah' => [
+                        'tingkat' => 'Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW)',
+                        'periode' => '2022 - 2027',
+                        'jabatan' => 'Sekretaris Umum / Sekretaris',
+                    ],
+                    'Hizbul Wathon' => [
+                        'tingkat' => 'Pimpinan Ranting (PR / DPR / Kolat TS / Qobilah HW)',
+                        'periode' => '2018 - 2022',
+                        'jabatan' => 'Lainnya',
+                        'jabatan_custom' => 'Pemimpin Qabilah',
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $fresh = $a->fresh();
+        $this->assertIsArray($fresh->jabatan_ortom);
+        $this->assertSame('Sekretaris Umum / Sekretaris', $fresh->jabatan_ortom['Pemuda Muhammadiyah']['jabatan']);
+        $this->assertSame('Pemimpin Qabilah', $fresh->jabatan_ortom['Hizbul Wathon']['jabatan']);
+        $this->assertSame(
+            'Sekretaris Umum / Sekretaris - Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW) - Periode 2022 - 2027',
+            $fresh->formatJabatanOrtom('Pemuda Muhammadiyah')
+        );
+        $this->assertSame(
+            'Pemimpin Qabilah - Pimpinan Ranting (PR / DPR / Kolat TS / Qobilah HW) - Periode 2018 - 2022',
+            $fresh->formatJabatanOrtom('Hizbul Wathon')
+        );
     }
 }

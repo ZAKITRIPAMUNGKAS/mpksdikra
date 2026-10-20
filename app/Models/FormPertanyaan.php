@@ -157,7 +157,7 @@ class FormPertanyaan extends Model
                 $ruleList = array_map(fn ($r) => $r === 'required' ? 'nullable' : $r, $ruleList);
             }
 
-            $skipOpsiValidation = ['jenis_kelamin', 'pendidikan_terakhir'];
+            $skipOpsiValidation = ['jenis_kelamin', 'pendidikan_terakhir', 'nama_aum', 'jabatan_aum'];
 
             if (! in_array($kode, $skipOpsiValidation, true) && $q->opsi && is_array($q->opsi) && count($q->opsi) > 0) {
                 if (in_array($q->tipe, ['select', 'text'], true)) {

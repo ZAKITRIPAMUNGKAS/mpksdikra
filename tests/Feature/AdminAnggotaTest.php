@@ -333,4 +333,81 @@ class AdminAnggotaTest extends TestCase
         $this->assertNotNull(Anggota::find($a->id));
         $this->assertNotNull(User::find($user->id));
     }
+
+    public function test_admin_can_filter_anggota_by_kategori_and_aum(): void
+    {
+        $admin = $this->admin();
+
+        $user1 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a1 = Anggota::factory()->create([
+            'user_id' => $user1->id,
+            'nama_lengkap' => 'Kader AUM PKU',
+            'nama_aum' => 'RS PKU Muhammadiyah Karanganyar',
+            'jabatan_aum' => 'Dokter Umum',
+        ]);
+
+        $user2 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a2 = Anggota::factory()->create([
+            'user_id' => $user2->id,
+            'nama_lengkap' => 'Kader AUM SMK',
+            'nama_aum' => 'SMK Muhammadiyah 1 Karanganyar',
+            'jabatan_aum' => 'Guru',
+        ]);
+
+        $user3 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a3 = Anggota::factory()->create([
+            'user_id' => $user3->id,
+            'nama_lengkap' => 'Kader Murni Cabang',
+            'pcm' => 'Colomadu',
+            'nama_aum' => null,
+            'jabatan_aum' => null,
+            'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah'],
+        ]);
+
+        // Filter kategori=aum
+        $response = $this->actingAs($admin)
+            ->get(route('admin.anggota.index', ['kategori' => 'aum']));
+        $response->assertOk();
+        $response->assertSee('Kader AUM PKU');
+        $response->assertSee('Kader AUM SMK');
+        $response->assertDontSee('Kader Murni Cabang');
+
+        // Filter aum spesifik
+        $resAum = $this->actingAs($admin)
+            ->get(route('admin.anggota.index', ['aum' => 'RS PKU Muhammadiyah Karanganyar']));
+        $resAum->assertOk();
+        $resAum->assertSee('Kader AUM PKU');
+        $resAum->assertDontSee('Kader AUM SMK');
+    }
+
+    public function test_admin_can_sort_anggota_by_aum_and_nama(): void
+    {
+        $admin = $this->admin();
+
+        $userA = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $userA->id,
+            'nama_lengkap' => 'Zainal Abidin',
+            'nama_aum' => 'Klinik PKU Muhammadiyah Karanganyar',
+        ]);
+
+        $userB = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $userB->id,
+            'nama_lengkap' => 'Anwar Sanusi',
+            'nama_aum' => 'SMA Muhammadiyah 1 Karanganyar',
+        ]);
+
+        // Sort nama_asc
+        $resSortNama = $this->actingAs($admin)
+            ->get(route('admin.anggota.index', ['sort' => 'nama_asc']));
+        $resSortNama->assertOk();
+        $resSortNama->assertSeeInOrder(['Anwar Sanusi', 'Zainal Abidin']);
+
+        // Sort aum_asc
+        $resSortAum = $this->actingAs($admin)
+            ->get(route('admin.anggota.index', ['sort' => 'aum_asc']));
+        $resSortAum->assertOk();
+        $resSortAum->assertSeeInOrder(['Klinik PKU Muhammadiyah Karanganyar', 'SMA Muhammadiyah 1 Karanganyar']);
+    }
 }

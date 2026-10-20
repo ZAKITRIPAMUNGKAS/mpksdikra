@@ -81,42 +81,74 @@
                         Pilih kader aktif terverifikasi untuk didaftarkan secara resmi ke agenda perkaderan ini.
                     </p>
 
-                    {{-- Search & Filter Bar --}}
-                    <form method="GET" action="{{ route('admin.events.enroll', $event) }}" class="mt-5 flex gap-2.5 flex-wrap sm:flex-nowrap">
-                        <div class="relative flex-1 min-w-[200px]">
-                            <input type="text" name="q" value="{{ $query }}" placeholder="Cari nama lengkap atau NIK kader…"
-                                class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition shadow-2xs">
-                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-
-                        {{-- Filter Cabang / PCM --}}
-                        <div class="relative min-w-[170px] sm:w-56 shrink-0">
-                            <select name="cabang" onchange="this.form.submit()"
-                                class="w-full pl-3 pr-8 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer appearance-none">
-                                <option value="">Semua Cabang (PCM)</option>
-                                @foreach($pcmList as $item)
-                                    <option value="{{ $item }}" {{ $cabang === $item ? 'selected' : '' }}>
-                                        PCM {{ $item }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    {{-- Search & Multi-Kategori Filter Bar (AUM, ORTOM, Muhammadiyah) --}}
+                    <form method="GET" action="{{ route('admin.events.enroll', $event) }}" class="mt-5 space-y-3">
+                        <div class="flex gap-2.5 flex-wrap sm:flex-nowrap">
+                            <div class="relative flex-1 min-w-[200px]">
+                                <input type="text" name="q" value="{{ $query }}" placeholder="Cari nama, NIK, NBM, atau nama AUM kader…"
+                                    class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition shadow-2xs">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                             </div>
+                            <button type="submit" class="px-5 py-2.5 bg-[#005c8a] hover:bg-[#00486d] active:bg-[#003855] text-white text-xs font-semibold rounded-lg shadow-2xs transition shrink-0">
+                                Cari
+                            </button>
+                            @if(!empty($query) || !empty($cabang) || !empty($kategori) || !empty($aum) || !empty($ortom) || !empty($sort))
+                            <a href="{{ route('admin.events.enroll', $event) }}" class="px-3.5 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-lg transition shrink-0">
+                                Reset
+                            </a>
+                            @endif
                         </div>
 
-                        <button type="submit" class="px-5 py-2.5 bg-[#005c8a] hover:bg-[#00486d] active:bg-[#003855] text-white text-xs font-semibold rounded-lg shadow-2xs transition shrink-0">
-                            Cari
-                        </button>
-                        @if(!empty($query) || !empty($cabang))
-                        <a href="{{ route('admin.events.enroll', $event) }}" class="px-3.5 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-lg transition shrink-0">
-                            Reset
-                        </a>
-                        @endif
+                        {{-- Dropdown Filter Row --}}
+                        <div class="flex items-center gap-2 flex-wrap text-xs">
+                            {{-- Filter Kategori Basis --}}
+                            <select name="kategori" onchange="this.form.submit()"
+                                class="px-3 py-2 bg-slate-50/70 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer">
+                                <option value="">Semua Pilar</option>
+                                <option value="aum" @selected(($kategori ?? '') === 'aum')>Amal Usaha Muhammadiyah (AUM)</option>
+                                <option value="ortom" @selected(($kategori ?? '') === 'ortom')>Organisasi Otonom (ORTOM)</option>
+                                <option value="muhammadiyah" @selected(($kategori ?? '') === 'muhammadiyah')>Pimpinan Muhammadiyah</option>
+                            </select>
+
+                            {{-- Filter Spesifik Nama AUM --}}
+                            <select name="aum" onchange="this.form.submit()"
+                                class="px-3 py-2 bg-slate-50/70 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer max-w-[200px] truncate">
+                                <option value="">Semua Nama AUM</option>
+                                @foreach($aumList ?? [] as $item)
+                                    <option value="{{ $item }}" @selected(($aum ?? '') === $item)>{{ $item }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Filter Spesifik ORTOM --}}
+                            <select name="ortom" onchange="this.form.submit()"
+                                class="px-3 py-2 bg-slate-50/70 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer">
+                                <option value="">Semua ORTOM</option>
+                                @foreach($ortomList ?? [] as $item)
+                                    <option value="{{ $item }}" @selected(($ortom ?? '') === $item)>{{ $item }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Filter Cabang / PCM --}}
+                            <select name="cabang" onchange="this.form.submit()"
+                                class="px-3 py-2 bg-slate-50/70 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer">
+                                <option value="">Semua Cabang (PCM)</option>
+                                @foreach($pcmList as $item)
+                                    <option value="{{ $item }}" @selected(($cabang ?? '') === $item)>PCM {{ $item }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Sorting --}}
+                            <select name="sort" onchange="this.form.submit()"
+                                class="px-3 py-2 bg-slate-50/70 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-sky-500 transition shadow-2xs font-medium text-slate-700 cursor-pointer">
+                                <option value="">Urutan: Terbaru</option>
+                                <option value="nama_asc" @selected(($sort ?? '') === 'nama_asc')>Nama Kader (A - Z)</option>
+                                <option value="nama_desc" @selected(($sort ?? '') === 'nama_desc')>Nama Kader (Z - A)</option>
+                                <option value="aum_asc" @selected(($sort ?? '') === 'aum_asc')>Nama AUM (A - Z)</option>
+                                <option value="pcm_asc" @selected(($sort ?? '') === 'pcm_asc')>Cabang PCM (A - Z)</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -182,6 +214,23 @@
                                 <span class="font-bold text-slate-900 text-xs sm:text-sm truncate block">{{ $k->nama_lengkap }}</span>
                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">Aktif</span>
                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-[#005c8a] border border-sky-200 shrink-0">PCM {{ $k->pcm ?: $k->kecamatan }}</span>
+                                
+                                {{-- AUM Badge --}}
+                                @if(!empty($k->nama_aum) || !empty($k->jabatan_aum))
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200 shrink-0" title="{{ $k->nama_aum }}">
+                                        AUM: {{ $k->nama_aum ?: 'Amal Usaha' }}@if($k->jabatan_aum) &bull; {{ $k->jabatan_aum }}@endif
+                                    </span>
+                                @endif
+
+                                {{-- ORTOM Badge --}}
+                                @php
+                                    $kCleanOrtom = is_array($k->keaktifan_ortom) ? array_filter($k->keaktifan_ortom, fn($x) => $x !== 'Tidak aktif') : [];
+                                @endphp
+                                @if(!empty($kCleanOrtom))
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                                        ORTOM: {{ implode(', ', $kCleanOrtom) }}
+                                    </span>
+                                @endif
                             </div>
                             <p class="text-xs text-slate-500 font-normal mt-0.5">
                                 {{ $k->desa_kelurahan ? $k->desa_kelurahan . ', ' : '' }}Kec. {{ $k->kecamatan }} &bull; NIK: <span class="font-mono text-slate-700 font-medium">{{ substr($k->nik, 0, 6) }}****</span>

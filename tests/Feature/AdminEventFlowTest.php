@@ -144,6 +144,48 @@ class AdminEventFlowTest extends TestCase
         });
     }
 
+    public function test_admin_enroll_search_filters_by_aum_and_ortom(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload() + ['created_by' => $admin->id]);
+
+        $uPku = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $uPku->id,
+            'nama_lengkap' => 'Kader Pegawai PKU',
+            'nama_aum' => 'RS PKU Muhammadiyah Karanganyar',
+            'jabatan_aum' => 'Perawat',
+            'keaktifan_ortom' => ['Nasyiatul Aisyiyah'],
+        ]);
+
+        $uSmk = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        Anggota::factory()->create([
+            'user_id' => $uSmk->id,
+            'nama_lengkap' => 'Kader Guru SMK',
+            'nama_aum' => 'SMK Muhammadiyah 1 Karanganyar',
+            'jabatan_aum' => 'Guru',
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+        ]);
+
+        // Filter AUM
+        $resAum = $this->actingAs($admin)
+            ->get(route('admin.events.enroll', [$event, 'aum' => 'RS PKU Muhammadiyah Karanganyar']));
+        $resAum->assertOk();
+        $resAum->assertViewHas('kandidat', function ($kandidat) {
+            return $kandidat->total() === 1
+                && $kandidat->first()->nama_lengkap === 'Kader Pegawai PKU';
+        });
+
+        // Filter ORTOM
+        $resOrtom = $this->actingAs($admin)
+            ->get(route('admin.events.enroll', [$event, 'ortom' => 'Pemuda Muhammadiyah']));
+        $resOrtom->assertOk();
+        $resOrtom->assertViewHas('kandidat', function ($kandidat) {
+            return $kandidat->total() === 1
+                && $kandidat->first()->nama_lengkap === 'Kader Guru SMK';
+        });
+    }
+
     public function test_admin_adds_session_and_scan_page_renders(): void
     {
         $admin = $this->admin();

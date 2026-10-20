@@ -26,17 +26,26 @@ class AnggotaController extends Controller
     {
         $status = $request->string('status')->toString();
         $q = trim($request->string('q')->toString());
+        $kategori = $request->string('kategori')->toString();
+        $aum = $request->string('aum')->toString();
+        $ortom = $request->string('ortom')->toString();
+        $cabang = $request->string('cabang')->toString();
+        $sort = $request->string('sort')->toString();
 
         $user = auth()->user();
         $isCabang = $user?->isAdminCabang();
         $pcm = $user?->pcm;
 
-        $query = Anggota::with('user')->latest();
+        $query = Anggota::with('user');
 
         // Scope cabang jika user adalah Admin Cabang
         if ($isCabang && $pcm) {
             $query->where(function ($sub) use ($pcm) {
                 $sub->where('pcm', $pcm)->orWhere('kecamatan', $pcm);
+            });
+        } elseif ($cabang !== '') {
+            $query->where(function ($sub) use ($cabang) {
+                $sub->where('pcm', $cabang)->orWhere('kecamatan', $cabang);
             });
         }
 
@@ -49,10 +58,54 @@ class AnggotaController extends Controller
                 $sub->where('nama_lengkap', 'like', "%{$q}%")
                     ->orWhere('nik', 'like', "%{$q}%")
                     ->orWhere('nbm', 'like', "%{$q}%")
+                    ->orWhere('nama_aum', 'like', "%{$q}%")
+                    ->orWhere('jabatan_aum', 'like', "%{$q}%")
                     ->orWhere('kecamatan', 'like', "%{$q}%")
                     ->orWhere('desa_kelurahan', 'like', "%{$q}%");
             });
         }
+
+        // Filter Kategori (Pilar: Muhammadiyah, AUM, ORTOM)
+        if ($kategori === 'muhammadiyah') {
+            $query->where(function ($sub) {
+                $sub->whereNotNull('keaktifan_muhammadiyah')
+                    ->where('keaktifan_muhammadiyah', '!=', '[]')
+                    ->whereJsonDoesntContain('keaktifan_muhammadiyah', 'Tidak aktif');
+            });
+        } elseif ($kategori === 'aum') {
+            $query->where(function ($sub) {
+                $sub->where(function ($s2) {
+                    $s2->whereNotNull('nama_aum')->where('nama_aum', '!=', '');
+                })->orWhere(function ($s2) {
+                    $s2->whereNotNull('jabatan_aum')->where('jabatan_aum', '!=', '');
+                });
+            });
+        } elseif ($kategori === 'ortom') {
+            $query->where(function ($sub) {
+                $sub->whereNotNull('keaktifan_ortom')
+                    ->where('keaktifan_ortom', '!=', '[]')
+                    ->whereJsonDoesntContain('keaktifan_ortom', 'Tidak aktif');
+            });
+        }
+
+        // Filter Spesifik Nama AUM
+        if ($aum !== '') {
+            $query->where('nama_aum', $aum);
+        }
+
+        // Filter Spesifik ORTOM
+        if ($ortom !== '') {
+            $query->whereJsonContains('keaktifan_ortom', $ortom);
+        }
+
+        // Sorting
+        match ($sort) {
+            'nama_asc' => $query->orderBy('nama_lengkap', 'asc'),
+            'nama_desc' => $query->orderBy('nama_lengkap', 'desc'),
+            'aum_asc' => $query->orderByRaw("CASE WHEN nama_aum IS NULL OR nama_aum = '' THEN 1 ELSE 0 END, nama_aum ASC"),
+            'pcm_asc' => $query->orderByRaw("COALESCE(NULLIF(pcm, ''), kecamatan) ASC"),
+            default => $query->latest(),
+        };
 
         // Pending & Ditolak Counter
         $pendingQuery = User::where('role', 'anggota')->where('status', 'menunggu_verifikasi');
@@ -63,10 +116,33 @@ class AnggotaController extends Controller
             $ditolakQuery->whereHas('anggota', fn ($aq) => $aq->where('pcm', $pcm)->orWhere('kecamatan', $pcm));
         }
 
+        $aumList = collect(config('arqam.opsi_form.nama_aum', []))
+            ->merge(Anggota::whereNotNull('nama_aum')->where('nama_aum', '!=', '')->pluck('nama_aum'))
+            ->filter(fn ($x) => ! in_array($x, ['Lainnya', ''], true))
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        $ortomList = collect(config('arqam.opsi_form.keaktifan_ortom', []))
+            ->filter(fn ($x) => $x !== 'Tidak aktif')
+            ->values()
+            ->all();
+
+        $pcmList = config('arqam.opsi_form.cabang_pcm', []);
+
         return view('admin.anggota.index', [
             'anggotas' => $query->paginate(20)->withQueryString(),
             'status' => $status,
             'q' => $q,
+            'kategori' => $kategori,
+            'aum' => $aum,
+            'ortom' => $ortom,
+            'cabang' => $cabang,
+            'sort' => $sort,
+            'aumList' => $aumList,
+            'ortomList' => $ortomList,
+            'pcmList' => $pcmList,
             'pendingCount' => $pendingQuery->count(),
             'ditolakCount' => $ditolakQuery->count(),
             'isCabang' => $isCabang,

@@ -52,29 +52,79 @@
                     <span>Impor Excel</span>
                 </a>
                 @endif
+            </div>
+        </div>
 
-                <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <div class="relative">
-                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="{{ $isCabang ? 'Cari nama, NIK, PRM...' : 'Cari nama, NIK, PCM...' }}"
-                            class="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full sm:w-48 bg-white outline-none shadow-2xs">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
-                        <option value="">Semua Status</option>
-                        <option value="menunggu_verifikasi" @selected($status==='menunggu_verifikasi')>Menunggu Verifikasi</option>
-                        <option value="aktif" @selected($status==='aktif')>Aktif</option>
-                        <option value="ditolak" @selected($status==='ditolak')>Ditolak</option>
-                        <option value="nonaktif" @selected($status==='nonaktif')>Nonaktif</option>
-                    </select>
-                    <button type="submit" class="px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white rounded-lg text-xs font-semibold transition shadow-2xs">
-                        Cari
-                    </button>
-                    @if(!empty($q) || !empty($status))
-                        <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">Reset</a>
-                    @endif
-                </form>
+        {{-- Filter & Search Multi-Kategori Toolbar (Muhammadiyah, AUM, ORTOM) --}}
+        <form method="GET" class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+            {{-- Search Box --}}
+            <div class="relative flex-1 min-w-[200px] sm:min-w-[240px]">
+                <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="{{ $isCabang ? 'Cari nama, NIK, PRM, AUM...' : 'Cari nama, NIK, PCM, AUM...' }}"
+                    class="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 w-full bg-slate-50/70 focus:bg-white outline-none shadow-2xs">
+                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+
+            {{-- Filter Kategori Basis --}}
+            <select name="kategori" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                <option value="">Semua Pilar</option>
+                <option value="aum" @selected(($kategori ?? '') === 'aum')>Amal Usaha Muhammadiyah (AUM)</option>
+                <option value="ortom" @selected(($kategori ?? '') === 'ortom')>Organisasi Otonom (ORTOM)</option>
+                <option value="muhammadiyah" @selected(($kategori ?? '') === 'muhammadiyah')>Pimpinan Muhammadiyah</option>
+            </select>
+
+            {{-- Filter Spesifik Nama AUM --}}
+            <select name="aum" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer max-w-[200px] truncate">
+                <option value="">Semua Nama AUM</option>
+                @foreach($aumList ?? [] as $item)
+                    <option value="{{ $item }}" @selected(($aum ?? '') === $item)>{{ $item }}</option>
+                @endforeach
+            </select>
+
+            {{-- Filter Spesifik ORTOM --}}
+            <select name="ortom" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                <option value="">Semua ORTOM</option>
+                @foreach($ortomList ?? [] as $item)
+                    <option value="{{ $item }}" @selected(($ortom ?? '') === $item)>{{ $item }}</option>
+                @endforeach
+            </select>
+
+            @if(!$isCabang)
+            {{-- Filter PCM (Cabang) --}}
+            <select name="cabang" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                <option value="">Semua Cabang (PCM)</option>
+                @foreach($pcmList ?? [] as $item)
+                    <option value="{{ $item }}" @selected(($cabang ?? '') === $item)>PCM {{ $item }}</option>
+                @endforeach
+            </select>
+            @endif
+
+            {{-- Filter Status Akun --}}
+            <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                <option value="">Semua Status</option>
+                <option value="menunggu_verifikasi" @selected(($status ?? '')==='menunggu_verifikasi')>Menunggu Verifikasi</option>
+                <option value="aktif" @selected(($status ?? '')==='aktif')>Aktif</option>
+                <option value="ditolak" @selected(($status ?? '')==='ditolak')>Ditolak</option>
+                <option value="nonaktif" @selected(($status ?? '')==='nonaktif')>Nonaktif</option>
+            </select>
+
+            {{-- Sorting --}}
+            <select name="sort" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-700 outline-none focus:border-sky-500 shadow-2xs cursor-pointer">
+                <option value="">Urutan: Terbaru</option>
+                <option value="nama_asc" @selected(($sort ?? '')==='nama_asc')>Nama Kader (A - Z)</option>
+                <option value="nama_desc" @selected(($sort ?? '')==='nama_desc')>Nama Kader (Z - A)</option>
+                <option value="aum_asc" @selected(($sort ?? '')==='aum_asc')>Nama AUM (A - Z)</option>
+                <option value="pcm_asc" @selected(($sort ?? '')==='pcm_asc')>Cabang PCM (A - Z)</option>
+            </select>
+
+            <button type="submit" class="px-3.5 py-2 bg-[#005c8a] hover:bg-[#00486d] text-white rounded-lg text-xs font-semibold transition shadow-2xs">
+                Terapkan
+            </button>
+            @if(!empty($q) || !empty($status) || !empty($kategori) || !empty($aum) || !empty($ortom) || !empty($cabang) || !empty($sort))
+                <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">Reset</a>
+            @endif
+        </form>
             </div>
         </div>
     </div>
@@ -87,6 +137,7 @@
                     <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         <th class="py-3.5 px-5">Nama Kader</th>
                         <th class="py-3.5 px-5">NIK / NBM</th>
+                        <th class="py-3.5 px-5">Kategori / Afiliasi</th>
                         <th class="py-3.5 px-5">Status Akun</th>
                         <th class="py-3.5 px-5 text-right">Tindakan</th>
                     </tr>
@@ -109,6 +160,39 @@
                             @if($a->nbm)
                                 <div class="text-xs text-slate-400 font-sans">NBM: {{ $a->nbm }}</div>
                             @endif
+                        </td>
+                        <td class="py-3.5 px-5 text-xs">
+                            <div class="space-y-1 max-w-[260px]">
+                                {{-- AUM Badge --}}
+                                @if(!empty($a->nama_aum) || !empty($a->jabatan_aum))
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 shrink-0">AUM</span>
+                                        <span class="font-bold text-slate-800 truncate" title="{{ $a->nama_aum }}">{{ $a->nama_aum ?: 'Amal Usaha' }}</span>
+                                        @if($a->jabatan_aum)
+                                            <span class="text-slate-500 font-normal truncate block w-full text-[11px]">&bull; {{ $a->jabatan_aum }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                {{-- ORTOM Badge --}}
+                                @php
+                                    $cleanOrtom = is_array($a->keaktifan_ortom) ? array_filter($a->keaktifan_ortom, fn($x) => $x !== 'Tidak aktif') : [];
+                                @endphp
+                                @if(!empty($cleanOrtom))
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">ORTOM</span>
+                                        <span class="text-slate-700 font-medium truncate" title="{{ implode(', ', $cleanOrtom) }}">{{ implode(', ', $cleanOrtom) }}</span>
+                                    </div>
+                                @endif
+
+                                {{-- Cabang / PRM --}}
+                                <div class="text-[11px] text-slate-400 flex items-center gap-1">
+                                    <span>PCM {{ $a->pcm ?: ($a->kecamatan ?: '-') }}</span>
+                                    @if($a->prm)
+                                        <span>&bull; {{ $a->prm }}</span>
+                                    @endif
+                                </div>
+                            </div>
                         </td>
                         <td class="py-3.5 px-5">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium capitalize
@@ -181,7 +265,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="py-12 text-center text-slate-400 text-xs">
+                        <td colspan="5" class="py-12 text-center text-slate-400 text-xs">
                             Tidak ada data anggota ditemukan dengan filter pencarian ini.
                         </td>
                     </tr>

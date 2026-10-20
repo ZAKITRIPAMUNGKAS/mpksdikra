@@ -61,7 +61,10 @@ class ProfileController extends Controller
                 ),
             ],
             'foto_mode' => ['nullable', 'string', 'in:cutout,original'],
+            'nama_aum' => ['nullable', 'string', 'max:255'],
+            'nama_aum_custom' => ['nullable', 'string', 'max:255'],
             'jabatan_aum' => ['nullable', 'string', 'max:255'],
+            'jabatan_aum_custom' => ['nullable', 'string', 'max:255'],
             'pendidikan_terakhir' => ['nullable', 'string', 'max:50'],
             'pendidikan_sd' => ['nullable', 'string', 'max:255'],
             'pendidikan_smp' => ['nullable', 'string', 'max:255'],
@@ -83,7 +86,11 @@ class ProfileController extends Controller
             'jabatan_muhammadiyah.*' => ['nullable', 'string', 'max:255'],
             'keaktifan_ortom' => ['nullable', 'array'],
             'jabatan_ortom' => ['nullable', 'array'],
-            'jabatan_ortom.*' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*' => ['nullable'],
+            'jabatan_ortom.*.tingkat' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*.periode' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*.jabatan' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*.jabatan_custom' => ['nullable', 'string', 'max:255'],
             'organisasi_lain' => ['nullable', 'string', 'max:255'],
             'aktifitas_jamaah_masjid' => ['nullable', 'string', 'max:2000'],
             'keaktifan_takmir' => ['nullable', 'string', 'max:20'],
@@ -96,10 +103,40 @@ class ProfileController extends Controller
 
         $data = $request->validate(FormPertanyaan::applyStandardValidationRules($rules) + FormPertanyaan::activeValidationRules());
 
-        if (empty($data['jabatan_aum']) && ! empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
-            $data['jabatan_aum'] = $data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'];
-        } elseif (! empty($data['jabatan_aum']) && empty($data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'])) {
-            $data['jabatan_muhammadiyah']['Amal Usaha Muhammadiyah'] = $data['jabatan_aum'];
+        $namaAum = $data['nama_aum'] ?? null;
+        if ($namaAum === 'Lainnya' && ! empty($data['nama_aum_custom'])) {
+            $namaAum = trim($data['nama_aum_custom']);
+        }
+        $jabatanAum = $data['jabatan_aum'] ?? null;
+        if ($jabatanAum === 'Lainnya' && ! empty($data['jabatan_aum_custom'])) {
+            $jabatanAum = trim($data['jabatan_aum_custom']);
+        }
+        $data['nama_aum'] = $namaAum;
+        $data['jabatan_aum'] = $jabatanAum;
+        unset($data['nama_aum_custom'], $data['jabatan_aum_custom']);
+
+        if (! empty($data['jabatan_ortom']) && is_array($data['jabatan_ortom'])) {
+            $cleanedOrtom = [];
+            foreach ($data['jabatan_ortom'] as $ortomKey => $val) {
+                if (is_array($val)) {
+                    $tingkat = $val['tingkat'] ?? null;
+                    $periode = $val['periode'] ?? null;
+                    $jabatan = $val['jabatan'] ?? null;
+                    if ($jabatan === 'Lainnya' && ! empty($val['jabatan_custom'])) {
+                        $jabatan = trim($val['jabatan_custom']);
+                    }
+                    if ($tingkat || $periode || $jabatan) {
+                        $cleanedOrtom[$ortomKey] = [
+                            'tingkat' => $tingkat,
+                            'periode' => $periode,
+                            'jabatan' => $jabatan,
+                        ];
+                    }
+                } elseif (is_string($val) && trim($val) !== '') {
+                    $cleanedOrtom[$ortomKey] = trim($val);
+                }
+            }
+            $data['jabatan_ortom'] = ! empty($cleanedOrtom) ? $cleanedOrtom : null;
         }
 
         $data['umur'] = Carbon::parse($data['tanggal_lahir'])->age;

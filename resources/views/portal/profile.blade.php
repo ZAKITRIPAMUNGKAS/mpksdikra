@@ -389,6 +389,10 @@
                  masyarakatText: '{{ addslashes(old('keaktifan_kemasyarakatan', $anggota->keaktifan_kemasyarakatan ?? '')) }}',
                  checkedMuhammadiyah: {{ json_encode(old('keaktifan_muhammadiyah', $anggota->keaktifan_muhammadiyah ?? [])) }},
                  checkedOrtom: {{ json_encode(old('keaktifan_ortom', $anggota->keaktifan_ortom ?? [])) }},
+                 selectedAum: '{{ old('nama_aum', in_array($anggota->nama_aum, config('arqam.opsi_form.nama_aum', [])) ? $anggota->nama_aum : (!empty($anggota->nama_aum) ? 'Lainnya' : '')) }}',
+                 customAum: '{{ addslashes(old('nama_aum_custom', !in_array($anggota->nama_aum, config('arqam.opsi_form.nama_aum', [])) ? ($anggota->nama_aum ?? '') : '')) }}',
+                 selectedJabatanAum: '{{ old('jabatan_aum', in_array($anggota->jabatan_aum, config('arqam.opsi_form.jabatan_aum', [])) ? $anggota->jabatan_aum : (!empty($anggota->jabatan_aum) ? 'Lainnya' : '')) }}',
+                 customJabatanAum: '{{ addslashes(old('jabatan_aum_custom', !in_array($anggota->jabatan_aum, config('arqam.opsi_form.jabatan_aum', [])) ? ($anggota->jabatan_aum ?? '') : '')) }}',
 
                  isMuhammadiyahChecked(val) {
                      return Array.isArray(this.checkedMuhammadiyah) && this.checkedMuhammadiyah.includes(val);
@@ -516,7 +520,7 @@
                                 Jabatan / Amanah di {{ $v }}:
                             </label>
                             <input type="text" name="jabatan_muhammadiyah[{{ $v }}]"
-                                   value="{{ old('jabatan_muhammadiyah.'.$v, $anggota->jabatan_muhammadiyah[$v] ?? ($v === 'Amal Usaha Muhammadiyah' ? $anggota->jabatan_aum : '')) }}"
+                                   value="{{ old('jabatan_muhammadiyah.'.$v, $anggota->jabatan_muhammadiyah[$v] ?? '') }}"
                                    placeholder="Contoh: Ketua / Sekretaris / Anggota Majelis"
                                    class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[46px]">
                         </div>
@@ -564,6 +568,70 @@
                 </div>
             </div>
 
+            {{-- 2. Amal Usaha Muhammadiyah (AUM) - 2 Dropdown (Nama AUM & Jabatan) --}}
+            <div class="p-4 sm:p-6 rounded-2xl bg-sky-50/60 border-2 border-sky-200 space-y-4">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span>2. Amal Usaha Muhammadiyah (AUM)</span>
+                        </h3>
+                        <span class="text-xs text-sky-800 font-bold bg-white px-2.5 py-0.5 rounded-full border border-sky-200">2 Dropdown (AUM &amp; Jabatan)</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1 font-medium leading-relaxed">
+                        Khusus kader yang bertugas atau berkhidmat di Amal Usaha Muhammadiyah (Sekolah, Madrasah, RS PKU, Klinik, BTM/BMT, Lazismu, dll):
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {{-- Dropdown 1: Nama AUM --}}
+                    <div>
+                        <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                            Nama Amal Usaha Muhammadiyah (AUM)
+                        </label>
+                        <select name="nama_aum" x-model="selectedAum"
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[50px]">
+                            <option value="">-- Bukan Pegawai / Tidak Aktif di AUM --</option>
+                            @foreach(\App\Models\FormPertanyaan::opsi('nama_aum', config('arqam.opsi_form.nama_aum')) as $aumOption)
+                                <option value="{{ $aumOption }}">{{ $aumOption }}</option>
+                            @endforeach
+                        </select>
+
+                        <div x-show="selectedAum === 'Lainnya'" x-cloak x-transition class="mt-2.5">
+                            <label class="block text-xs font-bold text-sky-800 mb-1">Nama AUM Lainnya:</label>
+                            <input type="text" name="nama_aum_custom" x-model="customAum"
+                                placeholder="Contoh: SD Muhammadiyah 2 Karanganyar"
+                                class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-sky-300 rounded-xl focus:border-sky-600 outline-none bg-white transition font-medium">
+                        </div>
+                        <span class="text-xs text-slate-500 mt-1.5 block font-medium">Pilih nama AUM tempat Anda mengabdi atau berkhidmat.</span>
+                    </div>
+
+                    {{-- Dropdown 2: Jabatan di AUM --}}
+                    <div>
+                        <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">
+                            Jabatan / Amanah Tugas di AUM
+                        </label>
+                        <select name="jabatan_aum" x-model="selectedJabatanAum"
+                            class="w-full px-4 py-3.5 text-base border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[50px]">
+                            <option value="">-- Pilih Jabatan / Posisi di AUM --</option>
+                            @foreach(\App\Models\FormPertanyaan::opsi('jabatan_aum', config('arqam.opsi_form.jabatan_aum')) as $jabOption)
+                                <option value="{{ $jabOption }}">{{ $jabOption }}</option>
+                            @endforeach
+                        </select>
+
+                        <div x-show="selectedJabatanAum === 'Lainnya'" x-cloak x-transition class="mt-2.5">
+                            <label class="block text-xs font-bold text-sky-800 mb-1">Jabatan di AUM Lainnya:</label>
+                            <input type="text" name="jabatan_aum_custom" x-model="customJabatanAum"
+                                placeholder="Contoh: Koordinator Lab / Staf Humas"
+                                class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-sky-300 rounded-xl focus:border-sky-600 outline-none bg-white transition font-medium">
+                        </div>
+                        <span class="text-xs text-slate-500 mt-1.5 block font-medium">Pilih posisi atau amanah tugas di AUM bersangkutan.</span>
+                    </div>
+                </div>
+            </div>
+
             {{-- 3. Keaktifan di Organisasi Otonom (ORTOM) --}}
             <div class="space-y-2.5">
                 <div class="flex items-center justify-between">
@@ -587,15 +655,77 @@
                         </label>
 
                         @if($v !== 'Tidak aktif')
+                        @php
+                            $rawOrtomVal = old('jabatan_ortom.'.$v, $anggota->jabatan_ortom[$v] ?? null);
+                            $oldTingkat = is_array($rawOrtomVal) ? ($rawOrtomVal['tingkat'] ?? '') : '';
+                            $oldPeriode = is_array($rawOrtomVal) ? ($rawOrtomVal['periode'] ?? '') : '';
+                            $oldJabatan = is_array($rawOrtomVal) ? ($rawOrtomVal['jabatan'] ?? '') : (is_string($rawOrtomVal) ? $rawOrtomVal : '');
+                            $oldJabatanCustom = is_array($rawOrtomVal) ? ($rawOrtomVal['jabatan_custom'] ?? '') : '';
+                            $opsiJabatan = config('arqam.opsi_form.jabatan_ortom_standar', []);
+                            $isCustomJabatan = $oldJabatan && !in_array($oldJabatan, $opsiJabatan) && $oldJabatan !== '';
+                            $initialSelectJabatan = $isCustomJabatan ? 'Lainnya' : $oldJabatan;
+                            $initialCustomText = $isCustomJabatan ? $oldJabatan : $oldJabatanCustom;
+                        @endphp
                         <div x-show="isOrtomChecked('{{ $v }}')" x-cloak x-transition
-                             class="mt-3 pt-3 border-t-2 border-sky-200 space-y-1.5">
-                            <label class="block text-xs sm:text-sm font-extrabold text-slate-800">
-                                Jabatan / Posisi di {{ $v }}:
-                            </label>
-                            <input type="text" name="jabatan_ortom[{{ $v }}]"
-                                   value="{{ old('jabatan_ortom.'.$v, $anggota->jabatan_ortom[$v] ?? '') }}"
-                                   placeholder="Contoh: Ketua / Sekretaris / Anggota Bidang"
-                                   class="w-full px-4 py-2.5 text-sm sm:text-base border-2 border-slate-300 rounded-xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none bg-white transition font-medium min-h-[46px]">
+                             x-data="{ selectedJabatan: @js($initialSelectJabatan) }"
+                             class="mt-3 pt-3 border-t-2 border-sky-200 space-y-2.5">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider text-sky-800 bg-sky-100/60 px-2.5 py-1 rounded-lg border border-sky-200">
+                                Detail Kepengurusan &amp; Jabatan ({{ $v }})
+                            </div>
+
+                            {{-- 1) Tingkat ORTOM --}}
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    1. Tingkat Kepengurusan
+                                </label>
+                                <select name="jabatan_ortom[{{ $v }}][tingkat]"
+                                        class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                    <option value="">-- Pilih Tingkat Kepengurusan --</option>
+                                    @foreach(config('arqam.opsi_form.tingkat_ortom', []) as $to)
+                                        <option value="{{ $to }}" @selected($oldTingkat === $to)>{{ $to }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 2) Periode --}}
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    2. Periode Kepengurusan
+                                </label>
+                                <select name="jabatan_ortom[{{ $v }}][periode]"
+                                        class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                    <option value="">-- Pilih Periode --</option>
+                                    @foreach(config('arqam.opsi_form.periode_ortom', []) as $po)
+                                        <option value="{{ $po }}" @selected($oldPeriode === $po)>{{ $po }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 3) Jabatan --}}
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    3. Jabatan / Amanah
+                                </label>
+                                <select name="jabatan_ortom[{{ $v }}][jabatan]"
+                                        x-model="selectedJabatan"
+                                        class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                    <option value="">-- Pilih Jabatan / Posisi --</option>
+                                    @foreach(config('arqam.opsi_form.jabatan_ortom_standar', []) as $jo)
+                                        <option value="{{ $jo }}" @selected($initialSelectJabatan === $jo)>{{ $jo }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Custom Jabatan jika Lainnya --}}
+                            <div x-show="selectedJabatan === 'Lainnya'" x-cloak class="pt-1">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Ketikkan Jabatan Spesifik:
+                                </label>
+                                <input type="text" name="jabatan_ortom[{{ $v }}][jabatan_custom]"
+                                       value="{{ $initialCustomText }}"
+                                       placeholder="Contoh: Komandan Kokam / Pelatih / Bidang Perkaderan"
+                                       class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                            </div>
                         </div>
                         @endif
                     </div>

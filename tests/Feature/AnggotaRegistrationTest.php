@@ -186,10 +186,11 @@ class AnggotaRegistrationTest extends TestCase
             'pcm' => 'Karanganyar',
             'prm' => 'PRM Lalung',
             'pekerjaan' => 'Guru SMA Muhammadiyah 1',
-            'keaktifan_muhammadiyah' => ['Pimpinan Daerah Muhammadiyah', 'Amal Usaha Muhammadiyah'],
+            'nama_aum' => 'SMA Muhammadiyah 1 Karanganyar',
+            'jabatan_aum' => 'Wakil Kepala Sekolah / Madrasah',
+            'keaktifan_muhammadiyah' => ['Pimpinan Daerah Muhammadiyah'],
             'jabatan_muhammadiyah' => [
                 'Pimpinan Daerah Muhammadiyah' => 'Anggota Majelis Dikdasmen',
-                'Amal Usaha Muhammadiyah' => 'Wakil Kepala Sekolah',
             ],
             'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
             'jabatan_ortom' => [
@@ -207,10 +208,35 @@ class AnggotaRegistrationTest extends TestCase
         $this->assertSame('Karanganyar', $anggota->pcm);
         $this->assertSame('PRM Lalung', $anggota->prm);
         $this->assertSame('Guru SMA Muhammadiyah 1', $anggota->pekerjaan);
-        $this->assertSame('Wakil Kepala Sekolah', $anggota->jabatan_aum); // mirrored
-        $this->assertEquals(['Pimpinan Daerah Muhammadiyah', 'Amal Usaha Muhammadiyah'], $anggota->keaktifan_muhammadiyah);
+        $this->assertSame('SMA Muhammadiyah 1 Karanganyar', $anggota->nama_aum);
+        $this->assertSame('Wakil Kepala Sekolah / Madrasah', $anggota->jabatan_aum);
+        $this->assertEquals(['Pimpinan Daerah Muhammadiyah'], $anggota->keaktifan_muhammadiyah);
         $this->assertSame('Anggota Majelis Dikdasmen', $anggota->jabatan_muhammadiyah['Pimpinan Daerah Muhammadiyah']);
         $this->assertSame('Ketua Bidang Perkaderan', $anggota->jabatan_ortom['Pemuda Muhammadiyah']);
+    }
+
+    public function test_registration_supports_custom_aum_and_jabatan_when_lainnya_selected(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313990011223344',
+            'no_wa' => '081299001122',
+            'nama_aum' => 'Lainnya',
+            'nama_aum_custom' => 'SD Muhammadiyah Unggulan Karanganyar',
+            'jabatan_aum' => 'Lainnya',
+            'jabatan_aum_custom' => 'Kepala Perpustakaan & Arsip',
+            'keaktifan_muhammadiyah' => ['Pimpinan Cabang Muhammadiyah'],
+        ]);
+
+        $response = $this->post(route('anggota.register.store'), $payload);
+        $response->assertRedirect(route('anggota.register'))
+            ->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '3313990011223344')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('SD Muhammadiyah Unggulan Karanganyar', $anggota->nama_aum);
+        $this->assertSame('Kepala Perpustakaan & Arsip', $anggota->jabatan_aum);
     }
 
     public function test_registration_auto_generates_password_from_birthdate_when_empty(): void
@@ -490,5 +516,52 @@ class AnggotaRegistrationTest extends TestCase
 
         $res = $this->post(route('anggota.register.store'), $payload);
         $res->assertSessionHasErrors(['foto_cutout']);
+    }
+
+    public function test_registration_supports_structured_ortom_with_3_dropdowns_and_custom_jabatan(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313109999990099',
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah', 'Tapak Suci'],
+            'jabatan_ortom' => [
+                'Pemuda Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW)',
+                    'periode' => '2022 - 2027',
+                    'jabatan' => 'Ketua Umum / Ketua',
+                ],
+                'Tapak Suci' => [
+                    'tingkat' => 'Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW)',
+                    'periode' => '2018 - 2022',
+                    'jabatan' => 'Lainnya',
+                    'jabatan_custom' => 'Pelatih Kepala / Pendekar Muda',
+                ],
+            ],
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertRedirect(route('anggota.register'));
+        $res->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '3313109999990099')->first();
+        $this->assertNotNull($anggota);
+        $this->assertIsArray($anggota->jabatan_ortom);
+        $this->assertSame('Ketua Umum / Ketua', $anggota->jabatan_ortom['Pemuda Muhammadiyah']['jabatan']);
+        $this->assertSame('Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW)', $anggota->jabatan_ortom['Pemuda Muhammadiyah']['tingkat']);
+        $this->assertSame('2022 - 2027', $anggota->jabatan_ortom['Pemuda Muhammadiyah']['periode']);
+
+        $this->assertSame('Pelatih Kepala / Pendekar Muda', $anggota->jabatan_ortom['Tapak Suci']['jabatan']);
+        $this->assertSame('Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW)', $anggota->jabatan_ortom['Tapak Suci']['tingkat']);
+        $this->assertSame('2018 - 2022', $anggota->jabatan_ortom['Tapak Suci']['periode']);
+
+        $this->assertSame(
+            'Ketua Umum / Ketua - Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW) - Periode 2022 - 2027',
+            $anggota->formatJabatanOrtom('Pemuda Muhammadiyah')
+        );
+        $this->assertSame(
+            'Pelatih Kepala / Pendekar Muda - Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW) - Periode 2018 - 2022',
+            $anggota->formatJabatanOrtom('Tapak Suci')
+        );
     }
 }

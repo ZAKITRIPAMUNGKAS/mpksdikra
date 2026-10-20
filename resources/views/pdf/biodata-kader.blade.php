@@ -129,10 +129,18 @@
         <div class="section"><div class="section-head"><b>I.</b> Amanah & Profesi</div>
             <table class="grid">
                 <tr><td class="key">Profesi utama</td><td class="sep">:</td><td class="val"><b>{{ $anggota->pekerjaan ?: '—' }}</b></td></tr>
-                <tr><td class="key">Amanah AUM</td><td class="sep">:</td><td class="val">{{ $anggota->jabatan_aum ?: '—' }}</td></tr>
+                <tr><td class="key">Amanah AUM</td><td class="sep">:</td><td class="val">@if($anggota->nama_aum)<b>{{ $anggota->nama_aum }}</b>@if($anggota->jabatan_aum) &mdash; {{ $anggota->jabatan_aum }}@endif @elseif($anggota->jabatan_aum){{ $anggota->jabatan_aum }}@else—@endif</td></tr>
                 <tr><td class="key">PCM · PRM</td><td class="sep">:</td><td class="val"><b>{{ $anggota->pcm ?: ($anggota->kecamatan ?: '—') }}</b> · {{ $anggota->prm ?: '—' }}</td></tr>
                 <tr><td class="key">Pimpinan Muhammadiyah</td><td class="sep">:</td><td class="val">{{ $list($anggota->keaktifan_muhammadiyah) }}</td></tr>
-                <tr><td class="key">ORTOM & jabatan</td><td class="sep">:</td><td class="val">{{ $list($anggota->keaktifan_ortom) }}@if(is_array($anggota->jabatan_ortom) && count(array_filter($anggota->jabatan_ortom))) <span class="muted">({{ implode(', ', array_filter($anggota->jabatan_ortom)) }})</span>@endif</td></tr>
+                <tr><td class="key">ORTOM & jabatan</td><td class="sep">:</td><td class="val">@php
+                    $formattedOrtomList = [];
+                    if (!empty($anggota->keaktifan_ortom) && is_array($anggota->keaktifan_ortom)) {
+                        foreach ($anggota->keaktifan_ortom as $oItem) {
+                            $j = $anggota->formatJabatanOrtom($oItem);
+                            $formattedOrtomList[] = $j ? "{$oItem} ({$j})" : $oItem;
+                        }
+                    }
+                @endphp {{ !empty($formattedOrtomList) ? implode(', ', $formattedOrtomList) : ($list($anggota->keaktifan_ortom) ?: '—') }}</td></tr>
                 <tr><td class="key">Organisasi lain</td><td class="sep">:</td><td class="val">{{ $anggota->organisasi_lain ?: '—' }}</td></tr>
             </table>
         </div>

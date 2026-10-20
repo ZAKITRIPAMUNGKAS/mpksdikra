@@ -201,6 +201,8 @@
                         {{ \App\Models\FormPertanyaan::label('nama_ayah', 'Nama Ayah Kandung') }}
                         @if(\App\Models\FormPertanyaan::isWajib('nama_ayah'))
                             <span class="text-red-500">*</span>
+                        @else
+                            <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                         @endif
                     </label>
                     <input name="nama_ayah" value="{{ old('nama_ayah', $anggota->nama_ayah) }}"
@@ -215,6 +217,8 @@
                         {{ \App\Models\FormPertanyaan::label('nama_ibu', 'Nama Ibu Kandung') }}
                         @if(\App\Models\FormPertanyaan::isWajib('nama_ibu'))
                             <span class="text-red-500">*</span>
+                        @else
+                            <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                         @endif
                     </label>
                     <input name="nama_ibu" value="{{ old('nama_ibu', $anggota->nama_ibu) }}"

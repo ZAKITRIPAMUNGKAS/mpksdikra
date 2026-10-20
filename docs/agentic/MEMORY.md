@@ -42,6 +42,11 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-10-20: Pembersihan Keamanan LoginController (Hapus Hardcode Password & Auto-Provision):
+  1. Menghapus seluruh password hardcode (`AdminPDM@25`, `cabangkra`, `cabangjra`) dan map auto-provision PCM dari `LoginController`.
+  2. Menghapus bypass otentikasi backdoor `User::updateOrCreate` saat login gagal/tidak ditemukan.
+  3. Login murni memverifikasi kredensial terhadap hash password pengguna di database (`Hash::check`), mendukung fleksibilitas input email/no_wa/slug PCM tanpa celah keamanan.
+  4. Tes `AuthTest` diperbarui untuk memverifikasi autentikasi aman tanpa auto-provisioning.
 - 2026-10-20: Peningkatan Input Organisasi Otonom (ORTOM) Menjadi 3 Dropdown Terstruktur (Tingkat, Periode, Jabatan):
   1. **Tingkat ORTOM (Dropdown 1)**: Opsi mencakup hirarki lengkap ortom: Pimpinan Pusat (PP), Pimpinan Wilayah (PW), Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW), Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW), Pimpinan Ranting (PR / DPR / Kolat TS / Qobilah HW), Pimpinan Komisariat (PK / Rayon), dan Lainnya (`config('arqam.opsi_form.tingkat_ortom')`).
   2. **Periode Kepengurusan (Dropdown 2)**: Opsi periode muktamar/musyda: 2022 - 2027, 2018 - 2022, 2015 - 2018, 2010 - 2015, dan Lainnya (`config('arqam.opsi_form.periode_ortom')`).

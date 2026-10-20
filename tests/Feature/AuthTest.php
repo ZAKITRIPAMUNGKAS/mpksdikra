@@ -127,20 +127,20 @@ class AuthTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_login_admin_cabang_using_pcm_name_and_cabangkra_password(): void
+    public function test_login_admin_cabang_using_pcm_name(): void
     {
         $adminCabang = User::factory()->create([
             'email' => 'tawangmangu',
             'role' => 'admin_cabang',
             'status' => 'aktif',
             'pcm' => 'Tawangmangu',
-            'password' => Hash::make('cabangkra'),
+            'password' => Hash::make('password_rahasia_cabang'),
         ]);
 
-        // 1. Login menggunakan nama kecamatan langsung 'tawangmangu' (tanpa @) dan password 'cabangkra'
+        // 1. Login menggunakan nama kecamatan langsung 'tawangmangu' (tanpa @)
         $this->post('/login', [
             'login' => 'tawangmangu',
-            'password' => 'cabangkra',
+            'password' => 'password_rahasia_cabang',
         ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($adminCabang);
@@ -150,48 +150,48 @@ class AuthTest extends TestCase
         // 2. Login dengan variasi huruf besar 'Tawangmangu'
         $this->post('/login', [
             'login' => 'Tawangmangu',
-            'password' => 'cabangkra',
+            'password' => 'password_rahasia_cabang',
         ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($adminCabang);
 
         auth()->logout();
 
-        // 3. Login dengan variasi password 'cabangjra' (toleransi typo)
+        // 3. Login dengan password salah harus gagal (tidak ada backdoor typo)
         $this->post('/login', [
             'login' => 'tawangmangu',
-            'password' => 'cabangjra',
-        ])->assertRedirect(route('admin.dashboard'));
+            'password' => 'password_salah',
+        ])->assertSessionHasErrors('login');
 
-        $this->assertAuthenticatedAs($adminCabang);
-
-        // Verifikasi tidak 403 saat mengakses dashboard admin dan master anggota
-        $this->get(route('admin.dashboard'))->assertOk();
-        $this->get(route('admin.anggota.index'))->assertOk();
+        // Verifikasi akses setelah login kembali
+        $this->actingAs($adminCabang)->get(route('admin.dashboard'))->assertOk();
+        $this->actingAs($adminCabang)->get(route('admin.anggota.index'))->assertOk();
     }
 
-    public function test_login_admin_daerah_using_admin_and_official_password_with_autosync(): void
+    public function test_login_admin_daerah_requires_valid_credentials_without_autoprovision(): void
     {
-        // 1. Uji saat database kosong dari user 'admin', sistem otomatis meng-autentikasi dan membuat akun admin daerah
+        // 1. Saat database kosong dari user, login tidak auto-provision dan harus ditolak
         $this->post('/login', [
             'login' => 'admin',
-            'password' => 'AdminPDM@25',
-        ])->assertRedirect(route('admin.dashboard'));
+            'password' => 'PasswordSembarang123',
+        ])->assertSessionHasErrors('login');
 
-        $this->assertAuthenticated();
-        $user = auth()->user();
-        $this->assertTrue($user->isAdmin());
-        $this->assertEquals('aktif', $user->status);
+        $this->assertGuest();
 
-        auth()->logout();
+        // 2. Saat user admin dibuat di database dengan password hash yang sah, login berhasil
+        $admin = User::factory()->create([
+            'email' => 'admin',
+            'role' => 'admin',
+            'status' => 'aktif',
+            'password' => Hash::make('KataSandiAdminKuat!'),
+        ]);
 
-        // 2. Uji saat akun admin daerah sudah ada di database, login tetap berhasil 100%
         $this->post('/login', [
             'login' => 'admin',
-            'password' => 'AdminPDM@25',
+            'password' => 'KataSandiAdminKuat!',
         ])->assertRedirect(route('admin.dashboard'));
 
-        $this->assertAuthenticatedAs($user);
+        $this->assertAuthenticatedAs($admin);
     }
 
     public function test_csrf_token_mismatch_or_419_redirects_with_friendly_error(): void

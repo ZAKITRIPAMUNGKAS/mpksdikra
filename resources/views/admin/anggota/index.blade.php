@@ -125,14 +125,12 @@
                 <a href="{{ route('admin.anggota.index') }}" class="inline-flex items-center justify-center px-2 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">Reset</a>
             @endif
         </form>
-            </div>
-        </div>
     </div>
 
     {{-- Data Table Card --}}
     <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="w-full text-left text-sm min-w-[700px]">
                 <thead>
                     <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         <th class="py-3.5 px-5">Nama Kader</th>

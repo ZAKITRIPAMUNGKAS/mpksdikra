@@ -27,6 +27,7 @@
                     <span class="block mt-0.5 text-slate-500">Syarat Kelulusan Terpadu: Presensi 100% + Posttest Selesai + RTL Terkirim (Lulus). Presensi 75%–99% atau tugas RTL/Posttest pending dinyatakan Lulus Bersyarat. Presensi &lt;75% dinyatakan Tidak Lulus.</span>
                 </p>
             </div>
+            <div class="flex items-center gap-2 flex-wrap">
                 @if($event->status === 'selesai')
                 <a href="{{ route('admin.events.certificates.batch', $event) }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

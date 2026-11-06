@@ -18,6 +18,7 @@ use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class EventController extends Controller
@@ -191,7 +192,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event): RedirectResponse
     {
-        $event->update($this->validated($request));
+        $event->update($this->validated($request, $event));
 
         return redirect()
             ->route('admin.events.show', $event)
@@ -213,6 +214,13 @@ class EventController extends Controller
 
     public function destroy(Event $event): RedirectResponse
     {
+        if ($event->ttd_kiri_path && Storage::disk('public')->exists($event->ttd_kiri_path)) {
+            Storage::disk('public')->delete($event->ttd_kiri_path);
+        }
+        if ($event->ttd_kanan_path && Storage::disk('public')->exists($event->ttd_kanan_path)) {
+            Storage::disk('public')->delete($event->ttd_kanan_path);
+        }
+
         $event->delete();
 
         return redirect()
@@ -220,7 +228,7 @@ class EventController extends Controller
             ->with('success', 'Event dihapus.');
     }
 
-    private function validated(Request $request): array
+    private function validated(Request $request, ?Event $event = null): array
     {
         $data = $request->validate([
             'nama_event' => ['required', 'string', 'max:255'],
@@ -231,12 +239,49 @@ class EventController extends Controller
             'kuota' => ['nullable', 'integer', 'min:1', 'max:65535'],
             'status' => ['required', 'in:persiapan,berlangsung,selesai'],
             'format_nomor_sertifikat' => ['nullable', 'string', 'max:255'],
+            'tanggal_terbit_sertifikat' => ['nullable', 'date'],
+            'nama_penandatangan_sertifikat' => ['nullable', 'string', 'max:255'],
+            'nbm_penandatangan_sertifikat' => ['nullable', 'string', 'max:50'],
+            'jabatan_penandatangan_sertifikat' => ['nullable', 'string', 'max:255'],
+            'nama_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
+            'jabatan_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
+            'keterangan_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
+            'ttd_kiri' => ['nullable', 'image', 'mimes:png', 'max:2048'],
+            'ttd_kanan' => ['nullable', 'image', 'mimes:png', 'max:2048'],
+            'hapus_ttd_kiri' => ['nullable', 'boolean'],
+            'hapus_ttd_kanan' => ['nullable', 'boolean'],
             'bobot_kognitif' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_psikomotor' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_afektif' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_keaktifan' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'gunakan_grade' => ['boolean'],
         ]);
+
+        if ($request->boolean('hapus_ttd_kiri')) {
+            if ($event?->ttd_kiri_path && Storage::disk('public')->exists($event->ttd_kiri_path)) {
+                Storage::disk('public')->delete($event->ttd_kiri_path);
+            }
+            $data['ttd_kiri_path'] = null;
+        } elseif ($request->hasFile('ttd_kiri')) {
+            if ($event?->ttd_kiri_path && Storage::disk('public')->exists($event->ttd_kiri_path)) {
+                Storage::disk('public')->delete($event->ttd_kiri_path);
+            }
+            $data['ttd_kiri_path'] = $request->file('ttd_kiri')->store('signatures', 'public');
+        }
+
+        if ($request->boolean('hapus_ttd_kanan')) {
+            if ($event?->ttd_kanan_path && Storage::disk('public')->exists($event->ttd_kanan_path)) {
+                Storage::disk('public')->delete($event->ttd_kanan_path);
+            }
+            $data['ttd_kanan_path'] = null;
+        } elseif ($request->hasFile('ttd_kanan')) {
+            if ($event?->ttd_kanan_path && Storage::disk('public')->exists($event->ttd_kanan_path)) {
+                Storage::disk('public')->delete($event->ttd_kanan_path);
+            }
+            $data['ttd_kanan_path'] = $request->file('ttd_kanan')->store('signatures', 'public');
+        }
+
+        unset($data['ttd_kiri'], $data['ttd_kanan'], $data['hapus_ttd_kiri'], $data['hapus_ttd_kanan']);
 
         foreach (['bobot_kognitif', 'bobot_psikomotor', 'bobot_afektif', 'bobot_keaktifan'] as $field) {
             if (isset($data[$field]) && $data[$field] !== null && $data[$field] !== '') {

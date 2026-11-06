@@ -368,8 +368,8 @@
                         <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1.5">
                             NIK KTP (16 digit angka) <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
-                        <input name="nik" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" autocomplete="off" required placeholder="3313xxxxxxxxxxxx"
-                            @input="clearError('nik')"
+                        <input name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13" autocomplete="off" required placeholder="3313xxxxxxxxxxxx"
+                            @input="this.value = this.value.replace(/\D/g, ''); clearError('nik'); saveDraft()"
                             :class="clientErrors.nik ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('nik') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-mono text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}">
                         <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Nomor Induk Kependudukan sesuai KTP (16 digit angka).</span>
@@ -558,7 +558,8 @@
                             Nomor WhatsApp / HP Aktif <span class="text-rose-600 font-black text-base" title="Wajib diisi">*</span>
                         </label>
                         <input name="no_wa" value="{{ old('no_wa') }}" placeholder="Contoh: 081234567890" autocomplete="tel" required
-                            @input="clearError('no_wa')"
+                            inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13"
+                            @input="this.value = this.value.replace(/\D/g, ''); clearError('no_wa'); saveDraft()"
                             :class="clientErrors.no_wa ? 'border-rose-500 bg-rose-50/30 ring-4 ring-rose-200/50' : '{{ $errors->has('no_wa') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }}'"
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-mono text-slate-900 border-2 rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px] sm:min-h-[52px]" aria-invalid="{{ $errors->has('no_wa') ? 'true' : 'false' }}">
                         <span class="text-xs sm:text-sm text-slate-500 font-normal mt-1 block">Digunakan untuk Username login dan notifikasi WhatsApp.</span>
@@ -609,9 +610,9 @@
 
                 <div class="flex items-center justify-end pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
-                        class="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] px-8 sm:px-10 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-3">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-9 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow transition">
                         <span>Lanjut: Data Keagamaan</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
@@ -889,16 +890,16 @@
                 {{-- Pertanyaan Kustom Seksi Keagamaan --}}
                 <x-form-custom-fields :questions="$customQuestions['agama'] ?? null" />
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
+                <div class="flex items-center justify-between gap-2.5 sm:gap-4 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('diri')"
-                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] border border-slate-300 bg-white text-slate-700 font-bold rounded-xl hover:bg-slate-50 active:bg-slate-100 transition text-xs sm:text-sm shadow-2xs shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('org')"
-                        class="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] px-6 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-8 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow transition text-center">
                         <span>Lanjut: Data Organisasi</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
@@ -908,7 +909,7 @@
                 {{-- 1. Keaktifan di Pimpinan Muhammadiyah --}}
                 @if(\App\Models\FormPertanyaan::isAktif('keaktifan_muhammadiyah'))
                 <div class="space-y-2.5">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3">
                         <label class="block text-sm sm:text-base font-bold text-slate-900">
                             1. {{ \App\Models\FormPertanyaan::label('keaktifan_muhammadiyah', 'Keaktifan di Pimpinan Muhammadiyah') }}
                             @if(\App\Models\FormPertanyaan::isWajib('keaktifan_muhammadiyah'))
@@ -917,19 +918,19 @@
                                 <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                             @endif
                         </label>
-                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                        <span class="self-start sm:self-auto text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 shadow-2xs">Boleh pilih lebih dari 1</span>
                     </div>
                     <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_muhammadiyah', 'Centang tingkatan pimpinan tempat Bapak/Ibu aktif dan isikan amanah/jabatannya:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_muhammadiyah', config('arqam.opsi_form.keaktifan_muhammadiyah')) as $v)
-                        <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
+                        <div class="p-3.5 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
                              :class="isMuhammadiyahChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
-                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none min-h-[44px]">
                                 <input type="checkbox" name="keaktifan_muhammadiyah[]" value="{{ $v }}"
                                     @checked(in_array($v, old('keaktifan_muhammadiyah', [])))
                                     @change="toggleMuhammadiyah('{{ $v }}', $el.checked)"
-                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500 shrink-0">
                                 <span>{{ $v }}</span>
                             </label>
 
@@ -1013,14 +1014,14 @@
                 @if(\App\Models\FormPertanyaan::isAktif('nama_aum') || \App\Models\FormPertanyaan::isAktif('jabatan_aum'))
                 <div class="p-5 sm:p-6 rounded-2xl bg-sky-50/60 border-2 border-sky-200/90 space-y-4 shadow-2xs">
                     <div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3">
                             <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 <span>2. Amal Usaha Muhammadiyah (AUM)</span>
                             </h3>
-                            <span class="text-xs text-sky-800 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-sky-200">2 Dropdown (AUM &amp; Jabatan)</span>
+                            <span class="self-start sm:self-auto text-xs text-sky-800 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-sky-200 shadow-2xs">2 Dropdown (AUM &amp; Jabatan)</span>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
                             Khusus kader yang berkhidmat, mengajar, atau bertugas di Amal Usaha Muhammadiyah (Sekolah, Madrasah, RS PKU, Klinik, BTM/BMT, Lazismu, dll):
@@ -1098,7 +1099,7 @@
                 {{-- 3. Keaktifan di Organisasi Otonom (ORTOM) --}}
                 @if(\App\Models\FormPertanyaan::isAktif('keaktifan_ortom'))
                 <div class="space-y-2.5">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3">
                         <label class="block text-sm sm:text-base font-bold text-slate-900">
                             3. {{ \App\Models\FormPertanyaan::label('keaktifan_ortom', 'Keaktifan di Organisasi Otonom (ORTOM)') }}
                             @if(\App\Models\FormPertanyaan::isWajib('keaktifan_ortom'))
@@ -1107,19 +1108,19 @@
                                 <span class="text-xs font-normal text-slate-500">(Opsional)</span>
                             @endif
                         </label>
-                        <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">Boleh pilih lebih dari 1</span>
+                        <span class="self-start sm:self-auto text-xs text-sky-800 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 shadow-2xs">Boleh pilih lebih dari 1</span>
                     </div>
                     <p class="text-xs sm:text-sm text-slate-500">{{ \App\Models\FormPertanyaan::bantuan('keaktifan_ortom', 'Centang ortom tempat Bapak/Ibu berkiprah dan isikan jabatan/posisi Anda:') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         @foreach(\App\Models\FormPertanyaan::opsi('keaktifan_ortom', config('arqam.opsi_form.keaktifan_ortom')) as $v)
-                        <div class="p-4 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
+                        <div class="p-3.5 sm:p-4.5 rounded-2xl border-2 transition-all shadow-2xs"
                              :class="isOrtomChecked('{{ $v }}') ? 'bg-sky-50/70 border-sky-500 ring-2 ring-sky-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70'">
-                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none">
+                            <label class="flex items-center gap-3 text-sm sm:text-base text-slate-900 font-bold cursor-pointer select-none min-h-[44px]">
                                 <input type="checkbox" name="keaktifan_ortom[]" value="{{ $v }}"
                                     @checked(in_array($v, old('keaktifan_ortom', [])))
                                     @change="toggleOrtom('{{ $v }}', $el.checked)"
-                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500">
+                                    class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 border-slate-300 text-sky-600 focus:ring-sky-500 shrink-0">
                                 <span>{{ $v }}</span>
                             </label>
 
@@ -1128,6 +1129,15 @@
                                 $oldOrtomVal = old('jabatan_ortom.'.$v);
                                 $oldTingkat = is_array($oldOrtomVal) ? ($oldOrtomVal['tingkat'] ?? '') : '';
                                 $oldPeriode = is_array($oldOrtomVal) ? ($oldOrtomVal['periode'] ?? '') : '';
+                                $oldTahunMulai = is_array($oldOrtomVal) ? ($oldOrtomVal['tahun_mulai'] ?? '') : '';
+                                $oldTahunSelesai = is_array($oldOrtomVal) ? ($oldOrtomVal['tahun_selesai'] ?? '') : '';
+                                if (empty($oldTahunMulai) && empty($oldTahunSelesai) && !empty($oldPeriode)) {
+                                    if (str_contains($oldPeriode, '-')) {
+                                        $parts = array_map('trim', explode('-', $oldPeriode, 2));
+                                        $oldTahunMulai = $parts[0] ?? '';
+                                        $oldTahunSelesai = $parts[1] ?? '';
+                                    }
+                                }
                                 $oldJabatan = is_array($oldOrtomVal) ? ($oldOrtomVal['jabatan'] ?? '') : (is_string($oldOrtomVal) ? $oldOrtomVal : '');
                                 $oldJabatanCustom = is_array($oldOrtomVal) ? ($oldOrtomVal['jabatan_custom'] ?? '') : '';
                                 $opsiJabatan = config('arqam.opsi_form.jabatan_ortom_standar', []);
@@ -1143,6 +1153,9 @@
                                 </div>
 
                                 {{-- 1) Tingkat ORTOM --}}
+                                @php
+                                    $opsiTingkatOrtom = config("arqam.opsi_form.tingkat_ortom_per_organisasi.{$v}") ?? config('arqam.opsi_form.tingkat_ortom', []);
+                                @endphp
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">
                                         1. Tingkat Kepengurusan
@@ -1150,24 +1163,42 @@
                                     <select name="jabatan_ortom[{{ $v }}][tingkat]"
                                             class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
                                         <option value="">-- Pilih Tingkat Kepengurusan --</option>
-                                        @foreach(config('arqam.opsi_form.tingkat_ortom', []) as $to)
+                                        @if($oldTingkat && !in_array($oldTingkat, $opsiTingkatOrtom))
+                                            <option value="{{ $oldTingkat }}" selected>{{ $oldTingkat }}</option>
+                                        @endif
+                                        @foreach($opsiTingkatOrtom as $to)
                                             <option value="{{ $to }}" @selected($oldTingkat === $to)>{{ $to }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                {{-- 2) Periode --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                                        2. Periode Kepengurusan
-                                    </label>
-                                    <select name="jabatan_ortom[{{ $v }}][periode]"
-                                            class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
-                                        <option value="">-- Pilih Periode --</option>
-                                        @foreach(config('arqam.opsi_form.periode_ortom', []) as $po)
-                                            <option value="{{ $po }}" @selected($oldPeriode === $po)>{{ $po }}</option>
-                                        @endforeach
-                                    </select>
+                                {{-- 2) Periode Kepengurusan (Tahun Mulai & Tahun Selesai) --}}
+                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">
+                                            2a. Tahun Mulai
+                                        </label>
+                                        <select name="jabatan_ortom[{{ $v }}][tahun_mulai]"
+                                                class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                            <option value="">-- Tahun Mulai --</option>
+                                            @for($yr = (int)date('Y') + 4; $yr >= 1980; $yr--)
+                                                <option value="{{ $yr }}" @selected($oldTahunMulai == $yr)>{{ $yr }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">
+                                            2b. Tahun Selesai
+                                        </label>
+                                        <select name="jabatan_ortom[{{ $v }}][tahun_selesai]"
+                                                class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                            <option value="">-- Tahun Selesai --</option>
+                                            <option value="Sekarang" @selected($oldTahunSelesai === 'Sekarang')>Sekarang (Masih Menjabat)</option>
+                                            @for($yr = (int)date('Y') + 4; $yr >= 1980; $yr--)
+                                                <option value="{{ $yr }}" @selected($oldTahunSelesai == $yr)>{{ $yr }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
                                 </div>
 
                                 {{-- 3) Jabatan --}}
@@ -1217,6 +1248,8 @@
                             @endif
                         </label>
                         <input name="nbm" value="{{ old('nbm') }}"
+                            inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13"
+                            @input="this.value = this.value.replace(/\D/g, ''); saveDraft()"
                             placeholder="{{ \App\Models\FormPertanyaan::placeholder('nbm', 'Contoh: 1234567 (Bila sudah ber-NBM)') }}"
                             {{ \App\Models\FormPertanyaan::isWajib('nbm') ? 'required' : '' }}
                             class="w-full px-4 py-3.5 sm:py-4 text-base font-medium text-slate-900 border-2 {{ $errors->has('nbm') ? 'border-rose-500 bg-rose-50/30' : 'border-slate-300 hover:border-slate-400' }} rounded-2xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[50px]">
@@ -1265,16 +1298,16 @@
                 {{-- Pertanyaan Kustom Seksi Organisasi --}}
                 <x-form-custom-fields :questions="$customQuestions['organisasi'] ?? null" />
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t border-slate-200">
+                <div class="flex items-center justify-between gap-2.5 sm:gap-4 pt-5 border-t border-slate-200">
                     <button type="button" @click="goTo('agama')"
-                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[54px] px-6 sm:px-7 border-2 border-slate-300 bg-white text-slate-700 font-bold rounded-2xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm sm:text-base">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] border border-slate-300 bg-white text-slate-700 font-bold rounded-xl hover:bg-slate-50 active:bg-slate-100 transition text-xs sm:text-sm shadow-2xs shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="button" @click="goTo('kemasyarakatan')"
-                        class="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] px-6 sm:px-9 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-8 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow transition text-center">
                         <span>Lanjut: Kemasyarakatan</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
@@ -1601,26 +1634,26 @@
                 </div>
 
                 {{-- Action Buttons --}}
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-5 border-t-2 border-slate-200">
+                <div class="flex items-center justify-between gap-2.5 sm:gap-4 pt-5 border-t-2 border-slate-200">
                     <button type="button" @click="goTo('org')"
-                        class="w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 border-2 border-slate-300 text-slate-700 font-extrabold rounded-2xl hover:bg-slate-100 active:bg-slate-200 transition flex items-center justify-center gap-2 text-sm sm:text-base">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 active:bg-slate-100 transition text-xs sm:text-sm shadow-2xs shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali</span>
                     </button>
                     <button type="submit" :disabled="isSubmitting"
-                        class="w-full sm:w-auto min-h-[52px] sm:min-h-[58px] px-8 sm:px-10 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black text-base sm:text-lg rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-10 py-2.5 sm:py-3 min-h-[44px] sm:min-h-[48px] bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-black text-xs sm:text-sm rounded-xl shadow-xs hover:shadow transition">
                         <template x-if="isSubmitting">
-                            <span class="flex items-center gap-2.5">
-                                <svg class="w-5 h-5 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                 </svg>
-                                <span>Mengirim Pendaftaran...</span>
+                                <span>Mengirim...</span>
                             </span>
                         </template>
                         <template x-if="!isSubmitting">
-                            <span class="flex items-center gap-2">
+                            <span class="flex items-center gap-1.5">
                                 <span>Kirim Pendaftaran</span>
-                                <span class="text-xl leading-none">&rarr;</span>
+                                <span class="text-base leading-none">&rarr;</span>
                             </span>
                         </template>
                     </button>
@@ -1630,28 +1663,28 @@
         @endif
 
         {{-- Unified Bottom Nav & Institutional Footer (Mobile-First) --}}
-        <div class="mt-6 rounded-xl bg-white border border-slate-200/90 shadow-2xs p-4 sm:p-5 space-y-3.5">
-            <div class="flex items-center justify-between gap-3">
-                <div class="text-left">
-                    <p class="text-xs font-semibold text-slate-800 leading-tight">Sudah memiliki akun kader?</p>
+        <div class="mt-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
+                <div>
+                    <p class="text-xs sm:text-sm font-bold text-slate-800 leading-tight">Sudah memiliki akun kader?</p>
                     <p class="text-xs text-slate-500 font-normal mt-0.5">Masuk untuk melihat status atau profil.</p>
                 </div>
-                <a href="{{ route('login') }}" class="px-3.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 border border-sky-200/80 text-xs font-semibold transition whitespace-nowrap shadow-2xs flex items-center gap-1.5 shrink-0">
+                <a href="{{ route('login') }}" class="w-full sm:w-auto px-4 py-2.5 sm:py-2 min-h-[44px] rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 border border-sky-200/80 text-xs sm:text-sm font-bold transition whitespace-nowrap shadow-2xs flex items-center justify-center gap-1.5 shrink-0 self-stretch sm:self-auto">
                     <span>Masuk Portal</span>
                     <span>&rarr;</span>
                 </a>
             </div>
 
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-400">
-                <a href="/" class="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 transition font-normal">
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500">
+                <a href="/" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 transition font-medium py-1">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                     <span>Beranda Utama</span>
                 </a>
 
-                <div class="flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div class="inline-flex items-center gap-1.5 py-1 text-slate-500 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>MPKSDI Karanganyar</span>
                 </div>
             </div>

@@ -564,4 +564,198 @@ class AnggotaRegistrationTest extends TestCase
             $anggota->formatJabatanOrtom('Tapak Suci')
         );
     }
+
+    public function test_registration_supports_ortom_with_tahun_mulai_and_tahun_selesai(): void
+    {
+        Storage::fake('local');
+
+        $payload = $this->payload([
+            'nik' => '3313109999990088',
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah', 'Ikatan Pelajar Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Pemuda Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW)',
+                    'tahun_mulai' => '2022',
+                    'tahun_selesai' => '2027',
+                    'jabatan' => 'Ketua Umum / Ketua',
+                ],
+                'Ikatan Pelajar Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW)',
+                    'tahun_mulai' => '2020',
+                    'tahun_selesai' => 'Sekarang',
+                    'jabatan' => 'Sekretaris Umum / Sekretaris',
+                ],
+            ],
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertRedirect(route('anggota.register'));
+        $res->assertSessionHas('success');
+
+        $anggota = Anggota::where('nik', '3313109999990088')->first();
+        $this->assertNotNull($anggota);
+        $this->assertIsArray($anggota->jabatan_ortom);
+
+        $pm = $anggota->jabatan_ortom['Pemuda Muhammadiyah'];
+        $this->assertSame('2022', $pm['tahun_mulai']);
+        $this->assertSame('2027', $pm['tahun_selesai']);
+        $this->assertSame('2022 - 2027', $pm['periode']);
+        $this->assertSame('Ketua Umum / Ketua', $pm['jabatan']);
+        $this->assertSame('Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW)', $pm['tingkat']);
+
+        $ipm = $anggota->jabatan_ortom['Ikatan Pelajar Muhammadiyah'];
+        $this->assertSame('2020', $ipm['tahun_mulai']);
+        $this->assertSame('Sekarang', $ipm['tahun_selesai']);
+        $this->assertSame('2020 - Sekarang', $ipm['periode']);
+        $this->assertSame('Sekretaris Umum / Sekretaris', $ipm['jabatan']);
+
+        $this->assertSame(
+            'Ketua Umum / Ketua - Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW) - Periode 2022 - 2027',
+            $anggota->formatJabatanOrtom('Pemuda Muhammadiyah')
+        );
+        $this->assertSame(
+            'Sekretaris Umum / Sekretaris - Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW) - Periode 2020 - Sekarang',
+            $anggota->formatJabatanOrtom('Ikatan Pelajar Muhammadiyah')
+        );
+    }
+
+    public function test_format_jabatan_ortom_synthesizes_when_periode_key_is_missing(): void
+    {
+        $anggota = new Anggota([
+            'jabatan_ortom' => [
+                'Pemuda Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Daerah',
+                    'tahun_mulai' => '2019',
+                    'tahun_selesai' => '2023',
+                    'jabatan' => 'Ketua',
+                ],
+                'Tapak Suci' => [
+                    'tingkat' => 'Pimpinan Cabang',
+                    'tahun_mulai' => '2020',
+                    'jabatan' => 'Pelatih',
+                ],
+                'Hizbul Wathon' => [
+                    'tingkat' => 'Kwartir Daerah',
+                    'jabatan' => 'Pembina',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            'Ketua - Pimpinan Daerah - Periode 2019 - 2023',
+            $anggota->formatJabatanOrtom('Pemuda Muhammadiyah')
+        );
+        $this->assertSame(
+            'Pelatih - Pimpinan Cabang - Periode 2020',
+            $anggota->formatJabatanOrtom('Tapak Suci')
+        );
+        $this->assertSame(
+            'Pembina - Kwartir Daerah',
+            $anggota->formatJabatanOrtom('Hizbul Wathon')
+        );
+    }
+
+    public function test_registration_with_alphabetic_nik_is_rejected(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->post(route('anggota.register.store'), $this->payload([
+            'nik' => '123456789012345A',
+        ]));
+
+        $response->assertSessionHasErrors(['nik']);
+        $this->assertContains('NIK KTP hanya boleh berisi angka murni.', session('errors')->get('nik'));
+    }
+
+    public function test_registration_with_alphabetic_no_wa_is_rejected(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->post(route('anggota.register.store'), $this->payload([
+            'no_wa' => '08123456789A',
+        ]));
+
+        $response->assertSessionHasErrors(['no_wa']);
+        $this->assertContains('Nomor WhatsApp hanya boleh berisi angka murni.', session('errors')->get('no_wa'));
+    }
+
+    public function test_registration_with_alphabetic_nbm_is_rejected(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->post(route('anggota.register.store'), $this->payload([
+            'nbm' => '12345ABC',
+        ]));
+
+        $response->assertSessionHasErrors(['nbm']);
+        $this->assertContains('Nomor NBM hanya boleh berisi angka murni.', session('errors')->get('nbm'));
+    }
+
+    public function test_registration_with_imm_and_korkom_or_pk_imm_succeeds(): void
+    {
+        Storage::fake('local');
+
+        $payloadKorkom = $this->payload([
+            'nik' => '3313050505990001',
+            'no_wa' => '081233445566',
+            'email' => 'kader.korkom@example.test',
+            'keaktifan_ortom' => ['Ikatan Mahasiswa Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Ikatan Mahasiswa Muhammadiyah' => [
+                    'tingkat' => 'Koordinator Komisariat (Korkom IMM)',
+                    'tahun_mulai' => '2023',
+                    'tahun_selesai' => '2024',
+                    'jabatan' => 'Ketua Umum / Ketua',
+                ],
+            ],
+        ]);
+
+        $resKorkom = $this->post(route('anggota.register.store'), $payloadKorkom);
+        $resKorkom->assertSessionHasNoErrors();
+        $resKorkom->assertRedirect(route('anggota.register'));
+        $resKorkom->assertSessionHas('success');
+
+        $anggotaKorkom = Anggota::where('nik', '3313050505990001')->first();
+        $this->assertNotNull($anggotaKorkom);
+        $this->assertContains('Ikatan Mahasiswa Muhammadiyah', $anggotaKorkom->keaktifan_ortom);
+        $this->assertSame('Koordinator Komisariat (Korkom IMM)', $anggotaKorkom->jabatan_ortom['Ikatan Mahasiswa Muhammadiyah']['tingkat']);
+        $this->assertSame('Ketua Umum / Ketua', $anggotaKorkom->jabatan_ortom['Ikatan Mahasiswa Muhammadiyah']['jabatan']);
+        $this->assertSame(
+            'Ketua Umum / Ketua - Koordinator Komisariat (Korkom IMM) - Periode 2023 - 2024',
+            $anggotaKorkom->formatJabatanOrtom('Ikatan Mahasiswa Muhammadiyah')
+        );
+
+        $payloadPk = $this->payload([
+            'nik' => '3313050505990002',
+            'no_wa' => '081233445567',
+            'email' => 'kader.pkimm@example.test',
+            'keaktifan_ortom' => ['Ikatan Mahasiswa Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Ikatan Mahasiswa Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Komisariat (PK / PK IMM / Rayon)',
+                    'tahun_mulai' => '2022',
+                    'tahun_selesai' => '2023',
+                    'jabatan' => 'Sekretaris Umum / Sekretaris',
+                ],
+            ],
+        ]);
+
+        $resPk = $this->post(route('anggota.register.store'), $payloadPk);
+        $resPk->assertSessionHasNoErrors();
+        $resPk->assertRedirect(route('anggota.register'));
+
+        $anggotaPk = Anggota::where('nik', '3313050505990002')->first();
+        $this->assertNotNull($anggotaPk);
+        $this->assertContains('Ikatan Mahasiswa Muhammadiyah', $anggotaPk->keaktifan_ortom);
+        $this->assertSame('Pimpinan Komisariat (PK / PK IMM / Rayon)', $anggotaPk->jabatan_ortom['Ikatan Mahasiswa Muhammadiyah']['tingkat']);
+
+        // Check registration page renders specific IMM tingkat options
+        $viewRes = $this->get(route('anggota.register', ['baru' => 1]));
+        $viewRes->assertOk();
+        $viewRes->assertSee('Dewan Pimpinan Pusat (DPP IMM)');
+        $viewRes->assertSee('Dewan Pimpinan Daerah (DPD IMM)');
+        $viewRes->assertSee('Pimpinan Cabang (PC IMM)');
+        $viewRes->assertSee('Koordinator Komisariat (Korkom IMM)');
+        $viewRes->assertSee('Pimpinan Komisariat (PK IMM)');
+    }
 }

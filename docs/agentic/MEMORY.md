@@ -36,12 +36,130 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (210 test hijau per 2026-10-20).
+- `php artisan test` — PHPUnit feature tests (222 test hijau per 2026-11-05).
 - `vendor\bin\pint` — format PHP (Laravel style).
 - `npm run build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-05: Eliminasi AI Slop Badge Kelulusan & Implementasi Fitur Edit/Upload TTD Pengesahan Sertifikat:
+  1. **Tipografi Formal Kelulusan (Bebas AI Slop)**:
+     - Mengganti bentuk rounded pill badge (`border-radius: 14px; background: #ecfdf5`) yang bergaya web AI chip dengan tipografi Serif klasik formal `L U L U S` (`letter-spacing: 5px; color: #064e3b; font-size: 15pt;`) diapit garis hairline emas horizontal (*gold hairline rules*). Desain menjadi sangat berwibawa layaknya ijazah/sertifikat resmi kenegaraan dan persyarikatan.
+  2. **Pengesahan & Upload Tanda Tangan PNG**:
+     - Menambahkan kolom database baru di tabel `events`:
+       * `nama_penandatangan_kiri`, `jabatan_penandatangan_kiri`, `keterangan_penandatangan_kiri`, `ttd_kiri_path` (Penandatangan 1 / MoT / Instruktur).
+       * `ttd_kanan_path` (Penandatangan 2 / Ketua MPKSDI / PDM).
+     - Memperbarui form event (`form.blade.php`) dengan `enctype="multipart/form-data"` dan kartu 2 kolom pengesahan yang memungkinkan admin mengedit seluruh teks pejabat serta mengunggah file tanda tangan PNG transparan (maks 2 MB) lengkap dengan pratinjau dan opsi hapus.
+     - Controller `EventController.php` memvalidasi file PNG, menyimpan ke disk publik (`storage/app/public/signatures/`), dan menghapus file fisik lama saat diganti atau dihapus.
+     - Template PDF (`certificate-pdf.blade.php` & `certificates-batch-pdf.blade.php`) secara otomatis mendeteksi tanda tangan tersimpan atau fallback cerdas bila nama pejabat sesuai.
+  3. **Verifikasi**:
+     - Seluruh 222 automated feature tests PHPUnit (978 assertions) lulus 100%.
+     - Laravel Pint lulus bersih (0 style violations).
+- 2026-11-05: Redesain Sertifikat & Transkrip Baitul Arqam Berbasis Template Kubah Hijau-Emas (Sesuai Referensi Media 1 & 2):
+  - **Aset & Background**:
+    * Menggunakan background resolusi tinggi kubah hijau ornamen geometris Islam beraksen emas (`public/aset/bg-sertifikat-ba.jpg`), siluet Gedung Dakwah dan Surya Muhammadiyah.
+    * Menggunakan teknik `@page { size: 297mm 210mm; margin: 0; }` dengan `.bg-fixed { position: fixed; top: 0; left: 0; width: 297mm; height: 210mm; z-index: -1000; }` sehingga latar belakang ter-render presisi di setiap halaman tanpa menambah bobot DOM atau memicu overflow.
+    * Menambahkan aset grafis pendukung: tanda tangan resmi berlatar belakang transparan (`public/aset/signature-mot.png`, `public/aset/signature-ketua.png`), dan ikon pembatas berlian emas (`public/aset/gold-diamond.png`) untuk menghindari karakter `?` pada font standar PDF.
+  - **Halaman 1 (Sertifikat Utama — Selaras Media 1)**:
+    * Dua logo di tengah atas (Surya Muhammadiyah kiri, MPKSDI kanan) di bawah kubah, dipisahkan garis emas vertikal.
+    * Teks formal institusi PDM & MPKSDI Karanganyar dengan pembatas berlian emas.
+    * Judul `SERTIFIKAT` (serif klasik), nomor sertifikat dinamis per-peserta, nama peserta bergaris bawah tebal, NBM, dan asal PCM.
+    * Pita nama acara bernuansa hijau botol (`#064e3b`) berbingkai emas (`#d4af37`), diiringi pill status kelulusan hijau emerald diapit ornamen berlian emas.
+    * Pengesahan 3 kolom seimbang: Master of Training (MoT) di kiri, QR Code verifikasi online & hash pangkalan data di tengah, serta Ketua MPKSDI PDM Karanganyar di kanan.
+  - **Halaman 2 (Transkrip Capaian Kompetensi — Selaras Media 2)**:
+    * Logo Surya Muhammadiyah tunggal di tengah atas beserta identitas PDM MPKSDI dan alamat kantor Gedung Dakwah.
+    * Judul `Transkrip Capaian Kompetensi` diiringi subjudul `PERKADERAN BAITUL ARQAM` dan badge pill lampiran nomor sertifikat & acara.
+    * Biodata kader 2 kolom (Nama Lengkap, NBM, PCM, Nomor Peserta).
+    * Tabel ganda 2 kolom proporsional:
+      - Kolom kiri: Tabel Mata Pembinaan / Materi Sesi, Narasumber, dan Durasi Aktual (menit) beserta total durasi tercatat.
+      - Kolom kanan: Tabel Evaluasi 3 Aspek Capaian (I. Kognitif, II. Psikomotorik, III. Afektif), Nilai Akhir Komprehensif, dan badge Lulus/Grade, diiringi kotak penjelasan Keterangan.
+    * Pengesahan Ketua Majelis di sisi kanan bawah.
+  - **Template Massal (`certificates-batch-pdf.blade.php`)**:
+    * Mengadopsi struktur identik dengan perulangan per-peserta yang dipisahkan secara tepat menggunakan `.page-break`.
+  - **Verifikasi**:
+    * Seluruh 220 automated tests PHPUnit (953 assertions) lulus 100%.
+    * Laravel Pint lulus bersih (0 style violations).
+    * Hasil render PDF contoh (`sample_certificate.pdf`) dan pratinjau PNG visual halaman 1 & 2 terkonfirmasi rapi, tanpa overflow, dan tersimpan di direktori artifact.
+- 2026-11-05: Penyesuaian Nomenklatur Spesifik Tingkat Kepengurusan Per ORTOM:
+  - Menambahkan konfigurasi `tingkat_ortom_per_organisasi` di `config/arqam.php` untuk memetakan tingkat kepengurusan resmi tiap organisasi otonom secara terisolasi tanpa mencampur singkatan ORTOM lain.
+  - Untuk Ikatan Mahasiswa Muhammadiyah (IMM): `Dewan Pimpinan Pusat (DPP IMM)`, `Dewan Pimpinan Daerah (DPD IMM)`, `Pimpinan Cabang (PC IMM)`, `Koordinator Komisariat (Korkom IMM)`, `Pimpinan Komisariat (PK IMM)`, dan `Lainnya`.
+  - Untuk IPM: PP, PW, PD, PC, PR, PK (Sekolah/Madrasah).
+  - Untuk HW: Kwarpus, Kwarwil, Kwarda, Kwarcab, Qobilah.
+  - Untuk TS: PP, Pimwil, Pimda, Pimcab, Unit Latihan / Kolat.
+  - Untuk Pemuda Muhammadiyah, NA, Aisyiyah: Sesuai struktur resmi persyarikatan.
+  - Menjaga backward compatibility penuh: data tersimpan lama tetap dirender dan dipertahankan.
+  - Seluruh 220 tests PHPUnit (953 assertions) lulus 100%, Pint 0 violations, Vite build bersih.
+- 2026-11-05: Perbaikan Kepatuhan Dokumen Sertifikat:
+  - Data pengesahan sertifikat kini per-event: tanggal terbit, jabatan, nama, dan NBM penandatangan. Template tidak lagi menggunakan nama/NBM pejabat atau tanggal cetak yang hardcode.
+  - NIK dihilangkan dari sertifikat dan transkrip. Identitas dokumen menggunakan nomor sertifikat, QR verifikasi, NBM bila tersedia, serta asal PCM.
+  - Transkrip mencetak durasi aktual sesi materi dalam menit dari jam mulai/selesai; tidak lagi mengasumsikan 2 JP per sesi atau total minimum 16 JP.
+  - Redaksi `Lulus Bersyarat` dibedakan dari kelulusan reguler. Ambang predikat dan presensi tidak dicetak sebagai kebijakan baku sebelum keputusan bisnis disahkan.
+- 2026-11-05: Standardisasi & Perapihan Desain Sistem Cetak Sertifikat Baitul Arqam (2 Halaman Landscape A4):
+  1. **Halaman 1 (Sertifikat Utama) — `certificate-pdf.blade.php` & `certificates-batch-pdf.blade.php`**:
+     - **Kop Surat Resmi Simetris**: Menambahkan logo resmi Muhammadiyah (kiri) dan logo resmi MPKSDI (kanan) berbasis Base64 data URI lokal agar kompatibel 100% di DomPDF tanpa masalah izin file/jaringan.
+     - **Perbaikan Masalah Border Tabrakan**: Menghapus `position: absolute; bottom: 3mm` pada tabel tanda tangan yang sebelumnya menyebabkan nama penandatangan, NBM, dan QR code menabrak dan memotong garis border kuning inner (`.cert-inner`). Diganti dengan alur vertikal normal (`margin-top: 6mm`) sehingga seluruh elemen tanda tangan (MoT, QR verifikasi, dan Ketua PDM) berada rapi di dalam batas bingkai inner.
+     - **Tipografi & Spacing**: Menyelaraskan ukuran font judul, nomor sertifikat, nama peserta (bold underline), deskripsi kegiatan, dan badge status kelulusan/grade.
+  2. **Halaman 2 (Transkrip Capaian Kompetensi Perkaderan)**:
+     - Mengadopsi bingkai double-border biru tua dan emas yang identik dengan Halaman 1 untuk konsistensi visual dokumen resmi.
+     - Header kop transkrip dilengkapi logo resmi Muhammadiyah dan MPKSDI.
+     - Rekap sesi materi (dengan beban JP) di sebelah kiri, dan rekap penilaian 3 aspek (Kognitif, Psikomotorik, Afektif) beserta nilai akhir dan predikat mutu kelulusan di sebelah kanan.
+     - Pengesahan Ketua Majelis tertata proporsional di kanan bawah di dalam batas bingkai dokumen.
+  3. **Verifikasi**:
+     - Seluruh 218 automated tests PHPUnit (931 assertions) tetap lulus 100%.
+     - Contoh sertifikat PDF dan hasil render PNG 150 DPI berhasil dibuat dan didokumentasikan di folder artifact.
+- 2026-11-05: Perapihan Mobile UI / Mobile-First Redesign (Stepper Navigation & Footer Landing Page):
+  1. **Tombol Navigasi Stepper Form Pendaftaran (`register.blade.php`)**:
+     - Mengubah orientasi tombol navigasi bawah pada seluruh tab (Diri, Agama, Organisasi, Kemasyarakatan):
+       * Mengganti susunan bertumpuk vertikal (`flex-col-reverse` yang menempatkan tombol Lanjut di atas dan tombol Kembali di bawah dengan tinggi masif) menjadi susunan **berdampingan horizontal (side-by-side)** di mobile (`flex items-center justify-between gap-2.5 sm:gap-4`).
+       * Tombol "Kembali" dibuat kompak, ramping, dan bersahabat di sisi kiri (`px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] border border-slate-300 rounded-xl`).
+       * Tombol "Lanjut" / "Kirim Pendaftaran" berada di sisi kanan menguasai porsi fleksibel (`flex-1 sm:flex-initial py-2.5 sm:py-3 min-h-[44px] rounded-xl font-extrabold`).
+       * Mengurangi konsumsi tinggi layar ponsel hingga lebih dari 60%, sehingga tidak lagi menutupi layar dan sangat ergonomis untuk jangkauan jempol pengguna.
+  2. **Footer Mobile Landing Page (`landing/index.blade.php`)**:
+     - **Batik Corner Overlay**: Sembunyikan batik sudut kanan atas dan kiri bawah pada layar mobile (`hidden sm:block`) agar motif batik tidak lagi menabrak/menimpa teks deskripsi MPKSDI PDM Karanganyar. Keterbacaan teks menjadi 100% jernih.
+     - **Tautan Organisasi & Perkaderan**: Diubah menjadi grid 2 kolom berdampingan di mobile (`grid grid-cols-2 gap-4 sm:gap-6 md:col-span-2 lg:col-span-4 lg:grid-cols-2 lg:gap-8`) untuk menghemat ruang vertikal secara drastis daripada bertumpuk 1 kolom memanjang.
+     - **Kontak & Padding Bawah**: Mengatur kartu WhatsApp dan Email menjadi grid responsif yang rapi serta menambahkan padding bawah ekstra (`pb-24 sm:pb-20 lg:pb-10`) agar kotak Sekretariat tidak terpotong oleh browser navigation bar pada perangkat ponsel.
+  3. **Periode ORTOM Mobile-First (`register.blade.php`, `profile.blade.php`)**:
+     - Mengubah grid dropdown Tahun Mulai dan Tahun Selesai menjadi `grid grid-cols-2 gap-2 sm:gap-3` sehingga selalu berdampingan secara alami di ponsel tanpa memanjang vertikal.
+  4. **Verifikasi**:
+     - Seluruh 218 automated tests PHPUnit (931 assertions) tetap lulus 100%.
+     - Laravel Pint lulus bersih (0 style violations).
+     - Kompilasi build aset Vite sukses.
+- 2026-11-05: Implementasi Hierarki IMM, Kunci Input Numerik Anti-Huruf, & Perapihan Mobile UI / Footer:
+  1. **Konfigurasi ORTOM (`config/arqam.php`)**:
+     - Menambahkan `'Ikatan Mahasiswa Muhammadiyah'` ke `keaktifan_ortom` melengkapi 7 ortom resmi Muhammadiyah.
+     - Memperbarui `tingkat_ortom` dengan nomenklatur spesifik IMM (`DPP IMM`, `DPD IMM (Wilayah)`, `PC IMM`, `Korkom IMM`, `PK IMM / Rayon`).
+  2. **Penguncian Input Klien & Validasi Server Anti-Huruf**:
+     - Frontend (`register.blade.php`, `profile.blade.php`, `cek-status.blade.php`, `admin/users/`, `admin/events/`):
+       * Menambahkan `inputmode="numeric"`, `pattern="[0-9]*"`, pencegah tombol huruf `onkeypress`, dan pembersihan instan `oninput="this.value = this.value.replace(/\D/g, '')"` pada field `nik`, `no_wa`, `nbm`, `identifier`, dan `kuota`. Pengguna tidak bisa mengetik atau menempel huruf.
+     - Backend (`AnggotaRegistrationRequest.php`, `ProfileController.php`):
+       * `nik`: Wajib 16 digit angka murni (`digits:16`, `regex:/^[0-9]{16}$/`) dengan pesan error kustom.
+       * `no_wa`: Wajib angka murni (`regex:/^[0-9]+$/`) dengan pesan error kustom.
+       * `nbm`: Angka murni opsional (`regex:/^[0-9]*$/`) dengan pesan error kustom.
+  3. **Perapihan Mobile UI & Footer (`register.blade.php`)**:
+     - Header kartu AUM & ORTOM ditata ulang dengan layout fleksibel (`flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3`) sehingga badge pill ("2 Dropdown (AUM & Jabatan)", "Boleh pilih lebih dari 1") tidak saling bertabrakan atau menumpuk judul pada layar ponsel sempit.
+     - Kotak footer "Sudah memiliki akun kader?" dan navigasi bawah dioptimalkan untuk mobile dengan touch target ergonomis ($\ge 44\text{px}$) dan alignment seimbang.
+  4. **Pengujian & Verifikasi**:
+     - Ditambahkan 4 skenario automated test (penolakan NIK/WA/NBM berhuruf dan pendaftaran kader IMM Korkom/PK IMM).
+     - 218 tests PHPUnit (931 assertions) lulus 100%.
+     - Laravel Pint lulus bersih (0 violations) dan aset Vite terkompilasi sukses.
+     - Pint styling lulus bersih.
+- 2026-11-05: Penyesuaian Periode Kepengurusan ORTOM Menjadi 2 Dropdown (Tahun Mulai & Tahun Selesai):
+  1. **Antarmuka Pendaftaran & Profil (`register.blade.php`, `profile.blade.php`)**:
+     - Menggantikan droplist periode statis tunggal dengan 2 dropdown berdampingan dalam grid 2 kolom:
+       * **2a. Tahun Mulai**: Opsi tahun dari `date('Y') + 4` (2030) sampai 1980 menurun (`@selected($oldTahunMulai == $yr)`).
+       * **2b. Tahun Selesai**: Opsi 'Sekarang' (Masih Menjabat) dan opsi tahun dari `date('Y') + 4` (2030) sampai 1980 menurun (`@selected($oldTahunSelesai == $yr)`).
+     - Menambahkan ekstraksi nilai lama otomatis untuk `$oldTahunMulai` dan `$oldTahunSelesai`, termasuk fallback parsing otomatis dari string periode lama (`YYYY - YYYY` atau `YYYY - Sekarang`).
+  2. **Validasi & Backend Controller (`AnggotaRegistrationRequest`, `AnggotaRegistrationController`, `ProfileController`)**:
+     - Aturan validasi mengizinkan `jabatan_ortom.*.tahun_mulai` dan `jabatan_ortom.*.tahun_selesai` (string nullable).
+     - Controller mengekstrak `$tahunMulai` dan `$tahunSelesai` serta melakukan sintesis atribut `$periode = trim($tahunMulai . ($tahunSelesai ? ' - ' . $tahunSelesai : ''))`.
+     - Struktur tersimpan pada kolom JSON `jabatan_ortom` berisi `tingkat`, `periode`, `tahun_mulai`, `tahun_selesai`, `jabatan`.
+  3. **Model & Kompatibilitas (`Anggota::formatJabatanOrtom()`)**:
+     - Memformat periode secara dinamis baik dari key `periode` maupun gabungan `tahun_mulai` & `tahun_selesai`.
+     - Seluruh template cetak PDF biodata kader, ekspor Excel, dan tampilan detail admin tetap 100% kompatibel tanpa regresi.
+  4. **Verifikasi**:
+     - Automated tests bertambah menjadi 214 tests lulus 100% (907 assertions).
+     - Laravel Pint lulus bersih.
+     - Kompilasi aset Vite sukses.
 - 2026-10-20: Pembersihan Keamanan LoginController (Hapus Hardcode Password & Auto-Provision):
   1. Menghapus seluruh password hardcode (`AdminPDM@25`, `cabangkra`, `cabangjra`) dan map auto-provision PCM dari `LoginController`.
   2. Menghapus bypass otentikasi backdoor `User::updateOrCreate` saat login gagal/tidak ditemukan.

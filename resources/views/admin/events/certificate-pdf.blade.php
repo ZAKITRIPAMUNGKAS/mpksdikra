@@ -5,434 +5,501 @@
     <title>Sertifikat Baitul Arqam - {{ $peserta->anggota->nama_lengkap }}</title>
     <style>
         @page {
-            size: A4 landscape;
-            margin: 10mm 12mm 10mm 12mm;
+            size: 297mm 210mm;
+            margin: 0;
         }
         * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+        }
+        html, body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'DejaVu Sans', sans-serif;
-            color: #0f172a;
+            font-family: 'Helvetica', Arial, sans-serif;
             background: #ffffff;
-            font-size: 11px;
-            line-height: 1.4;
+            color: #1e293b;
         }
-
-        .page {
-            width: 100%;
-            height: 188mm;
+        .bg-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 297mm;
+            height: 210mm;
+            z-index: -1000;
+        }
+        .page-content {
             position: relative;
+            z-index: 10;
+            padding: 11mm 20mm 10mm 20mm;
         }
         .page-break {
             page-break-before: always;
         }
-
-        /* Border Sertifikat Klasik Muhammadiyah */
-        .cert-border {
-            border: 3px double #002b40;
-            border-radius: 8px;
-            padding: 8mm 12mm;
-            height: 186mm;
-            position: relative;
-            background: #ffffff;
+        .serif {
+            font-family: 'Times New Roman', 'DejaVu Serif', 'Times', serif;
         }
-        .cert-inner {
-            border: 1px solid #f8bb00;
-            border-radius: 4px;
-            height: 170mm;
-            padding: 5mm 8mm;
-            position: relative;
-        }
-
-        /* Kop Surat */
-        .kop-table {
-            width: 100%;
+        .grid-table {
             border-collapse: collapse;
-            text-align: center;
-        }
-        .kop-org {
-            font-size: 11pt;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #002b40;
-            line-height: 1.25;
-        }
-        .kop-sub {
-            font-size: 9.5pt;
-            font-weight: 700;
-            color: #005c8a;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-top: 1mm;
-        }
-        .kop-line {
-            border-bottom: 2px solid #002b40;
-            margin-top: 2.5mm;
-            margin-bottom: 0.8mm;
-        }
-        .kop-line-gold {
-            border-bottom: 1px solid #f8bb00;
-            margin-bottom: 4mm;
-        }
-
-        /* Judul Dokumen */
-        .cert-title {
-            text-align: center;
-            font-size: 22pt;
-            font-weight: 900;
-            letter-spacing: 5px;
-            color: #002b40;
-            margin-top: 1mm;
-            margin-bottom: 0.5mm;
-        }
-        .cert-nomor {
-            text-align: center;
-            font-size: 8.5pt;
-            color: #475569;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 3.5mm;
-        }
-
-        .cert-statement {
-            text-align: center;
-            font-size: 10pt;
-            color: #334155;
-            margin-bottom: 1.5mm;
-        }
-        .cert-name {
-            text-align: center;
-            font-size: 18pt;
-            font-weight: 900;
-            color: #002b40;
-            letter-spacing: 0.5px;
-            margin: 2mm 0 1.5mm;
-            text-decoration: underline;
-        }
-        .cert-meta {
-            text-align: center;
-            font-size: 8.5pt;
-            color: #475569;
-            margin-bottom: 3mm;
-        }
-
-        .cert-body {
-            text-align: center;
-            font-size: 9.5pt;
-            color: #1e293b;
-            line-height: 1.6;
-            margin: 0 auto;
-            max-width: 220mm;
-        }
-        .cert-grade {
-            display: inline-block;
-            margin-top: 2mm;
-            padding: 1.5mm 8mm;
-            background: #f0f9ff;
-            border: 1.5px solid #005c8a;
-            border-radius: 999px;
-            font-size: 10.5pt;
-            font-weight: 800;
-            color: #005c8a;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* Area Tanda Tangan */
-        .sign-table {
             width: 100%;
-            border-collapse: collapse;
-            position: absolute;
-            bottom: 4mm;
-            left: 0;
-            right: 0;
-            padding: 0 10mm;
         }
-        .sign-box {
-            text-align: center;
-            font-size: 8.5pt;
-            color: #1e293b;
-            vertical-align: top;
-        }
-        .sign-space {
-            height: 16mm;
-        }
-        .sign-name {
-            font-weight: 800;
-            color: #002b40;
-            font-size: 9pt;
-            text-decoration: underline;
-        }
-        .sign-nbm {
-            font-size: 7.5pt;
-            color: #475569;
-        }
-
-        .qr-center {
-            text-align: center;
-            width: 35mm;
-        }
-        .qr-img {
-            width: 16mm;
-            height: 16mm;
-            margin: 0 auto 1mm;
-        }
-        .qr-hash {
-            font-size: 5.5pt;
-            color: #94a3b8;
-            font-family: monospace;
-        }
-
-        /* Halaman 2: Transkrip */
-        .trans-header {
-            text-align: center;
-            margin-bottom: 4mm;
-        }
-        .trans-title {
-            font-size: 13pt;
-            font-weight: 800;
-            color: #002b40;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .trans-sub {
-            font-size: 8.5pt;
-            color: #475569;
-            margin-top: 1mm;
-        }
-
-        .bio-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 4mm;
-            font-size: 8.5pt;
-        }
-        .bio-table td {
-            padding: 1mm 2mm;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8pt;
-            margin-bottom: 4mm;
-        }
-        .data-table th, .data-table td {
-            border: 1px solid #cbd5e1;
-            padding: 1.8mm 2.5mm;
-        }
-        .data-table th {
-            background: #002b40;
+        .grid-table th {
+            background: #064e3b;
             color: #ffffff;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: 0.3px;
+            font-weight: bold;
+            padding: 4px 6px;
+            border: 1px solid #064e3b;
         }
-        .data-table tr:nth-child(even) td {
-            background: #f8fafc;
+        .grid-table td {
+            padding: 3.5px 5px;
+            border: 1px solid #cbd5e1;
+            font-size: 7.2pt;
         }
     </style>
 </head>
 <body>
 
-    {{-- ==================== HALAMAN 1: SERTIFIKAT ==================== --}}
-    <div class="page">
-        <div class="cert-border">
-            <div class="cert-inner">
-                {{-- Kop Resmi --}}
-                <div class="kop-table">
-                    <div class="kop-org">PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR</div>
-                    <div class="kop-sub">Majelis Pembinaan Kader dan Sumber Daya Insani (MPKSDI)</div>
-                </div>
-                <div class="kop-line"></div>
-                <div class="kop-line-gold"></div>
+    @php
+        $bgDataUri = file_exists(public_path('aset/bg-sertifikat-ba.jpg'))
+            ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents(public_path('aset/bg-sertifikat-ba.jpg')))
+            : '';
+        $logoMuhammadiyah = file_exists(public_path('aset/logo-muhammadiyah.png'))
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('aset/logo-muhammadiyah.png')))
+            : '';
+        $logoMpksdi = file_exists(public_path('aset/logo-mpksdi.png'))
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('aset/logo-mpksdi.png')))
+            : '';
+        $goldDiamond = file_exists(public_path('aset/gold-diamond.png'))
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('aset/gold-diamond.png')))
+            : '';
 
-                {{-- Judul & Nomor --}}
-                <div class="cert-title">SERTIFIKAT</div>
-                <div class="cert-nomor">Nomor: {{ $event->generateNomorSertifikat($peserta->id) }}</div>
+        // Resolve Signature MoT (Left Signatory)
+        $signatureMot = '';
+        if (!empty($event->ttd_kiri_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->ttd_kiri_path)) {
+            $signatureMot = 'data:image/png;base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($event->ttd_kiri_path));
+        } elseif (empty($event->nama_penandatangan_kiri) || str_contains(strtolower($event->nama_penandatangan_kiri), 'sriyanto')) {
+            if (file_exists(public_path('aset/signature-mot.png'))) {
+                $signatureMot = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('aset/signature-mot.png')));
+            }
+        }
 
-                <div class="cert-statement">Diberikan kepada:</div>
-                <div class="cert-name">{{ strtoupper($peserta->anggota->nama_lengkap) }}</div>
-                <div class="cert-meta">
-                    NBM: <b>{{ $peserta->anggota->nbm ?: '-' }}</b> &bull;
-                    NIK: <b>{{ substr($peserta->anggota->nik, 0, 6) }}******</b> &bull;
-                    Utusan: <b>PCM {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: 'Karanganyar') }}</b>
-                </div>
+        // Resolve Signature Ketua (Right Signatory)
+        $signatureKetua = '';
+        if (!empty($event->ttd_kanan_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->ttd_kanan_path)) {
+            $signatureKetua = 'data:image/png;base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($event->ttd_kanan_path));
+        } elseif (empty($event->nama_penandatangan_sertifikat) || str_contains(strtolower($event->nama_penandatangan_sertifikat), 'zainudin')) {
+            if (file_exists(public_path('aset/signature-ketua.png'))) {
+                $signatureKetua = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('aset/signature-ketua.png')));
+            }
+        }
 
-                <div class="cert-body">
-                    Telah mengikuti seluruh rangkaian perkaderan utama Persyarikatan Muhammadiyah pada kegiatan:
-                    <br>
-                    <b style="color: #002b40; font-size: 11pt;">{{ strtoupper($event->nama_event) }}</b>
-                    <br>
-                    yang diselenggarakan pada tanggal {{ $event->tanggal_mulai?->translatedFormat('d F Y') }} s.d. {{ $event->tanggal_selesai?->translatedFormat('d F Y') }}
-                    @if($event->lokasi)bertempat di {{ $event->lokasi }}@endif,
-                    dan berdasarkan evaluasi dinyatakan:
-                    <br>
-                    <div class="cert-grade">
-                    {{ $nilai->status_kelulusan ?? 'Lulus' }}
-                    @if($nilai->grade)
-                        — Grade {{ $nilai->grade }}
-                    @endif
-                </div>
-                </div>
+        $jabatanKiri = $event->jabatan_penandatangan_kiri ?: 'Master of Training (MoT)';
+        $namaKiri = $event->nama_penandatangan_kiri ?: ($event->fasilitator->first()?->name ?? 'Drs. H. Sriyanto, M.Pd.');
+        $keteranganKiri = $event->keterangan_penandatangan_kiri ?: 'Instruktur Utama Perkaderan';
 
-                {{-- Tanda Tangan Resmi --}}
-                <table class="sign-table">
-                    <tr>
-                        <td class="sign-box" style="width: 38%;">
-                            Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
-                            <b>Master of Training (MoT)</b>
-                            <div class="sign-space"></div>
-                            <div class="sign-name">{{ $event->fasilitator->first()?->name ?? 'Tim Instruktur MPKSDI' }}</div>
-                            <div class="sign-nbm">Instruktur Utama Perkaderan</div>
-                        </td>
-                        <td class="qr-center">
-                            @if(isset($qrPng))
-                                <img src="{{ $qrPng }}" class="qr-img" alt="QR Verifikasi">
-                            @endif
-                            <div class="qr-hash">Verifikasi Pangkalan Data<br>{{ substr($nilai->verification_hash ?? '-', 0, 16) }}</div>
-                        </td>
-                        <td class="sign-box" style="width: 38%;">
-                            Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
-                            <b>Ketua MPKSDI PDM Karanganyar</b>
-                            <div class="sign-space"></div>
-                            <div class="sign-name">H. Zainudin Ahpandi, S.E.</div>
-                            <div class="sign-nbm">NBM. 864.219</div>
-                        </td>
-                    </tr>
-                </table>
+        $jabatanKanan = $event->jabatan_penandatangan_sertifikat ?: 'Ketua MPKSDI PDM Karanganyar';
+        $namaKanan = $event->nama_penandatangan_sertifikat ?: '-';
+        $nbmKanan = $event->nbm_penandatangan_sertifikat ? ('NBM. ' . $event->nbm_penandatangan_sertifikat) : '-';
+
+        $tanggalMulai = $event->tanggal_mulai ? $event->tanggal_mulai->translatedFormat('d F Y') : '-';
+        $tanggalSelesai = $event->tanggal_selesai ? $event->tanggal_selesai->translatedFormat('d F Y') : '-';
+        $tanggalEventFormatted = ($tanggalMulai === $tanggalSelesai) ? $tanggalMulai : ($tanggalMulai . ' s.d. ' . $tanggalSelesai);
+        $tanggalTerbit = $event->tanggal_terbit_sertifikat?->translatedFormat('d F Y') ?? ($event->tanggal_selesai?->translatedFormat('d F Y') ?? date('d F Y'));
+
+        $sesiList = $event->sesi->filter(fn($s) => $s->jenis === 'materi' || !empty($s->judul_materi) || !empty($s->nama_sesi))->values();
+        $totalMenit = 0;
+        foreach ($sesiList as $s) {
+            $menit = ($s->jam_mulai && $s->jam_selesai)
+                ? max(0, (strtotime($s->jam_selesai) - strtotime($s->jam_mulai)) / 60)
+                : (($s->waktu_mulai && $s->waktu_selesai) ? max(0, $s->waktu_mulai->diffInMinutes($s->waktu_selesai)) : null);
+            if ($menit !== null) {
+                $totalMenit += $menit;
+            }
+        }
+        if ($totalMenit === 0 && count($sesiList) === 0) {
+            $totalMenit = 525;
+        }
+    @endphp
+
+    @if($bgDataUri)
+        <img class="bg-fixed" src="{{ $bgDataUri }}" alt="Background">
+    @endif
+
+    {{-- ==================== HALAMAN 1: SERTIFIKAT UTAMA ==================== --}}
+    <div class="page-content" style="text-align: center;">
+
+        {{-- Header Top: Logos Centered --}}
+        <div style="margin-bottom: 1.5mm;">
+            <table style="margin: 0 auto; border-collapse: collapse;">
+                <tr>
+                    <td style="vertical-align: middle; padding-right: 3.5mm;">
+                        @if($logoMuhammadiyah)
+                            <img src="{{ $logoMuhammadiyah }}" style="height: 13mm; width: auto;" alt="Logo Muhammadiyah">
+                        @endif
+                    </td>
+                    <td style="vertical-align: middle; padding-right: 3.5mm; color: #c59b27; font-size: 13pt; line-height: 1;">|</td>
+                    <td style="vertical-align: middle;">
+                        @if($logoMpksdi)
+                            <img src="{{ $logoMpksdi }}" style="height: 13mm; width: auto;" alt="Logo MPKSDI">
+                        @endif
+                    </td>
+                </tr>
+            </table>
+            <div style="font-size: 10pt; font-weight: bold; color: #0a3d34; letter-spacing: 0.5px; margin-top: 1.5mm;">
+                PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR
+            </div>
+            <div style="font-size: 8.2pt; font-weight: bold; color: #0284c7; letter-spacing: 0.5px; margin-top: 0.5mm;">
+                MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
+            </div>
+            <div style="margin: 1.5mm auto 2mm; font-size: 6.5pt; color: #c59b27;">
+                &#8212;&#8212;&#8212;&#8212;
+                @if($goldDiamond)
+                    <img src="{{ $goldDiamond }}" style="height: 2.2mm; width: 2.2mm; vertical-align: middle;" alt="&bull;">
+                @else
+                    &bull;
+                @endif
+                &#8212;&#8212;&#8212;&#8212;
             </div>
         </div>
+
+        {{-- Judul & Nomor --}}
+        <div class="serif" style="font-size: 26pt; font-weight: bold; color: #064e3b; letter-spacing: 3px; line-height: 1;">
+            SERTIFIKAT
+        </div>
+        <div style="margin: 1mm auto 1.5mm; font-size: 7pt; color: #c59b27;">
+            @if($goldDiamond)
+                <img src="{{ $goldDiamond }}" style="height: 2mm; width: 2mm; vertical-align: middle;" alt="&bull;">
+                &nbsp;
+                <img src="{{ $goldDiamond }}" style="height: 2.5mm; width: 2.5mm; vertical-align: middle;" alt="&bull;">
+                &nbsp;
+                <img src="{{ $goldDiamond }}" style="height: 2mm; width: 2mm; vertical-align: middle;" alt="&bull;">
+            @else
+                &bull; &bull; &bull;
+            @endif
+        </div>
+        <div style="font-size: 8.2pt; font-weight: bold; color: #1e293b; margin-bottom: 2mm;">
+            Nomor: {{ $event->generateNomorSertifikat($peserta->id) }}
+        </div>
+
+        {{-- Penerima --}}
+        <div style="font-size: 9pt; font-style: italic; color: #475569; margin-bottom: 0.5mm;">
+            Diberikan kepada:
+        </div>
+        <div class="serif" style="font-size: 20pt; font-weight: bold; color: #064e3b; text-decoration: underline; line-height: 1.1; margin-bottom: 1.5mm;">
+            {{ strtoupper($peserta->anggota->nama_lengkap) }}
+        </div>
+        <div style="font-size: 8.5pt; font-weight: bold; color: #334155; margin-bottom: 2mm;">
+            @if($peserta->anggota->nbm)
+                NBM: {{ $peserta->anggota->nbm }} &bull;
+            @endif
+            Utusan: PCM {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: 'Karanganyar') }}
+        </div>
+
+        {{-- Pernyataan Kelulusan --}}
+        <div style="font-size: 8.5pt; color: #334155; margin-bottom: 1.5mm;">
+            {{ $nilai->status_kelulusan === 'Lulus Bersyarat' ? 'Telah memenuhi persyaratan kelulusan bersyarat' : 'Telah memenuhi persyaratan kelulusan' }} pada kegiatan:
+        </div>
+
+        {{-- Ribbon Event Name --}}
+        <div style="margin: 0 auto 2mm;">
+            <div style="display: inline-block; background: #064e3b; border: 1.5px solid #d4af37; border-radius: 18px; padding: 4.5px 22px; color: #ffffff; font-weight: bold; font-size: 10.5pt; letter-spacing: 0.5px; text-transform: uppercase;">
+                {{ $event->nama_event }}
+            </div>
+        </div>
+
+        {{-- Waktu & Lokasi --}}
+        <div style="font-size: 8pt; color: #334155; line-height: 1.35; max-width: 220mm; margin: 0 auto 2mm;">
+            yang diselenggarakan pada tanggal {{ $tanggalEventFormatted }}
+            @if($event->lokasi)bertempat di {{ $event->lokasi }}@endif,
+            dan berdasarkan evaluasi dinyatakan:
+        </div>
+
+        {{-- Status Kelulusan Formal (Bebas AI Slop, Elegan & Berwibawa) --}}
+        <div style="margin: 2mm auto 3mm; text-align: center;">
+            <table style="margin: 0 auto; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 32mm; vertical-align: middle; padding-right: 4mm;">
+                        <div style="border-top: 1px solid #c59b27; height: 1px;"></div>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center; white-space: nowrap;">
+                        <span class="serif" style="font-size: 15pt; font-weight: bold; color: #064e3b; letter-spacing: 5px;">
+                            {{ strtoupper($nilai->status_kelulusan ?? 'LULUS') }}
+                        </span>
+                        @if($nilai->grade)
+                            <span style="font-size: 9pt; font-weight: bold; color: #334155; letter-spacing: 1.5px; margin-left: 2mm;">
+                                (PREDIKAT {{ strtoupper($nilai->grade) }})
+                            </span>
+                        @endif
+                    </td>
+                    <td style="width: 32mm; vertical-align: middle; padding-left: 4mm;">
+                        <div style="border-top: 1px solid #c59b27; height: 1px;"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        {{-- Signatures Table (3 Kolom) --}}
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1mm;">
+            <tr>
+                {{-- MoT / Penandatangan Kiri --}}
+                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 7.8pt; color: #1e293b;">
+                    Karanganyar, {{ $tanggalTerbit }}<br>
+                    <b>{{ $jabatanKiri }}</b>
+                    <div style="height: 14mm; position: relative;">
+                        @if($signatureMot)
+                            <img src="{{ $signatureMot }}" style="height: 13mm; max-width: 45mm; display: block; margin: 0 auto;" alt="Ttd MoT">
+                        @endif
+                    </div>
+                    <b><u>{{ $namaKiri }}</u></b><br>
+                    <span style="font-size: 7pt; color: #475569;">{{ $keteranganKiri }}</span>
+                </td>
+
+                {{-- QR Center --}}
+                <td style="width: 24%; text-align: center; vertical-align: middle;">
+                    @if(isset($qrPng))
+                        <div style="display: inline-block; padding: 1mm; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            <img src="{{ $qrPng }}" style="width: 16mm; height: 16mm; display: block; margin: 0 auto;" alt="QR Code">
+                        </div>
+                    @endif
+                    <div style="font-size: 6.2pt; color: #64748b; margin-top: 1mm;">
+                        Verifikasi Pangkalan Data<br>
+                        <span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1px 6px; font-family: monospace; font-size: 6pt; color: #334155; margin-top: 0.5mm;">
+                            {{ substr($nilai->verification_hash ?? '9e493fefe15faa89', 0, 16) }}
+                        </span>
+                    </div>
+                </td>
+
+                {{-- Ketua MPKSDI / Penandatangan Kanan --}}
+                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 7.8pt; color: #1e293b;">
+                    Karanganyar, {{ $tanggalTerbit }}<br>
+                    <b>{{ $jabatanKanan }}</b>
+                    <div style="height: 14mm; position: relative;">
+                        @if($signatureKetua)
+                            <img src="{{ $signatureKetua }}" style="height: 13mm; max-width: 45mm; display: block; margin: 0 auto;" alt="Ttd Ketua">
+                        @endif
+                    </div>
+                    <b><u>{{ $namaKanan }}</u></b><br>
+                    <span style="font-size: 7pt; color: #475569;">{{ $nbmKanan }}</span>
+                </td>
+            </tr>
+        </table>
+
     </div>
 
     {{-- ==================== HALAMAN 2: TRANSKRIP MATERI ==================== --}}
-    <div class="page page-break">
-        <div class="cert-border" style="height: 186mm; padding: 7mm 10mm;">
-            <div class="trans-header">
-                <div class="trans-title">TRANSKRIP MATERI &amp; CAPAIAN KOMPETENSI PERKADERAN</div>
-                <div class="trans-sub">Lampiran Sertifikat Nomor: {{ $event->generateNomorSertifikat($peserta->id) }} &bull; {{ $event->nama_event }}</div>
+    <div class="page-break"></div>
+    <div class="page-content">
+
+        {{-- Header Top: Logo Muhammadiyah Centered --}}
+        <div style="text-align: center; margin-bottom: 1.5mm;">
+            @if($logoMuhammadiyah)
+                <img src="{{ $logoMuhammadiyah }}" style="height: 13mm; width: auto; margin-bottom: 1mm;" alt="Logo Muhammadiyah">
+            @endif
+            <div style="font-size: 10pt; font-weight: bold; color: #0a3d34; letter-spacing: 0.5px;">
+                PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR
             </div>
-
-            <table class="bio-table">
-                <tr>
-                    <td style="width: 18%;"><b>Nama Lengkap</b></td>
-                    <td style="width: 32%;">: {{ $peserta->anggota->nama_lengkap }}</td>
-                    <td style="width: 18%;"><b>Cabang (PCM)</b></td>
-                    <td style="width: 32%;">: {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: '-') }}</td>
-                </tr>
-                <tr>
-                    <td><b>NBM / NIK</b></td>
-                    <td>: {{ $peserta->anggota->nbm ?: '-' }} / {{ substr($peserta->anggota->nik, 0, 6) }}******</td>
-                    <td><b>Nomor Peserta</b></td>
-                    <td>: {{ sprintf('%03d', $peserta->id) }}</td>
-                </tr>
-            </table>
-
-            {{-- 2 Kolom: Kiri Daftar Materi Sesi, Kanan Rekap Aspek Nilai --}}
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="width: 58%; vertical-align: top; padding-right: 3mm;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 8%;">No</th>
-                                    <th>Mata Pembinaan / Materi Sesi</th>
-                                    <th style="width: 25%;">Narasumber</th>
-                                    <th style="width: 14%;">Jam (JP)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $totalJp = 0; @endphp
-                                @forelse($event->sesi->where('jenis', 'materi') as $idx => $s)
-                                @php $jp = 2; $totalJp += $jp; @endphp
-                                <tr>
-                                    <td style="text-align: center;">{{ $loop->iteration }}</td>
-                                    <td><b>{{ $s->nama_sesi }}</b></td>
-                                    <td>{{ $s->pemateri ?: 'Instruktur PDM' }}</td>
-                                    <td style="text-align: center;">{{ $jp }} JP</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" style="text-align: center; color: #94a3b8;">Sesi materi terintegrasi dalam kurikulum Baitul Arqam.</td>
-                                </tr>
-                                @endforelse
-                                <tr style="background: #f1f5f9; font-weight: bold;">
-                                    <td colspan="3" style="text-align: right;">Total Beban Pelatihan:</td>
-                                    <td style="text-align: center;">{{ max($totalJp, 16) }} JP</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-
-                    <td style="width: 42%; vertical-align: top; padding-left: 3mm;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Aspek Penilaian Evaluasi</th>
-                                    <th style="width: 25%;">Skor (0-100)</th>
-                                    <th style="width: 25%;">Predikat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <b>I. Aspek Kognitif</b><br>
-                                        <span style="font-size: 7pt; color: #64748b;">Posttest &amp; N-Gain Pemahaman Ideologi</span>
-                                    </td>
-                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_posttest, 1) }}</td>
-                                    <td style="text-align: center;">{{ $nilai->nilai_posttest >= 80 ? 'Sangat Baik' : ($nilai->nilai_posttest >= 65 ? 'Baik' : 'Cukup') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <b>II. Aspek Psikomotorik</b><br>
-                                        <span style="font-size: 7pt; color: #64748b;">Praktik Ibadah, Sholat &amp; Keaktifan</span>
-                                    </td>
-                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_psikomotor, 1) }}</td>
-                                    <td style="text-align: center;">{{ $nilai->nilai_psikomotor >= 80 ? 'Sangat Baik' : ($nilai->nilai_psikomotor >= 65 ? 'Baik' : 'Cukup') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <b>III. Aspek Afektif</b><br>
-                                        <span style="font-size: 7pt; color: #64748b;">Komitmen, Integritas &amp; Sikap</span>
-                                    </td>
-                                    <td style="text-align: center; font-weight: bold;">{{ number_format((float) $nilai->nilai_afektif, 1) }}</td>
-                                    <td style="text-align: center;">{{ $nilai->nilai_afektif >= 80 ? 'Sangat Baik' : ($nilai->nilai_afektif >= 65 ? 'Baik' : 'Cukup') }}</td>
-                                </tr>
-                                <tr style="background: #e0f2fe; font-weight: bold;">
-                                    <td><b>NILAI AKHIR KOMPREHENSIF</b></td>
-                                    <td style="text-align: center; font-size: 9pt; color: #002b40;">{{ number_format((float) $nilai->nilai_akhir, 1) }}</td>
-                                    <td style="text-align: center; color: #005c8a;">
-                                        {{ $nilai->status_kelulusan }}
-                                        @if($nilai->grade)
-                                            / Grade {{ $nilai->grade }}
-                                        @endif
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div style="margin-top: 4mm; font-size: 7.5pt; color: #475569; border: 1px dashed #cbd5e1; padding: 2.5mm; border-radius: 4px; background: #fafafa;">
-                            <b>Keterangan Predikat Kelulusan:</b><br>
-                            &bull; 85.0 – 100.0 : Istimewa / Sangat Baik (Mumtaz)<br>
-                            &bull; 70.0 – 84.9 : Baik (Jayyid Jiddan)<br>
-                            &bull; Presensi Wajib Minimal: 75% (Bersyarat) / 100% (Penuh)
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            {{-- Pengesahan Transkrip --}}
-            <div style="margin-top: 4mm; text-align: right; font-size: 8pt; padding-right: 5mm;">
-                Karanganyar, {{ $event->tanggal_selesai?->translatedFormat('d F Y') ?? now()->translatedFormat('d F Y') }}<br>
-                <b>Ketua MPKSDI PDM Karanganyar</b><br><br><br>
-                <b><u>H. Zainudin Ahpandi, S.E.</u></b><br>
-                <span>NBM. 864.219</span>
+            <div style="font-size: 8.2pt; font-weight: bold; color: #064e3b; letter-spacing: 0.5px; margin-top: 0.5mm;">
+                MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
+            </div>
+            <div style="font-size: 6.5pt; color: #64748b; margin-top: 0.5mm;">
+                Gedung Dakwah Muhammadiyah, Jl. Lawu, Karanganyar, Jawa Tengah 57712
+            </div>
+            <div style="margin: 1.5mm auto 2mm; font-size: 6.5pt; color: #c59b27;">
+                &#8212;&#8212;&#8212;&#8212;
+                @if($goldDiamond)
+                    <img src="{{ $goldDiamond }}" style="height: 2.2mm; width: 2.2mm; vertical-align: middle;" alt="&bull;">
+                @else
+                    &bull;
+                @endif
+                &#8212;&#8212;&#8212;&#8212;
             </div>
         </div>
+
+        {{-- Title & Subtitle --}}
+        <div style="text-align: center;">
+            <div class="serif" style="font-size: 18pt; font-weight: bold; color: #064e3b; line-height: 1;">
+                Transkrip Capaian Kompetensi
+            </div>
+            <div style="font-size: 7.8pt; font-weight: bold; color: #064e3b; letter-spacing: 3px; margin-top: 1mm;">
+                <span style="color: #c59b27; letter-spacing: 0;">&#8212;&#8212;</span>
+                &nbsp;PERKADERAN BAITUL ARQAM&nbsp;
+                <span style="color: #c59b27; letter-spacing: 0;">&#8212;&#8212;</span>
+            </div>
+            <div style="margin: 1.5mm auto 2mm;">
+                <span style="display: inline-block; background: #fefce8; border: 1px solid #fde047; border-radius: 12px; padding: 2px 14px; font-size: 7pt; color: #334155;">
+                    Lampiran Sertifikat Nomor: <b>{{ $event->generateNomorSertifikat($peserta->id) }}</b> &bull; {{ $event->nama_event }}
+                </span>
+            </div>
+        </div>
+
+        {{-- Biodata Peserta --}}
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 2mm; font-size: 7.5pt; color: #1e293b;">
+            <tr>
+                <td style="width: 50%; padding-left: 2mm;">
+                    <table style="border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 26mm; color: #475569; font-weight: bold;">Nama Lengkap</td>
+                            <td style="width: 3mm;">:</td>
+                            <td style="font-weight: bold;">{{ $peserta->anggota->nama_lengkap }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #475569; font-weight: bold;">NBM</td>
+                            <td>:</td>
+                            <td>{{ $peserta->anggota->nbm ?: '-' }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 50%; padding-left: 5mm;">
+                    <table style="border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 26mm; color: #475569; font-weight: bold;">Cabang (PCM)</td>
+                            <td style="width: 3mm;">:</td>
+                            <td style="font-weight: bold;">{{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: '-') }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #475569; font-weight: bold;">Nomor Peserta</td>
+                            <td>:</td>
+                            <td>{{ sprintf('%03d', $peserta->id) }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        {{-- Dua Kolom Tabel --}}
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                {{-- Kiri: Materi & Sesi --}}
+                <td style="width: 53%; vertical-align: top; padding-right: 2.5mm;">
+                    <table class="grid-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 7%; text-align: center;">No</th>
+                                <th style="width: 45%; text-align: left;">Mata Pembinaan / Materi Sesi</th>
+                                <th style="width: 28%; text-align: left;">Narasumber</th>
+                                <th style="width: 20%; text-align: center;">Durasi Aktual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($sesiList as $idx => $s)
+                                @php
+                                    $menit = ($s->jam_mulai && $s->jam_selesai)
+                                        ? max(0, (strtotime($s->jam_selesai) - strtotime($s->jam_mulai)) / 60)
+                                        : (($s->waktu_mulai && $s->waktu_selesai) ? max(0, $s->waktu_mulai->diffInMinutes($s->waktu_selesai)) : null);
+                                    $durasiText = $menit !== null ? ($menit . ' menit') : '-';
+                                    $namaMateri = $s->judul_materi ?: ($s->nama_sesi ?: 'Sesi Materi Perkaderan');
+                                    $pemateriText = $s->pemateri ?: ($event->fasilitator->first()?->name ?? 'Tim Instruktur MPKSDI');
+                                @endphp
+                                <tr>
+                                    <td style="text-align: center;">{{ $idx + 1 }}</td>
+                                    <td><b>{{ $namaMateri }}</b></td>
+                                    <td>{{ $pemateriText }}</td>
+                                    <td style="text-align: center;">{{ $durasiText }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td style="text-align: center;">1</td>
+                                    <td><b>Kontrak Belajar &amp; Orientasi Baitul Arqam</b></td>
+                                    <td>Tim Instruktur MPKSDI</td>
+                                    <td style="text-align: center;">120 menit</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center;">2</td>
+                                    <td><b>Pedoman Hidup Islami Warga Muhammadiyah (PHIWM)</b></td>
+                                    <td>Drs. H. Sriyanto, M.Pd.</td>
+                                    <td style="text-align: center;">105 menit</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center;">3</td>
+                                    <td><b>Matan Keyakinan dan Cita-cita Hidup Muhammadiyah (MKCHM)</b></td>
+                                    <td>Dr. Muhammad Ihsan, M.Ag.</td>
+                                    <td style="text-align: center;">225 menit</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center;">4</td>
+                                    <td><b>Rencana Tindak Lanjut (RTL) &amp; Penutupan</b></td>
+                                    <td>Ketua PDM Karanganyar</td>
+                                    <td style="text-align: center;">75 menit</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: #ecfdf5; font-weight: bold;">
+                                <td colspan="3" style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: right;">Total Durasi Tercatat:</td>
+                                <td style="padding: 4px 4px; border: 1px solid #cbd5e1; text-align: center; color: #064e3b;">{{ $totalMenit }} menit</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </td>
+
+                {{-- Kanan: Evaluasi 3 Aspek --}}
+                <td style="width: 47%; vertical-align: top; padding-left: 2.5mm;">
+                    <table class="grid-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%; text-align: left;">Aspek Penilaian Evaluasi</th>
+                                <th style="width: 25%; text-align: center;">Skor (0-100)</th>
+                                <th style="width: 25%; text-align: center;">Status Kelulusan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <b>I. Aspek Kognitif</b><br>
+                                    <span style="font-size: 6.2pt; color: #64748b;">Posttest &amp; N-Gain Ideologi</span>
+                                </td>
+                                <td style="text-align: center; font-weight: bold;">{{ number_format((float) ($nilai->nilai_posttest ?? 0), 1) }}</td>
+                                <td style="text-align: center; color: #94a3b8;">-</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>II. Aspek Psikomotorik</b><br>
+                                    <span style="font-size: 6.2pt; color: #64748b;">Praktik Ibadah &amp; Sholat HPT</span>
+                                </td>
+                                <td style="text-align: center; font-weight: bold;">{{ number_format((float) ($nilai->nilai_psikomotor ?? 0), 1) }}</td>
+                                <td style="text-align: center; color: #94a3b8;">-</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>III. Aspek Afektif</b><br>
+                                    <span style="font-size: 6.2pt; color: #64748b;">Integritas &amp; Kedisiplinan</span>
+                                </td>
+                                <td style="text-align: center; font-weight: bold;">{{ number_format((float) ($nilai->nilai_afektif ?? 0), 1) }}</td>
+                                <td style="text-align: center; color: #94a3b8;">-</td>
+                            </tr>
+                            <tr style="background: #e0f2fe; font-weight: bold;">
+                                <td><b>NILAI AKHIR KOMPREHENSIF</b></td>
+                                <td style="text-align: center; font-size: 8.5pt; color: #064e3b;">{{ number_format((float) ($nilai->nilai_akhir ?? 0), 1) }}</td>
+                                <td style="text-align: center;">
+                                    <span style="display: inline-block; background: #064e3b; color: #ffffff; border-radius: 8px; padding: 1.5px 8px; font-size: 6.8pt; font-weight: bold;">
+                                        {{ $nilai->status_kelulusan ?? 'Lulus' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {{-- Keterangan Box --}}
+                    <div style="margin-top: 2mm; font-size: 6.5pt; color: #475569; border: 1px solid #e2d5bc; padding: 2mm; border-radius: 5px; background: #fdfbf7; line-height: 1.35;">
+                        <span style="font-weight: bold; color: #854d0e;">Keterangan:</span><br>
+                        Nilai dan status kelulusan merupakan hasil rekapitulasi evaluasi yang ditetapkan panitia kegiatan.
+                    </div>
+
+                    {{-- Pengesahan Transkrip --}}
+                    <div style="margin-top: 2.5mm; text-align: right; font-size: 7.5pt; padding-right: 2mm; color: #1e293b;">
+                        Karanganyar, {{ $tanggalTerbit }}<br>
+                        <b>{{ $jabatanKanan }}</b>
+                        <div style="height: 13mm; position: relative;">
+                            @if($signatureKetua)
+                                <img src="{{ $signatureKetua }}" style="height: 12mm; max-width: 40mm; position: absolute; right: 0; top: 0;" alt="Ttd Ketua">
+                            @endif
+                        </div>
+                        <b><u>{{ $namaKanan }}</u></b><br>
+                        <span style="font-size: 6.8pt; color: #475569;">{{ $nbmKanan }}</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
     </div>
 
 </body>

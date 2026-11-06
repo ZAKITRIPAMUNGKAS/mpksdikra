@@ -44,6 +44,7 @@
                     </label>
                     <div class="relative">
                         <input type="text" name="identifier" value="{{ old('identifier', request('identifier', $identifier ?? '')) }}"
+                            inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13" oninput="this.value = this.value.replace(/\D/g, '')"
                             required autofocus placeholder="Contoh: 331301... atau 08123456..."
                             class="w-full px-4 py-3.5 pl-12 bg-white border-2 border-slate-300 rounded-2xl text-base font-medium text-slate-900 focus:ring-4 focus:ring-sky-100 focus:border-sky-600 outline-none transition min-h-[52px]">
                         <svg class="w-5 h-5 text-slate-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -12,7 +12,12 @@ class AnggotaRegistrationRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->has('no_wa')) {
-            $sanitized = preg_replace('/[\s\-\.]/', '', (string) $this->input('no_wa'));
+            $raw = (string) $this->input('no_wa');
+            if (preg_match('/[a-zA-Z]/', $raw)) {
+                $sanitized = $raw;
+            } else {
+                $sanitized = preg_replace('/\D/', '', $raw);
+            }
             $this->merge(['no_wa' => $sanitized]);
         }
     }
@@ -25,8 +30,8 @@ class AnggotaRegistrationRequest extends FormRequest
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'alamat_rumah' => ['required', 'string', 'max:255'],
             'jenis_kelamin' => ['required', Rule::in(array_keys($o['jenis_kelamin']))],
-            'nik' => ['required', 'digits:16', 'unique:anggota,nik'],
-            'nbm' => ['nullable', 'string', 'max:20'],
+            'nik' => ['required', 'string', 'digits:16', 'regex:/^[0-9]{16}$/', 'unique:anggota,nik'],
+            'nbm' => ['nullable', 'string', 'regex:/^[0-9]*$/', 'max:20'],
             'nama_aum' => ['nullable', 'string', 'max:255'],
             'nama_aum_custom' => ['nullable', 'string', 'max:255'],
             'jabatan_aum' => ['nullable', 'string', 'max:255'],
@@ -42,7 +47,7 @@ class AnggotaRegistrationRequest extends FormRequest
             'pcm' => ['nullable', 'string', 'max:255'],
             'prm' => ['nullable', 'string', 'max:255'],
             'kabupaten' => ['required', 'string', 'max:255'],
-            'no_wa' => ['required', 'string', 'regex:/^(0|62|\+62)8[0-9]{6,13}$/'],
+            'no_wa' => ['required', 'string', 'regex:/^[0-9]+$/'],
             'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
             'foto' => ['required', 'image', 'max:2048'],
@@ -77,6 +82,8 @@ class AnggotaRegistrationRequest extends FormRequest
             'jabatan_ortom.*' => ['nullable'],
             'jabatan_ortom.*.tingkat' => ['nullable', 'string', 'max:255'],
             'jabatan_ortom.*.periode' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*.tahun_mulai' => ['nullable', 'string', 'max:20'],
+            'jabatan_ortom.*.tahun_selesai' => ['nullable', 'string', 'max:50'],
             'jabatan_ortom.*.jabatan' => ['nullable', 'string', 'max:255'],
             'jabatan_ortom.*.jabatan_custom' => ['nullable', 'string', 'max:255'],
             'organisasi_lain' => ['nullable', 'string', 'max:255'],
@@ -95,7 +102,9 @@ class AnggotaRegistrationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'no_wa.regex' => 'Nomor WhatsApp tidak valid (contoh: 081234567890).',
+            'nik.regex' => 'NIK KTP hanya boleh berisi angka murni.',
+            'no_wa.regex' => 'Nomor WhatsApp hanya boleh berisi angka murni.',
+            'nbm.regex' => 'Nomor NBM hanya boleh berisi angka murni.',
             'no_wa.required' => 'Nomor WhatsApp wajib diisi.',
             'nik.digits' => 'NIK harus tepat 16 digit angka.',
             'nik.unique' => 'NIK ini sudah terdaftar di pangkalan data.',

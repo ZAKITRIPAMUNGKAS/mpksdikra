@@ -1615,10 +1615,10 @@
     </main>
 
     {{-- SECTION 9: Multi-Column Themed Footer --}}
-    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-14 pb-20 lg:pb-10 text-slate-600 relative overflow-hidden reveal">
-        {{-- Batik Solo Surya Pattern Corners --}}
-        <x-batik-corner position="top-right" class="w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.28] reveal-fade reveal-delay-100" />
-        <x-batik-corner position="bottom-left" class="w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.26] reveal-fade reveal-delay-150" />
+    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-12 sm:pt-14 pb-24 sm:pb-20 lg:pb-10 text-slate-600 relative overflow-hidden reveal">
+        {{-- Batik Solo Surya Pattern Corners: Hidden on mobile to avoid overlapping brand text --}}
+        <x-batik-corner position="top-right" class="hidden sm:block w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.22] reveal-fade reveal-delay-100" />
+        <x-batik-corner position="bottom-left" class="hidden sm:block w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.20] reveal-fade reveal-delay-150" />
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {{-- Main Themed Grid (12 Columns) --}}
@@ -1639,7 +1639,7 @@
                     </p>
 
                     {{-- Contact Cards with Clean SVG Badges --}}
-                    <div class="pt-1 flex flex-col sm:flex-row gap-2.5">
+                    <div class="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 max-w-lg">
                         <a href="https://wa.me/6281226309576" target="_blank" rel="noopener noreferrer"
                            class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 text-xs text-slate-700 hover:text-emerald-700 transition-all duration-300 shadow-2xs card-lift-sm">
                             <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
@@ -1662,38 +1662,41 @@
                             </div>
                             <div class="text-left">
                                 <span class="text-xs text-slate-400 uppercase font-bold block leading-none">Email</span>
-                                <span class="font-bold text-slate-800 group-hover:text-sky-700 text-xs">mpksdi@pdmkaranganyar.org</span>
+                                <span class="font-bold text-slate-800 group-hover:text-sky-700 text-xs truncate max-w-[150px] sm:max-w-none block">mpksdi@pdmkaranganyar.org</span>
                             </div>
                         </a>
                     </div>
                 </div>
 
-                {{-- Col 2: Organisasi (2 cols) --}}
-                <div class="lg:col-span-2 space-y-3 reveal-top reveal-delay-150">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-3 rounded-full bg-sky-500"></span>
-                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Organisasi</h4>
+                {{-- Cols 2 & 3: Organisasi & Perkaderan (Berdampingan 2 Kolom di Mobile untuk Efisiensi Layar) --}}
+                <div class="grid grid-cols-2 gap-4 sm:gap-6 md:col-span-2 lg:col-span-4 lg:grid-cols-2 lg:gap-8">
+                    {{-- Organisasi --}}
+                    <div class="space-y-3 reveal-top reveal-delay-150">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-3 rounded-full bg-sky-500"></span>
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Organisasi</h4>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-500 font-medium">
+                            <li><a href="#beranda" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Tentang MPKSDI</a></li>
+                            <li><a href="#keunggulan" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Visi &amp; Misi</a></li>
+                            <li><a href="#sebaran" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> 17 Cabang PCM</a></li>
+                            <li><a href="#kontak" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Gedung Dakwah</a></li>
+                        </ul>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-500 font-medium">
-                        <li><a href="#beranda" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Tentang MPKSDI</a></li>
-                        <li><a href="#keunggulan" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Visi &amp; Misi</a></li>
-                        <li><a href="#sebaran" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> 17 Cabang PCM</a></li>
-                        <li><a href="#kontak" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> Gedung Dakwah</a></li>
-                    </ul>
-                </div>
 
-                {{-- Col 3: Perkaderan (2 cols) --}}
-                <div class="lg:col-span-2 space-y-3 reveal-top reveal-delay-200">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-3 rounded-full bg-amber-400"></span>
-                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Perkaderan</h4>
+                    {{-- Perkaderan --}}
+                    <div class="space-y-3 reveal-top reveal-delay-200">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-3 rounded-full bg-amber-400"></span>
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Perkaderan</h4>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-500 font-medium">
+                            <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Pimpinan Cabang</a></li>
+                            <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Guru AUM</a></li>
+                            <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Nakes PKU</a></li>
+                            <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> TOT Instruktur</a></li>
+                        </ul>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-500 font-medium">
-                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Pimpinan Cabang</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Guru AUM</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> BA Nakes PKU</a></li>
-                        <li><a href="#program" class="hover:text-sky-600 hover:pl-1 transition-all flex items-center gap-1.5"><span class="text-slate-300">&rsaquo;</span> TOT Instruktur</a></li>
-                    </ul>
                 </div>
 
                 {{-- Col 4: Sekretariat & Portal (3 cols) --}}
@@ -1713,7 +1716,7 @@
                             </p>
                         </div>
                         <a href="{{ route('anggota.register') }}" 
-                           class="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-xs hover:scale-[1.02] active:scale-[0.98]">
+                           class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-xs hover:scale-[1.02] active:scale-[0.98]">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                             </svg>

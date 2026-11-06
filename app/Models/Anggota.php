@@ -130,8 +130,13 @@ class Anggota extends Model
             if ($tingkat) {
                 $parts[] = $tingkat;
             }
-            if ($periode) {
-                $parts[] = 'Periode '.$periode;
+
+            $rawMulai = $raw['tahun_mulai'] ?? null;
+            $rawSelesai = $raw['tahun_selesai'] ?? null;
+            $rawPeriode = ($rawMulai || $rawSelesai) ? trim($rawMulai.($rawSelesai ? ' - '.$rawSelesai : '')) : null;
+            $periodeStr = $periode ?: $rawPeriode;
+            if ($periodeStr) {
+                $parts[] = 'Periode '.$periodeStr;
             }
 
             return ! empty($parts) ? implode(' - ', $parts) : null;

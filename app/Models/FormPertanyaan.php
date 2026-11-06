@@ -123,7 +123,20 @@ class FormPertanyaan extends Model
         $q = static::configMap()->get($kode);
 
         if ($q && is_array($q->opsi) && count($q->opsi) > 0) {
-            return $q->opsi;
+            $opsi = $q->opsi;
+            if ($kode === 'keaktifan_ortom' && ! in_array('Ikatan Mahasiswa Muhammadiyah', $opsi, true)) {
+                $pos = array_search('Hizbul Wathon', $opsi, true);
+                if ($pos === false) {
+                    $pos = array_search('Tidak aktif', $opsi, true);
+                }
+                if ($pos !== false) {
+                    array_splice($opsi, $pos, 0, ['Ikatan Mahasiswa Muhammadiyah']);
+                } else {
+                    $opsi[] = 'Ikatan Mahasiswa Muhammadiyah';
+                }
+            }
+
+            return $opsi;
         }
 
         return $default;
@@ -185,7 +198,7 @@ class FormPertanyaan extends Model
                     $cleanRules[] = Rule::in($allowedOpsi);
                     $ruleList = $cleanRules;
                 } elseif ($q->tipe === 'checkbox') {
-                    $baseRules[$kode.'.*'] = [Rule::in($q->opsi)];
+                    $baseRules[$kode.'.*'] = [Rule::in(static::opsi($kode, $q->opsi))];
                 }
             }
 

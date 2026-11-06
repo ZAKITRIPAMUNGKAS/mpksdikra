@@ -258,4 +258,92 @@ class PortalProfileTest extends TestCase
             $fresh->formatJabatanOrtom('Hizbul Wathon')
         );
     }
+
+    public function test_portal_profile_updates_ortom_with_tahun_mulai_and_tahun_selesai(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('portal.profile.update'), [
+                'nama_lengkap' => $a->nama_lengkap,
+                'alamat_rumah' => $a->alamat_rumah,
+                'tempat_lahir' => $a->tempat_lahir,
+                'tanggal_lahir' => $a->tanggal_lahir->format('Y-m-d'),
+                'status_pernikahan' => $a->status_pernikahan,
+                'desa_kelurahan' => $a->desa_kelurahan,
+                'kecamatan' => $a->kecamatan,
+                'kabupaten' => $a->kabupaten,
+                'keaktifan_ortom' => ['Pemuda Muhammadiyah', 'Nasyiatul Aisyiyah'],
+                'jabatan_ortom' => [
+                    'Pemuda Muhammadiyah' => [
+                        'tingkat' => 'Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW)',
+                        'tahun_mulai' => '2023',
+                        'tahun_selesai' => '2028',
+                        'jabatan' => 'Ketua Umum / Ketua',
+                    ],
+                    'Nasyiatul Aisyiyah' => [
+                        'tingkat' => 'Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW)',
+                        'tahun_mulai' => '2021',
+                        'tahun_selesai' => 'Sekarang',
+                        'jabatan' => 'Lainnya',
+                        'jabatan_custom' => 'Ketua Bidang Kaderisasi',
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $fresh = $a->fresh();
+        $this->assertIsArray($fresh->jabatan_ortom);
+
+        $pm = $fresh->jabatan_ortom['Pemuda Muhammadiyah'];
+        $this->assertSame('2023', $pm['tahun_mulai']);
+        $this->assertSame('2028', $pm['tahun_selesai']);
+        $this->assertSame('2023 - 2028', $pm['periode']);
+        $this->assertSame('Ketua Umum / Ketua', $pm['jabatan']);
+
+        $na = $fresh->jabatan_ortom['Nasyiatul Aisyiyah'];
+        $this->assertSame('2021', $na['tahun_mulai']);
+        $this->assertSame('Sekarang', $na['tahun_selesai']);
+        $this->assertSame('2021 - Sekarang', $na['periode']);
+        $this->assertSame('Ketua Bidang Kaderisasi', $na['jabatan']);
+
+        $this->assertSame(
+            'Ketua Umum / Ketua - Pimpinan Daerah (PD / DPD / Pimda TS / Kwarda HW) - Periode 2023 - 2028',
+            $fresh->formatJabatanOrtom('Pemuda Muhammadiyah')
+        );
+        $this->assertSame(
+            'Ketua Bidang Kaderisasi - Pimpinan Cabang (PC / DPC / Pimcab TS / Kwarcab HW) - Periode 2021 - Sekarang',
+            $fresh->formatJabatanOrtom('Nasyiatul Aisyiyah')
+        );
+    }
+
+    public function test_portal_profile_supports_imm_and_renders_imm_tingkat_options(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'keaktifan_ortom' => ['Ikatan Mahasiswa Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Ikatan Mahasiswa Muhammadiyah' => [
+                    'tingkat' => 'Koordinator Komisariat (Korkom IMM)',
+                    'tahun_mulai' => '2022',
+                    'tahun_selesai' => '2023',
+                    'jabatan' => 'Ketua Umum / Ketua',
+                ],
+            ],
+        ]);
+
+        $res = $this->actingAs($user)->get(route('portal.profile.index'));
+        $res->assertOk();
+        $res->assertSee('Ikatan Mahasiswa Muhammadiyah');
+        $res->assertSee('Dewan Pimpinan Pusat (DPP IMM)');
+        $res->assertSee('Dewan Pimpinan Daerah (DPD IMM)');
+        $res->assertSee('Pimpinan Cabang (PC IMM)');
+        $res->assertSee('Koordinator Komisariat (Korkom IMM)');
+        $res->assertSee('Pimpinan Komisariat (PK IMM)');
+    }
 }

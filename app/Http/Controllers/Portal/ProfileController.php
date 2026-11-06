@@ -45,7 +45,7 @@ class ProfileController extends Controller
             'desa_kelurahan' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:255'],
             'kabupaten' => ['required', 'string', 'max:255'],
-            'nbm' => ['nullable', 'string', 'max:50'],
+            'nbm' => ['nullable', 'string', 'regex:/^[0-9]*$/', 'max:50'],
             'nama_ayah' => ['nullable', 'string', 'max:255'],
             'nama_ibu' => ['nullable', 'string', 'max:255'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
@@ -89,6 +89,8 @@ class ProfileController extends Controller
             'jabatan_ortom.*' => ['nullable'],
             'jabatan_ortom.*.tingkat' => ['nullable', 'string', 'max:255'],
             'jabatan_ortom.*.periode' => ['nullable', 'string', 'max:255'],
+            'jabatan_ortom.*.tahun_mulai' => ['nullable', 'string', 'max:20'],
+            'jabatan_ortom.*.tahun_selesai' => ['nullable', 'string', 'max:50'],
             'jabatan_ortom.*.jabatan' => ['nullable', 'string', 'max:255'],
             'jabatan_ortom.*.jabatan_custom' => ['nullable', 'string', 'max:255'],
             'organisasi_lain' => ['nullable', 'string', 'max:255'],
@@ -120,15 +122,23 @@ class ProfileController extends Controller
             foreach ($data['jabatan_ortom'] as $ortomKey => $val) {
                 if (is_array($val)) {
                     $tingkat = $val['tingkat'] ?? null;
-                    $periode = $val['periode'] ?? null;
+                    $tahunMulai = $val['tahun_mulai'] ?? null;
+                    $tahunSelesai = $val['tahun_selesai'] ?? null;
+                    if ($tahunMulai || $tahunSelesai) {
+                        $periode = trim($tahunMulai.($tahunSelesai ? ' - '.$tahunSelesai : ''));
+                    } else {
+                        $periode = $val['periode'] ?? null;
+                    }
                     $jabatan = $val['jabatan'] ?? null;
                     if ($jabatan === 'Lainnya' && ! empty($val['jabatan_custom'])) {
                         $jabatan = trim($val['jabatan_custom']);
                     }
-                    if ($tingkat || $periode || $jabatan) {
+                    if ($tingkat || $periode || $jabatan || $tahunMulai || $tahunSelesai) {
                         $cleanedOrtom[$ortomKey] = [
                             'tingkat' => $tingkat,
                             'periode' => $periode,
+                            'tahun_mulai' => $tahunMulai,
+                            'tahun_selesai' => $tahunSelesai,
                             'jabatan' => $jabatan,
                         ];
                     }

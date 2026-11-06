@@ -228,6 +228,7 @@
                 <div>
                     <label class="block text-sm sm:text-base font-black text-slate-900 mb-2">Nomor Baku Muhammadiyah (NBM)</label>
                     <input name="nbm" value="{{ old('nbm', $anggota->nbm) }}" placeholder="Contoh: 1084201"
+                        inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13" oninput="this.value = this.value.replace(/\D/g, '')"
                         class="w-full px-4 py-3.5 text-base font-mono bg-white border-2 border-slate-300 rounded-2xl focus:border-sky-600 focus:ring-4 focus:ring-sky-100 outline-none transition font-medium min-h-[50px]">
                 </div>
             </div>
@@ -653,6 +654,15 @@
                             $rawOrtomVal = old('jabatan_ortom.'.$v, $anggota->jabatan_ortom[$v] ?? null);
                             $oldTingkat = is_array($rawOrtomVal) ? ($rawOrtomVal['tingkat'] ?? '') : '';
                             $oldPeriode = is_array($rawOrtomVal) ? ($rawOrtomVal['periode'] ?? '') : '';
+                            $oldTahunMulai = is_array($rawOrtomVal) ? ($rawOrtomVal['tahun_mulai'] ?? '') : '';
+                            $oldTahunSelesai = is_array($rawOrtomVal) ? ($rawOrtomVal['tahun_selesai'] ?? '') : '';
+                            if (empty($oldTahunMulai) && empty($oldTahunSelesai) && !empty($oldPeriode)) {
+                                if (str_contains($oldPeriode, '-')) {
+                                    $parts = array_map('trim', explode('-', $oldPeriode, 2));
+                                    $oldTahunMulai = $parts[0] ?? '';
+                                    $oldTahunSelesai = $parts[1] ?? '';
+                                }
+                            }
                             $oldJabatan = is_array($rawOrtomVal) ? ($rawOrtomVal['jabatan'] ?? '') : (is_string($rawOrtomVal) ? $rawOrtomVal : '');
                             $oldJabatanCustom = is_array($rawOrtomVal) ? ($rawOrtomVal['jabatan_custom'] ?? '') : '';
                             $opsiJabatan = config('arqam.opsi_form.jabatan_ortom_standar', []);
@@ -668,6 +678,9 @@
                             </div>
 
                             {{-- 1) Tingkat ORTOM --}}
+                            @php
+                                $opsiTingkatOrtom = config("arqam.opsi_form.tingkat_ortom_per_organisasi.{$v}") ?? config('arqam.opsi_form.tingkat_ortom', []);
+                            @endphp
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
                                     1. Tingkat Kepengurusan
@@ -675,24 +688,42 @@
                                 <select name="jabatan_ortom[{{ $v }}][tingkat]"
                                         class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
                                     <option value="">-- Pilih Tingkat Kepengurusan --</option>
-                                    @foreach(config('arqam.opsi_form.tingkat_ortom', []) as $to)
+                                    @if($oldTingkat && !in_array($oldTingkat, $opsiTingkatOrtom))
+                                        <option value="{{ $oldTingkat }}" selected>{{ $oldTingkat }}</option>
+                                    @endif
+                                    @foreach($opsiTingkatOrtom as $to)
                                         <option value="{{ $to }}" @selected($oldTingkat === $to)>{{ $to }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            {{-- 2) Periode --}}
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    2. Periode Kepengurusan
-                                </label>
-                                <select name="jabatan_ortom[{{ $v }}][periode]"
-                                        class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
-                                    <option value="">-- Pilih Periode --</option>
-                                    @foreach(config('arqam.opsi_form.periode_ortom', []) as $po)
-                                        <option value="{{ $po }}" @selected($oldPeriode === $po)>{{ $po }}</option>
-                                    @endforeach
-                                </select>
+                            {{-- 2) Periode Kepengurusan (Tahun Mulai & Tahun Selesai) --}}
+                            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                                        2a. Tahun Mulai
+                                    </label>
+                                    <select name="jabatan_ortom[{{ $v }}][tahun_mulai]"
+                                            class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                        <option value="">-- Tahun Mulai --</option>
+                                        @for($yr = (int)date('Y') + 4; $yr >= 1980; $yr--)
+                                            <option value="{{ $yr }}" @selected($oldTahunMulai == $yr)>{{ $yr }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                                        2b. Tahun Selesai
+                                    </label>
+                                    <select name="jabatan_ortom[{{ $v }}][tahun_selesai]"
+                                            class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
+                                        <option value="">-- Tahun Selesai --</option>
+                                        <option value="Sekarang" @selected($oldTahunSelesai === 'Sekarang')>Sekarang (Masih Menjabat)</option>
+                                        @for($yr = (int)date('Y') + 4; $yr >= 1980; $yr--)
+                                            <option value="{{ $yr }}" @selected($oldTahunSelesai == $yr)>{{ $yr }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
                             </div>
 
                             {{-- 3) Jabatan --}}

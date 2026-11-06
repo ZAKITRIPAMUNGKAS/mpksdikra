@@ -41,6 +41,7 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nomor WhatsApp (Opsional)</label>
                             <input type="text" name="no_wa" value="{{ old('no_wa', $user->no_wa) }}"
+                                inputmode="numeric" pattern="[0-9]*" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 13" oninput="this.value = this.value.replace(/\D/g, '')"
                                 class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-normal rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/70 focus:bg-white outline-none transition shadow-2xs"
                                 placeholder="08123456789">
                             @error('no_wa') <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror

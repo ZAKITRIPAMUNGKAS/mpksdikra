@@ -198,4 +198,20 @@ class EventDashboardTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertEquals(9, AngketItem::where('event_id', $event->id)->count());
     }
+
+    public function test_angket_management_route_redirects_to_merged_feedback_workspace(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'BA Workspace Angket',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDay()->toDateString(),
+            'status' => 'persiapan',
+            'created_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.events.angket', $event))
+            ->assertRedirect(route('admin.events.show', [$event, 'tab' => 'feedback', 'sub_feedback' => 'kelola']));
+    }
 }

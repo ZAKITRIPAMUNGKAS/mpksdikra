@@ -7,19 +7,16 @@ use App\Models\AngketItem;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class AngketController extends Controller
 {
-    public function index(Event $event): View
+    public function index(Event $event): RedirectResponse
     {
-        $items = AngketItem::where('event_id', $event->id)
-            ->orderBy('kategori')
-            ->orderBy('urutan')
-            ->get()
-            ->groupBy('kategori');
-
-        return view('admin.events.angket', compact('event', 'items'));
+        return redirect()->route('admin.events.show', [
+            'event' => $event,
+            'tab' => 'feedback',
+            'sub_feedback' => 'kelola',
+        ]);
     }
 
     public function store(Request $request, Event $event): RedirectResponse

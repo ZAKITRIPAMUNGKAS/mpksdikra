@@ -29,7 +29,6 @@ class SoalController extends Controller
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
 
         $otherEvents = Event::where('id', '!=', $event->id)
-            ->whereHas('soal')
             ->orderByDesc('created_at')
             ->get();
 

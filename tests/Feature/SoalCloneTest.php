@@ -13,6 +13,32 @@ class SoalCloneTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_question_page_shows_copy_controls_when_another_event_has_no_questions_yet(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $target = Event::create([
+            'nama_event' => 'BA Tujuan',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDay()->toDateString(),
+            'status' => 'persiapan',
+            'created_by' => $admin->id,
+        ]);
+        Event::create([
+            'nama_event' => 'BA Sumber Tanpa Soal',
+            'tanggal_mulai' => now()->addDays(2)->toDateString(),
+            'tanggal_selesai' => now()->addDays(3)->toDateString(),
+            'status' => 'persiapan',
+            'created_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.events.soal.index', [$target, 'posttest']))
+            ->assertOk()
+            ->assertSee('Salin dari Kegiatan Lain')
+            ->assertSee('Dari Pretest')
+            ->assertSee('Dari Posttest');
+    }
+
     public function test_admin_can_clone_soal_from_another_event(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);

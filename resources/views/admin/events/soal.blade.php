@@ -42,6 +42,8 @@
                         Salin Soal
                     </button>
                 </form>
+                @else
+                <p class="max-w-64 text-xs text-slate-500" role="status">Belum ada BA lain sebagai sumber. Buat atau pilih BA lain untuk menyalin soal.</p>
                 @endif
 
                 @if($sesi && $sesi->status === 'aktif')

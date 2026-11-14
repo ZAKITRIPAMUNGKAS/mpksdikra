@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AfektifJawaban;
+use App\Models\AngketItem;
+use App\Models\AngketJawaban;
+use App\Models\AngketKomentar;
 use App\Models\Event;
 use App\Models\Keaktifan;
 use App\Models\OutboundKelompok;
@@ -148,6 +151,28 @@ class EventController extends Controller
 
         $rerataNilai = PenilaianAkhir::where('event_id', $event->id)->avg('nilai_akhir') ?? 0;
 
+        // Feedback & Angket Penyelenggaraan
+        $angketItems = AngketItem::where('event_id', $event->id)
+            ->orderBy('kategori')
+            ->orderBy('urutan')
+            ->get();
+        $angketItemsGrouped = $angketItems->groupBy('kategori');
+        $totalRespondenAngket = AngketJawaban::where('event_id', $event->id)
+            ->distinct('anggota_id')
+            ->count('anggota_id');
+        $rerataSkorAngket = (float) (AngketJawaban::where('event_id', $event->id)->avg('skor') ?? 0);
+        $skorPerItem = AngketJawaban::where('event_id', $event->id)
+            ->selectRaw('item_id, AVG(skor) as avg_skor, COUNT(skor) as total_responden')
+            ->groupBy('item_id')
+            ->get()
+            ->keyBy('item_id');
+        $angketKomentarList = AngketKomentar::where('event_id', $event->id)
+            ->with('anggota')
+            ->whereNotNull('komentar')
+            ->where('komentar', '!=', '')
+            ->latest()
+            ->get();
+
         return view('admin.events.show', compact(
             'event',
             'sesi',
@@ -181,7 +206,13 @@ class EventController extends Controller
             'recentRtls',
             'liveSesi',
             'leaderboard',
-            'rerataNilai'
+            'rerataNilai',
+            'angketItems',
+            'angketItemsGrouped',
+            'totalRespondenAngket',
+            'rerataSkorAngket',
+            'skorPerItem',
+            'angketKomentarList'
         ));
     }
 

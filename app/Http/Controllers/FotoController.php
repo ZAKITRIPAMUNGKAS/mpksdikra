@@ -32,12 +32,28 @@ class FotoController extends Controller
         }
 
         if (! $anggota->foto || ! Storage::disk('local')->exists($anggota->foto)) {
-            return $this->placeholderSvg($anggota->nama_lengkap);
+            return $this->defaultProfileResponse($anggota);
         }
 
         return Storage::disk('local')->response($anggota->foto, null, [
             'Cache-Control' => 'private, max-age=86400',
         ]);
+    }
+
+    private function defaultProfileResponse(Anggota $anggota): BinaryFileResponse|Response
+    {
+        $file = $anggota->jenis_kelamin === 'P'
+            ? public_path('aset/default-profile-wanita.jpg')
+            : public_path('aset/default-profile-pria.jpg');
+
+        if (file_exists($file)) {
+            return response()->file($file, [
+                'Content-Type' => 'image/jpeg',
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        return $this->placeholderSvg($anggota->nama_lengkap);
     }
 
     private function placeholderSvg(string $name): Response

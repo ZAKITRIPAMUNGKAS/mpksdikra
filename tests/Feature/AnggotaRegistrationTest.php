@@ -758,4 +758,35 @@ class AnggotaRegistrationTest extends TestCase
         $viewRes->assertSee('Koordinator Komisariat (Korkom IMM)');
         $viewRes->assertSee('Pimpinan Komisariat (PK IMM)');
     }
+
+    public function test_registration_renders_and_accepts_tahun_selesai_up_to_2040(): void
+    {
+        Storage::fake('local');
+
+        $viewRes = $this->get(route('anggota.register', ['baru' => 1]));
+        $viewRes->assertOk();
+        $viewRes->assertSee('<option value="2040"', false);
+
+        $payload = $this->payload([
+            'nik' => '3313010101900099',
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+            'jabatan_ortom' => [
+                'Pemuda Muhammadiyah' => [
+                    'tingkat' => 'Pimpinan Cabang (PC Pemuda Muhammadiyah)',
+                    'tahun_mulai' => '2025',
+                    'tahun_selesai' => '2040',
+                    'jabatan' => 'Ketua Umum / Ketua',
+                ],
+            ],
+        ]);
+
+        $res = $this->post(route('anggota.register.store'), $payload);
+        $res->assertSessionHasNoErrors();
+        $res->assertRedirect(route('anggota.register'));
+
+        $anggota = Anggota::where('nik', '3313010101900099')->first();
+        $this->assertNotNull($anggota);
+        $this->assertSame('2040', $anggota->jabatan_ortom['Pemuda Muhammadiyah']['tahun_selesai']);
+        $this->assertSame('2025 - 2040', $anggota->jabatan_ortom['Pemuda Muhammadiyah']['periode']);
+    }
 }

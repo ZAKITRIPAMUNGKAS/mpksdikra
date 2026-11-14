@@ -382,10 +382,10 @@
                         @forelse($latestPending as $p)
                         <div class="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0 flex-1">
-                                <div class="relative w-9 h-11 rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
+                                <div class="relative w-9 h-12 aspect-[3/4] rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
                                     <img src="{{ route('foto.anggota', $p) }}" 
                                          alt="{{ $p->nama_lengkap }}" 
-                                         class="w-full h-full object-cover"
+                                         class="w-full h-full object-cover object-top"
                                          loading="lazy"
                                          onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
                                     <div class="hidden w-full h-full bg-amber-50 text-amber-800 font-bold text-xs flex items-center justify-center">
@@ -444,10 +444,10 @@
                         @forelse($latestAktif as $akt)
                         <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <div class="relative w-8 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
+                                <div class="relative w-8 h-[42px] aspect-[3/4] rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
                                     <img src="{{ route('foto.anggota', $akt) }}" 
                                          alt="{{ $akt->nama_lengkap }}" 
-                                         class="w-full h-full object-cover"
+                                         class="w-full h-full object-cover object-top"
                                          loading="lazy"
                                          onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
                                     <div class="hidden w-full h-full bg-[#005c8a]/10 text-[#005c8a] font-bold text-xs flex items-center justify-center">
@@ -593,10 +593,10 @@
                         @forelse($latestPending as $p)
                         <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <div class="relative w-8 h-10 rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
+                                <div class="relative w-8 h-[42px] aspect-[3/4] rounded-lg overflow-hidden border border-amber-200/80 bg-amber-50 shrink-0 shadow-2xs">
                                     <img src="{{ route('foto.anggota', $p) }}" 
                                          alt="{{ $p->nama_lengkap }}" 
-                                         class="w-full h-full object-cover"
+                                         class="w-full h-full object-cover object-top"
                                          loading="lazy"
                                          onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
                                     <div class="hidden w-full h-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">

@@ -1194,7 +1194,7 @@
                                                 class="w-full px-3 py-2 text-xs sm:text-sm border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-sky-500/20 focus:border-sky-600 outline-none bg-white transition min-h-[42px] font-medium text-slate-800">
                                             <option value="">-- Tahun Selesai --</option>
                                             <option value="Sekarang" @selected($oldTahunSelesai === 'Sekarang')>Sekarang (Masih Menjabat)</option>
-                                            @for($yr = (int)date('Y') + 4; $yr >= 1980; $yr--)
+                                            @for($yr = max(2040, (int)date('Y') + 4); $yr >= 1980; $yr--)
                                                 <option value="{{ $yr }}" @selected($oldTahunSelesai == $yr)>{{ $yr }}</option>
                                             @endfor
                                         </select>

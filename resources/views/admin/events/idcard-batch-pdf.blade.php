@@ -2,244 +2,71 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>ID Card B4 Batch - {{ $event->nama_event }}</title>
+    <title>ID Card Baitul Arqam - {{ $event->nama_event }}</title>
     <style>
-        @page {
-            size: 265.75pt 383.75pt;
-            margin: 0;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            width: 265.75pt;
-            height: 383.75pt;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background: #FFFFFF;
-            color: #063A60;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        .card-page {
-            width: 265.75pt;
-            height: 383.75pt;
-            position: relative;
-            overflow: hidden;
-            background: #FFFFFF;
-            page-break-after: always;
-            break-after: page;
-        }
-
-        .card-page:last-child {
-            page-break-after: avoid;
-            break-after: avoid;
-        }
-
-        .card-bg, .card-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 265.75pt;
-            height: 383.75pt;
-            z-index: 1;
-        }
-
-        .card-overlay {
-            z-index: 3;
-        }
-
-        .photo-box {
-            position: absolute;
-            left: 95.7pt;
-            top: 55.6pt;
-            width: 154.1pt;
-            height: 199.5pt;
-            text-align: right;
-            z-index: 2;
-        }
-
-        .photo-img {
-            vertical-align: bottom;
-        }
-
-        .photo-img-cutout {
-            max-width: 100%;
-            max-height: 100%;
-            display: inline-block;
-        }
-
-        .photo-box-original {
-            text-align: right;
-        }
-
-        .photo-img-original {
-            width: 112pt;
-            height: 149.3pt;
-            border-radius: 8pt;
-            border: 2pt solid #FFFFFF;
-            margin-top: 28pt;
-            margin-right: 12pt;
-            display: inline-block;
-        }
-
-        .front-status {
-            position: absolute;
-            left: 53.75pt;
-            top: 245.5pt;
-            width: 125pt;
-            font-weight: bold;
-            font-size: 8.5pt;
-            color: #063A60;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            z-index: 4;
-        }
-
-        .front-nama {
-            position: absolute;
-            left: 53.75pt;
-            top: 281.5pt;
-            width: 138pt;
-            font-weight: bold;
-            color: #063A60;
-            line-height: 1.1;
-            z-index: 4;
-        }
-
-        .front-nbm {
-            position: absolute;
-            left: 53.75pt;
-            top: 318.0pt;
-            width: 138pt;
-            font-weight: bold;
-            font-size: 8.5pt;
-            color: #063A60;
-            z-index: 4;
-        }
-
-        /* BACK CARD */
-        .qr-box {
-            position: absolute;
-            left: 104.125pt;
-            top: 64.25pt;
-            width: 57.5pt;
-            height: 57.5pt;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .qr-img {
-            width: 57.5pt;
-            height: 57.5pt;
-        }
-
-        .back-val {
-            position: absolute;
-            left: 43.75pt;
-            width: 104pt;
-            font-weight: bold;
-            color: #063A60;
-            z-index: 2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .back-nama { top: 194pt; }
-        .back-nbm { top: 221.5pt; font-size: 6.5pt; }
-        .back-status { top: 248.5pt; font-size: 6.5pt; }
-        .back-kegiatan { top: 275.25pt; font-size: 6.5pt; }
-        .back-waktu { top: 302.25pt; font-size: 6.5pt; }
+        @page { size: 265.75pt 383.75pt; margin: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 265.75pt; height: 383.75pt; font-family: DejaVu Sans, sans-serif; }
+        .card { width: 265.75pt; height: 383.75pt; position: relative; overflow: hidden; page-break-after: always; }
+        .card:last-child { page-break-after: avoid; }
+        .bg { position: absolute; inset: 0; width: 265.75pt; height: 383.75pt; z-index: 1; }
+        .brand, .title, .event, .photo, .name, .meta, .qr-wrap, .scan, .valid { position: absolute; z-index: 2; text-align: center; }
+        .brand { top: 10pt; left: 100pt; width: 66pt; color: #fff; }
+        .brand-table { width: 100%; border-collapse: collapse; }
+        .brand-cell { width: 31pt; vertical-align: middle; text-align: center; }
+        .brand-divider { width: 1pt; height: 17pt; background: #eab308; }
+        .brand-logo { width: 18pt; height: 18pt; vertical-align: middle; }
+        .title { top: 38pt; left: 20pt; width: 226pt; color: #fff; font-size: 18pt; font-weight: bold; letter-spacing: 1.1pt; }
+        .event { top: 63pt; left: 42pt; width: 182pt; padding: 4pt 8pt; border: 1.2pt solid #eab308; border-radius: 10pt; background: #fff; color: #092c59; font-size: 6.8pt; font-weight: bold; }
+        .photo { top: 88pt; left: 88pt; width: 90pt; height: 120pt; padding: 3pt; border: 2.5pt solid #eab308; border-radius: 17pt; background: #fff; overflow: hidden; text-align: center; }
+        .photo img { max-width: 100%; max-height: 100%; width: auto; height: 100%; border-radius: 12pt; display: block; margin: 0 auto; object-fit: cover; }
+        .name { top: 217pt; left: 25pt; width: 216pt; padding: 7pt 10pt; border-radius: 14pt; background: #062a58; border: 1.5pt solid #eab308; color: #fff; font-size: 13pt; font-weight: bold; line-height: 1.15; }
+        .meta { top: 254pt; left: 33pt; width: 200pt; color: #062a58; font-size: 7.2pt; font-weight: bold; line-height: 1.55; }
+        .meta .divider { color: #d79a00; padding: 0 5pt; }
+        .qr-wrap { top: 268pt; left: 101pt; width: 64pt; height: 64pt; padding: 4pt; background: #fff; border: 1.5pt solid #062a58; border-radius: 8pt; }
+        .qr-wrap img { width: 54pt; height: 54pt; }
+        .scan { top: 340pt; left: 26pt; width: 214pt; color: #062a58; font-size: 6.2pt; font-weight: bold; }
+        .valid { top: 365pt; left: 26pt; width: 214pt; color: #fff; font-size: 5.5pt; font-weight: bold; }
     </style>
 </head>
 <body>
 @php
-    $resolveDataUri = function (array $candidates): string {
-        foreach ($candidates as $path) {
-            if ($path && file_exists($path)) {
-                $mime = str_ends_with(strtolower($path), '.jpg') || str_ends_with(strtolower($path), '.jpeg') ? 'image/jpeg' : 'image/png';
-                return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
-            }
-        }
-        return '';
+    $asDataUri = function (string $path): string {
+        if (! file_exists($path)) return '';
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($path) ?: 'image/png';
+        return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
     };
-
-    $bgFrontDataUri = $resolveDataUri([
-        public_path('aset/idcard/front-bg.png'),
-        public_path('assets/2.png'),
-        public_path('aset/2.png'),
-    ]);
-    $fgFrontDataUri = $resolveDataUri([
-        public_path('aset/idcard/front-overlay.png'),
-        public_path('assets/3.png'),
-        public_path('aset/3.png'),
-    ]);
-    $bgBackDataUri = $resolveDataUri([
-        public_path('aset/idcard/back.png'),
-        public_path('assets/1.png'),
-        public_path('aset/1.png'),
-    ]);
-
-    $defaultPhoto = $resolveDataUri([
-        public_path('aset/ketua-mpksdi-cutout.png'),
-        public_path('aset/ketua-mpksdi.png'),
-    ]);
+    $background = $asDataUri(public_path('aset/idcard/idcard-satu-sisi-bg.png'));
+    $logoMuhammadiyah = $asDataUri(public_path('aset/idcard/logo-muhammadiyah-putih.png'));
+    $logoMpksdi = $asDataUri(public_path('aset/idcard/logo-mpksdi-putih.png'));
+    $tahun = $event->tanggal_mulai?->format('Y') ?? date('Y');
+    $masaBerlaku = trim(($event->tanggal_mulai?->translatedFormat('d F Y') ?? '') . ' – ' . ($event->tanggal_selesai?->translatedFormat('d F Y') ?? ''));
 @endphp
-
-@foreach($cards as $index => $card)
-    @php
-        $namaLen = mb_strlen($card['nama']);
-        if ($namaLen > 34) {
-            $frontFontSize = '6.5pt';
-            $backFontSize = '5.5pt';
-        } elseif ($namaLen > 24) {
-            $frontFontSize = '7.5pt';
-            $backFontSize = '6pt';
-        } else {
-            $frontFontSize = '8.5pt';
-            $backFontSize = '6.5pt';
-        }
-        $statusStr = $card['status'] ?? 'PESERTA';
-        $statusTitle = ucfirst(strtolower($statusStr));
-        $cardMode = $card['foto_mode'] ?? 'cutout';
-        $photoSrc = $card['foto'] ?: $defaultPhoto;
-    @endphp
-
-    <!-- FRONT CARD -->
-    <div class="card-page">
-        @if($bgFrontDataUri)
-        <img src="{{ $bgFrontDataUri }}" class="card-bg" alt="">
-        @endif
-        <div class="photo-box photo-box-{{ $cardMode }}">
-            <img src="{{ $photoSrc }}" class="photo-img photo-img-{{ $cardMode }}" alt="Foto">
+@foreach($cards as $card)
+    @php $nama = $card['nama']; $fontSize = mb_strlen($nama) > 28 ? '9.5pt' : (mb_strlen($nama) > 20 ? '11pt' : '13pt'); @endphp
+    <div class="card">
+        @if($background)<img src="{{ $background }}" class="bg" alt="">@endif
+        <div class="brand">
+            <table class="brand-table" role="presentation">
+                <tr>
+                    <td class="brand-cell">
+                        @if($logoMuhammadiyah)<img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo PDM Karanganyar">@endif
+                    </td>
+                    <td class="brand-divider"></td>
+                    <td class="brand-cell">
+                        @if($logoMpksdi)<img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI">@endif
+                    </td>
+                </tr>
+            </table>
         </div>
-        @if($fgFrontDataUri)
-        <img src="{{ $fgFrontDataUri }}" class="card-overlay" alt="">
-        @endif
-        
-        <div class="front-status">{{ strtoupper($statusStr) }}</div>
-        <div class="front-nama" style="font-size: {{ $frontFontSize }};">{{ $card['nama'] }}</div>
-        <div class="front-nbm">{{ $card['nbm'] ?: '-' }}</div>
-    </div>
-
-    <!-- BACK CARD -->
-    <div class="card-page">
-        @if($bgBackDataUri)
-        <img src="{{ $bgBackDataUri }}" class="card-bg" alt="">
-        @endif
-        
-        <div class="qr-box">
-            <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Code">
-        </div>
-
-        <div class="back-val back-nama" style="font-size: {{ $backFontSize }};">{{ $card['nama'] }}</div>
-        <div class="back-val back-nbm">{{ $card['nbm'] ?: '-' }}</div>
-        <div class="back-val back-status">{{ $statusTitle }}</div>
-        <div class="back-val back-kegiatan">{{ $event->nama_event ?: 'Baitul Arqam' }}</div>
-        <div class="back-val back-waktu">{{ $event->lokasi ?: 'Karanganyar' }}, {{ $event->tanggal_mulai ? $event->tanggal_mulai->format('Y') : date('Y') }}</div>
+        <div class="title">BAITUL ARQAM</div>
+        <div class="event">{{ $event->nama_event }} · Angkatan {{ $tahun }}</div>
+        <div class="photo">@if($card['foto'])<img src="{{ $card['foto'] }}" alt="Foto {{ $nama }}">@endif</div>
+        <div class="name" style="font-size: {{ $fontSize }};">{{ $nama }}</div>
+        <div class="meta">{{ $card['pcm'] ?: 'Utusan Muhammadiyah' }}<span class="divider">|</span>No. Peserta {{ str_pad((string) $card['no_peserta'], 5, '0', STR_PAD_LEFT) }}</div>
+        <div class="qr-wrap"><img src="{{ $card['qr'] }}" alt="QR presensi"></div>
+        <div class="scan">Pindai QR untuk presensi</div>
+        <div class="valid">Berlaku {{ $masaBerlaku }}</div>
     </div>
 @endforeach
 </body>

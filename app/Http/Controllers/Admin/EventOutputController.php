@@ -194,7 +194,7 @@ class EventOutputController extends Controller
         abort_if($peserta->isEmpty(), 404, 'Belum ada peserta aktif pada kegiatan ini.');
 
         $cards = $peserta->map(function ($ep) {
-            $photoInfo = $this->cutout->resolveForAnggota($ep->anggota);
+            $photoInfo = $this->cutout->resolveOriginalForAnggota($ep->anggota);
 
             return [
                 'id' => $ep->id,

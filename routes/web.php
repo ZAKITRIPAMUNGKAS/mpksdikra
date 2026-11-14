@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\PresentasiController;
 use App\Http\Controllers\Admin\PsikomotorController;
 use App\Http\Controllers\Admin\RtlAdminController;
 use App\Http\Controllers\Admin\SesiController;
+use App\Http\Controllers\Admin\SmartEnrollController;
 use App\Http\Controllers\Admin\SoalController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AnggotaRegistrationController;
@@ -110,6 +111,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::post('/anggota/{anggota}/reset-password', [AdminAnggotaController::class, 'resetPassword'])->name('anggota.reset-password');
         Route::post('/anggota/{anggota}/kirim-wa', [AdminAnggotaController::class, 'kirimWa'])->name('anggota.kirim-wa');
         Route::patch('/anggota/{anggota}/foto-mode', [AdminAnggotaController::class, 'updateFotoMode'])->name('anggota.foto-mode');
+        Route::post('/anggota/{anggota}/foto', [AdminAnggotaController::class, 'updateFoto'])->name('anggota.foto.update');
         Route::delete('/anggota/{anggota}/cutout', [AdminAnggotaController::class, 'destroyCutout'])->name('anggota.cutout.destroy');
         Route::delete('/anggota/{anggota}', [AdminAnggotaController::class, 'destroy'])->name('anggota.destroy');
     });
@@ -143,6 +145,13 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
 
         Route::get('/events/{event}/enroll', [PesertaController::class, 'search'])->name('events.enroll');
         Route::post('/events/{event}/enroll', [PesertaController::class, 'enroll'])->name('events.enroll.store');
+        Route::post('/events/{event}/smart-enroll/preview', [SmartEnrollController::class, 'preview'])->name('events.smart-enroll.preview');
+        Route::post('/events/{event}/smart-enroll/match', [SmartEnrollController::class, 'match'])->name('events.smart-enroll.match');
+        Route::post('/events/{event}/smart-enroll/recommend', [SmartEnrollController::class, 'recommend'])->name('events.smart-enroll.recommend');
+        Route::post('/events/{event}/smart-enroll/ai-prompt', [SmartEnrollController::class, 'aiPrompt'])->name('events.smart-enroll.ai-prompt');
+        Route::post('/events/{event}/smart-enroll/execute', [SmartEnrollController::class, 'execute'])->name('events.smart-enroll.execute');
+        Route::post('/events/{event}/smart-enroll/undo', [SmartEnrollController::class, 'undo'])->name('events.smart-enroll.undo');
+        Route::post('/events/{event}/smart-enroll/feedback', [SmartEnrollController::class, 'feedback'])->name('events.smart-enroll.feedback');
         Route::post('/events/{event}/peserta/{peserta}/remove', [PesertaController::class, 'remove'])->name('events.peserta.remove');
         Route::post('/events/{event}/peserta/{peserta}/remind-wa', [PesertaController::class, 'remind'])->name('events.peserta.remind-wa');
         Route::post('/events/{event}/peserta/remind-wa-batch', [PesertaController::class, 'remindBatch'])->name('events.peserta.remind-wa-batch');
@@ -168,6 +177,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/angket', [AngketController::class, 'index'])->name('events.angket');
         Route::post('/events/{event}/angket/item', [AngketController::class, 'store'])->name('events.angket.item.store');
         Route::delete('/events/{event}/angket/item/{item}', [AngketController::class, 'destroy'])->name('events.angket.item.destroy');
+        Route::post('/events/{event}/angket/seed-defaults', [AngketController::class, 'seedDefaults'])->name('events.angket.seed-defaults');
 
         Route::get('/events/{event}/rtl', [RtlAdminController::class, 'index'])->name('events.rtl.index');
         Route::get('/events/{event}/rtl/{rtl}', [RtlAdminController::class, 'show'])->name('events.rtl.show');

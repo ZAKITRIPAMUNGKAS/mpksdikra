@@ -26,13 +26,17 @@
             </div>
             <div class="flex gap-2 items-center flex-wrap">
                 @if(isset($otherEvents) && $otherEvents->isNotEmpty())
-                <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="flex items-center gap-1.5" onsubmit="return confirm('Salin semua soal {{ $tipe }} dari kegiatan yang dipilih ke kegiatan ini?')">
+                <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="flex items-center gap-1.5 flex-wrap" onsubmit="return confirm('Salin soal dari kegiatan dan jenis tes yang dipilih ke {{ $tipe }} kegiatan ini?')">
                     @csrf
                     <select name="source_event_id" required class="px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
                         <option value="">-- Salin dari Kegiatan Lain --</option>
                         @foreach($otherEvents as $oe)
                         <option value="{{ $oe->id }}">{{ $oe->nama_event }}</option>
                         @endforeach
+                    </select>
+                    <select name="source_tipe" required aria-label="Jenis soal sumber" class="px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
+                        <option value="pretest" @selected($tipe === 'pretest')>Dari Pretest</option>
+                        <option value="posttest" @selected($tipe === 'posttest')>Dari Posttest</option>
                     </select>
                     <button type="submit" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-sky-800 border border-slate-200 hover:border-sky-300 text-xs font-semibold rounded-lg transition shadow-2xs">
                         Salin Soal

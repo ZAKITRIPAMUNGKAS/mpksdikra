@@ -20,7 +20,7 @@
                 <div class="flex items-center gap-4">
                     <img src="{{ route('foto.anggota', $anggota) }}"
                         alt="{{ $anggota->nama_lengkap }}"
-                        class="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-xl border border-slate-200 shadow-2xs shrink-0 bg-slate-100"
+                        class="w-16 h-[85px] sm:w-20 sm:h-[107px] aspect-[3/4] object-cover object-top rounded-xl border border-slate-200 shadow-2xs shrink-0 bg-slate-100"
                         onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23002b40\'/%3E%3Ctext x=\'50%25\' y=\'54%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23f8bb00\' font-family=\'Arial\' font-size=\'64\' font-weight=\'bold\'%3E{{ strtoupper(substr($anggota->nama_lengkap, 0, 2)) }}%3C/text%3E%3C/svg%3E'">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $anggota->nama_lengkap }}</h1>
@@ -169,102 +169,722 @@
             </div>
         </div>
 
-        {{-- Card Pasfoto & Cutout ID Card (K5) --}}
-        <div class="mb-6 p-4 sm:p-5 rounded-xl border border-slate-200/90 bg-slate-50/70 shadow-2xs">
-            <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-200/80 mb-4">
+        {{-- Card Studio Pasfoto & Penyesuaian ID Card (Tab Workbench Anti-Gepeng) --}}
+        <div x-data="adminFotoStudio({
+                anggotaId: {{ $anggota->id }},
+                namaLengkap: '{{ addslashes($anggota->nama_lengkap) }}',
+                nbm: '{{ addslashes($anggota->nbm ?: '-') }}',
+                pcm: '{{ addslashes($anggota->pcm ?: ($anggota->kecamatan ?: '-')) }}',
+                kegiatanNama: '{{ addslashes($anggota->eventPeserta->first()?->event?->nama_event ?? 'Baitul Arqam MPKSDI Karanganyar') }}',
+                initialPhotoUrl: '{{ route('foto.anggota', $anggota) }}?t={{ time() }}',
+                initialCutoutUrl: '{{ $anggota->foto_cutout_path ? route('foto.anggota', [$anggota, 'type' => 'cutout']) . '?t=' . time() : '' }}',
+                initialMode: '{{ $anggota->foto_mode ?: 'cutout' }}',
+                saveUrl: '{{ route('admin.anggota.foto.update', $anggota) }}',
+                destroyCutoutUrl: '{{ route('admin.anggota.cutout.destroy', $anggota) }}',
+                csrfToken: '{{ csrf_token() }}'
+            })"
+            class="mb-6 p-4 sm:p-6 rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/70 shadow-xs">
+            
+            {{-- Header Studio --}}
+            <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-200/80 mb-5">
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#063A60] flex items-center gap-2">
-                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h2 class="text-sm sm:text-base font-extrabold uppercase tracking-wide text-[#063A60] flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         <span>Pengaturan Pasfoto & Cutout ID Card</span>
                     </h2>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Pratinjau foto sumber dan hasil cutout transparan untuk kartu tanda anggota/ID Card Baitul Arqam.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Studio Pasfoto & Penyesuaian ID Card. Kelola foto profil 3:4 kader, atur posisi & perbesaran, serta centering presisi agar pasfoto tidak gepeng di ID Card.</p>
                 </div>
-                <div class="flex items-center gap-2">
+
+                {{-- Status Pills --}}
+                <div class="flex items-center gap-2 flex-wrap">
+                    <template x-if="isDirty">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>Ada Perubahan Belum Disimpan</span>
+                        </span>
+                    </template>
                     <span class="text-[11px] font-semibold text-slate-500">Mode Aktif:</span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold {{ $anggota->foto_mode === 'original' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300' }}">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $anggota->foto_mode === 'original' ? 'bg-amber-500' : 'bg-emerald-500' }}"></span>
-                        {{ $anggota->foto_mode === 'original' ? 'Original (Berbingkai)' : 'Cutout (Transparan)' }}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+                          :class="fotoMode === 'original' ? 'bg-amber-50 text-amber-900 border border-amber-300' : 'bg-emerald-50 text-emerald-900 border border-emerald-300'">
+                        <span class="w-2 h-2 rounded-full" :class="fotoMode === 'original' ? 'bg-amber-500' : 'bg-emerald-500'"></span>
+                        <span x-text="fotoMode === 'original' ? 'Original (Berbingkai)' : 'Cutout (Transparan)'">{{ $anggota->foto_mode === 'original' ? 'Original (Berbingkai)' : 'Cutout (Transparan)' }}</span>
                     </span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-start">
-                {{-- 1. Foto Sumber Asli --}}
-                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs text-center flex flex-col items-center">
-                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">1. Foto Sumber (Asli)</span>
-                    <div class="w-24 h-32 rounded-lg border border-slate-200 overflow-hidden bg-slate-100 shadow-2xs flex items-center justify-center">
-                        <img src="{{ route('foto.anggota', $anggota) }}"
-                             alt="Foto Sumber"
-                             class="w-full h-full object-cover">
-                    </div>
-                    <span class="text-[10px] text-slate-400 mt-2">Format pasfoto resmi kader</span>
-                </div>
+            {{-- Tab Navigasi Terpadu dalam Satu Halaman --}}
+            <div class="flex items-center gap-2 p-1.5 bg-slate-100/90 rounded-xl mb-5 w-fit border border-slate-200/80">
+                <button type="button" @click="activeTab = 'foto'"
+                    :class="activeTab === 'foto' ? 'bg-white text-sky-950 font-black shadow-xs border border-slate-200/90' : 'text-slate-600 hover:text-slate-900 font-bold'"
+                    class="px-4 py-2 rounded-lg text-xs transition duration-150 flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span>1. Edit &amp; Reposisi Pasfoto (3:4)</span>
+                </button>
 
-                {{-- 2. Foto Cutout Klien --}}
-                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs text-center flex flex-col items-center">
-                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">2. Hasil Cutout Klien</span>
-                    @if($anggota->foto_cutout_path)
-                        <div class="w-24 h-32 rounded-lg border border-slate-300 overflow-hidden shadow-2xs flex items-center justify-center bg-[linear-gradient(45deg,#f1f5f9_25%,transparent_25%),linear-gradient(-45deg,#f1f5f9_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f1f5f9_75%),linear-gradient(-45deg,transparent_75%,#f1f5f9_75%)] [background-size:12px_12px] [background-position:0_0,0_6px,6px_-6px,-6px_0]">
-                            <img src="{{ route('foto.anggota', [$anggota, 'type' => 'cutout']) }}"
-                                 alt="Foto Cutout"
-                                 class="w-full h-full object-contain">
-                        </div>
-                        <div class="mt-2 flex items-center gap-1.5">
-                            <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Tersedia di Server</span>
-                        </div>
-                    @else
-                        <div class="w-24 h-32 rounded-lg border border-dashed border-slate-300 flex flex-col items-center justify-center p-2 text-center bg-slate-50">
-                            <svg class="w-6 h-6 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                <button type="button" @click="activeTab = 'idcard'"
+                    :class="activeTab === 'idcard' ? 'bg-white text-sky-950 font-black shadow-xs border border-slate-200/90' : 'text-slate-600 hover:text-slate-900 font-bold'"
+                    class="px-4 py-2 rounded-lg text-xs transition duration-150 flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+                    </svg>
+                    <span>2. Centering &amp; Pratinjau ID Card (Anti-Gepeng)</span>
+                </button>
+            </div>
+
+            {{-- ==================== TAB 1: EDIT & REPOSISI PASFOTO ==================== --}}
+            <div x-show="activeTab === 'foto'" x-cloak class="space-y-5">
+                {{-- Toolbar Unggah Foto Baru --}}
+                <div class="flex items-center justify-between flex-wrap gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold text-xs shadow-xs transition select-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                             </svg>
-                            <span class="text-[10px] text-slate-400 font-medium">Tidak ada cutout klien</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 mt-2">Fallback otomatis ke engine GD v2</span>
-                    @endif
-                </div>
+                            <span>Unggah Foto Baru dari Komputer / HP</span>
+                            <input type="file" accept="image/jpeg,image/png,image/webp,image/jpg" @change="handleFileSelect($event)" class="sr-only">
+                        </label>
 
-                {{-- 3. Aksi Manajemen Admin --}}
-                <div class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between h-full space-y-3">
-                    <div>
-                        <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">Aksi Tampilan ID Card</span>
-                        <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Bila cutout browser kurang rapi atau user mengenakan pakaian khusus, Admin dapat beralih ke mode <strong>Original</strong> berbingkai rapi atau menghapus cutout agar fallback ke GD.
-                        </p>
+                        <button type="button" @click="resetToCurrentPhoto()"
+                            class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs">
+                            Gunakan Foto Tersimpan Saat Ini
+                        </button>
                     </div>
 
-                    <div class="space-y-2 pt-2 border-t border-slate-100">
-                        <form method="POST" action="{{ route('admin.anggota.foto-mode', $anggota) }}" class="flex items-center gap-2">
-                            @csrf
-                            @method('PATCH')
-                            @if($anggota->foto_mode === 'original')
-                                <input type="hidden" name="foto_mode" value="cutout">
-                                <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-2xs flex items-center justify-center gap-1.5">
-                                    <span>Ganti ke Mode Cutout</span>
-                                </button>
-                            @else
-                                <input type="hidden" name="foto_mode" value="original">
-                                <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-2xs flex items-center justify-center gap-1.5">
-                                    <span>Ganti ke Mode Original</span>
-                                </button>
-                            @endif
-                        </form>
+                    <div class="flex items-center gap-2">
+                        <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none">
+                            <input type="checkbox" x-model="showGuide" class="rounded text-sky-600 focus:ring-sky-500">
+                            <span>Tampilkan Garis Panduan Wajah (3:4)</span>
+                        </label>
+                    </div>
+                </div>
 
-                        @if($anggota->foto_cutout_path)
-                        <form method="POST" action="{{ route('admin.anggota.cutout.destroy', $anggota) }}" onsubmit="return confirm('Hapus file cutout klien? Sistem akan membuat cutout otomatis dengan GD v2 saat pencetakan ID Card.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition shadow-2xs flex items-center justify-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                <span>Hapus Cutout Klien</span>
-                            </button>
-                        </form>
-                        @endif
+                {{-- Grid Editor Kanvas & Live Preview --}}
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    {{-- Kolom Viewport Interaktif Kanvas --}}
+                    <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center select-none shadow-inner border border-slate-800">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 self-start flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Kanvas Interaktif Reposisi Wajah (Drag &amp; Zoom)</span>
+                        </span>
+
+                        {{-- 3:4 Viewport (240px x 320px) --}}
+                        <div class="relative overflow-hidden rounded-2xl shadow-2xl border-2 border-slate-700 bg-slate-950 cursor-grab active:cursor-grabbing touch-none shrink-0"
+                             style="width: 240px; height: 320px;"
+                             @pointerdown="startDrag($event)"
+                             @pointermove="onDrag($event)"
+                             @pointerup="endDrag($event)"
+                             @pointercancel="endDrag($event)">
+
+                            {{-- Gambar Pengguna --}}
+                            <template x-if="rawImageSrc">
+                                <img :src="rawImageSrc"
+                                     alt="Edit Pasfoto"
+                                     :style="`
+                                         position: absolute;
+                                         left: ${centerX}px;
+                                         top: ${centerY}px;
+                                         width: ${imgWidth}px;
+                                         height: ${imgHeight}px;
+                                         transform: translate(-50%, -50%) rotate(${rotation}deg) scale(${scale});
+                                         transform-origin: center center;
+                                         max-width: none;
+                                         user-select: none;
+                                         pointer-events: none;
+                                     `">
+                            </template>
+
+                            {{-- SVG Garis Panduan Rasio 3:4 Wajah & Peci/Jilbab --}}
+                            <template x-if="showGuide">
+                                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 240 320">
+                                    <rect x="2" y="2" width="236" height="316" rx="14" fill="none" stroke="#f8bb00" stroke-width="1.8" stroke-dasharray="6,4" opacity="0.85" />
+                                    <ellipse cx="120" cy="125" rx="56" ry="76" fill="rgba(1, 176, 245, 0.05)" stroke="#01b0f5" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.9" />
+                                    <line x1="75" y1="120" x2="165" y2="120" stroke="#f8bb00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.95" />
+                                    <rect x="85" y="109" width="70" height="13" rx="3" fill="rgba(0,0,0,0.65)" />
+                                    <text x="120" y="119" text-anchor="middle" font-size="8" fill="#f8bb00" font-weight="bold" letter-spacing="0.3">TINGGI MATA</text>
+                                    <line x1="90" y1="48" x2="150" y2="48" stroke="#01b0f5" stroke-width="1.4" stroke-dasharray="3,3" opacity="0.85" />
+                                    <rect x="70" y="37" width="100" height="13" rx="3" fill="rgba(0,0,0,0.65)" />
+                                    <text x="120" y="47" text-anchor="middle" font-size="7.5" fill="#01b0f5" font-weight="bold">PUNCAK KEPALA/PECI</text>
+                                    <path d="M 18 320 C 40 252, 75 232, 120 232 C 165 232, 200 252, 222 320" fill="none" stroke="#f8bb00" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.9" />
+                                    <rect x="88" y="238" width="64" height="13" rx="3" fill="rgba(0,0,0,0.65)" />
+                                    <text x="120" y="248" text-anchor="middle" font-size="8" fill="#f8bb00" font-weight="bold" letter-spacing="0.3">GARIS BAHU</text>
+                                    <circle cx="120" cy="160" r="2.5" fill="#ffffff" opacity="0.6" />
+                                </svg>
+                            </template>
+
+                            {{-- Tip Drag --}}
+                            <div class="absolute bottom-2 inset-x-2 text-center pointer-events-none">
+                                <span class="inline-block px-2.5 py-1 rounded-full bg-slate-950/85 text-[10px] font-bold text-slate-200 border border-slate-700/80">
+                                    👆 Klik &amp; geser untuk memposisikan
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Toolbar Kontrol Zoom, Putar & Reset --}}
+                        <div class="w-full max-w-[280px] mt-3.5 space-y-2.5">
+                            {{-- Slider Zoom --}}
+                            <div class="flex items-center gap-2 bg-slate-800/90 rounded-xl px-2.5 py-1.5 border border-slate-700">
+                                <button type="button" @click="zoomOut()" title="Perkecil Ukuran"
+                                    class="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black text-xs flex items-center justify-center transition active:scale-95 cursor-pointer">
+                                    &minus;
+                                </button>
+                                <div class="flex-1 px-1 flex items-center gap-2">
+                                    <input type="range"
+                                        :min="minScale"
+                                        :max="maxScale"
+                                        step="0.02"
+                                        x-model.number="scale"
+                                        @input="renderCanvas(); isDirty = true"
+                                        class="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-[#f8bb00]">
+                                    <span class="text-[10px] text-amber-300 font-mono w-10 text-right" x-text="`${Math.round(scale * 100)}%`"></span>
+                                </div>
+                                <button type="button" @click="zoomIn()" title="Perbesar Ukuran"
+                                    class="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black text-xs flex items-center justify-center transition active:scale-95 cursor-pointer">
+                                    &#43;
+                                </button>
+                            </div>
+
+                            {{-- Tombol Cepat: Auto-Center, Putar, Reset --}}
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" @click="autoCenter()"
+                                    class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-bold border border-slate-700 transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer"
+                                    title="Posisikan gambar tepat di tengah kanvas">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    <span>Tengah</span>
+                                </button>
+
+                                <button type="button" @click="rotate()"
+                                    class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer"
+                                    title="Putar 90 derajat searah jarum jam">
+                                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span>Putar 90&deg;</span>
+                                </button>
+
+                                <button type="button" @click="resetTransform()"
+                                    class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer"
+                                    title="Kembalikan zoom &amp; posisi ke setelan awal">
+                                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Kolom Pratinjau Hasil Crop 3:4 & Keterangan --}}
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Hasil Pasfoto Terpusat (Standar 3:4)</span>
+                            </span>
+
+                            <div class="flex items-center gap-4">
+                                <div class="w-24 h-32 rounded-xl border-2 border-emerald-500 overflow-hidden shadow-xs bg-slate-100 flex items-center justify-center shrink-0">
+                                    <template x-if="cropPreviewUrl">
+                                        <img :src="cropPreviewUrl" alt="Hasil Pasfoto" class="w-full h-full object-cover">
+                                    </template>
+                                </div>
+                                <div class="space-y-1.5 text-xs">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-bold text-slate-700">Rasio Aspek:</span>
+                                        <span class="px-2 py-0.5 rounded font-black bg-emerald-100 text-emerald-800 border border-emerald-300">3 : 4 Resmi</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">
+                                        Output kanvas: <strong>600 &times; 800 piksel</strong>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 leading-relaxed">
+                                        Pasfoto ini terjamin proporsional untuk seluruh dokumen PDF (Biodata CV, Presensi, dan Sertifikat).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Panduan Penyelarasan --}}
+                        <div class="p-4 rounded-xl bg-sky-50/70 border border-sky-200/90 text-xs text-sky-950 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-sky-900">
+                                <svg class="w-4 h-4 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Langkah Reposisi Ideal:</span>
+                            </div>
+                            <ul class="list-disc list-inside space-y-1 text-[11px] text-sky-900/90 pl-1 leading-relaxed">
+                                <li>Pastikan mata kader sejajar dengan garis horizontal kuning <strong>Tinggi Mata</strong>.</li>
+                                <li>Puncak peci atau jilbab berada di bawah garis biru <strong>Puncak Kepala</strong>.</li>
+                                <li>Bahu kader berada di kurva kuning bawah <strong>Garis Bahu</strong>.</li>
+                                <li>Buka tab <strong>"2. Centering &amp; Pratinjau ID Card"</strong> untuk melihat tampilan cetak kartu fisik.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {{-- ==================== TAB 2: CENTERING & PRATINJAU ID CARD ==================== --}}
+            <div x-show="activeTab === 'idcard'" x-cloak class="space-y-5">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {{-- Kolom Kiri: Live Mockup Fisik ID Card Baitul Arqam --}}
+                    <div class="lg:col-span-5 flex flex-col items-center">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5 self-center">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>Mockup Kartu Tanda Peserta (Fisik)</span>
+                        </span>
+
+                        {{-- Mockup Fisik ID Card Baitul Arqam (210px x 304px, rasio standar B8) --}}
+                        <div class="relative w-[216px] h-[312px] rounded-2xl overflow-hidden shadow-xl border-2 border-[#eab308] bg-[#092c59] text-white flex flex-col justify-between p-3 select-none">
+                            {{-- Latar Dekoratif Id Card --}}
+                            <div class="absolute inset-0 bg-gradient-to-b from-[#062a58] via-[#092c59] to-[#041c3b] opacity-95 pointer-events-none"></div>
+
+                            {{-- Bagian Atas: Logo & Judul --}}
+                            <div class="relative z-10 text-center space-y-0.5">
+                                <div class="flex items-center justify-center gap-1.5 mb-1">
+                                    <span class="text-[9px] font-black tracking-widest text-[#eab308] uppercase">MPKSDI PDM KARANGANYAR</span>
+                                </div>
+                                <div class="text-[13px] font-black tracking-wider text-white uppercase leading-none">BAITUL ARQAM</div>
+                                <div class="inline-block px-2 py-0.5 rounded-full bg-white text-[#092c59] text-[7.5px] font-bold border border-[#eab308] truncate max-w-[190px]" x-text="kegiatanNama"></div>
+                            </div>
+
+                            {{-- Bagian Tengah: Frame Pasfoto 3:4 Anti-Gepeng --}}
+                            <div class="relative z-10 my-auto flex flex-col items-center">
+                                <div class="relative w-[88px] h-[118px] rounded-xl border-2 border-[#eab308] bg-white overflow-hidden shadow-md flex items-center justify-center">
+                                    {{-- Foto Hasil Reposisi Terkunci 3:4 --}}
+                                    <template x-if="cropPreviewUrl">
+                                        <img :src="(fotoMode === 'cutout' && currentCutoutUrl) ? currentCutoutUrl : cropPreviewUrl"
+                                             alt="Foto ID Card"
+                                             class="w-full h-full object-cover select-none">
+                                    </template>
+
+                                    {{-- Watermark 3:4 Terkunci --}}
+                                    <div class="absolute top-1 right-1 bg-emerald-600/90 text-[7px] font-bold text-white px-1 py-0.2 rounded shadow-xs leading-none">
+                                        3:4
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Bagian Bawah: Nama, Cabang & Barcode/QR --}}
+                            <div class="relative z-10 space-y-1 text-center">
+                                {{-- Kotak Nama Kader --}}
+                                <div class="bg-[#062a58] border border-[#eab308] rounded-lg py-1 px-2 shadow-2xs">
+                                    <div class="text-[10px] font-bold text-white truncate max-w-[185px] mx-auto leading-tight" x-text="namaLengkap"></div>
+                                </div>
+
+                                {{-- Meta PCM & No Peserta --}}
+                                <div class="text-[8px] text-amber-200 font-semibold flex items-center justify-center gap-1">
+                                    <span class="truncate max-w-[100px]" x-text="pcm"></span>
+                                    <span>|</span>
+                                    <span>No. <span x-text="anggotaId"></span></span>
+                                </div>
+
+                                {{-- QR Mini Mockup --}}
+                                <div class="w-8 h-8 mx-auto bg-white p-0.5 rounded border border-slate-300 flex items-center justify-center">
+                                    <svg class="w-full h-full text-slate-800" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v4h-4v-4zm-4 4h4v4h-4v-4zm4-4h4v4h-4v-4zm-4-4h4v4h-4v-4zm0 8h4v4h-4v-4z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Kolom Kanan: Panel Kontrol Centering & Jaminan Anti-Gepeng --}}
+                    <div class="lg:col-span-7 space-y-4">
+                        {{-- Kartu Garansi Anti-Gepeng --}}
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 shadow-2xs">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 font-black">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-xs font-black text-emerald-950 uppercase tracking-wide">Rasio Aspek Terkunci (100% Anti-Gepeng)</h3>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-200 text-emerald-900">Aktif</span>
+                                    </div>
+                                    <p class="text-xs text-emerald-900 leading-relaxed font-normal">
+                                        Sistem mengunci kanvas tepat di rasio resmi <strong>3:4 (90pt &times; 120pt)</strong>. Foto pasfoto kader tidak akan pernah lonjong, pipih, ataupun terdistorsi saat dicetak massal ke dokumen ID Card PDF.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Kontrol Centering Cepat --}}
+                        <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-3">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block">Kontrol Centering &amp; Penyesuaian Ketinggian Wajah</span>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <button type="button" @click="autoCenter()"
+                                    class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 text-xs font-bold border border-sky-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    <span>Pusat Tengah Otomatis</span>
+                                </button>
+
+                                <button type="button" @click="nudgeY(-8)"
+                                    class="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                                    title="Naikkan foto 8px agar bahu dan leher lebih tampak">
+                                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                    <span>▲ Naikkan Foto</span>
+                                </button>
+
+                                <button type="button" @click="nudgeY(8)"
+                                    class="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                                    title="Turunkan foto 8px jika peci terlalu mepet">
+                                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                    <span>▼ Turunkan Foto</span>
+                                </button>
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 italic">
+                                *Setiap penyesuaian di tab ini langsung menyinkronkan kanvas pasfoto secara real-time.
+                            </p>
+                        </div>
+
+                        {{-- Pengaturan Mode ID Card (Original vs Cutout) --}}
+                        <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-3">
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block">Pilihan Mode Tampilan ID Card</span>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="p-3 rounded-xl border cursor-pointer transition flex items-start gap-2.5"
+                                       :class="fotoMode === 'original' ? 'border-amber-500 bg-amber-50/50 ring-2 ring-amber-100' : 'border-slate-200 hover:bg-slate-50'">
+                                    <input type="radio" name="foto_mode_radio" value="original" x-model="fotoMode" @change="isDirty = true" class="text-amber-600 mt-0.5">
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Original (Berbingkai)</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5">Menampilkan pasfoto utuh dengan bingkai emas formal. Sangat rapi untuk pasfoto studio resmi.</div>
+                                    </div>
+                                </label>
+
+                                <label class="p-3 rounded-xl border cursor-pointer transition flex items-start gap-2.5"
+                                       :class="fotoMode === 'cutout' ? 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-100' : 'border-slate-200 hover:bg-slate-50'">
+                                    <input type="radio" name="foto_mode_radio" value="cutout" x-model="fotoMode" @change="isDirty = true" class="text-emerald-600 mt-0.5">
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Cutout (Transparan)</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5">Menghilangkan latar belakang pasfoto sehingga subjek menyatu mulus dengan kartu tanda peserta.</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            @if($anggota->foto_cutout_path)
+                            <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+                                <span class="text-[11px] text-emerald-700 font-semibold flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>File Cutout Klien Tersimpan di Server</span>
+                                </span>
+                                <form method="POST" action="{{ route('admin.anggota.cutout.destroy', $anggota) }}" onsubmit="return confirm('Hapus file cutout klien? Sistem akan membuat cutout otomatis dengan GD v2 saat pencetakan ID Card.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-[11px] font-bold text-rose-600 hover:text-rose-800 underline cursor-pointer">
+                                        Hapus Cutout Klien (Reset ke GD)
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Bilah Aksi Simpan Terpadu (Selalu Tampak di Bawah Kedua Tab) --}}
+            <div class="mt-6 pt-4 border-t border-slate-200/80 flex items-center justify-between flex-wrap gap-3">
+                {{-- Notifikasi Sukses / Error --}}
+                <div>
+                    <template x-if="statusSuccess">
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-300">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span x-text="statusSuccess"></span>
+                        </div>
+                    </template>
+                    <template x-if="statusError">
+                        <div class="flex items-center gap-2 text-xs font-bold text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-300">
+                            <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span x-text="statusError"></span>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Tombol Simpan & Reset --}}
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" @click="resetToCurrentPhoto()"
+                        :disabled="isSaving"
+                        class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs cursor-pointer">
+                        Batal Perubahan
+                    </button>
+
+                    <button type="button" @click="saveChanges()"
+                        :disabled="isSaving"
+                        class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-extrabold shadow-sm transition flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                        <template x-if="isSaving">
+                            <svg class="w-4 h-4 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </template>
+                        <template x-if="!isSaving">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        </template>
+                        <span x-text="isSaving ? 'Menyimpan &amp; Menyelaraskan ID Card...' : 'Simpan Foto &amp; Pengaturan ID Card'"></span>
+                    </button>
+                </div>
+            </div>
         </div>
+
+        {{-- Alpine Script Handler Admin Foto Studio --}}
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('adminFotoStudio', (config) => ({
+                activeTab: 'foto',
+                anggotaId: config.anggotaId,
+                namaLengkap: config.namaLengkap,
+                nbm: config.nbm,
+                pcm: config.pcm,
+                kegiatanNama: config.kegiatanNama,
+                saveUrl: config.saveUrl,
+                destroyCutoutUrl: config.destroyCutoutUrl,
+                csrfToken: config.csrfToken,
+
+                currentPhotoUrl: config.initialPhotoUrl,
+                currentCutoutUrl: config.initialCutoutUrl,
+                rawImageSrc: null,
+                cropPreviewUrl: null,
+
+                fotoMode: config.initialMode,
+                isDirty: false,
+                isSaving: false,
+                statusSuccess: '',
+                statusError: '',
+                showGuide: true,
+                isProcessing: false,
+
+                // Dimensi Viewport 3:4 (240px x 320px) & Output 600x800 px
+                viewportW: 240,
+                viewportH: 320,
+                outputW: 600,
+                outputH: 800,
+
+                img: null,
+                imgWidth: 0,
+                imgHeight: 0,
+                centerX: 120,
+                centerY: 160,
+                scale: 1,
+                minScale: 0.2,
+                maxScale: 3.5,
+                rotation: 0,
+
+                isDragging: false,
+                startX: 0,
+                startY: 0,
+                initialCenterX: 120,
+                initialCenterY: 160,
+
+                init() {
+                    this.loadInitialImage();
+                },
+
+                loadInitialImage() {
+                    this.isProcessing = true;
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        this.img = img;
+                        this.imgWidth = img.naturalWidth || img.width;
+                        this.imgHeight = img.naturalHeight || img.height;
+                        this.rawImageSrc = this.currentPhotoUrl;
+                        this.resetTransform();
+                        this.isProcessing = false;
+                    };
+                    img.onerror = () => {
+                        this.isProcessing = false;
+                    };
+                    img.src = this.currentPhotoUrl;
+                },
+
+                handleFileSelect(e) {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.img = img;
+                            this.imgWidth = img.naturalWidth || img.width;
+                            this.imgHeight = img.naturalHeight || img.height;
+                            this.rawImageSrc = evt.target.result;
+                            this.isDirty = true;
+                            this.resetTransform();
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                resetToCurrentPhoto() {
+                    this.isDirty = false;
+                    this.statusSuccess = '';
+                    this.statusError = '';
+                    this.loadInitialImage();
+                },
+
+                resetTransform() {
+                    if (!this.imgWidth || !this.imgHeight) return;
+                    const scaleX = this.viewportW / this.imgWidth;
+                    const scaleY = this.viewportH / this.imgHeight;
+                    this.scale = Math.max(scaleX, scaleY);
+                    this.minScale = Math.max(0.2, Number((this.scale * 0.4).toFixed(3)));
+                    this.maxScale = Math.max(3.5, Number((this.scale * 3.5).toFixed(3)));
+                    this.centerX = this.viewportW / 2;
+                    this.centerY = this.viewportH / 2;
+                    this.rotation = 0;
+                    this.renderCanvas();
+                },
+
+                autoCenter() {
+                    this.centerX = this.viewportW / 2;
+                    this.centerY = this.viewportH / 2;
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                nudgeY(amount) {
+                    this.centerY += amount;
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                zoomIn() {
+                    this.scale = Math.min(this.maxScale, Number((this.scale * 1.08).toFixed(3)));
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                zoomOut() {
+                    this.scale = Math.max(this.minScale, Number((this.scale / 1.08).toFixed(3)));
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                rotate() {
+                    this.rotation = (this.rotation + 90) % 360;
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                startDrag(e) {
+                    this.isDragging = true;
+                    this.startX = e.clientX;
+                    this.startY = e.clientY;
+                    this.initialCenterX = this.centerX;
+                    this.initialCenterY = this.centerY;
+                },
+
+                onDrag(e) {
+                    if (!this.isDragging) return;
+                    const dx = e.clientX - this.startX;
+                    const dy = e.clientY - this.startY;
+                    this.centerX = this.initialCenterX + dx;
+                    this.centerY = this.initialCenterY + dy;
+                    this.isDirty = true;
+                    this.renderCanvas();
+                },
+
+                endDrag() {
+                    this.isDragging = false;
+                },
+
+                renderCanvas() {
+                    if (!this.img) return;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.outputW;
+                    canvas.height = this.outputH;
+                    const ctx = canvas.getContext('2d');
+
+                    const ratio = this.outputW / this.viewportW;
+
+                    ctx.save();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.translate(this.centerX * ratio, this.centerY * ratio);
+                    ctx.rotate((this.rotation * Math.PI) / 180);
+                    ctx.scale(this.scale * ratio, this.scale * ratio);
+                    ctx.drawImage(this.img, -this.imgWidth / 2, -this.imgHeight / 2, this.imgWidth, this.imgHeight);
+                    ctx.restore();
+
+                    this.cropPreviewUrl = canvas.toDataURL('image/jpeg', 0.92);
+                },
+
+                async saveChanges() {
+                    if (!this.img) return;
+                    this.isSaving = true;
+                    this.statusSuccess = '';
+                    this.statusError = '';
+
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = this.outputW;
+                        canvas.height = this.outputH;
+                        const ctx = canvas.getContext('2d');
+                        const ratio = this.outputW / this.viewportW;
+
+                        ctx.save();
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.translate(this.centerX * ratio, this.centerY * ratio);
+                        ctx.rotate((this.rotation * Math.PI) / 180);
+                        ctx.scale(this.scale * ratio, this.scale * ratio);
+                        ctx.drawImage(this.img, -this.imgWidth / 2, -this.imgHeight / 2, this.imgWidth, this.imgHeight);
+                        ctx.restore();
+
+                        const photoDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+                        // Hasilkan cutout jika mode cutout aktif dan segmenter klien tersedia
+                        let cutoutDataUrl = null;
+                        if (this.fotoMode === 'cutout' && window.IdCardCutout && typeof window.IdCardCutout.generateCutout === 'function') {
+                            try {
+                                cutoutDataUrl = await window.IdCardCutout.generateCutout(canvas);
+                            } catch (err) {
+                                console.warn('Cutout generator browser fallback:', err);
+                            }
+                        }
+
+                        const formData = new FormData();
+                        formData.append('_token', this.csrfToken);
+                        formData.append('foto', photoDataUrl);
+                        if (cutoutDataUrl) {
+                            formData.append('foto_cutout', cutoutDataUrl);
+                        }
+                        formData.append('foto_mode', this.fotoMode);
+
+                        const res = await fetch(this.saveUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        const json = await res.json();
+                        if (json.success) {
+                            this.statusSuccess = json.message || 'Foto profil & ID Card berhasil disimpan!';
+                            this.isDirty = false;
+                            this.currentPhotoUrl = json.foto_url;
+                            if (json.cutout_url) {
+                                this.currentCutoutUrl = json.cutout_url;
+                            }
+                            // Perbarui juga avatar di header halaman jika ada
+                            const mainAvatar = document.querySelector('img[alt="' + this.namaLengkap.replace(/"/g, '\\"') + '"]');
+                            if (mainAvatar) {
+                                mainAvatar.src = json.foto_url;
+                            }
+                            setTimeout(() => { this.statusSuccess = ''; }, 5000);
+                        } else {
+                            this.statusError = json.message || 'Gagal menyimpan foto profil.';
+                        }
+                    } catch (err) {
+                        this.statusError = 'Terjadi kesalahan saat menyimpan foto. Silakan coba lagi.';
+                        console.error(err);
+                    } finally {
+                        this.isSaving = false;
+                    }
+                }
+            }));
+        });
+        </script>
 
         {{-- Banner Informasi Status Nonaktif --}}
         @if($anggota->user->status === 'nonaktif')

@@ -2,10 +2,15 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import L from 'leaflet';
 import Chart from 'chart.js/auto';
+import { createPresentationEvents, normalizeRagResponse } from './sikader/adapter.js';
+import { SIKADER_UI } from './sikader/constants.js';
 
 window.Alpine = Alpine;
 window.L = L;
 window.Chart = Chart;
+window.SiKaderAdapter = { createPresentationEvents, normalizeRagResponse };
+window.SiKaderUI = SIKADER_UI;
+window.SiKaderConstants = SIKADER_UI;
 Alpine.start();
 
 // Unified Dynamic Scroll Animation & Reveal Engine

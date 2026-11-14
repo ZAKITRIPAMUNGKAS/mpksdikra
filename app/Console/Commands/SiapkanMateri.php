@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AfektifButir;
 use App\Models\AfektifSubAspek;
+use App\Models\AngketItem;
 use App\Models\Event;
 use App\Models\PsikomotorTemplate;
 use App\Models\RtlSoal;
@@ -30,6 +31,7 @@ class SiapkanMateri extends Command
             $this->seedPsikomotor($event);
             $this->seedAfektif($event);
             $this->seedRtl($event);
+            $this->seedAngket($event);
         });
 
         $this->info("Rubrik default untuk '{$event->nama_event}' siap. Soal pretest/posttest diisi manual oleh admin.");
@@ -137,6 +139,42 @@ class SiapkanMateri extends Command
                 'tipe' => $tipe,
                 'urutan' => $index + 1,
             ]);
+        }
+    }
+
+    private function seedAngket(Event $event): void
+    {
+        if (AngketItem::where('event_id', $event->id)->exists()) {
+            return;
+        }
+
+        $defaultItems = [
+            'A' => [
+                'Materi perkaderan relevan dengan penguatan ideologi & kebutuhan persyarikatan.',
+                'Alokasi waktu pemaparan materi dan forum diskusi/tanya-jawab memadai.',
+                'Materi mudah dipahami dan aplikatif untuk diterapkan di Cabang/Ranting/AUM.',
+            ],
+            'B' => [
+                'Narasumber menguasai materi secara mendalam, inspiratif, dan komunikatif.',
+                'Master of Training / Tim Instruktur mendampingi dinamika kelas dengan disiplin dan solutif.',
+                'Keteladanan ibadah dan kedisiplinan tim fasilitator sangat baik.',
+            ],
+            'C' => [
+                'Kenyamanan ruangan, pencahayaan, proyektor, dan tata suara audio memuaskan.',
+                'Kualitas konsumsi, kudapan, dan ketepatan jadwal istirahat/ibadah terjaga baik.',
+                'Kesiapan panitia dalam melayani kebutuhan dan respon kendala peserta sangat memuaskan.',
+            ],
+        ];
+
+        foreach ($defaultItems as $kategori => $teksList) {
+            foreach ($teksList as $urutan => $teks) {
+                AngketItem::create([
+                    'event_id' => $event->id,
+                    'kategori' => $kategori,
+                    'urutan' => $urutan + 1,
+                    'teks_item' => $teks,
+                ]);
+            }
         }
     }
 }

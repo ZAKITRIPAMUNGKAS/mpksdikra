@@ -288,15 +288,28 @@
 
         {{-- Sidebar Footer: User Details & Logout Action --}}
         @auth
-        <div class="p-3 border-t border-slate-200/80 bg-slate-50/80">
-            <div class="flex items-center justify-between gap-2.5">
-                <div class="flex items-center gap-2.5 min-w-0 overflow-hidden">
-                    @if(auth()->user()->anggota?->foto)
-                        <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0">
+        <div class="p-3 border-t border-slate-200/80 bg-slate-50/80 transition-all duration-300">
+            <div class="flex items-center gap-2.5 transition-all duration-300"
+                 :class="{
+                     'justify-between': !sidebarCollapsed,
+                     'lg:flex-col lg:justify-center lg:items-center lg:gap-3': sidebarCollapsed
+                 }">
+                <div class="flex items-center gap-2.5 min-w-0"
+                     :class="{
+                         'lg:justify-center lg:w-full': sidebarCollapsed
+                     }">
+                    @if(auth()->user()->anggota)
+                        <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" 
+                             alt="{{ auth()->user()->name }}" 
+                             class="w-9 h-9 min-w-[36px] max-w-[36px] min-h-[36px] max-h-[36px] aspect-square rounded-xl object-cover border border-sky-400/80 shadow-2xs shrink-0"
+                             style="aspect-ratio: 1 / 1; width: 36px; height: 36px; object-fit: cover; flex-shrink: 0;"
+                             title="{{ auth()->user()->name }}">
                     @else
-                        <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                        </div>
+                        <img src="{{ asset('aset/default-profile-pria.jpg') }}" 
+                             alt="{{ auth()->user()->name }}" 
+                             class="w-9 h-9 min-w-[36px] max-w-[36px] min-h-[36px] max-h-[36px] aspect-square rounded-xl object-cover border border-sky-400/80 shadow-2xs shrink-0"
+                             style="aspect-ratio: 1 / 1; width: 36px; height: 36px; object-fit: cover; flex-shrink: 0;"
+                             title="{{ auth()->user()->name }}">
                     @endif
                     <div class="min-w-0 transition-opacity duration-200" :class="{ 'lg:hidden': sidebarCollapsed }">
                         <p class="text-xs font-semibold text-slate-900 truncate leading-tight">{{ auth()->user()->name }}</p>
@@ -307,9 +320,9 @@
                 </div>
 
                 {{-- Logout Button --}}
-                <form method="POST" action="{{ route('logout') }}" class="inline shrink-0">
+                <form method="POST" action="{{ route('logout') }}" class="inline shrink-0" :class="{ 'lg:w-full lg:flex lg:justify-center': sidebarCollapsed }">
                     @csrf
-                    <button type="submit" title="Keluar dari sistem" class="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                    <button type="submit" title="Keluar dari sistem" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>
@@ -376,12 +389,16 @@
 
                         @auth
                             <div class="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-                                @if(auth()->user()->anggota?->foto)
-                                    <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0">
+                                @if(auth()->user()->anggota)
+                                    <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" 
+                                         alt="{{ auth()->user()->name }}" 
+                                         class="w-8 h-8 min-w-[32px] max-w-[32px] min-h-[32px] max-h-[32px] aspect-square rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0"
+                                         style="aspect-ratio: 1 / 1; width: 32px; height: 32px; object-fit: cover; flex-shrink: 0;">
                                 @else
-                                    <div class="w-8 h-8 rounded-lg bg-[#005c8a] flex items-center justify-center text-white font-bold text-xs shadow-2xs shrink-0">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                    </div>
+                                    <img src="{{ asset('aset/default-profile-pria.jpg') }}" 
+                                         alt="{{ auth()->user()->name }}" 
+                                         class="w-8 h-8 min-w-[32px] max-w-[32px] min-h-[32px] max-h-[32px] aspect-square rounded-lg object-cover border border-sky-400/80 shadow-2xs shrink-0"
+                                         style="aspect-ratio: 1 / 1; width: 32px; height: 32px; object-fit: cover; flex-shrink: 0;">
                                 @endif
                                 <div class="hidden sm:block text-left leading-tight">
                                     <span class="text-xs font-bold text-slate-800 block truncate max-w-[140px]">{{ auth()->user()->name }}</span>

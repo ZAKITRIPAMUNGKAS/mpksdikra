@@ -36,12 +36,212 @@ Pola berguna dari referensi:
 - WhatsApp API dan SIMPEKA hanya placeholder desain sampai kontrak integrasi tersedia.
 
 ## Perintah verifikasi
-- `php artisan test` — PHPUnit feature tests (222 test hijau per 2026-11-05).
-- `vendor\bin\pint` — format PHP (Laravel style).
-- `npm run build` — Vite production build.
+- `php artisan test` — PHPUnit feature tests (264 test hijau per 2026-11-13).
+- `php vendor/bin/pint` — format PHP (Laravel style).
+- `node node_modules/vite/bin/vite.js build` — Vite production build.
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-13: Integrasi Modul Tab "Feedback & Evaluasi" pada Navigasi Horizontal Event Dashboard (`show.blade.php`):
+  - **Penambahan Tab Feedback Tingkat 1 (Workspace Module Nav)**: Menempatkan tab `Feedback` di samping `RTL` sebelum `Laporan` pada bilah navigasi horizontal *sticky* (`admin.events.show`). Dilengkapi indikator badge jumlah responden yang telah mengisi evaluasi.
+  - **Arsitektur 3 Sub-Navigasi (Level 2 Sub-Tabs)**:
+    1. *Sub-Tab 1: Rekap & Statistik Skor Likert*: Menampilkan 4 kartu bento metrik (Tingkat Partisipasi Responden, Indeks Kepuasan Rata-rata Likert 1–5 ⭐ beserta predikat mutu, Total Butir Instrumen, dan Ulasan Tertulis). Dilengkapi rincian rata-rata skor per butir dan bar visual progres warna (emerald/sky/amber) per aspek/kategori.
+    2. *Sub-Tab 2: Masukan & Saran Kader*: Menampilkan kutipan testimoni kualitatif, kritik, dan saran konstruktif peserta dengan avatar inisial, nama kader, asal cabang/ranting, dan waktu pengiriman.
+    3. *Sub-Tab 3: Kelola Instrumen Angket*: Form inline penambahan butir evaluasi Likert 1–5 per kategori (A - Materi & Kurikulum, B - Narasumber & Fasilitator, C - Pelayanan & Sarana, D - Aspek Tambahan), daftar butir aktif, dan tombol hapus.
+  - **Otomasi Templat Standar MPKSDI**: Menyediakan tombol *"Isi Butir Standar MPKSDI"* (`POST /admin/events/{event}/angket/seed-defaults`) dan mengintegrasikan seeder angket standar ke command `ba:siapkan-materi` dan `DemoDataSeeder.php`.
+  - **Tautan Cepat Pratinjau Peserta**: Memudahkan admin membuka dan menguji form pengisian angket dari sudut pandang peserta (`portal.angket.index`).
+  - **Verifikasi**: 266 tests PHPUnit (1.276 assertions) lulus 100%, Laravel Pint 0 violations, Vite build produksi sukses (4.23s).
+- 2026-11-13: Perbaikan Proporsi Pasfoto Kader (Anti-Gepeng / Distorsi Rasio Wajah 3:4):
+  - **Akar Masalah "Masih Gepeng" Teridentifikasi**:
+    1. *Sumber File Gambar Seeder (`DemoDataSeeder.php`)*: Pemotongan kisi (*grid crop*) foto demo kader dari `foto1.png` dan `foto2.png` awalnya mengambil dimensi persegi panjang mentah sel (lebar ~298px, tinggi ~507px) lalu langsung di-resample ke kanvas 300x400 px (`imagecopyresampled`). Karena tinggi ditekan dari 507px ke 400px (~21.1% pemampatan vertikal) sementara lebar tetap di ~300px, seluruh foto wajah kader tersimpan dalam kondisi pipih/gepeng vertikal dari file sumbernya (`kader-01.jpg` s.d. `kader-20.jpg`).
+    2. *Dimensi Container Thumbnail UI*: Pada `admin/events/show.blade.php`, container avatar berukuran `w-10 h-12` (40x48px = rasio 5:6 atau 0.833), bukan rasio resmi pasfoto 3:4 (0.75). Beberapa tampilan lain (`enroll.blade.php`, `anggota/index.blade.php`, `dashboard.blade.php`) juga menggunakan `w-9 h-11` atau `w-8 h-10` tanpa `aspect-[3/4]`.
+  - **Solusi & Penanganan Komprehensif**:
+    1. *Formulasi Crop 3:4 Presisi di `DemoDataSeeder.php`*: Menerapkan perhitungan matematis rasio 3:4 seragam: `$cropH = (int) round($cropW * 4 / 3)` dengan offset atas `$srcY = $rRange[0] + 8` yang mencakup ruang kepala/peci/hijab, leher, dan bahu tanpa peregangan maupun pemampatan non-uniform.
+    2. *Regenerasi 20 Pasfoto Demo*: Meregenerasi dan memperbarui 20 file `kader-01.jpg` s.d. `kader-20.jpg` pada `database/seeders/assets/kader/` dan `storage/app/private/anggota/foto/`.
+    3. *Penyeragaman Rasio Kontainer 3:4 di Seluruh UI*: Mengubah seluruh wadah pasfoto thumbnail kader di `admin/events/show.blade.php` (`w-10 h-[53px] aspect-[3/4]`), `admin/events/enroll.blade.php` (`w-9 h-12 aspect-[3/4]`), `admin/anggota/index.blade.php` (`w-9 h-12 aspect-[3/4]`), `admin/dashboard.blade.php` (`aspect-[3/4]`), dan `portal/dashboard.blade.php` dengan `object-cover object-top`.
+  - **Verifikasi**: 264 tests PHPUnit (1.267 assertions) lulus 100%, seluruh pasfoto kader tampil tegak, proporsional, dan alami.
+- 2026-11-13: Studio Pasfoto & Penyesuaian ID Card (Tab Workbench Reposisi & Centering Anti-Gepeng) untuk Admin:
+  - **Studio Workbench dalam Satu Halaman (`admin.anggota.show`)**: Menggantikan kartu pratinjau pasfoto statis lama dengan studio workbench terpadu yang memadukan edit pasfoto, reposisi (drag/pan, zoom 0.2x-3.5x, rotasi 90°, auto-center), dan centering ID card.
+  - **Sistem Tab Navigasi Interaktif**:
+    - **Tab 1 (Edit & Reposisi Pasfoto 3:4)**: Menyediakan pilihan unggah foto baru dari komputer/HP atau gunakan foto tersimpan. Kanvas interaktif (viewport 240x320 px, output 600x800 px) dengan panduan rasio resmi 3:4 wajah (tinggi mata, puncak kepala/peci, garis bahu), slider zoom, auto-center, dan reset transform.
+    - **Tab 2 (Centering & Pratinjau ID Card Anti-Gepeng)**: Menghadirkan mockup realistis kartu tanda peserta fisik Baitul Arqam (navy & gold, logo PDM & MPKSDI, frame foto 3:4, nama kader, NBM, barcode/QR). Dilengkapi jaminan rasio 3:4 terkunci (100% bebas gepeng/distorsi), tombol kontrol cepat centering vertikal (Pusat Tengah, Naikkan Foto 8px, Turunkan Foto 8px), dan pemilih mode ID Card (Original berbingkai vs Cutout transparan).
+  - **Sinkronisasi Dua Arah Real-time**: Perubahan posisi, zoom, atau ketinggian wajah di Tab 1 maupun Tab 2 saling menyinkronkan kanvas secara instan tanpa perlu reload.
+  - **Backend Endpoint `POST /admin/anggota/{anggota}/foto`**: Mendukung multipart upload maupun Data URI Base64 dari kanvas, validasi format gambar, penyimpanan JPEG 3:4 terstandar, integrasi cutout klien/server GD otomatis, pembersihan file lama, dan otorisasi Admin Daerah & Admin Cabang.
+  - **Pencegahan Distorsi DomPDF**: Memperketat styling `.photo img` pada `admin/events/idcard-batch-pdf.blade.php` dan `.photo-img-original` pada `portal/idcard-pdf.blade.php` (`max-width: 100%; max-height: 100%; object-fit: cover;`) agar pencetakan ID Card PDF massal bebas dari efek gepeng/pipih.
+  - **Verifikasi**: 264 tests PHPUnit (1.267 assertions) lulus 100%, Laravel Pint 0 violations, Vite build produksi sukses (3.31s).
+- 2026-11-07: Restyle Visual Widget Chat SiKader Bergaya Prompt Composer 21st.dev (Mosaic Prompt Template):
+  - **Prompt Composer Kaca Ringan**: Mengubah kolom chat bawah menjadi kotak composer besar membulat bergaya kaca frosted (`glass-composer`, `backdrop-blur-md`, border tipis semi-transparan, bayangan lembut, ring fokus warna aksen amber `--accent`). Textarea auto-grow hingga 5 baris (`max-h-36`).
+  - **Toolbar Aksi Terpadu di Dalam Composer**: Memindahkan baris aksi (lampirkan file, tempel daftar nama, unggah spreadsheet Excel/CSV) ke sisi kiri bawah di dalam kotak composer, dan menempatkan tombol kirim pesawat kertas (*paper plane*) di pojok kanan bawah composer.
+  - **Quick Action Pills Melayang di Atas Composer**: Aksi cepat lama dipindahkan menjadi deretan pills chip kaca horizontal di atas kotak composer (`overflow-x-auto` rapi tanpa scrollbar kasar), mudah diakses dalam sekali sentuh di lebar 380px–480px.
+  - **Build Log Proses RAG Bertahap & Collapsible**: Menyajikan status proses RAG langkah-demi-langkah berurutan (`✓ Selesai`, `● Berjalan`, `○ Antre`) di dalam bubble respon maupun saat status pencarian berlangsung (`showRetrievalStatus`), yang otomatis menciut menjadi akordeon *"Lihat proses (3 langkah) ▾"* setelah selesai.
+  - **Sliding Preview Panel Dokumen Sumber**: Menggantikan popover kecil dengan panel laci geser mulus dari kanan (*Slide-over Preview Drawer*) yang menampilkan nomor sitasi `[1]`, status *RAG Terverifikasi*, judul sumber tabel database, dan blok kutipan teks terverifikasi ter-highlight.
+  - **Kartu Hasil & Konfirmasi Kaca (`glass-card`)**: Kartu kandidat rekomendasi dan kartu hasil pencocokan mengadopsi latar semi-transparan, border halus, sudut membulat, hover naik 2px (`hover:-translate-y-0.5`), menampilkan NIK tersamar (`331392****`), badge skor/riwayat, serta tombol *Daftarkan* individual dan tombol *Enroll Terpilih* massal, didahului kartu konfirmasi pra-pendaftaran.
+  - **Variabel Warna `--accent` & Aksesibilitas WCAG**: Menetapkan variabel CSS `--accent` (amber `#f8bb00`) untuk aksi utama, fokus ring, dan sitasi aktif berpadu dengan teal MPKSDI (`#005c8a`). Menghormati `prefers-reduced-motion` (animasi langkah dialihkan ke fade instan), `aria-live="polite"`, dan kontras teks ≥ 4.5:1. Seluruh teks antarmuka Bahasa Indonesia terpusat di `resources/js/sikader/constants.js`.
+  - **Verifikasi**: 252 tests PHPUnit (1.197 assertions) lulus 100%, Laravel Pint lulus bersih, Vite production build sukses.
+- 2026-11-07: Perbaikan Visual Terarah Empty State & Tampilan Awal Widget Chat SiKader:
+  - **Quick Action Cards Rapi & Tidak Terpotong**: Menghapus ikon chevron `>`, menerapkan `line-clamp-2 leading-snug`, tinggi kartu seragam (`min-h-[54px]`), dan tooltip `:title="chip.label"` dengan label resmi: *"Rekomendasi seimbang"*, *"Prioritaskan belum aktif"*, *"Prioritaskan kader AUM"*, *"Tempel daftar nama"*, *"Unggah Excel / CSV"*.
+  - **Ikon Tombol Kirim Standar**: Mengganti ikon segitiga dengan ikon pesawat kertas (*paper plane* Lucide). Tombol dipudarkan saat teks kosong dan solid teal saat siap kirim, dilengkapi `aria-label="Kirim pesan"` dan `title="Kirim pesan"`.
+  - **Header Lega & Dropdown Pengaturan**: Subjudul dipadatkan menjadi satu baris (*"Asisten Perkaderan MPKSDI"*). Tombol ukuran font, tema terang/gelap, dan reset percakapan dikelompokkan ke dalam menu dropdown `⋯` yang rapi dan aksesibel (`aria-label="Menu pengaturan"`). Bar progres kuota dan badge AKTIF tetap dipertahankan.
+  - **Sapaan Ringkas Dinamis**: Pesan sapaan awal dipangkas menjadi 2 baris tanpa emoji (*"Assalamu'alaikum, Admin. Siap membantu kegiatan **{namaKegiatan}**. Mau mulai dari mana?"*) sehingga kartu aksi terlihat utuh tanpa scroll.
+  - **Konsistensi Ikon Garis 20px**: Menghapus seluruh ikon emoji berwarna, digantikan ikon garis Lucide seragam (20px, stroke-width 2, aksen teal) di dalam kotak membulat tipis seragam.
+  - **Kontras Teks Bantu Terjamin**: Ukuran teks hint dinaikkan ke 12px (`text-xs`), dan warna placeholder serta hint disesuaikan agar rasio kontras mencapai ≥ 4.5:1 di mode terang (`text-slate-600` / `placeholder:text-slate-500`) maupun mode gelap (`dark:text-slate-300` / `dark:placeholder:text-slate-400`).
+  - **Verifikasi**: 252 tests PHPUnit (1.197 assertions) lulus 100%, Laravel Pint 0 violations, Vite production build sukses.
+- 2026-11-07: Penerapan Foto Profil Default Resmi Berdasarkan Gender (Putra Berpeci & Putri Berhijab):
+  - **Aset Default Resmi**: Menyimpan foto profil default resmi ke `public/aset/default-profile-pria.jpg` (kader putra berpeci hitam dan koko putih) dan `public/aset/default-profile-wanita.jpg` (kader putri berhijab rapi).
+  - **Routing Terpusat di `FotoController`**: `FotoController::show` mendeteksi `$anggota->jenis_kelamin === 'P'` untuk menyajikan foto wanita dan default foto pria dalam format JPEG (`Content-Type: image/jpeg`), menggantikan kotak inisial SVG lama secara universal di seluruh sistem.
+  - **Dukungan ID Card**: `ImageCutoutService::resolveOriginalForAnggota()` mengarahkan fallback foto ID card ke aset profil default gender tersebut.
+  - **Integrasi Antarmuka**: Seluruh kartu enroll kader (`admin/events/enroll.blade.php`), topbar/sidebar avatar (`layouts/app.blade.php`), dan daftar kartu rekomendasi SiKader AI (`smart-enroll-modal.blade.php`) kini menampilkan foto profil default gender secara konsisten dengan mekanisme cache-busting `?v=2`.
+  - **Verifikasi**: 249 tests PHPUnit (1.174 assertions) lulus 100%, Laravel Pint lulus bersih, Vite production build sukses.
+- 2026-11-07: Penambahan Fitur Rekomendasi Kader Berdasarkan Riwayat BA Terbanyak & Profil Keagamaan:
+  - **Penyebab Awal Jawaban "Tidak Bisa"**: Sebelumnya instruksi prompt berasumsi bahwa pangkalan data SIMKader tidak mencatat riwayat keikutsertaan BA secara terinci atau kebiasaan sholat di masjid. Padahal pangkalan data memiliki relasi `event_peserta` (bisa menghitung frekuensi keikutsertaan BA per kader) serta kolom formulir profil keagamaan mandiri seperti `aktivitas_sholat_masjid`, `hafalan_quran`, dan `keaktifan_takmir`.
+  - **Dukungan Pencarian Partisipasi BA Terbanyak**: Menambahkan opsi `sort: paling_sering_ba` pada `recommendCandidates()` yang mengurutkan kader aktif berdasarkan `withCount('eventPeserta')->orderByDesc('event_peserta_count')`. Rekomendasi menyajikan kader senior/berpengalaman yang telah mengikuti BA (hingga 3x).
+  - **Dukungan Pencarian Profil Keagamaan**: Mendukung pencarian kriteria ibadah riil dari formulir pendaftaran anggota (`aktivitas_sholat_masjid` untuk kader yang selalu/sering sholat 5 waktu di masjid, `hafalan_quran`, dan `keaktifan_takmir`).
+  - **Badge Transparan di Kartu Rekomendasi**: Menambahkan informasi riil pada setiap baris calon peserta yang direkomendasikan di modal SiKader (menampilkan badge frekuensi `3x BA` dan catatan sholat masjid).
+  - **Verifikasi**: 19 automated tests PHPUnit lulus 100%, Pint lulus bersih, Vite build berhasil.
+- 2026-11-07: Penyempurnaan Bahasa Hangat (Welcome), Bolding Informasi Kunci, Grounding Data & Perapian Input Bar SiKader:
+  - **Penghilangan Border Kotak Input Bar**: Membersihkan CSS textarea pada `resources/css/app.css` dan inline styling modal `smart-enroll-modal.blade.php` (`border: 0 !important`, `border-none`, `ring-0`, `shadow-none`) sehingga textarea berada mulus di dalam kapsul chat tanpa garis kotak persegi internal.
+  - **Bahasa Welcome & Tidak Kaku**: Mengubah nada bahasa asisten AI menjadi ramah, santun, bersahabat, islami, dan komunikatif layaknya rekan sejawat perkaderan dengan format berbutir (*bullet points*) dan emoji relevan.
+  - **Cetak Tebal (Bold) Informasi Kunci**: Menegakkan instruksi format markdown `**teks**` pada LLM dan tag `<strong>` pada sapaan awal modal untuk setiap nama asisten (**SiKader**), nama kegiatan (**BA DOSEN DEMO**), lokasi (**Rumah Revolusi WCS Mojogedang**), tanggal/waktu, kuota/kursi, nama peserta/kader, cabang PCM/AUM, dan 4 pilar evaluasi (**Kognitif**, **Psikomotor Praktik Ibadah sesuai HPT**, **Afektif**, **RTL**).
+  - **Grounding & Batas Data Ibadah Pribadi**: Menghubungkan permintaan kriteria ibadah pribadi (seperti "sholat 5 waktu di masjid") secara bijak bahwa pangkalan data SIMKader Karanganyar mencatat profil administratif kader, dan mengaitkannya dengan 4 Pilar Evaluasi Baitul Arqam (Praktik Ibadah sesuai HPT 35%) serta menawarkan rekomendasi kader aktif siap bina tanpa memunculkan data halusinasi.
+  - **Disambiguasi Kueri Peserta**: Memastikan kueri seperti *"list pesertanya coba"* atau *"siapa saja pesertanya"* menampilkan daftar nama peserta resmi terdaftar dan sisa kuota kursi yang kosong, tanpa pernah keliru menganggapnya sebagai nama orang.
+  - **Verifikasi**: Automated tests PHPUnit lulus 100%, Laravel Pint lulus bersih, Vite build produksi sukses.
+- 2026-11-07: Implementasi Desain Sitasi RAG & Sumber Terverifikasi (ala 21st.dev / Perplexity AI):
+  - **Inline Citation Chips**: Teks balasan SiKader menyertakan lencana nomor sitasi interaktif `[1]`, `[2]`, `[3]`, `[4]` yang grounded pada entitas database riil.
+  - **Floating Preview Tooltip**: Meng-hover atau mengetuk badge sitasi menampilkan cuplikan data asli dan identitas tabel sumber (`Database: events`, `event_sesi`, `SPM`, atau `master_anggota`).
+  - **Collapsible Sources Drawer**: Di bawah balon chat, terdapat akordeon lipat *"Sumber Data RAG Terverifikasi"* yang menampilkan grid kartu rujukan lengkap dengan fitur cross-highlighting antara chip di teks dan kartu sumber di bawah.
+  - **Verifikasi**: 245 automated tests (1.143 assertions) lulus 100%, Pint 0 violations, Vite build bersih.
+- 2026-11-07: Perluasan Wawasan dan Kapabilitas Edukatif AI SiKader (Holistic RAG & Intent Disambiguation):
+  - **Pencegahan False Positive Pencarian Nama**: Memperbaiki `classifyIntent()` agar pertanyaan umum atau perintah penjelasan seperti *"jelaskan soal ba ini"*, *"apa itu baitul arqam"*, *"bagaimana penilaiannya"*, dan *"apa saja materinya"* tidak pernah lagi keliru dideteksi sebagai pencarian nama anggota. Kata kunci penjelasan/edukasi secara tegas diarahkan ke kategori `info`.
+  - **Pengetahuan RAG Mendalam**: Memperluas `retrieveEventKnowledge()` dengan data deskripsi kegiatan, kurikulum/daftar sesi materi dari relasi `sesi` (`EventSesi`), bobot komposisi 4 pilar kelulusan (Kognitif, Praktik Ibadah Psikomotorik, Sikap Afektif, dan RTL), profil fasilitator, serta pangkalan data PCM/AUM.
+  - **Jawaban Edukatif & Holistik**: Menambahkan handler naratif mendalam untuk pertanyaan seputar Baitul Arqam Muhammadiyah, kurikulum perkaderan, sistem evaluasi kelulusan 4 pilar, serta panduan alur pendaftaran Smart Enroll.
+  - **Optimasi Integrasi Reasoning Geraikita AI**: Menyesuaikan parameter pemanggilan model penalaran (`deepseek-v4-flash`) dengan menaikkan `max_tokens` ke 2048 dan `timeout` ke 18 detik sehingga kuota token tidak habis sebelum penalaran selesai. Mendukung pembersihan tag `<think>...</think>` dan pemformatan markdown (bold/italic/bullet) otomatis menjadi tag HTML terstruktur yang ramah antarmuka.
+  - **Ketahanan Fallback RAG Lokal**: Jika AI eksternal sedang offline atau lambat, SiKader lokal deterministik merespon instan dengan kualitas jawaban RAG terstruktur yang sama lengkapnya.
+  - **Verifikasi**: Seluruh 243 automated tests PHPUnit (1.126 assertions) lulus 100%, Laravel Pint lulus bersih.
+- 2026-11-06: Penyempurnaan & Perapian UI Modal SiKader (`smart-enroll-modal.blade.php`):
+  - Memperbaiki backdrop gelap (`bg-slate-950/80 backdrop-blur-sm`) sehingga elemen halaman di latar belakang tidak lagi tembus pandang atau bocor pada tepi bawah viewport.
+  - Memperbaiki tata letak header: tombol close dan reset memiliki target klik lebih lega (`w-8 h-8 rounded-full`), margin aman, dan tidak terhalang ekstensi browser.
+  - Mengintegrasikan strip status event di bawah header (`Konteks kegiatan`) dengan badge dot emerald dan metrik kuota live.
+  - Merapikan balon chat dan avatar dengan lencana `Asisten`, padding proporsional, serta sapaan alami.
+  - Menyatukan bilah masukan (dock footer) menjadi **kapsul chat modern** terpadu (`flex items-end gap-1.5 bg-slate-50 border rounded-2xl p-1.5 focus-within:ring-2`), menggabungkan tombol klip lampiran, textarea borderless, dan tombol kirim secara harmonis.
+- 2026-11-06: Arsitektur RAG (Retrieval-Augmented Generation) & Dialog Alami SiKader:
+  - Mengimplementasikan Retrieval Engine riil (`retrieveEventKnowledge`): mengambil data event (kuota, sisa kursi, terdaftar, jadwal, lokasi, tim fasilitator) serta statistik master kader MPKSDI (kader aktif, belum pernah BA, rasio gender, persebaran top PCM dan AUM).
+  - Klasifikasi Intensi Cerdas (`classifyIntent`): membedakan pesan `chat` (sapaan santai), `info` (tanya kuota, cabang, jadwal, fasilitator), `search` (cek status satu kader), dan `recommendation` (permintaan kandidat).
+  - Dialog Alami: Sapaan santai seperti "hai", "halo", "assalamu'alaikum" kini dibalas hangat, ramah, dan kontekstual dengan overview status kuota terkini tanpa memunculkan kartu 20 kandidat membabi-buta (`needs_candidate_card: false`). Kartu rekomendasi hanya dihadirkan saat admin benar-benar memintanya.
+  - Injeksi RAG ke LLM & Local Fallback: Konteks RAG diinjeksikan langsung ke prompt Geraikita AI dengan timeout 6s, didukung fallback lokal deterministik yang menjawab pertanyaan kuota, cabang, dan fasilitator secara akurat.
+- 2026-11-06: Asisten untuk enroll massal dinamai **SiKader** dengan identitas “Asisten Perkaderan MPKSDI”; modal membuka satu sapaan saja dan menyediakan tindakan cepat dalam grid dua kolom di layar ponsel.
+- 2026-11-06: Tampilan SiKader dipadatkan untuk penggunaan ponsel: konteks kegiatan tampil satu baris, sapaan dipersingkat, tindakan cepat memakai grid dua kolom dengan AUM satu baris penuh, dan dock input tanpa teks bantuan tambahan.
+- 2026-11-06: Panel SiKader memakai inset viewport aman (`100dvh - 1rem`) dan panel membulat, sehingga header serta dock input tidak terpotong pada layar kecil.
+- 2026-11-06: Scroll SiKader diisolasi dengan `overscroll-contain`; saat modal terbuka, scroll dokumen dikunci dan dipulihkan saat modal ditutup agar roda mouse/geser tidak merembet ke halaman belakang.
+- 2026-11-06: Penerapan Maskot & Logo Resmi SiKader (`public/aset/sikader.jpg`):
+  - Memasang logo robot berbentuk 'S' biru maskot SiKader pada header modal chatbot, avatar balon obrolan asisten, balon status berpikir/mengetik (*thinking bubble*), balon hasil pencocokan nama, balon kandidat rekomendasi, serta Quick Action banner dan tombol pemicu di halaman enroll event (`enroll.blade.php`).
+- 2026-11-06: Transformasi Smart Enroll Menjadi Asisten Chatbot AI Interaktif (`smart-enroll-modal.blade.php`):
+  - Mengubah antarmuka modal Smart Enroll menjadi **Chatbot AI Interaktif** yang komunikatif layaknya asisten virtual pribadi:
+    * **Antarmuka Chatbot Bento Modern**:
+      - Modal floating chat drawer (`h-[100dvh] sm:h-[680px] sm:max-w-2xl`) dengan avatar cerulean-emas, indikator status online berdenyut hijau (*pulsing dot*), bubble obrolan dua arah, status berpikir AI (*thinking dots*), dan auto-scroll reaktif.
+    * **Quick Action Chips Cepat**:
+      - Sapaan hangat awal dilengkapi 5 pilihan aksi cepat: *Tempel Daftar Nama WA*, *Unggah File Excel/CSV*, *Rekomendasi Seimbang 50:50*, *Prioritaskan Belum Pernah BA*, dan *Prioritas Kader AUM*.
+    * **Mesin Pemrosesan Cerdas (*Hybrid Parser*)**:
+      - Deteksi otomatis jenis pesan: input daftar nama (multi-line atau berangka/bullet) langsung diarahkan ke *Bulk Matcher* in-memory berjenjang (Exact + Fuzzy >88%).
+      - Pesan instruksi bebas diproses oleh Geraikita AI API (`https://ai.geraikita.com/v1`) dengan *graceful local fallback* (`extractLocalCriteria`) dan pencarian nama parsial tanpa pernah menimbulkan error 402/500 kepada pengguna.
+    * **Kartu Hasil & Eksekusi Cepat di Dalam Obrolan**:
+      - Kartu hasil analisis memuat ubin metrik 3 status (*Siap Enroll*, *Sudah Terdaftar*, *Belum Punya Akun*), daftar centang kandidat, tombol 1-klik *Salin Undangan WA*, dan tombol eksekusi massal *Enroll Terpilih* dengan proteksi `DB::transaction`.
+    * **Restorasi Routing & Controller**:
+      - Menghidupkan kembali rute dan endpoint `smart-enroll.recommend` dan `smart-enroll.ai-prompt` dengan validasi server-side dan penanganan error yang andal.
+    * **Verifikasi Lengkap**:
+      - Seluruh 236 feature & unit tests suite (1.062 assertions) lulus 100%.
+      - Vite production build bersih (3.95 detik).
+      - Laravel Pint 0 style violations.
+- 2026-11-06: Penyederhanaan Modul: Fokus 100% pada Pencocokan Nama Massal (Bulk Matcher Excel / WhatsApp):
+  - Menghapus tab/asisten kriteria sesuai permintaan pengguna agar antarmuka lebih simpel, cepat, dan fokus:
+    * Modal di [`resources/views/admin/events/partials/smart-enroll-modal.blade.php`](file:///D:/website/04_Organisasi%20%26%20Komunitas/Portal-Muhammadiyah/MPKSDI%20KRA/resources/views/admin/events/partials/smart-enroll-modal.blade.php) disederhanakan tanpa tab switcher: langsung menyajikan 2 opsi input (Tempel Teks WhatsApp & Unggah File Excel/CSV).
+    * Hasil langsung menampilkan 3 status: *Siap Enroll*, *Sudah Terdaftar*, dan *Belum Punya Akun* (+ Tombol Salin Pesan Undangan WhatsApp).
+    * Membersihkan endpoint controller dan rute asisten kriteria yang tidak lagi digunakan.
+    * 233 feature & unit tests (1.048 assertions) lulus 100%, Vite build bersih, Pint 0 violations.
+- 2026-11-06: Implementasi Lengkap Smart Enroll & Bulk Name Matcher (Hybrid Engine + Geraikita AI):
+  - Memecahkan kendala pendaftaran peserta massal (*enroll*) yang sebelumnya lambat saat panitia menerima puluhan/ratusan nama delegasi dari Excel/WhatsApp:
+    * **Modul Pencocokan Nama Massal (*Bulk Matcher*)**:
+      - Mendukung upload file spreadsheet (`.xlsx`, `.xls`, `.csv`) maupun tempel teks (*paste text*) dari grup WhatsApp/Word.
+      - Normalisasi cerdas otomatis membersihkan nomor urut, karakter pemisah, serta gelar awalan/akhiran (*Drs., Dra., dr., Ir., H., Hj., Ust., S.Pd, M.Pd, S.T, M.T, S.Ag, M.Ag, dll.*).
+      - Pencocokan in-memory berjenjang (Exact Match dan Fuzzy Similarity >88%).
+      - Pengelompokan hasil ke 3 tab status: *Siap Enroll*, *Sudah Terdaftar di Event*, dan *Belum Punya Akun*.
+      - Generator WhatsApp 1-klik untuk nama yang belum punya akun, memuat draf pesan ramah berisikan daftar nama bersangkutan dan tautan registrasi mandiri (`route('anggota.register')`).
+    * **Asisten Kriteria Cerdas Lokal & Integrasi Geraikita AI**:
+      - Engine kriteria lokal: filter target kuota, keseimbangan gender seimbang 50:50, cabang PCM, instansi AUM, dan prioritas kader yang belum pernah mengikuti Baitul Arqam.
+      - Integrasi Geraikita AI (`https://ai.geraikita.com/v1/chat/completions`) untuk memproses instruksi prompt bahasa alami.
+      - Mekanisme *Graceful Fallback*: jika kuota GeraiPoints habis (`402`) atau offline, sistem otomatis mengalihkan ke asisten lokal dengan aman tanpa crash.
+    * **Modal Bento Interaktif (`partials/smart-enroll-modal.blade.php`)**:
+      - Komponen modal berbasis Alpine.js dengan transisi halus, tab interaktif, ubin metrik hasil analisis, centang massal, dan eksekusi transaksi database aman (`DB::transaction`).
+    * **Verifikasi Komprehensif**:
+      - 13 test otomatis baru (`SmartEnrollServiceTest`, `SmartEnrollRecommendationTest`, `SmartEnrollFeatureTest`) lulus 100%.
+      - Seluruh 238 feature & unit tests suite (1.063 assertions) lulus 100%, Vite asset build bersih, Pint 0 violations.
+- 2026-11-06: ID Card Baitul Arqam diubah menjadi satu muka portrait untuk cetak dan unduhan peserta:
+  - Kedua jalur memakai template PDF tunggal `admin/events/idcard-batch-pdf.blade.php`, dengan latar biru-emas resmi `aset/idcard/idcard-satu-sisi-bg.png`.
+  - Isi kartu dipadatkan menjadi identitas institusi, judul Baitul Arqam, acara/angkatan, foto peserta, nama, PCM, nomor peserta, QR presensi, dan masa berlaku.
+  - Foto kartu selalu memakai unggahan asli peserta (`resolveOriginalForAnggota`); penghapusan latar dan cache cutout tidak lagi dijalankan untuk ID card.
+- 2026-11-06: Perbaikan & Kustomisasi Paginasi Bento Bahasa Indonesia (`vendor/pagination/tailwind.blade.php`, `lang/id/pagination.php`):
+  - Memperbaiki bug tampilan teks mentah `pagination.previous` dan `pagination.next` yang muncul pada tombol gelap default framework:
+    * **Penyediaan Lokalisasi ID**: Menambahkan berkas `lang/id/pagination.php`, `lang/id/auth.php`, dan `lang/id/passwords.php` sehingga pemanggilan `__('pagination.previous')` dan `__('pagination.next')` diterjemahkan secara sempurna menjadi *Sebelumnya* dan *Berikutnya*.
+    * **Pembersihan Kelas Dark Mode Liar**: Menghapus kelas `dark:bg-gray-800` dan `dark:text-gray-300` pada template bawaan Laravel yang menyebabkan tombol berubah menjadi kotak hitam legam saat perangkat klien mengaktifkan prefers-color-scheme dark.
+    * **Desain Paginasi Bento Modern**:
+      - Mobile: Tampilan ringkas dengan tombol *Sebelumnya* (panah kiri), indikator halaman aktif tengah (*Hal X / Y*), dan tombol *Berikutnya* (panah kanan) dengan palet putih-slate bersih.
+      - Tablet/Desktop: Baris ringkasan data ("Menampilkan X sampai Y dari Z data") dan grup pil nomor halaman dengan highlight biru Muhammadiyah (`#005c8a`) pada halaman aktif.
+    * **Verifikasi Otomatis**: Menambahkan assertion `assertSee('Sebelumnya')`, `assertSee('Berikutnya')`, `assertDontSee('pagination.previous')`, dan `assertDontSee('pagination.next')` pada `AdminEventFlowTest`. Seluruh 12 test (37 assertions) lulus 100%, Pint 0 violations, Vite build bersih.
+- 2026-11-06: Redesain Bento & Deep-Clean Halaman Enroll Peserta Kegiatan (`admin/events/enroll.blade.php`):
+  - Mengatasi penumpukan vertikal ekstrem pada form pencarian & filter yang sebelumnya memakan >70% layar mobile:
+    * **Bento Header & Micro-Metric Strip**: Judul dan informasi halaman diintegrasikan dengan strip 3 metrik mikro ringkas (`Kandidat`, `Sisa Kuota`, dan `Terpilih` secara live via Alpine.js).
+    * **Konsol Filter Bento Terstruktur**: Mengubah dropdown yang sebelumnya berjejer tak beraturan menjadi Bento Grid responsif 2 kolom di mobile (`grid-cols-2`), 3 kolom di tablet (`sm:grid-cols-3`), dan 5 kolom di desktop (`lg:grid-cols-5`). Setiap select diformat ringkas dengan `truncate` dan state hover/focus elegan.
+    * **Chips Filter Aktif (*Active Filter Pills*)**: Menampilkan badge pil interaktif untuk filter pencarian, pilar, AUM, ORTOM, PCM, atau urutan yang sedang aktif dengan tombol hapus silang individual (&times;) serta tombol *Reset Semua*.
+    * **Grid Bento Kartu Kandidat**: Menata daftar kandidat dalam grid 2 kolom di tablet/desktop (`grid-cols-1 sm:grid-cols-2 gap-2.5`) sehingga memotong tinggi scroll hingga 50%, dengan avatar ringkas, badge AUM/ORTOM/PCM yang tertata rapi, dan feedback visual saat kandidat dipilih (`ring-1 ring-[#005c8a]/30 bg-sky-50/60`).
+    * **Mobile Floating Action Dock**: Menyediakan dock bawah melayang (`fixed bottom-0 inset-x-0 z-30`) otomatis muncul saat ada kandidat yang dipilih, menampilkan ringkasan jumlah terpilih dan tombol aksi langsung `Enroll Terpilih` tanpa harus menggulir ke dasar halaman.
+  - Seluruh 225 feature tests PHPUnit (1.003 assertions) lulus 100%, Vite asset build bersih, Pint 0 violations.
+- 2026-11-06: Optimasi Bento Skalabel untuk Penugasan Banyak Fasilitator (`admin/events/show.blade.php`):
+  - Mengantisipasi jumlah fasilitator/instruktur yang banyak (10-30+ orang) dengan arsitektur Bento Grid multi-kolom yang ringkas:
+    * **Multi-Kolom Grid Responsif**: Mengubah susunan baris vertikal penuh menjadi grid ubin Bento 2 kolom di mobile (`grid-cols-2`), 3 kolom di tablet (`sm:grid-cols-3`), dan 4 kolom di desktop (`lg:grid-cols-4`).
+    * **Wadah Scroll Terkendali (*Contained Height*)**: Membatasi tinggi maksimal grid (`max-h-[300px] sm:max-h-[360px] overflow-y-auto`) sehingga sebanyak apa pun jumlah fasilitator terdaftar di sistem, halaman tidak akan memanjang ke bawah tanpa batas.
+    * **Pencarian Cepat & Aksi Massal (*Quick Search & Bulk Select*)**: Menambahkan kontrol pencarian live (`x-model="searchFasil"`) serta tombol cepat *Pilih Semua* dan *Kosongkan* dengan penghitung reaktif real-time.
+    * **Desain Ubin Bento Mandiri**: Ubin kartu interaktif dengan inisial nama, indikator centang (*check indicator*), nama, email, dan status *Bertugas* (dot hijau) vs *Lepas Tugas* (dot abu-abu).
+  - 12 feature test `AdminEventFlowTest` lulus 100%, Vite build bersih, Pint 0 violations.
+- 2026-11-06: Redesain Bento Penugasan Fasilitator & Instruktur (`admin/events/show.blade.php`):
+  - Mengubah seksi Penugasan Fasilitator dari 2 kartu polos memanjang dengan tombol terpisah menjadi **Bento Tile Widget terpadu**:
+    * **Header Bento Integratif**: Dilengkapi ikon person, judul tebal, badge jumlah instruktur bertugas (`{{ count($assignedFasilitatorIds) }} Bertugas`), serta tombol CTA `Simpan Penugasan` yang terintegrasi rapi di sudut atas kartu.
+    * **Grid Bento Fasilitator**: Disusun dalam grid seimbang (`grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5`) dengan avatar inisial berwarna, tipografi nama yang tegas, email monospaced, dan checkbox interaktif.
+    * **Interaktivitas Visual State**: Saat dicentang (`has-[:checked]`), avatar berubah warna menjadi biru sky cerah dengan teks putih, bingkai berubah menjadi biru sky (`border-sky-500`), dan latar belakang menjadi aksen lembut (`bg-sky-50/50`).
+  - Menambahkan automated test `test_admin_can_update_event_fasilitator_assignment()` pada `AdminEventFlowTest`.
+  - Seluruh 225 feature tests PHPUnit (1003 assertions) lulus 100%, Vite build bersih, Pint 0 violations.
+- 2026-11-06: Redesain Bento Tab Peserta Event (`admin/events/show.blade.php`):
+  - Mengubah tampilan Tab Peserta yang sebelumnya menumpuk vertikal menjadi arsitektur Bento Grid yang ringkas, modern, dan proporsional:
+    1. **Bento Strip Ringkasan 3-Tile (Menggantikan 3 Box Vertikal)**:
+       - Mengubah 3 kartu besar yang tadinya menumpuk ke bawah (*Total Kader*, *Komposisi Gender*, *Sebaran Cabang*) menjadi 3 Bento Tile sejajar dalam 1 baris (`grid grid-cols-3 gap-2 sm:gap-3`), memangkas tinggi vertikal hingga 70% di layar ponsel.
+       - Tile 1 (*Total Kader*): Indikator kuota, rasio keterisian, dan mini progress bar warna sky.
+       - Tile 2 (*Komposisi Gender*): Badge kontras pill L (biru) dan P (rose) beserta persentase.
+       - Tile 3 (*Sebaran Cabang*): Jumlah PCM terwakili beserta nama pimpinan cabang domisili utama.
+    2. **Bento Action Cluster Header**:
+       - Mengatur tombol aksi (`+ Enroll Peserta`, `ID Card A4`, `Broadcast WA`) dalam grid 2-kolom mobile yang rapi dan seimbang tanpa patahan teks atau baris canggung.
+    3. **Kartu Bento Kader Peserta**:
+       - Menata ulang baris data peserta menjadi kartu Bento bersih dengan avatar berbingkai lembut, badge PCM berlatar sky, nomor NBM monospaced, serta kluster aksi tombol WhatsApp, Sertifikat, dan Keluarkan yang proporsional dan tidak mendesak nama kader.
+  - Asset Vite dikompilasi ulang, Pint 0 style violations, pengujian `AdminEventFlowTest` lulus 100%.
+- 2026-11-06: Redesain Bento & Optimasi Scroll Landing Page (`landing/index.blade.php`):
+  - Mengeliminasi tata letak menumpuk vertikal ke bawah (*linear single-column stack*) dan memangkas tinggi scroll vertikal secara signifikan (pengurangan lebih dari 3.000px pada layar ponsel) menggunakan Bento Grid asimetris dan modern:
+    1. **Bento Micro-Dock Kategori**: Deretan 8 kategori materi/keilmuan dikompresi menjadi *micro-dock strip* horizontal yang ramping (`mt-4 sm:mt-5 p-2 sm:p-3`, ikon `w-9 h-9 sm:w-11 sm:h-11`).
+    2. **Bento Keunggulan Mutu & Tokoh Pimpinan (`#keunggulan`)**:
+       * Kolom kiri (`lg:col-span-5`): Kartu Tokoh Ketua MPKSDI H. Zainudin Ahpandi dengan tampilan *horizontal compact strip* di mobile (thumbnail `w-16 h-20`, badge, quote) dan *full portrait* elegan di desktop.
+       * Kolom kanan (`lg:col-span-7`): Grid Bento 2x2 yang memadukan 4 standar keunggulan (Kurikulum Baku PP, Penilaian 4 Format, Instruktur Bersertifikat, E-Sertifikat QR) secara berdampingan 2 kolom bahkan di layar smartphone.
+    3. **Bento Course Cards & Mobile Snap Carousel (`#program`)**:
+       * Mengonversi 4 kartu pelatihan besar menjadi *horizontal swipeable snap carousel* di mobile (`flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 -mx-4 px-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible`) dengan kartu berdimensi kompak (`w-[82vw] max-w-[290px]`, header `h-32 sm:h-36`), memangkas ~1.360px tinggi scroll mobile tanpa menghilangkan konten.
+    4. **Bento Alur Peserta (`#tahapan`)**:
+       * Mengubah alur vertikal 4 langkah menjadi grid 2x2 di mobile (`grid-cols-2 gap-2.5`) dan alur 4 kolom terhubung di desktop.
+    5. **Bento Peta Spasial & Direktori 17 Cabang (`#sebaran`)**:
+       * Menyesuaikan kanvas peta Leaflet menjadi responsif proporsional (`min-h-[260px] sm:min-h-[360px] lg:min-h-[440px]`), kontainer padding lebih rapat, serta mempertahankan jendela scroll 5 cabang aktif yang halus.
+    6. **Bento Helpdesk & FAQ Accordion (`#faq`)**:
+       * Memperketat *vertical padding* dan margin kartu helpdesk dan accordion, menghemat ~250px tinggi layar.
+    7. **Multi-Column Themed Footer (`#kontak`)**:
+       * Mempercantik dan memadatkan padding footer (`pt-8 sm:pt-12 pb-14 sm:pb-16 lg:pb-10`), menjaga navigasi bawah mengambang (*floating bottom dock*) tetap ergonomis.
+  - 224 feature tests PHPUnit (992 assertions) lulus 100%, Vite build bersih, Pint 0 violations.
+- 2026-11-06: Penyesuaian Rentang Tahun Selesai Dropdown Kepengurusan Organisasi (ORTOM) Sampai 2040:
+  - Mengubah batas atas perulangan opsi `tahun_selesai` pada formulir pendaftaran (`register.blade.php`) dan halaman profil anggota (`profile.blade.php`) menjadi `max(2040, (int)date('Y') + 4)` sehingga dropdown mencakup tahun hingga 2040 secara menurun ke 1980.
+  - Opsi 'Sekarang' (Masih Menjabat) tetap dipertahankan di posisi atas.
+  - Menambahkan pengujian automated test pada `AnggotaRegistrationTest` dan `PortalProfileTest` untuk memverifikasi opsi `<option value="2040">` dan penyimpanan data periode paska-2030.
+  - 224 feature tests PHPUnit (992 assertions) lulus 100%. Pint 0 violations.
 - 2026-11-05: Eliminasi AI Slop Badge Kelulusan & Implementasi Fitur Edit/Upload TTD Pengesahan Sertifikat:
   1. **Tipografi Formal Kelulusan (Bebas AI Slop)**:
      - Mengganti bentuk rounded pill badge (`border-radius: 14px; background: #ecfdf5`) yang bergaya web AI chip dengan tipografi Serif klasik formal `L U L U S` (`letter-spacing: 5px; color: #064e3b; font-size: 15pt;`) diapit garis hairline emas horizontal (*gold hairline rules*). Desain menjadi sangat berwibawa layaknya ijazah/sertifikat resmi kenegaraan dan persyarikatan.
@@ -1419,3 +1619,80 @@ Pola berguna dari referensi:
       - 94 feature & unit tests lulus 100% (293 assertions).
       - Laravel Pint lolos (0 issues).
       - Vite production build sukses (assets terkompilasi dalam 2.77s).
+- 2026-11-07: Perbaikan UI Widget Chat SiKader (Dark Mode, Hint Layout, & Quick Actions):
+    - **Penyelesaian Bug Hint Melayang**: Memperbaiki tag duplikat pada composer form dan memindahkan hint keyboard ("Enter kirim • Shift+Enter baris baru") ke dalam kontainer `.glass-composer` di bawah baris input/aksi; menambahkan `overflow-hidden` pada root modal dan `.sikader-shell`.
+    - **Mode Gelap Terbaca & Konsisten (WCAG AA)**: Bubble bot menggunakan `rgba(255,255,255,0.07)` + `backdrop-blur-md` + border `rgba(255,255,255,0.10)` dengan teks terang `#E6EDF3` (kontras > 4.5:1). Bubble user solid `#005c8a` teks putih. Composer bergaya kaca gelap dengan fokus ring `--accent` (#f8bb00).
+    - **Scrollbar Khusus**: Area percakapan menggunakan scrollbar tipis 6px dengan track transparan dan thumb semi-transparan (`.sikader-chat-scroll`), sedangkan baris chip menggunakan mask fade tepi kanan-kiri (`.sikader-chips-scroll`).
+    - **Pola Quick Action Tunggal (Unified Pattern)**: Saat percakapan kosong (`!hasUserMessage`), kartu aksi ringkas 48px ditampilkan pada badan chat (1 kolom di <400px, 2 kolom di ≥400px) tanpa baris chip. Setelah pesan pertama dikirim (`hasUserMessage`), kartu awal disembunyikan dan baris chip di atas composer dimunculkan.
+    - **Pembersihan Override & Penyegaran Sesi**: Menghapus selektor CSS agresif berklausul `!important` yang sebelumnya merusak kontras tema, mengisolasi storage history ke `sikader-chat-v2` untuk membuang draf sapaan 3-paragraf usang dan kartu ganda, merampingkan kartu aksi menjadi `h-[44px]` dengan ikon 16px, dan menyempurnakan baris konteks kegiatan agar rasio keterisian `4/20 Terdaftar` terbaca jelas pada mode terang maupun gelap.
+    - **Optimalisasi Vertikal & Tombol Kirim**: Sapaan dipadatkan maksimal 2 baris tanpa emoji, baris konteks kegiatan menampilkan judul penuh dengan ringkasan status terdaftar "4/20 Terdaftar" dan progress bar amber. Tombol kirim konsisten memakai ikon paper plane dengan status disabled opasitas 40% saat kosong dan solid aksen emas saat ada teks.
+    - **Verifikasi**: 252 tests PHPUnit lulus 100% (1.197 assertions), Laravel Pint lulus, Vite build sukses.
+
+- 2026-11-07: SiKader memakai light mode saat halaman dimuat, tanpa mengikuti tema OS atau preferensi sikader-theme lama. Toggle tema tetap tersedia selama sesi halaman. Varian Tailwind dark dikendalikan kelas .dark agar pilihan light konsisten. Verifikasi: 23 SmartEnrollFeatureTest lulus (169 assertions), runtime init/toggle Node lulus, Vite build lulus melalui node node_modules/vite/bin/vite.js build (npm shim gagal pada path proyek dengan ampersand).
+
+- 2026-11-07: Perbaikan Tampilan Box Peringatan / Notice SiKader & Penyesuaian Respons Sapaan (Chat Intent):
+  - **Penyebab Teks Duplikat Vertikal**: Di `resources/views/admin/events/partials/smart-enroll-modal.blade.php`, template notice sebelumnya menampilkan dua elemen `<span>` bersebelahan (`msg.data.notice` dan `UI.previewPanel.uncertainNotice`) dalam kontainer flex, di mana keduanya berisi teks peringatan panjang yang sama dan elemen pertama menggunakan `shrink-0`. Hal ini menyebabkan teks kedua terhimpit ke sisi kanan dan memecah kata per baris secara vertikal.
+  - **Penyempurnaan Struktur Box Notice**: Mengganti template notice menjadi satu kesatuan elemen `<div class="flex-1 leading-relaxed">` dengan icon SVG segitiga peringatan amber, label `Perlu Konfirmasi:`, dan teks peringatan tunggal yang mengalir rapi.
+  - **Peniadaan Notice pada Sapaan Santai (Chat/Greeting)**: Menyesuaikan `adapter.js` dan normalisasi frontend agar respons sapaan atau percakapan ramah (`intent === 'chat'`) tidak otomatis diberi flag `confidence: 'low'` atau memunculkan box peringatan luar basis data.
+  - **Penyertaan RAG Sources pada Balasan Sapaan Lokal**: Menghubungkan sumber RAG kegiatan pada balasan sapaan ramah di `SmartEnrollService.php` sehingga sitasi yang disebut dapat langsung diverifikasi.
+  - **Verifikasi**: Vitest 10 tests lulus, PHPUnit 252 tests (1.197 assertions) lulus 100%, Laravel Pint lulus bersih, Vite production build sukses.
+
+- 2026-11-08: Penyelesaian Celah Tembus Pandang / Garis Putih Bawah Modal SiKader (Backdrop Margin Leak):
+  - **Penyebab**: Modal `smart-enroll-modal.blade.php` sebelumnya di-include di dalam kontainer `<div class="space-y-5 pb-20 lg:pb-6">` pada `resources/views/admin/events/enroll.blade.php`. Di Tailwind CSS 4, aturan `:where(.space-y-5 > :not(:last-child))` memberikan `margin-block-end: 20px` pada seluruh anak langsung kecuali yang terakhir. Karena di dalam file modal terdapat tag `<script>` setelah `<div>` modal, elemen modal menjadi `:not(:last-child)` sehingga terdorong margin bawah 20px. Hal ini menyebabkan backdrop `fixed inset-0` terpotong 20px dari tepi bawah layar, membocorkan baris kartu kandidat di latar belakang ("-, Kec. Karanganyar • NIK: 331327****").
+  - **Solusi**:
+    1. Memindahkan `@include('admin.events.partials.smart-enroll-modal')` keluar dari kontainer `.space-y-5` di `enroll.blade.php` sehingga modal berada di level root section.
+    2. Menambahkan kelas utilitas `!m-0 m-0` pada elemen backdrop modal di `smart-enroll-modal.blade.php` untuk memastikan margin selalu bernilai 0 mutlak terlepas dari konteks parent.
+  - **Verifikasi**: Vite production build sukses, 252 pengujian PHPUnit (1.197 assertions) lulus 100%, Laravel Pint lulus bersih (0 issues).
+
+- 2026-11-08: Optimalisasi Performa & Kelancaran Interaksi SiKader Chatbot (60 FPS & Eliminasi Lag/Stutter):
+  - **Identifikasi Penyebab Lag & Rasa Berat**:
+    1. *Smooth Scroll Animation Contention*: Pada `smart-enroll-modal.blade.php`, observer `$watch('messages')` memanggil `el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })` setiap 14ms pada tiap token teks yang di-stream. Pemanggilan animasi scroll berulang 50-70x per detik memicu thrashing pada thread animasi browser (ticker contention) dan penurunan drastis FPS.
+    2. *Synchronous I/O Storage Thrashing*: Fungsi `persistHistory()` melakukan serialisasi `JSON.stringify` seluruh riwayat pesan dan menulis ke `sessionStorage` secara sinkron pada setiap kata saat streaming teks.
+    3. *Artificial Delay / Latensi Buatan*: Pemanggilan `setTimeout` 600ms buatan saat modal dibuka, 500ms saat reset, dan 350ms saat klik chip starter memperlambat persepsi responsivitas UI.
+    4. *Ketiadaan GPU Compositing*: Kontainer scroll belum memiliki instruksi isolasi layout (`contain`) dan akselerasi GPU.
+  - **Solusi & Perbaikan**:
+    1. *Pemisahan Mode Scroll*: Menghapus `$watch('messages')` looping. Menggunakan direct assignment instan `el.scrollTop = el.scrollHeight` selama proses streaming teks (tanpa animasi easing berulang), dan mencadangkan animasi smooth hanya saat kartu pesan baru ditambahkan.
+    2. *Streaming Cadence & Debounce Storage*: Menyesuaikan streaming menjadi 2 kata per chunk (interval 22ms) dan menerapkan debounce 250ms pada penyimpanan `sessionStorage` yang hanya dieksekusi final setelah streaming selesai.
+    3. *Instant Response*: Menghilangkan artificial delay pada sapaan awal dan starter chips sehingga respon chatbot instan.
+    4. *CSS GPU Acceleration*: Menambahkan `contain: content; will-change: scroll-position;` pada `.sikader-chat-scroll` dan `transform: translateZ(0); backface-visibility: hidden;` pada `.sikader-shell`.
+  - **Verifikasi**: Vitest 10 tests lulus, PHPUnit 252 tests (1.197 assertions) lulus 100%, Vite asset build sukses (3.14s).
+
+- 2026-11-08: Peningkatan Kemampuan Pencarian Cerdas & Pelacakan Riwayat Perkaderan Kader (Smart Cadre History & Profile Lookup):
+  - **Identifikasi Masalah**: Pertanyaan pengguna mengenai riwayat perkaderan perorangan (seperti "tolong carikan riwayat perkaderan husain faqihudin") sebelumnya menghasilkan respon "tidak ditemukan". Hal ini disebabkan oleh:
+    1. *Intent Misclassification*: Prompt bahasa alami tidak terdeteksi sebagai pencarian kader melainkan jatuh ke rekomendasi umum.
+    2. *Kekakuan Pencarian Teks*: Pencarian nama sebelumnya hanya menggunakan klausa LIKE persis (`%searchQuery%`) sehingga variasi ejaan (misal: "husain faqihudin" dengan 1 huruf d vs nama resmi "Husain Faqihuddin Asy Sarif, S.Pd" dengan 2 huruf d dan gelar) gagal cocok.
+    3. *Ketiadaan Injeksi Riwayat BA pada Prompt LLM*: LLM eksternal tidak memiliki akses basis data langsung dan hanya menerima statistik agregat, sehingga berhalusinasi menyatakan kader tidak ditemukan.
+  - **Solusi & Implementasi**:
+    1. *Pencarian Cerdas Multi-Tier (Fuzzy, Metaphone, Substring, Levenshtein)*: Membuat method `searchCadres()` dan `extractCadreSearchQuery()` di `SmartEnrollService.php` yang membersihkan stopwords pencarian, menormalisasi gelar, dan mencocokkan token nama dengan toleransi ejaan/metaphone.
+    2. *Ekstraksi Riwayat Perkaderan Terpadu*: Menambahkan method `getCadreHistory()` yang menggabungkan riwayat BA dari arsip SIMKader (`custom_fields['riwayat_ba']`) dan relasi `eventPeserta`, lengkap dengan nama event, tanggal, lokasi, dan status kelulusan.
+    3. *Grounding Data Riil & Anti-Halusinasi*: Menginjeksikan hasil pencarian kader riil langsung ke system prompt LLM (`Geraikita`), serta menambahkan proteksi fallback ke RAG lokal terstruktur jika LLM salah menyimpulkan kader tidak ada.
+    4. *Kartu Pendaftaran Interaktif*: Menyediakan data kandidat terformat beserta opsi kartu centang (`needs_candidate_card: true`) jika kader belum terdaftar di kegiatan yang sedang dibuka.
+  - **Verifikasi**:
+    - PHPUnit: Seluruh 253 tests (1.206 assertions) lulus 100%, termasuk unit dan feature test baru untuk pencarian riwayat perkaderan dengan ejaan tidak persis.
+    - Vitest: 10 tests lulus 100%.
+    - Laravel Pint: Lulus bersih.
+
+- 2026-11-08: Transformasi SiKader Menjadi All-in-One Perkaderan Copilot (Natural Language Action Execution, WhatsApp Blast, Evaluasi 4 Pilar & Quick Export):
+  - **Latar Belakang & Kebutuhan**: Mengembangkan seluruh rekomendasi kapabilitas agar SiKader tidak hanya berfungsi sebagai asisten rekomendasi dan tanya-jawab statis, melainkan menjadi All-in-One Copilot cerdas yang dapat mengeksekusi aksi pendaftaran, membuat draf komunikasi, menganalisis evaluasi peserta, dan menyediakan shortcut berkas.
+  - **Fitur yang Diimplementasikan**:
+    1. *Command-to-Action (Natural Language Auto-Enroll)*:
+       - Memproses perintah langsung seperti *"Daftarkan 5 kader dari PCM Colomadu yang belum BA"*.
+       - Otomatis mengekstrak kriteria wilayah, kuota, dan prioritas, menyaring kandidat terbaik, dan menyajikan kartu pendaftaran dengan pesan afirmasi instruksi serta tombol bulk enroll langsung.
+    2. *WhatsApp Blast & Invitation Generator*:
+       - Menghasilkan draf undangan perkaderan resmi berformat WhatsApp (emoji, jadwal, lokasi, kuota, dan tautan pendaftaran mandiri).
+       - Menyediakan tombol aksi langsung `Kirim via WhatsApp` yang membuka URL `https://api.whatsapp.com/send?text=...` untuk kemudahan broadcast pimpinan cabang/ranting/AUM.
+    3. *Copilot Analitik Penilaian & Deteksi Risiko 4 Pilar*:
+       - Menghitung statistik riil: rata-rata pre-test, post-test, delta peningkatan, dan nilai akhir (skala 100).
+       - Menjalankan simulasi yudisium: Lulus Murni, Lulus Bersyarat, Tidak Lulus.
+       - *Deteksi Dini Risiko*: Mengidentifikasi peserta dengan nilai akhir di bawah Passing Grade/KKM (< 70) dan memberikan saran remedial pilar Kognitif & RTL sebelum penandatanganan Berita Acara.
+       - *Deteksi Presensi*: Memperingatkan peserta dengan kehadiran sesi di bawah 75% sesuai standar SPM MPKSDI.
+    4. *Quick Export & Document Links (One-Click Actions)*:
+       - Menyediakan tombol pintas langsung di gelembung obrolan untuk mengunduh Rekap Excel (`admin.events.exportExcel`), Lembar Ranking (`admin.events.ranking`), dan Berita Acara Yudisium (`admin.events.berita-acara`).
+    5. *Interactive Slash Commands (`/`) di Composer UI*:
+       - Menampilkan floating quick-command bar saat pengguna mengetik `/` (`/kuota`, `/rekap`, `/undangan`, `/ranking`, `/export`).
+       - Memungkinkan eksekusi instan deterministik berlatensi 0 ms tanpa jeda jaringan LLM eksternal.
+  - **Verifikasi & Kualitas**:
+    - PHPUnit: Seluruh 257 pengujian (1.230 assertions) lulus 100% tanpa ada kegagalan maupun regresi.
+    - Vitest: 10 tests lulus 100%.
+    - Laravel Pint: Lulus bersih (0 code style issues).
+    - Frontend Assets: Vite production build sukses dan terkompilasi optimal.

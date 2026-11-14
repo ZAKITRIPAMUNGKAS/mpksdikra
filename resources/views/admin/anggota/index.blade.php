@@ -146,7 +146,7 @@
                         <td class="py-3.5 px-5">
                             <div class="flex items-center gap-3">
                                 <img src="{{ route('foto.anggota', $a) }}" alt="{{ $a->nama_lengkap }}"
-                                    class="w-9 h-11 rounded-lg object-cover border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
+                                    class="w-9 h-12 aspect-[3/4] rounded-lg object-cover object-top border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
                                 <div>
                                     <span class="font-semibold text-slate-900 block leading-tight text-sm">{{ $a->nama_lengkap }}</span>
                                     <span class="text-xs text-slate-500 mt-0.5 block">{{ $a->desa_kelurahan ? $a->desa_kelurahan . ', ' . $a->kecamatan : 'Domisili belum lengkap' }}</span>

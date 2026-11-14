@@ -11,7 +11,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center gap-4">
                 @if(auth()->user()->anggota)
-                    <div class="w-14 h-18 sm:w-16 sm:h-20 rounded-xl overflow-hidden border-2 border-sky-400 shadow-sm shrink-0 bg-slate-100">
+                    <div class="w-14 h-[75px] sm:w-16 sm:h-[85px] aspect-[3/4] rounded-xl overflow-hidden border-2 border-sky-400 shadow-sm shrink-0 bg-slate-100">
                         <img src="{{ route('foto.anggota', auth()->user()->anggota) }}" 
                              alt="Pasfoto {{ auth()->user()->name }}" 
                              class="w-full h-full object-cover object-top"

@@ -78,11 +78,14 @@
         .photo-img-original {
             width: 112pt;
             height: 149.3pt;
+            max-width: 112pt;
+            max-height: 149.3pt;
             border-radius: 8pt;
             border: 2pt solid #FFFFFF;
             margin-top: 28pt;
             margin-right: 12pt;
             display: inline-block;
+            object-fit: cover;
         }
 
         .front-status {

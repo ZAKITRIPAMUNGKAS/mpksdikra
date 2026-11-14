@@ -6,10 +6,13 @@ use App\Exports\AnggotaExport;
 use App\Http\Controllers\Controller;
 use App\Models\Anggota;
 use App\Models\User;
+use App\Rules\ValidCutoutPng;
+use App\Services\ImageCutoutService;
 use App\Services\QrService;
 use App\Services\WhatsAppNotificationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -481,6 +484,129 @@ class AnggotaController extends Controller
         ]);
 
         return back()->with('success', 'Mode tampilan pasfoto ID Card berhasil diperbarui menjadi '.ucfirst($validated['foto_mode']).'.');
+    }
+
+    public function updateFoto(Request $request, Anggota $anggota, ImageCutoutService $cutoutService): RedirectResponse|JsonResponse
+    {
+        $this->authorizeCabang($anggota);
+
+        $request->validate([
+            'foto' => ['nullable'],
+            'foto_cutout' => ['nullable'],
+            'foto_mode' => ['nullable', 'string', 'in:original,cutout'],
+        ]);
+
+        $newFotoPath = null;
+        $newCutoutPath = null;
+        $fotoMode = $request->input('foto_mode', $anggota->foto_mode ?: 'cutout');
+
+        // 1. Proses Pasfoto (UploadedFile atau Data URI base64 dari canvas)
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $request->validate([
+                'foto' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            ]);
+            $newFotoPath = $file->store('anggota/foto', 'local');
+        } elseif ($request->filled('foto') && str_starts_with((string) $request->input('foto'), 'data:image/')) {
+            $dataUri = (string) $request->input('foto');
+            $commaPos = strpos($dataUri, ',');
+            if ($commaPos !== false) {
+                $raw = base64_decode(substr($dataUri, $commaPos + 1));
+                if ($raw !== false && strlen($raw) > 50) {
+                    $img = @imagecreatefromstring($raw);
+                    if ($img) {
+                        ob_start();
+                        imagejpeg($img, null, 92);
+                        $jpgData = ob_get_clean();
+                        imagedestroy($img);
+
+                        $filename = 'foto_'.Str::random(40).'.jpg';
+                        $path = 'anggota/foto/'.$filename;
+                        Storage::disk('local')->put($path, $jpgData);
+                        $newFotoPath = $path;
+                    }
+                }
+            }
+        }
+
+        // 2. Proses Cutout (UploadedFile atau Data URI base64 dari canvas)
+        if ($request->hasFile('foto_cutout')) {
+            $cutoutFile = $request->file('foto_cutout');
+            $cutoutFilename = 'cutout_'.Str::random(40).'.png';
+            $targetPath = Storage::disk('local')->path('anggota/cutouts/'.$cutoutFilename);
+            if (ValidCutoutPng::reencodePng($cutoutFile, $targetPath)) {
+                $newCutoutPath = 'anggota/cutouts/'.$cutoutFilename;
+            }
+        } elseif ($request->filled('foto_cutout') && str_starts_with((string) $request->input('foto_cutout'), 'data:image/')) {
+            $dataUri = (string) $request->input('foto_cutout');
+            $commaPos = strpos($dataUri, ',');
+            if ($commaPos !== false) {
+                $raw = base64_decode(substr($dataUri, $commaPos + 1));
+                if ($raw !== false && strlen($raw) > 50) {
+                    $img = @imagecreatefromstring($raw);
+                    if ($img) {
+                        imagealphablending($img, false);
+                        imagesavealpha($img, true);
+                        ob_start();
+                        imagepng($img, null, 6);
+                        $pngData = ob_get_clean();
+                        imagedestroy($img);
+
+                        $cutoutFilename = 'cutout_'.Str::random(40).'.png';
+                        $path = 'anggota/cutouts/'.$cutoutFilename;
+                        Storage::disk('local')->put($path, $pngData);
+                        $newCutoutPath = $path;
+                    }
+                }
+            }
+        }
+
+        // 3. Perbarui database dan bersihkan file usang
+        $updateData = ['foto_mode' => $fotoMode];
+
+        if ($newFotoPath) {
+            if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+                Storage::disk('local')->delete($anggota->foto);
+            }
+            $updateData['foto'] = $newFotoPath;
+        }
+
+        if ($newCutoutPath) {
+            if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+                Storage::disk('local')->delete($anggota->foto_cutout_path);
+            }
+            $updateData['foto_cutout_path'] = $newCutoutPath;
+        } elseif ($newFotoPath && $fotoMode === 'cutout') {
+            // Jika foto baru disimpan dalam mode cutout tapi klien tidak menghasilkan cutout,
+            // picu pembuatan otomatis cutout GD server
+            $serverCutoutUri = $cutoutService->getCutoutDataUriForStorageFile($newFotoPath, 'local');
+            if ($serverCutoutUri && str_starts_with($serverCutoutUri, 'data:image/png;base64,')) {
+                $rawPng = base64_decode(substr($serverCutoutUri, 22));
+                if ($rawPng !== false) {
+                    $cutoutFilename = 'cutout_'.Str::random(40).'.png';
+                    $path = 'anggota/cutouts/'.$cutoutFilename;
+                    Storage::disk('local')->put($path, $rawPng);
+                    if ($anggota->foto_cutout_path && Storage::disk('local')->exists($anggota->foto_cutout_path)) {
+                        Storage::disk('local')->delete($anggota->foto_cutout_path);
+                    }
+                    $updateData['foto_cutout_path'] = $path;
+                }
+            }
+        }
+
+        $anggota->update($updateData);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto profil dan penyesuaian ID Card berhasil disimpan.',
+                'foto_url' => route('foto.anggota', $anggota).'?t='.time(),
+                'cutout_url' => $anggota->foto_cutout_path ? (route('foto.anggota', [$anggota, 'type' => 'cutout']).'?t='.time()) : null,
+                'foto_mode' => $anggota->foto_mode,
+            ]);
+        }
+
+        return back()->with('success', 'Foto profil dan penyesuaian ID Card berhasil disimpan.');
     }
 
     public function destroyCutout(Anggota $anggota): RedirectResponse

@@ -522,6 +522,40 @@ class ImageCutoutService
     }
 
     /**
+     * Resolve the original participant photo for the one-sided ID card.
+     *
+     * @return array{dataUri: ?string, mode: string}
+     */
+    public function resolveOriginalForAnggota(Anggota $anggota): array
+    {
+        if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
+            $raw = Storage::disk('local')->get($anggota->foto);
+            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+
+            return [
+                'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                'mode' => 'original',
+            ];
+        }
+
+        $defaultPath = $anggota->jenis_kelamin === 'P'
+            ? public_path('aset/default-profile-wanita.jpg')
+            : public_path('aset/default-profile-pria.jpg');
+
+        if (file_exists($defaultPath)) {
+            $raw = file_get_contents($defaultPath);
+            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+
+            return [
+                'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                'mode' => 'original',
+            ];
+        }
+
+        return ['dataUri' => null, 'mode' => 'original'];
+    }
+
+    /**
      * Resolve photo data URI and active rendering mode for an Anggota.
      *
      * @return array{dataUri: ?string, mode: string}

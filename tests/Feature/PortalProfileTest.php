@@ -346,4 +346,44 @@ class PortalProfileTest extends TestCase
         $res->assertSee('Koordinator Komisariat (Korkom IMM)');
         $res->assertSee('Pimpinan Komisariat (PK IMM)');
     }
+
+    public function test_portal_profile_renders_and_accepts_tahun_selesai_up_to_2040(): void
+    {
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $a = Anggota::factory()->create([
+            'user_id' => $user->id,
+            'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+        ]);
+
+        $viewRes = $this->actingAs($user)->get(route('portal.profile.index'));
+        $viewRes->assertOk();
+        $viewRes->assertSee('<option value="2040"', false);
+
+        $this->actingAs($user)
+            ->put(route('portal.profile.update'), [
+                'nama_lengkap' => $a->nama_lengkap,
+                'alamat_rumah' => $a->alamat_rumah,
+                'tempat_lahir' => $a->tempat_lahir,
+                'tanggal_lahir' => $a->tanggal_lahir->format('Y-m-d'),
+                'status_pernikahan' => $a->status_pernikahan,
+                'desa_kelurahan' => $a->desa_kelurahan,
+                'kecamatan' => $a->kecamatan,
+                'kabupaten' => $a->kabupaten,
+                'keaktifan_ortom' => ['Pemuda Muhammadiyah'],
+                'jabatan_ortom' => [
+                    'Pemuda Muhammadiyah' => [
+                        'tingkat' => 'Pimpinan Daerah (PD Pemuda Muhammadiyah)',
+                        'tahun_mulai' => '2024',
+                        'tahun_selesai' => '2040',
+                        'jabatan' => 'Ketua Umum / Ketua',
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $fresh = $a->fresh();
+        $this->assertIsArray($fresh->jabatan_ortom);
+        $this->assertSame('2040', $fresh->jabatan_ortom['Pemuda Muhammadiyah']['tahun_selesai']);
+        $this->assertSame('2024 - 2040', $fresh->jabatan_ortom['Pemuda Muhammadiyah']['periode']);
+    }
 }

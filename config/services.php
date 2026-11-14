@@ -41,4 +41,10 @@ return [
         'endpoint' => env('WA_GATEWAY_ENDPOINT', 'https://api.fonnte.com/send'),
     ],
 
+    'geraikita' => [
+        'api_key' => env('GERAIKITA_API_KEY'),
+        'base_url' => env('GERAIKITA_BASE_URL', 'https://ai.geraikita.com/v1'),
+        'model' => env('GERAIKITA_MODEL', 'qwen3-32b'),
+    ],
+
 ];

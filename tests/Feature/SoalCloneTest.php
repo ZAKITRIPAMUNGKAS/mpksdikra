@@ -56,6 +56,7 @@ class SoalCloneTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.events.soal.clone', [$eventTarget, 'pretest']), [
             'source_event_id' => $eventSumber->id,
+            'source_tipe' => 'pretest',
         ]);
 
         $response->assertRedirect();
@@ -68,5 +69,44 @@ class SoalCloneTest extends TestCase
         $clonedSoal = Soal::where('event_id', $eventTarget->id)->first();
         $this->assertCount(2, $clonedSoal->pilihan);
         $this->assertTrue((bool) $clonedSoal->pilihan->firstWhere('label', 'A')->is_benar);
+    }
+
+    public function test_admin_can_clone_posttest_questions_into_pretest_from_another_event(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $source = Event::create([
+            'nama_event' => 'BA Sumber',
+            'tanggal_mulai' => now()->subDays(3)->toDateString(),
+            'tanggal_selesai' => now()->subDays(2)->toDateString(),
+            'status' => 'selesai',
+            'created_by' => $admin->id,
+        ]);
+        $question = Soal::create([
+            'event_id' => $source->id,
+            'tipe' => 'posttest',
+            'teks_soal' => 'Apa makna tajdid?',
+            'urutan' => 1,
+        ]);
+        PilihanJawaban::create(['soal_id' => $question->id, 'label' => 'A', 'teks' => 'Pembaruan', 'is_benar' => true]);
+        PilihanJawaban::create(['soal_id' => $question->id, 'label' => 'B', 'teks' => 'Perpecahan', 'is_benar' => false]);
+        $target = Event::create([
+            'nama_event' => 'BA Tujuan',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDay()->toDateString(),
+            'status' => 'persiapan',
+            'created_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.events.soal.clone', [$target, 'pretest']), [
+                'source_event_id' => $source->id,
+                'source_tipe' => 'posttest',
+            ])
+            ->assertRedirect();
+
+        $cloned = Soal::where('event_id', $target->id)->firstOrFail();
+        $this->assertSame('pretest', $cloned->tipe);
+        $this->assertSame('Apa makna tajdid?', $cloned->teks_soal);
+        $this->assertTrue((bool) $cloned->pilihan->firstWhere('label', 'A')->is_benar);
     }
 }

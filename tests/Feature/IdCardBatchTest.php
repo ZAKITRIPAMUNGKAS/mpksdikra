@@ -103,7 +103,7 @@ class IdCardBatchTest extends TestCase
         $this->assertEquals($dataUri, $cachedDataUri);
     }
 
-    public function test_batch_id_cards_automatically_removes_background_for_participant_photo(): void
+    public function test_batch_id_cards_uses_original_participant_photo_without_creating_a_cutout(): void
     {
         Storage::fake('local');
 
@@ -151,8 +151,8 @@ class IdCardBatchTest extends TestCase
         $response->assertOk();
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
 
-        // Verify the cutout was cached in storage
+        // The one-sided card keeps the original photo and must not create a cutout cache.
         $hash = md5($jpegData.'|v2|15');
-        $this->assertTrue(Storage::disk('local')->exists("cutouts/v2_{$hash}.png"));
+        $this->assertFalse(Storage::disk('local')->exists("cutouts/v2_{$hash}.png"));
     }
 }

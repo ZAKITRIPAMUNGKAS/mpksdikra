@@ -105,6 +105,10 @@ class AdminEventFlowTest extends TestCase
             ->get(route('admin.events.enroll', $event));
 
         $response->assertOk();
+        $response->assertSee('Sebelumnya');
+        $response->assertSee('Berikutnya');
+        $response->assertDontSee('pagination.previous');
+        $response->assertDontSee('pagination.next');
         $response->assertViewHas('kandidat', function ($kandidat) {
             return $kandidat instanceof LengthAwarePaginator
                 && $kandidat->perPage() === 20
@@ -265,5 +269,32 @@ class AdminEventFlowTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.events.certificate', [$event, $peserta]))
             ->assertForbidden();
+    }
+
+    public function test_admin_can_update_event_fasilitator_assignment(): void
+    {
+        $admin = $this->admin();
+        $event = Event::create($this->payload() + ['created_by' => $admin->id]);
+
+        $fas1 = User::factory()->create(['role' => 'fasilitator', 'status' => 'aktif']);
+        $fas2 = User::factory()->create(['role' => 'fasilitator', 'status' => 'aktif']);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.events.fasilitator.update', $event), [
+                'fasilitator_ids' => [$fas1->id, $fas2->id],
+            ]);
+
+        $response->assertRedirect();
+        $this->assertTrue($event->fresh()->fasilitator->contains($fas1->id));
+        $this->assertTrue($event->fresh()->fasilitator->contains($fas2->id));
+
+        // Test detail event renders the assigned count in Bento header
+        $viewResponse = $this->actingAs($admin)
+            ->get(route('admin.events.show', $event));
+
+        $viewResponse->assertOk();
+        $viewResponse->assertSee('2 Bertugas');
+        $viewResponse->assertSee($fas1->name);
+        $viewResponse->assertSee($fas2->name);
     }
 }

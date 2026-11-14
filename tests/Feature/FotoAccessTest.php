@@ -21,11 +21,11 @@ class FotoAccessTest extends TestCase
         $u2 = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
         $a2 = Anggota::factory()->create(['user_id' => $u2->id, 'nama_lengkap' => 'Kader Dua']);
 
-        // Admin can access any photo (returns SVG placeholder if file not present)
+        // Admin can access any photo (returns default profile photo if file not present)
         $this->actingAs($admin)
             ->get(route('foto.anggota', $a1))
             ->assertOk()
-            ->assertHeader('Content-Type', 'image/svg+xml');
+            ->assertHeader('Content-Type', 'image/jpeg');
 
         // Owner can access own photo
         $this->actingAs($u1)

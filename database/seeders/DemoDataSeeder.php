@@ -7,6 +7,9 @@ use App\Models\AfektifButir;
 use App\Models\AfektifJawaban;
 use App\Models\AfektifSubAspek;
 use App\Models\Anggota;
+use App\Models\AngketItem;
+use App\Models\AngketJawaban;
+use App\Models\AngketKomentar;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
@@ -564,13 +567,17 @@ class DemoDataSeeder extends Seeder
 
                 if (isset($portraitMap[$i]) && $portraitMap[$i][0]) {
                     [$src, $cRange, $rRange] = $portraitMap[$i];
-                    $x = $cRange[0] + 3;
-                    $y = $rRange[0] + 3;
-                    $srcW = ($cRange[1] - $cRange[0] + 1) - 6;
-                    $srcH = ($rRange[1] - $rRange[0] + 1) - 6;
+                    $colW = $cRange[1] - $cRange[0] + 1;
+                    $cropW = $colW - 8;
+                    $cropH = (int) round($cropW * 4 / 3);
+                    $srcX = $cRange[0] + 4;
+                    $srcY = $rRange[0] + 8;
+                    if ($srcY + $cropH > $rRange[1]) {
+                        $srcY = $rRange[1] - $cropH;
+                    }
                     $dest = imagecreatetruecolor(300, 400);
-                    imagecopyresampled($dest, $src, 0, 0, $x, $y, 300, 400, $srcW, $srcH);
-                    imagejpeg($dest, $assetPath, 94);
+                    imagecopyresampled($dest, $src, 0, 0, $srcX, $srcY, 300, 400, $cropW, $cropH);
+                    imagejpeg($dest, $assetPath, 95);
                     imagedestroy($dest);
                     copy($assetPath, $targetPath);
                 }
@@ -1091,6 +1098,72 @@ class DemoDataSeeder extends Seeder
 
         // Jalankan kalkulasi nilai resmi dari NilaiService
         app(NilaiService::class)->hitungUlang($eventPersiapan);
+
+        $this->seedAngketDemo([$eventSelesai, $eventBerlangsung, $eventPersiapan]);
+    }
+
+    private function seedAngketDemo(array $events): void
+    {
+        $defaultItems = [
+            'A' => [
+                'Materi perkaderan relevan dengan penguatan ideologi & kebutuhan persyarikatan.',
+                'Alokasi waktu pemaparan materi dan forum diskusi/tanya-jawab memadai.',
+                'Materi mudah dipahami dan aplikatif untuk diterapkan di Cabang/Ranting/AUM.',
+            ],
+            'B' => [
+                'Narasumber menguasai materi secara mendalam, inspiratif, dan komunikatif.',
+                'Master of Training / Tim Instruktur mendampingi dinamika kelas dengan disiplin dan solutif.',
+                'Keteladanan ibadah dan kedisiplinan tim fasilitator sangat baik.',
+            ],
+            'C' => [
+                'Kenyamanan ruangan, pencahayaan, proyektor, dan tata suara audio memuaskan.',
+                'Kualitas konsumsi, kudapan, dan ketepatan jadwal istirahat/ibadah terjaga baik.',
+                'Kesiapan panitia dalam melayani kebutuhan dan respon kendala peserta sangat memuaskan.',
+            ],
+        ];
+
+        $sampleComments = [
+            'Alhamdulillah materi Manhaj Tarjih & Ideologi Muhammadiyah sangat membuka wawasan dan aplikatif untuk pembinaan di Cabang kami.',
+            'Pelayanan panitia MPKSDI sangat ramah dan sigap. Fasilitas aula nyaman, hanya sound system perlu sedikit penyesuaian saat sesi malam.',
+            'Narasumber sangat inspiratif dan interaktif. Waktu diskusi kelompok dan problem solving terasa sangat hidup dan berbobot.',
+            'Kegiatan Baitul Arqam ini memberikan suntikan ghiroh luar biasa bagi pengabdian kami di Amal Usaha Muhammadiyah Karanganyar.',
+            'Secara umum sangat memuaskan, jadwal shalat berjamaah dan qiyamul lail sangat disiplin dan membina ruhani.',
+        ];
+
+        foreach ($events as $event) {
+            foreach ($defaultItems as $kategori => $teksList) {
+                foreach ($teksList as $urutan => $teks) {
+                    AngketItem::firstOrCreate([
+                        'event_id' => $event->id,
+                        'kategori' => $kategori,
+                        'urutan' => $urutan + 1,
+                    ], [
+                        'teks_item' => $teks,
+                    ]);
+                }
+            }
+
+            $items = AngketItem::where('event_id', $event->id)->get();
+            $peserta = EventPeserta::where('event_id', $event->id)->where('status', 'terdaftar')->take(6)->get();
+
+            $idx = 0;
+            foreach ($peserta as $p) {
+                foreach ($items as $it) {
+                    AngketJawaban::updateOrCreate(
+                        ['event_id' => $event->id, 'anggota_id' => $p->anggota_id, 'item_id' => $it->id],
+                        ['skor' => ($idx % 2 === 0) ? 5 : 4]
+                    );
+                }
+
+                if (isset($sampleComments[$idx])) {
+                    AngketKomentar::updateOrCreate(
+                        ['event_id' => $event->id, 'anggota_id' => $p->anggota_id],
+                        ['komentar' => $sampleComments[$idx]]
+                    );
+                }
+                $idx++;
+            }
+        }
     }
 
     private function seedAfektifDefault(Event $event): void

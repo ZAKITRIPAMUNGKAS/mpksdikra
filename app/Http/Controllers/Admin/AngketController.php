@@ -51,4 +51,39 @@ class AngketController extends Controller
 
         return back()->with('success', 'Item dihapus.');
     }
+
+    public function seedDefaults(Event $event): RedirectResponse
+    {
+        $defaultItems = [
+            'A' => [
+                'Materi perkaderan relevan dengan penguatan ideologi & kebutuhan persyarikatan.',
+                'Alokasi waktu pemaparan materi dan forum diskusi/tanya-jawab memadai.',
+                'Materi mudah dipahami dan aplikatif untuk diterapkan di Cabang/Ranting/AUM.',
+            ],
+            'B' => [
+                'Narasumber menguasai materi secara mendalam, inspiratif, dan komunikatif.',
+                'Master of Training / Tim Instruktur mendampingi dinamika kelas dengan disiplin dan solutif.',
+                'Keteladanan ibadah dan kedisiplinan tim fasilitator sangat baik.',
+            ],
+            'C' => [
+                'Kenyamanan ruangan, pencahayaan, proyektor, dan tata suara audio memuaskan.',
+                'Kualitas konsumsi, kudapan, dan ketepatan jadwal istirahat/ibadah terjaga baik.',
+                'Kesiapan panitia dalam melayani kebutuhan dan respon kendala peserta sangat memuaskan.',
+            ],
+        ];
+
+        foreach ($defaultItems as $kategori => $teksList) {
+            foreach ($teksList as $urutan => $teks) {
+                AngketItem::firstOrCreate([
+                    'event_id' => $event->id,
+                    'kategori' => $kategori,
+                    'urutan' => $urutan + 1,
+                ], [
+                    'teks_item' => $teks,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Instrumen feedback & angket standar Baitul Arqam berhasil disiapkan.');
+    }
 }

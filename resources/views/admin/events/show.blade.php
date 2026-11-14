@@ -4,9 +4,10 @@
 
 @section('content')
 <div class="space-y-3.5 sm:space-y-4" x-data="{ 
-    activeTab: '{{ in_array(request('tab'), ['evaluasi', 'cbt']) ? 'cbt' : (in_array(request('tab'), ['unduh_data', 'laporan']) ? 'laporan' : request('tab', 'peserta')) }}', 
+    activeTab: '{{ in_array(request('tab'), ['evaluasi', 'cbt']) ? 'cbt' : (in_array(request('tab'), ['unduh_data', 'laporan']) ? 'laporan' : (in_array(request('tab'), ['angket', 'feedback']) ? 'feedback' : request('tab', 'peserta'))) }}', 
     subTabCbt: '{{ request('sub', 'tes') }}', 
     subTabOutbound: 'regu', 
+    subTabFeedback: '{{ request('sub_feedback', 'rekap') }}',
     subTabLaporan: 'rekap', 
     modalSesi: false, 
     editSesi: null, 
@@ -225,7 +226,22 @@
                 <span>RTL</span>
             </button>
 
-            {{-- 6. Laporan --}}
+            {{-- 6. Feedback --}}
+            <button type="button" @click="activeTab = 'feedback'"
+                :class="(activeTab === 'feedback' || activeTab === 'angket') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <span>Feedback</span>
+                @if(isset($totalRespondenAngket) && $totalRespondenAngket > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    {{ $totalRespondenAngket }}
+                </span>
+                @endif
+            </button>
+
+            {{-- 7. Laporan --}}
             <button type="button" @click="activeTab = 'laporan'"
                 :class="(activeTab === 'laporan' || activeTab === 'unduh_data') ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
                 class="py-3.5 border-b-2 transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer -mb-[1px]">
@@ -237,66 +253,124 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB: PESERTA                                              --}}
+        {{-- PAGE TAB: PESERTA (BENTO CLEAN DESIGN)                         --}}
         {{-- ============================================================== --}}
-        <div x-show="activeTab === 'peserta'" class="p-4 sm:p-5 space-y-4">
+        <div x-show="activeTab === 'peserta'" class="p-3.5 sm:p-5 space-y-3.5 sm:space-y-4">
             {{-- Header Tab Peserta --}}
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
                 <div>
-                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Peserta</h2>
-                    <p class="text-xs text-slate-500 font-normal">Pendaftaran kader, penerbitan tanda peserta (ID Card), dan penetapan fasilitator pendamping.</p>
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">Kader Peserta</h2>
+                        <span class="px-2 py-0.2 rounded-full bg-sky-50 text-sky-700 border border-sky-200/80 text-[10px] font-bold">
+                            {{ $totalPeserta }} Terdaftar
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-normal mt-0.5">
+                        Penerbitan tanda peserta (ID Card), pengingat kegiatan WhatsApp, dan penetapan fasilitator.
+                    </p>
                 </div>
-                <div class="flex items-center gap-1.5 flex-wrap">
+                
+                {{-- Bento Action Cluster --}}
+                <div class="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-2">
+                    @if($canManage)
+                    <a href="{{ route('admin.events.enroll', $event) }}" class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold transition shadow-2xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        <span>+ Enroll Peserta</span>
+                    </a>
+                    @endif
                     @if($totalPeserta > 0)
-                    <a href="{{ route('admin.events.idcards.batch', $event) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 text-sky-800 text-xs font-semibold hover:bg-sky-100 transition shadow-2xs">
-                        <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                        <span>Cetak ID Card Massal (A4)</span>
+                    <a href="{{ route('admin.events.idcards.batch', $event) }}" target="_blank" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs">
+                        <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <span class="truncate">ID Card (A4)</span>
                     </a>
                     @if($canManage)
-                    <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" onsubmit="return confirm('Kirim notifikasi pengingat kegiatan via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
+                    <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" class="inline-block" onsubmit="return confirm('Kirim notifikasi pengingat kegiatan via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
                         @csrf
-                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                        <button type="submit" class="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                             </svg>
-                            <span>Broadcast Pengingat WA</span>
+                            <span class="truncate">Broadcast WA</span>
                         </button>
                     </form>
                     @endif
                     @endif
-                    @if($canManage)
-                    <a href="{{ route('admin.events.enroll', $event) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold transition shadow-2xs">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                        <span>+ Enroll Peserta</span>
-                    </a>
-                    @endif
                 </div>
             </div>
 
-            {{-- Ringkasan Peserta & Sebaran Cabang Ramping --}}
-            <div class="grid sm:grid-cols-3 gap-2.5">
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200/70">
-                    <span class="text-[11px] text-slate-500 block">Total Kader Terdaftar</span>
-                    <span class="text-base font-bold text-slate-900">{{ $totalPeserta }} <span class="text-xs text-slate-500 font-normal">/ {{ $event->kuota ?: '∞' }} Kuota</span></span>
+            {{-- 3-Tile Bento Grid (Kompak & Sejajar 3 Kolom di Mobile, Menggantikan Tumpukan Vertikal) --}}
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                {{-- Tile 1: Total & Kuota --}}
+                <div class="p-2 sm:p-3 bg-slate-50/80 hover:bg-white rounded-xl border border-slate-200/80 hover:border-sky-300 shadow-2xs transition flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600">Total Kader</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                    </div>
+                    <div class="my-0.5">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-base sm:text-xl font-black text-slate-900">{{ $totalPeserta }}</span>
+                            <span class="text-[10px] sm:text-xs text-slate-400 font-normal">/ {{ $event->kuota ?: '∞' }}</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1 mt-1 overflow-hidden">
+                            <div class="bg-sky-500 h-1 rounded-full" style="width: {{ $event->kuota ? min(100, round(($totalPeserta / $event->kuota) * 100)) : 100 }}%"></div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                        {{ $event->kuota ? (round(($totalPeserta / $event->kuota) * 100) . '% Terisi') : 'Kuota Bebas' }}
+                    </span>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200/70">
-                    <span class="text-[11px] text-slate-500 block">Komposisi Gender</span>
-                    <span class="text-base font-bold text-slate-900">L: {{ $totalLaki }} <span class="text-slate-400">|</span> P: {{ $totalPerempuan }}</span>
+
+                {{-- Tile 2: Gender --}}
+                <div class="p-2 sm:p-3 bg-slate-50/80 hover:bg-white rounded-xl border border-slate-200/80 hover:border-indigo-300 shadow-2xs transition flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600">Komposisi Gender</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    </div>
+                    <div class="my-1 space-y-1 text-[10px] sm:text-xs">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="inline-flex items-center gap-1 text-slate-600"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>Laki-laki</span>
+                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap">{{ $totalLaki }} peserta</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="inline-flex items-center gap-1 text-slate-600"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>Perempuan</span>
+                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap">{{ $totalPerempuan }} peserta</span>
+                        </div>
+                        <div class="flex h-1.5 overflow-hidden rounded-full bg-slate-200" aria-label="Komposisi gender peserta">
+                            <span class="bg-sky-500" style="width: {{ $totalPeserta > 0 ? round(($totalLaki / $totalPeserta) * 100) : 0 }}%"></span>
+                            <span class="bg-rose-400" style="width: {{ $totalPeserta > 0 ? round(($totalPerempuan / $totalPeserta) * 100) : 0 }}%"></span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium mt-0.5">
+                        {{ $totalPeserta > 0 ? 'Total ' . $totalPeserta . ' peserta' : 'Belum ada peserta' }}
+                    </span>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200/70">
-                    <span class="text-[11px] text-slate-500 block">Sebaran PCM (Cabang)</span>
-                    <span class="text-base font-bold text-sky-700">{{ $pcmCounts->count() }} Cabang Asal</span>
+
+                {{-- Tile 3: Cabang --}}
+                <div class="p-2 sm:p-3 bg-slate-50/80 hover:bg-white rounded-xl border border-slate-200/80 hover:border-amber-300 shadow-2xs transition flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600">Sebaran</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    </div>
+                    <div class="my-0.5">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-base sm:text-xl font-black text-slate-900">{{ $pcmCounts->count() }}</span>
+                            <span class="text-[10px] sm:text-xs text-slate-500 font-medium">Cabang</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-amber-700 font-semibold truncate mt-0.5" title="{{ $pcmCounts->keys()->implode(', ') }}">
+                        {{ $pcmCounts->keys()->first() ?: 'Belum Ada' }}
+                    </span>
                 </div>
             </div>
 
             {{-- List Peserta Terdaftar dengan Live Search Filter --}}
-            <div class="space-y-2">
+            <div class="space-y-2 pt-1">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Daftar Kader Terdaftar ({{ $totalPeserta }})</h3>
                     @if($totalPeserta > 0)
                     <div class="relative w-full sm:w-72">
                         <input type="text" x-model="searchPeserta" placeholder="Cari nama, NBM, cabang..."
-                            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition">
+                            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition">
                         <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -304,88 +378,207 @@
                     @endif
                 </div>
 
-                <div class="space-y-1.5 max-h-[30rem] overflow-y-auto pr-1">
+                {{-- Participant Bento Cards --}}
+                <div class="space-y-2 max-h-[34rem] overflow-y-auto pr-0.5">
                     @forelse($peserta as $p)
                     <div x-show="!searchPeserta || '{{ strtolower(addslashes($p->anggota->nama_lengkap . ' ' . $p->anggota->nbm . ' ' . ($p->anggota->pcm ?: $p->anggota->kecamatan))) }}'.includes(searchPeserta.toLowerCase())"
-                        class="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:border-sky-200 transition">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-9 h-11 rounded bg-slate-200 overflow-hidden shrink-0 border border-slate-300">
+                        class="group p-2.5 sm:p-3 rounded-xl border border-slate-200/90 bg-white hover:border-sky-300 hover:shadow-xs transition-all duration-200 flex items-center justify-between gap-2.5">
+                        
+                        {{-- Left: Foto & Identitas Kader --}}
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <div class="w-10 h-[53px] aspect-[3/4] rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-2xs relative">
                                 @if($p->anggota->foto)
-                                <img src="{{ route('foto.anggota', $p->anggota) }}" alt="" class="w-full h-full object-cover">
+                                <img src="{{ route('foto.anggota', $p->anggota) }}" alt="" class="w-full h-full object-cover object-top">
                                 @else
-                                <div class="w-full h-full flex items-center justify-center text-[9px] text-slate-500 font-bold">FOTO</div>
+                                <div class="w-full h-full flex items-center justify-center text-[9px] text-slate-400 font-bold bg-slate-100">FOTO</div>
                                 @endif
                             </div>
-                            <div class="min-w-0">
-                                <p class="font-bold text-xs text-slate-900 truncate">{{ $p->anggota->nama_lengkap }}</p>
-                                <p class="text-[11px] text-slate-500 truncate">{{ $p->anggota->pcm ?: ($p->anggota->kecamatan ?: '-') }} &bull; NBM: {{ $p->anggota->nbm ?: 'Belum Ada' }} &bull; NIK: {{ $p->anggota->nik ?: '-' }}</p>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-900 truncate leading-snug">{{ $p->anggota->nama_lengkap }}</h4>
+                                    @if($p->anggota->pcm)
+                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-100 shrink-0">
+                                        {{ $p->anggota->pcm }}
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5 truncate">
+                                    <span class="font-mono text-slate-600 text-[10px] sm:text-[11px]">NBM: {{ $p->anggota->nbm ?: '-' }}</span>
+                                    @if($p->anggota->nik)
+                                    <span class="text-slate-300 hidden sm:inline">&bull;</span>
+                                    <span class="font-mono text-slate-400 text-[10px] hidden sm:inline">NIK: {{ $p->anggota->nik }}</span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
+                        {{-- Right: Actions Bento Cluster --}}
                         @if($canManage)
                         <div class="flex items-center gap-1 shrink-0">
                             @if($p->anggota->no_wa)
                             <form method="POST" action="{{ route('admin.events.peserta.remind-wa', [$event, $p]) }}">
                                 @csrf
-                                <button type="submit" title="Kirim Pengingat WA ke peserta ini" class="p-1 rounded-md border border-emerald-300 text-emerald-700 bg-emerald-50/60 hover:bg-emerald-100 text-xs font-semibold transition shadow-2xs">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                <button type="submit" title="Kirim Pengingat WA ke peserta ini" class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs cursor-pointer">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                                     </svg>
                                 </button>
                             </form>
                             @endif
-                            <a href="{{ route('admin.events.certificate', [$event, $p]) }}" class="px-2 py-1 rounded-md border border-slate-200 hover:bg-sky-50 hover:text-sky-900 text-xs font-semibold text-slate-700 transition shadow-2xs">
-                                Sertifikat
+                            <a href="{{ route('admin.events.certificate', [$event, $p]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-200 hover:bg-sky-50 hover:text-sky-900 text-xs font-semibold text-slate-700 transition shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-sky-600 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <span>Sertifikat</span>
                             </a>
-                            <form method="POST" action="{{ route('admin.events.peserta.remove', [$event, $p]) }}" onsubmit="return confirm('Keluarkan peserta dari event ini?')">
+                            <form method="POST" action="{{ route('admin.events.peserta.remove', [$event, $p]) }}" onsubmit="return confirm('Keluarkan peserta {{ $p->anggota->nama_lengkap }} dari event ini?')">
                                 @csrf
-                                <button type="submit" class="px-2 py-1 rounded-md border border-red-200 text-red-700 hover:bg-red-50 text-xs font-semibold transition shadow-2xs">
-                                    Keluarkan
+                                <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                                    <svg class="w-3.5 h-3.5 text-red-500 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <span>Keluarkan</span>
                                 </button>
                             </form>
                         </div>
                         @endif
                     </div>
                     @empty
-                    <div class="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl">
+                    <div class="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
                         Belum ada peserta yang terdaftar pada kegiatan ini. Klik tombol <b>+ Enroll Peserta</b> di atas untuk menambahkan kader.
                     </div>
                     @endforelse
                 </div>
             </div>
 
-            {{-- Seksi Penugasan Fasilitator Ramping --}}
+            {{-- Seksi Penugasan Fasilitator Bento Multi-Kolom --}}
             @if($canManage)
-            <div class="pt-4 border-t border-slate-100">
-                <div class="pb-2">
-                    <h3 class="font-bold text-slate-900 text-xs sm:text-sm tracking-tight">Penugasan Fasilitator &amp; Instruktur Kegiatan</h3>
-                    <p class="text-[11px] text-slate-500">Centang instruktur/fasilitator yang bertugas mengoperasikan scanner presensi dan menilai praktik peserta di event ini.</p>
-                </div>
-
-                <form method="POST" action="{{ route('admin.events.fasilitator.update', $event) }}" class="space-y-3">
+            <div class="pt-3 border-t border-slate-100">
+                <form method="POST" action="{{ route('admin.events.fasilitator.update', $event) }}" 
+                      x-data="{ 
+                          searchFasil: '', 
+                          checkedCount: {{ count($assignedFasilitatorIds) }},
+                          updateCount() {
+                              this.checkedCount = this.$el.querySelectorAll('input[name=\'fasilitator_ids[]\']:checked').length;
+                          },
+                          toggleAll(val) {
+                              this.$el.querySelectorAll('input[name=\'fasilitator_ids[]\']').forEach(cb => {
+                                  cb.checked = val;
+                              });
+                              this.updateCount();
+                          }
+                      }"
+                      @change="updateCount()"
+                      class="bg-gradient-to-br from-slate-50/70 via-white to-slate-50/40 rounded-2xl border border-slate-200/90 p-3 sm:p-4 shadow-2xs space-y-3">
                     @csrf
-                    <div class="grid sm:grid-cols-2 gap-2.5">
-                        @forelse($fasilitatorOptions as $f)
-                        <label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-sky-400 has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50/40 cursor-pointer transition">
-                            <input type="checkbox" name="fasilitator_ids[]" value="{{ $f->id }}"
-                                @checked(in_array($f->id, $assignedFasilitatorIds))
-                                class="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                    
+                    {{-- Bento Header --}}
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-sky-50 border border-sky-100 text-sky-700 flex items-center justify-center shrink-0 shadow-2xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            </div>
                             <div>
-                                <span class="text-xs font-semibold text-slate-900 block leading-tight">{{ $f->name }}</span>
-                                <span class="text-[11px] text-slate-500 font-normal">{{ $f->email }}</span>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight">Penugasan Fasilitator &amp; Instruktur</h3>
+                                    <span class="px-2 py-0.2 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold" x-text="checkedCount + ' Bertugas'">
+                                        {{ count($assignedFasilitatorIds) }} Bertugas
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 font-normal mt-0.5">
+                                    Otorisasi instruktur pendamping untuk pemindaian presensi QR dan penilaian rubrik praktik.
+                                </p>
+                            </div>
+                        </div>
+
+                        @if($fasilitatorOptions->count())
+                        <button type="submit" class="self-end sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold rounded-xl shadow-xs transition hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Simpan Penugasan</span>
+                        </button>
+                        @endif
+                    </div>
+
+                    {{-- Search & Quick Toggle Bar (Bento Controls) --}}
+                    @if($fasilitatorOptions->count() > 2)
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
+                        <div class="relative flex-1 max-w-xs">
+                            <input type="text" x-model="searchFasil" placeholder="Cari nama instruktur..."
+                                class="w-full pl-7 pr-3 py-1 text-xs bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-sky-500 focus:border-sky-500 outline-none transition">
+                            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-[11px]">
+                            <button type="button" @click="toggleAll(true)" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition cursor-pointer">
+                                Pilih Semua
+                            </button>
+                            <span class="text-slate-300">&bull;</span>
+                            <button type="button" @click="toggleAll(false)" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition cursor-pointer">
+                                Kosongkan
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Fasilitator Bento Multi-Column Grid (2 Kolom di Mobile, 3 di Tablet, 4 di Desktop) --}}
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-2.5 max-h-[300px] sm:max-h-[360px] overflow-y-auto pr-0.5">
+                        @forelse($fasilitatorOptions as $f)
+                        @php
+                            $isAssigned = in_array($f->id, $assignedFasilitatorIds);
+                            $cleanName = trim(preg_replace('/^(Drs\.|Dr\.|H\.|Hj\.|Ust\.|Ustadz|Prof\.|Ir\.)\s+/i', '', $f->name));
+                            $words = explode(' ', $cleanName ?: trim($f->name));
+                            $initials = count($words) >= 2 
+                                ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1)) 
+                                : strtoupper(substr($words[0], 0, 2));
+                        @endphp
+                        <label x-show="!searchFasil || '{{ strtolower(addslashes($f->name . ' ' . $f->email)) }}'.includes(searchFasil.toLowerCase())"
+                               class="group relative flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border border-slate-200/90 bg-white hover:border-sky-300 hover:shadow-xs has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50/50 has-[:checked]:shadow-xs cursor-pointer transition-all duration-200 select-none">
+                            
+                            {{-- Top: Avatar + Custom Check Indicator --}}
+                            <div class="flex items-start justify-between gap-1.5 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-sky-100 group-has-[:checked]:bg-sky-600 group-has-[:checked]:text-white text-slate-700 font-black text-xs flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                    <span>{{ $initials }}</span>
+                                </div>
+                                <div class="w-4.5 h-4.5 rounded-md border border-slate-300 group-has-[:checked]:border-sky-600 group-has-[:checked]:bg-sky-600 flex items-center justify-center transition-colors">
+                                    <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <input type="checkbox" name="fasilitator_ids[]" value="{{ $f->id }}"
+                                    @checked($isAssigned)
+                                    class="sr-only">
+                            </div>
+
+                            {{-- Middle: Name & Email --}}
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-slate-900 group-has-[:checked]:text-sky-950 leading-tight line-clamp-2" title="{{ $f->name }}">
+                                    {{ $f->name }}
+                                </h4>
+                                <p class="text-[10px] text-slate-400 group-has-[:checked]:text-sky-700 font-mono truncate mt-0.5" title="{{ $f->email }}">
+                                    {{ $f->email }}
+                                </p>
+                            </div>
+
+                            {{-- Bottom: Status Pill Badge --}}
+                            <div class="mt-2 pt-1.5 border-t border-slate-100 group-has-[:checked]:border-sky-200/60 flex items-center justify-between text-[10px]">
+                                <span class="font-semibold text-slate-400 group-has-[:checked]:text-sky-700">
+                                    <span class="inline group-has-[:checked]:hidden">Lepas Tugas</span>
+                                    <span class="hidden group-has-[:checked]:inline font-bold">Bertugas</span>
+                                </span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-has-[:checked]:bg-emerald-500"></span>
                             </div>
                         </label>
                         @empty
-                        <div class="sm:col-span-2 py-3 text-center text-slate-400 text-xs font-normal">
+                        <div class="col-span-2 sm:col-span-3 lg:col-span-4 py-6 text-center text-slate-400 text-xs font-normal border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
                             Belum ada akun dengan role fasilitator terdaftar di sistem.
                         </div>
                         @endforelse
                     </div>
 
+                    {{-- Bottom Status Hint --}}
                     @if($fasilitatorOptions->count())
-                    <div class="pt-1 flex justify-end">
-                        <button type="submit" class="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
-                            Simpan Penugasan Fasilitator
+                    <div class="pt-1 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span class="flex items-center gap-1 text-slate-500">
+                            <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Klik ubin fasilitator untuk mengatur penugasan scanner &amp; penilaian.</span>
+                        </span>
+                        <button type="submit" class="sm:hidden text-sky-600 font-bold hover:underline shrink-0">
+                            Simpan &rarr;
                         </button>
                     </div>
                     @endif
@@ -890,7 +1083,294 @@
         </div>
 
         {{-- ============================================================== --}}
-        {{-- PAGE TAB 6: LAPORAN                                            --}}
+        {{-- PAGE TAB 6: FEEDBACK & EVALUASI PENYELENGGARAAN                --}}
+        {{-- ============================================================== --}}
+        <div x-show="activeTab === 'feedback' || activeTab === 'angket'" class="p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Feedback &amp; Evaluasi Penyelenggaraan</h2>
+                    <p class="text-xs text-slate-500 font-normal">Instrumen angket evaluasi kepuasan kader (Skala Likert 1–5), analisis mutu sarana &amp; narasumber, serta masukan konstruktif peserta.</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('portal.angket.index', $event) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs transition">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        <span>Buka Form Peserta</span>
+                    </a>
+                    @if($canManage && $angketItems->isEmpty())
+                    <form method="POST" action="{{ route('admin.events.angket.seed-defaults', $event) }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#005c8a] hover:bg-[#004a70] text-white text-xs font-semibold shadow-2xs transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <span>Isi Butir Standar MPKSDI</span>
+                        </button>
+                    </form>
+                    @endif
+                </div>
+            </div>
+
+            {{-- LEVEL 2: FEEDBACK SUB-NAVIGATION --}}
+            <div class="border-b border-slate-200/90 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-none text-xs">
+                <button type="button" @click="subTabFeedback = 'rekap'"
+                    :class="subTabFeedback === 'rekap' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer flex items-center gap-1.5">
+                    <span>Rekap &amp; Statistik Skor</span>
+                </button>
+                <button type="button" @click="subTabFeedback = 'komentar'"
+                    :class="subTabFeedback === 'komentar' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer flex items-center gap-1.5">
+                    <span>Masukan &amp; Saran Kader</span>
+                    @if($angketKomentarList->count() > 0)
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800">
+                        {{ $angketKomentarList->count() }}
+                    </span>
+                    @endif
+                </button>
+                <button type="button" @click="subTabFeedback = 'kelola'"
+                    :class="subTabFeedback === 'kelola' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer flex items-center gap-1.5">
+                    <span>Kelola Butir Angket ({{ $angketItems->count() }})</span>
+                </button>
+            </div>
+
+            {{-- SUB-TAB 1: REKAP & STATISTIK SKOR --}}
+            <div x-show="subTabFeedback === 'rekap'" class="space-y-4">
+                {{-- 4 Metric Cards --}}
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                    <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                        <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Responden Feedback</span>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-xl sm:text-2xl font-black text-slate-900">{{ $totalRespondenAngket }}</span>
+                            <span class="text-xs text-slate-500 font-normal">/ {{ $totalPeserta }} peserta</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-700 font-semibold mt-0.5 block">
+                            {{ $totalPeserta > 0 ? round(($totalRespondenAngket / $totalPeserta) * 100, 1) : 0 }}% tingkat partisipasi
+                        </span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                        <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Indeks Kepuasan Rata-rata</span>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-xl sm:text-2xl font-black text-[#005c8a]">{{ number_format($rerataSkorAngket, 2) }}</span>
+                            <span class="text-xs text-slate-500 font-normal">/ 5.00 ⭐</span>
+                        </div>
+                        <span class="text-[10px] font-semibold mt-0.5 block
+                            {{ $rerataSkorAngket >= 4.0 ? 'text-emerald-700' : ($rerataSkorAngket >= 3.0 ? 'text-sky-700' : 'text-amber-700') }}">
+                            {{ $rerataSkorAngket >= 4.5 ? 'Sangat Memuaskan' : ($rerataSkorAngket >= 3.75 ? 'Memuaskan / Baik' : ($rerataSkorAngket >= 3.0 ? 'Cukup Baik' : ($rerataSkorAngket > 0 ? 'Perlu Peningkatan' : 'Belum Ada Penilaian'))) }}
+                        </span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                        <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Instrumen Evaluasi</span>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-xl sm:text-2xl font-black text-slate-900">{{ $angketItems->count() }}</span>
+                            <span class="text-xs text-slate-500 font-normal">butir pertanyaan</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 mt-0.5 block">
+                            {{ $angketItemsGrouped->count() }} dimensi/kategori aspek
+                        </span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                        <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Masukan &amp; Saran</span>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-xl sm:text-2xl font-black text-slate-900">{{ $angketKomentarList->count() }}</span>
+                            <span class="text-xs text-slate-500 font-normal">ulasan tertulis</span>
+                        </div>
+                        <button type="button" @click="subTabFeedback = 'komentar'" class="text-[10px] text-sky-600 hover:underline font-semibold mt-0.5 block text-left">
+                            Lihat semua kritik &amp; saran &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Detail Skor per Kategori & Butir Likert --}}
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between pb-1">
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Rincian Penilaian per Aspek &amp; Butir Evaluasi</h3>
+                        <span class="text-[11px] text-slate-500">Skala 1 (Kurang) &ndash; 5 (Sangat Baik)</span>
+                    </div>
+
+                    @forelse($angketItemsGrouped as $kategori => $itemList)
+                    <div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-sky-50 text-[#005c8a] font-bold text-xs flex items-center justify-center border border-sky-200/80">
+                                    {{ $kategori }}
+                                </span>
+                                <div>
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-900">
+                                        @if($kategori === 'A')
+                                            Aspek A: Materi &amp; Kurikulum
+                                        @elseif($kategori === 'B')
+                                            Aspek B: Narasumber &amp; Fasilitator
+                                        @elseif($kategori === 'C')
+                                            Aspek C: Pelayanan &amp; Sarana Penyelenggaraan
+                                        @else
+                                            Aspek {{ $kategori }}
+                                        @endif
+                                    </h4>
+                                    <p class="text-[10px] text-slate-500">{{ $itemList->count() }} butir instrumen</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            @foreach($itemList as $item)
+                            @php
+                                $itemStat = $skorPerItem->get($item->id);
+                                $avgSkor = $itemStat ? (float) $itemStat->avg_skor : 0.0;
+                                $respCount = $itemStat ? (int) $itemStat->total_responden : 0;
+                                $pct = round(($avgSkor / 5.0) * 100);
+                            @endphp
+                            <div class="p-2.5 rounded-lg bg-slate-50/70 border border-slate-200/70 hover:bg-white hover:border-sky-200 transition">
+                                <div class="flex items-start justify-between gap-3 mb-1.5">
+                                    <p class="text-xs text-slate-800 font-medium flex-1">
+                                        <span class="font-bold text-slate-500 mr-1">{{ $item->urutan }}.</span>
+                                        {{ $item->teks_item }}
+                                    </p>
+                                    <div class="text-right shrink-0">
+                                        @if($respCount > 0)
+                                        <span class="font-bold text-xs text-[#005c8a]">{{ number_format($avgSkor, 2) }}</span>
+                                        <span class="text-[10px] text-slate-400">/ 5.0</span>
+                                        @else
+                                        <span class="text-[10px] text-slate-400 italic">Belum ada nilai</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 h-2 rounded-full bg-slate-200/80 overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-300 {{ $avgSkor >= 4.0 ? 'bg-emerald-500' : ($avgSkor >= 3.0 ? 'bg-sky-500' : ($avgSkor > 0 ? 'bg-amber-500' : 'bg-slate-300')) }}"
+                                             style="width: {{ $pct }}%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-slate-500 shrink-0 font-mono">{{ $respCount }} respon</span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @empty
+                    <div class="p-8 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 text-center space-y-3">
+                        <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xs sm:text-sm text-slate-800">Instrumen Angket Belum Dibuat</h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Tambahkan butir pertanyaan angket atau gunakan instrumen standar Baitul Arqam MPKSDI.</p>
+                        </div>
+                        @if($canManage)
+                        <form method="POST" action="{{ route('admin.events.angket.seed-defaults', $event) }}">
+                            @csrf
+                            <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-[#005c8a] hover:bg-[#004a70] text-white text-xs font-semibold shadow-2xs transition inline-flex items-center gap-1.5">
+                                <span>Gunakan Templat Butir Standar MPKSDI</span>
+                            </button>
+                        </form>
+                        @endif
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- SUB-TAB 2: MASUKAN & SARAN KADER --}}
+            <div x-show="subTabFeedback === 'komentar'" class="space-y-3">
+                <div class="flex items-center justify-between pb-1">
+                    <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Ulasan Kualitatif, Kritik, &amp; Saran Konstruktif Peserta</h3>
+                    <span class="text-[11px] text-slate-500">{{ $angketKomentarList->count() }} masukan tercatat</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    @forelse($angketKomentarList as $kom)
+                    <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200/90 bg-white hover:border-sky-200 shadow-2xs transition flex flex-col justify-between space-y-2.5">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <div class="w-7 h-7 rounded-full bg-sky-100 text-[#005c8a] font-bold text-xs flex items-center justify-center shrink-0">
+                                        {{ strtoupper(substr($kom->anggota?->nama_lengkap ?? 'K', 0, 1)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-xs text-slate-900 truncate">{{ $kom->anggota?->nama_lengkap ?? 'Kader Peserta' }}</p>
+                                        <p class="text-[10px] text-slate-500 truncate">{{ $kom->anggota?->pcm ?: ($kom->anggota?->kecamatan ?: 'Peserta') }}</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-mono text-slate-400 shrink-0">
+                                    {{ $kom->created_at?->format('d/m/Y H:i') }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-700 leading-relaxed italic bg-slate-50/70 p-2.5 rounded-lg border-l-2 border-sky-500">
+                                &ldquo;{{ $kom->komentar }}&rdquo;
+                            </p>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="md:col-span-2 text-center py-10 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl">
+                        Belum ada saran atau kritik tertulis dari peserta pelatihan.
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- SUB-TAB 3: KELOLA INSTRUMEN ANGKET --}}
+            <div x-show="subTabFeedback === 'kelola'" class="space-y-4">
+                @if($canManage)
+                {{-- Form Tambah Butir --}}
+                <div class="p-3.5 sm:p-4 bg-slate-50/70 rounded-xl border border-slate-200/90 shadow-2xs">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-900 mb-2">Tambah Butir Angket Baru</h3>
+                    <form method="POST" action="{{ route('admin.events.angket.item.store', $event) }}" class="flex gap-2 flex-wrap items-end">
+                        @csrf
+                        <div class="w-full sm:w-44">
+                            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Kategori Aspek</label>
+                            <select name="kategori" required class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition">
+                                <option value="A">A - Materi &amp; Kurikulum</option>
+                                <option value="B">B - Narasumber &amp; Fasilitator</option>
+                                <option value="C">C - Pelayanan &amp; Sarana</option>
+                                <option value="D">D - Aspek Tambahan</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[240px]">
+                            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Pernyataan Evaluasi (Likert 1–5)</label>
+                            <input name="teks_item" required placeholder="Contoh: Materi disampaikan dengan jelas dan aplikatif..."
+                                class="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition">
+                        </div>
+                        <button type="submit" class="px-4 py-2 bg-[#005c8a] hover:bg-[#004a70] text-white text-xs font-semibold rounded-lg shadow-2xs transition shrink-0 cursor-pointer">
+                            + Tambah Butir
+                        </button>
+                    </form>
+                </div>
+                @endif
+
+                {{-- Daftar Butir per Kategori --}}
+                <div class="space-y-3">
+                    @forelse($angketItemsGrouped as $kategori => $items)
+                    <div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+                        <h4 class="font-bold text-xs sm:text-sm text-slate-900 mb-2.5">
+                            Kategori {{ $kategori }} ({{ $items->count() }} Butir)
+                        </h4>
+                        <div class="space-y-1.5">
+                            @foreach($items as $item)
+                            <div class="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-slate-50/70 border border-slate-200/60 hover:bg-white hover:border-sky-200 transition text-xs">
+                                <p class="text-slate-800 font-medium">
+                                    <span class="font-bold text-slate-500 mr-1">{{ $item->urutan }}.</span>
+                                    {{ $item->teks_item }}
+                                </p>
+                                @if($canManage)
+                                <form method="POST" action="{{ route('admin.events.angket.item.destroy', [$event, $item]) }}" onsubmit="return confirm('Hapus butir angket ini?')">
+                                    @csrf @method('DELETE')
+                                    <button class="text-slate-400 hover:text-red-600 font-bold px-2 py-0.5 rounded transition" title="Hapus Butir">&times;</button>
+                                </form>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl">
+                        Belum ada butir angket evaluasi.
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        {{-- ============================================================== --}}
+        {{-- PAGE TAB 7: LAPORAN                                            --}}
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'laporan' || activeTab === 'unduh_data'" class="p-4 sm:p-5 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -1110,15 +1590,23 @@
                             </span>
                             <p class="text-[11px] text-slate-600 mt-1">Unduh seluruh sertifikat kader lulus sekaligus dalam 1 PDF (Hal 1: Sertifikat QR; Hal 2: Transkrip JP).</p>
                         </div>
-                        @if($event->status === 'selesai')
-                        <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
-                            Unduh Batch Sertifikat
-                        </a>
-                        @else
-                        <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
-                            Status Selesai Diperlukan
-                        </span>
-                        @endif
+                        <div class="space-y-1.5">
+                            @if($event->status === 'selesai')
+                            <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block">
+                                Unduh Batch Sertifikat
+                            </a>
+                            @else
+                            <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
+                                Status Selesai Diperlukan
+                            </span>
+                            @endif
+                            @if($canManage)
+                            <a href="{{ route('admin.events.edit', $event) }}" class="inline-flex items-center justify-center gap-1 w-full text-[11px] text-indigo-700 hover:text-indigo-900 font-semibold py-1 hover:underline transition">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                <span>Edit Pengesahan &amp; TTD Sertifikat</span>
+                            </a>
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Halaman Ranking Interaktif --}}

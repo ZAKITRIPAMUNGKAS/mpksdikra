@@ -29,7 +29,7 @@ class SoalController extends Controller
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
 
         $otherEvents = Event::where('id', '!=', $event->id)
-            ->whereHas('soal', fn ($q) => $q->where('tipe', $tipe))
+            ->whereHas('soal')
             ->orderByDesc('created_at')
             ->get();
 
@@ -44,6 +44,7 @@ class SoalController extends Controller
 
         $data = $request->validate([
             'source_event_id' => ['required', 'integer', 'exists:events,id'],
+            'source_tipe' => ['required', 'in:pretest,posttest'],
         ]);
 
         $sourceEventId = (int) $data['source_event_id'];
@@ -52,7 +53,7 @@ class SoalController extends Controller
         }
 
         $sourceSoal = Soal::where('event_id', $sourceEventId)
-            ->where('tipe', $tipe)
+            ->where('tipe', $data['source_tipe'])
             ->with('pilihan')
             ->orderBy('urutan')
             ->get();

@@ -1130,6 +1130,50 @@
                     class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer flex items-center gap-1.5">
                     <span>Kelola Butir Angket ({{ $angketItems->count() }})</span>
                 </button>
+                <button type="button" @click="subTabFeedback = 'pratinjau'"
+                    :class="subTabFeedback === 'pratinjau' ? 'border-[#063A60] text-[#063A60] font-semibold' : 'border-transparent text-slate-500 hover:text-slate-800 font-medium'"
+                    class="py-2.5 border-b-2 transition -mb-[1px] cursor-pointer flex items-center gap-1.5">
+                    <span>Pratinjau Skala Likert</span>
+                </button>
+            </div>
+
+            <div x-show="subTabFeedback === 'pratinjau'" class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,0.8fr)]">
+                <section class="overflow-hidden rounded-xl border border-slate-200 bg-white" aria-labelledby="preview-angket-title">
+                    <div class="border-b border-slate-200 bg-slate-50 px-4 py-3">
+                        <h3 id="preview-angket-title" class="text-sm font-bold text-slate-900">Pratinjau angket peserta</h3>
+                        <p class="mt-1 text-xs text-slate-600">Peserta menilai setiap pernyataan dari 1 (Sangat Kurang) sampai 5 (Sangat Baik).</p>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        @forelse($angketItems as $item)
+                        <div class="px-4 py-3">
+                            <p class="mb-2 text-xs font-medium text-slate-800">{{ $item->teks_item }}</p>
+                            <div class="grid grid-cols-5 gap-1.5 sm:gap-2" role="group" aria-label="Skala Likert untuk {{ $item->teks_item }}">
+                                @foreach([1 => 'Sangat Kurang', 2 => 'Kurang', 3 => 'Cukup', 4 => 'Baik', 5 => 'Sangat Baik'] as $score => $label)
+                                <div class="flex min-h-14 flex-col items-center justify-center rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-center {{ $score === 5 ? 'border-sky-300 bg-sky-50 text-sky-900' : 'text-slate-700' }}">
+                                    <span class="text-sm font-bold">{{ $score }}</span>
+                                    <span class="mt-0.5 hidden text-[10px] leading-tight sm:block">{{ $label }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="mt-1 flex justify-between text-[10px] text-slate-500 sm:hidden"><span>Sangat Kurang</span><span>Sangat Baik</span></div>
+                        </div>
+                        @empty
+                        <p class="px-4 py-8 text-center text-xs text-slate-500">Tambahkan butir angket agar pratinjau skala Likert tampil.</p>
+                        @endforelse
+                    </div>
+                </section>
+
+                <section class="flex flex-col rounded-xl border border-slate-200 bg-white" aria-labelledby="preview-feedback-title">
+                    <div class="border-b border-slate-200 bg-slate-50 px-4 py-3">
+                        <h3 id="preview-feedback-title" class="text-sm font-bold text-slate-900">Preview ulasan tertulis</h3>
+                        <p class="mt-1 text-xs text-slate-600">Kolom saran untuk masukan yang tidak terwakili oleh skor.</p>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-3 p-4">
+                        <label for="feedback-preview" class="text-xs font-semibold text-slate-800">Apa yang sudah baik, dan apa yang perlu diperbaiki?</label>
+                        <textarea id="feedback-preview" rows="4" disabled placeholder="Tulis saran atau masukan Anda di sini..." class="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 placeholder:text-slate-400"></textarea>
+                        <p class="text-[11px] leading-relaxed text-slate-500">Pratinjau ini tidak menyimpan jawaban. Peserta mengirim skor Likert dan komentar melalui Form Peserta.</p>
+                    </div>
+                </section>
             </div>
 
             {{-- SUB-TAB 1: REKAP & STATISTIK SKOR --}}

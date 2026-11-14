@@ -175,6 +175,10 @@ class EventDashboardTest extends TestCase
         $response->assertSee('Materi sangat aplikatif dan inspiratif.');
         $response->assertSee('Sangat menginspirasi dan panitia sangat ramah.');
         $response->assertSee('5.00');
+        $response->assertSee('Pratinjau Skala Likert');
+        $response->assertSee('Sangat Kurang');
+        $response->assertSee('Sangat Baik');
+        $response->assertSee('Preview ulasan tertulis');
     }
 
     public function test_admin_can_seed_default_angket_items(): void

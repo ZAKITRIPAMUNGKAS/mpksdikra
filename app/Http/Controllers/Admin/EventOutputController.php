@@ -128,6 +128,9 @@ class EventOutputController extends Controller
 
     public function certificatesBatch(Event $event)
     {
+        @ini_set('memory_limit', '512M');
+        @ini_set('max_execution_time', '300');
+
         abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
 
         $this->nilai->hitungUlang($event);
@@ -185,15 +188,24 @@ class EventOutputController extends Controller
 
     public function idCardsBatch(Event $event)
     {
+        @ini_set('memory_limit', '512M');
+        @ini_set('max_execution_time', '300');
+
         $peserta = $event->pesertaAktif()
+            ->whereHas('anggota')
             ->with(['anggota.user'])
             ->get()
+            ->filter(fn ($ep) => $ep->anggota !== null)
             ->sortBy('anggota.nama_lengkap')
             ->values();
 
         abort_if($peserta->isEmpty(), 404, 'Belum ada peserta aktif pada kegiatan ini.');
 
         $cards = $peserta->map(function ($ep) {
+            if (! $ep->anggota) {
+                return null;
+            }
+
             $photoInfo = $this->cutout->resolveOriginalForAnggota($ep->anggota);
 
             return [
@@ -209,7 +221,7 @@ class EventOutputController extends Controller
                 'foto_mode' => $photoInfo['mode'],
                 'qr' => $this->qr->qrPngDataUri($ep, 4, 1),
             ];
-        });
+        })->filter()->values();
 
         $pdf = Pdf::loadView('admin.events.idcard-batch-pdf', compact('event', 'cards'))
             ->setPaper([0, 0, 265.75, 383.75], 'portrait');

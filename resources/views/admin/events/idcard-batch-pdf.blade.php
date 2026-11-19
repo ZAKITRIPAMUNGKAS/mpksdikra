@@ -113,16 +113,31 @@
 @php
     $asDataUri = function (string $path): string {
         if (! file_exists($path)) return '';
-        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($path) ?: 'image/png';
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mime = match($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'svg' => 'image/svg+xml',
+            'webp' => 'image/webp',
+            default => 'image/png',
+        };
         return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
     };
-    $background = $asDataUri(public_path('aset/idcard/idcard-satu-sisi-bg.png'));
-    $logoMuhammadiyah = file_exists(public_path('aset/idcard/badge-muhammadiyah.png'))
-        ? $asDataUri(public_path('aset/idcard/badge-muhammadiyah.png'))
-        : $asDataUri(public_path('aset/logo-muhammadiyah.png'));
-    $logoMpksdi = file_exists(public_path('aset/idcard/badge-mpksdi.png'))
-        ? $asDataUri(public_path('aset/idcard/badge-mpksdi.png'))
-        : $asDataUri(public_path('aset/logo-mpksdi.png'));
+
+    $bgFile = file_exists(public_path('aset/idcard/idcard-satu-sisi-bg.jpg'))
+        ? public_path('aset/idcard/idcard-satu-sisi-bg.jpg')
+        : public_path('aset/idcard/idcard-satu-sisi-bg.png');
+    $background = $asDataUri($bgFile);
+
+    $logoMFile = file_exists(public_path('aset/idcard/badge-muhammadiyah.png'))
+        ? public_path('aset/idcard/badge-muhammadiyah.png')
+        : (file_exists(public_path('aset/logo-muhammadiyah.png')) ? public_path('aset/logo-muhammadiyah.png') : public_path('assets/logo/muhammadiyah.png'));
+    $logoMuhammadiyah = $asDataUri($logoMFile);
+
+    $logoKFile = file_exists(public_path('aset/idcard/badge-mpksdi.png'))
+        ? public_path('aset/idcard/badge-mpksdi.png')
+        : (file_exists(public_path('aset/logo-mpksdi.png')) ? public_path('aset/logo-mpksdi.png') : public_path('assets/logo/mpksdi.png'));
+    $logoMpksdi = $asDataUri($logoKFile);
+
     $tahun = $event->tanggal_mulai?->format('Y') ?? date('Y');
     $masaBerlaku = trim(($event->tanggal_mulai?->translatedFormat('d F Y') ?? '') . ' – ' . ($event->tanggal_selesai?->translatedFormat('d F Y') ?? ''));
 

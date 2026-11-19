@@ -17,12 +17,13 @@ class QrService
 
     public function payload(EventPeserta $ep): string
     {
-        $signature = $this->sign($ep->event_id, $ep->anggota_id, $ep->qr_token);
+        $token = (string) ($ep->qr_token ?: Str::random(32));
+        $signature = $this->sign((int) $ep->event_id, (int) $ep->anggota_id, $token);
 
         return base64_encode(json_encode([
-            'e' => $ep->event_id,
-            'a' => $ep->anggota_id,
-            't' => $ep->qr_token,
+            'e' => (int) $ep->event_id,
+            'a' => (int) $ep->anggota_id,
+            't' => $token,
             's' => $signature,
         ]));
     }

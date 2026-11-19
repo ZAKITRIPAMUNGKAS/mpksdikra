@@ -205,10 +205,17 @@ class AdminEventFlowTest extends TestCase
         $sesi = $event->sesi()->first();
         $this->assertSame('sholat', $sesi->jenis);
 
-        $this->actingAs($admin)
+        $response = $this->actingAs($admin)
             ->get(route('admin.events.absensi.scan', [$event, $sesi]))
-            ->assertOk()
-            ->assertSee('Sholat Berjamaah');
+            ->assertOk();
+
+        $response
+            ->assertSee('Sholat Berjamaah')
+            ->assertSee('lg:grid-cols-12', false)
+            ->assertSee('lg:col-span-7', false)
+            ->assertSee('lg:col-span-5', false)
+            ->assertSee('Pindai QR peserta');
+
     }
 
     public function test_selesai_status_is_final(): void

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Anggota;
-use finfo;
 use Illuminate\Support\Facades\Storage;
 use SplQueue;
 use Throwable;
@@ -530,7 +529,7 @@ class ImageCutoutService
     {
         if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
             $raw = Storage::disk('local')->get($anggota->foto);
-            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+            $mime = $this->detectMime($raw);
 
             return [
                 'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
@@ -544,7 +543,7 @@ class ImageCutoutService
 
         if (file_exists($defaultPath)) {
             $raw = file_get_contents($defaultPath);
-            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+            $mime = $this->detectMime($raw);
 
             return [
                 'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
@@ -567,7 +566,7 @@ class ImageCutoutService
         if ($mode === 'original') {
             if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
                 $raw = Storage::disk('local')->get($anggota->foto);
-                $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+                $mime = $this->detectMime($raw);
 
                 return [
                     'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
@@ -603,7 +602,7 @@ class ImageCutoutService
 
             // Priority 3: Raw source photo fallback (mode: original)
             $raw = Storage::disk('local')->get($anggota->foto);
-            $mime = (new finfo(FILEINFO_MIME_TYPE))->buffer($raw) ?: 'image/jpeg';
+            $mime = $this->detectMime($raw);
 
             return [
                 'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
@@ -616,5 +615,39 @@ class ImageCutoutService
             'dataUri' => $this->getDefaultPhotoDataUri(),
             'mode' => 'cutout',
         ];
+    }
+
+    /**
+     * Robust MIME detector using magic bytes without requiring ext-fileinfo.
+     */
+    public function detectMime(?string $raw): string
+    {
+        if (empty($raw)) {
+            return 'image/jpeg';
+        }
+
+        if (str_starts_with($raw, "\x89PNG\r\n\x1a\n")) {
+            return 'image/png';
+        }
+        if (str_starts_with($raw, "\xFF\xD8\xFF")) {
+            return 'image/jpeg';
+        }
+        if (str_starts_with($raw, 'RIFF') && substr($raw, 8, 4) === 'WEBP') {
+            return 'image/webp';
+        }
+        if (str_starts_with($raw, '<svg') || str_contains(substr($raw, 0, 100), '<svg')) {
+            return 'image/svg+xml';
+        }
+
+        if (class_exists(\finfo::class)) {
+            try {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                return $finfo->buffer($raw) ?: 'image/jpeg';
+            } catch (Throwable) {
+                // Fallback
+            }
+        }
+
+        return 'image/jpeg';
     }
 }

@@ -171,4 +171,73 @@ class AbsensiTest extends TestCase
         $this->assertSame('50.00', $p->nilai_kehadiran);
         $this->assertSame('Tidak Lulus', $p->status_kelulusan);
     }
+
+    public function test_manual_checklist_page_and_toggle(): void
+    {
+        [$admin, $event, $anggota, $ep] = $this->setupEvent(2);
+        $sesi = $event->sesi()->first();
+
+        // View manual checklist page
+        $res = $this->actingAs($admin)
+            ->get(route('admin.events.absensi.manual-page', [$event, $sesi]));
+        $res->assertOk();
+        $res->assertSee($anggota->nama_lengkap);
+
+        // Toggle attend (Centang Hadir)
+        $this->actingAs($admin)
+            ->post(route('admin.events.absensi.toggle', [$event, $sesi, $anggota->id]))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('absensi', [
+            'event_id' => $event->id,
+            'sesi_id' => $sesi->id,
+            'anggota_id' => $anggota->id,
+            'metode' => 'manual',
+        ]);
+
+        // Toggle cancel (Batal Hadir)
+        $this->actingAs($admin)
+            ->post(route('admin.events.absensi.toggle', [$event, $sesi, $anggota->id]))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('absensi', [
+            'event_id' => $event->id,
+            'sesi_id' => $sesi->id,
+            'anggota_id' => $anggota->id,
+        ]);
+    }
+
+    public function test_bulk_all_and_copy_session_attendance(): void
+    {
+        [$admin, $event, $anggota, $ep] = $this->setupEvent(2);
+        $sesiList = $event->sesi()->orderBy('urutan')->get();
+        $sesi1 = $sesiList[0];
+        $sesi2 = $sesiList[1];
+
+        // Bulk all hadir di Sesi 1
+        $this->actingAs($admin)
+            ->post(route('admin.events.absensi.bulk-all', [$event, $sesi1]))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('absensi', [
+            'event_id' => $event->id,
+            'sesi_id' => $sesi1->id,
+            'anggota_id' => $anggota->id,
+            'metode' => 'manual',
+        ]);
+
+        // Copy dari Sesi 1 ke Sesi 2
+        $this->actingAs($admin)
+            ->post(route('admin.events.absensi.copy', [$event, $sesi2]), [
+                'source_sesi_id' => $sesi1->id,
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('absensi', [
+            'event_id' => $event->id,
+            'sesi_id' => $sesi2->id,
+            'anggota_id' => $anggota->id,
+            'metode' => 'manual',
+        ]);
+    }
 }

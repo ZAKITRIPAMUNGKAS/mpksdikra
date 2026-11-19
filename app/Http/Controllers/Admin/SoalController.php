@@ -28,11 +28,14 @@ class SoalController extends Controller
 
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
 
+        $oppositeTipe = $tipe === 'pretest' ? 'posttest' : 'pretest';
+        $oppositeCount = Soal::where('event_id', $event->id)->where('tipe', $oppositeTipe)->count();
+
         $otherEvents = Event::where('id', '!=', $event->id)
             ->orderByDesc('created_at')
             ->get();
 
-        return view('admin.events.soal', compact('event', 'tipe', 'soal', 'sesi', 'otherEvents'));
+        return view('admin.events.soal', compact('event', 'tipe', 'soal', 'sesi', 'otherEvents', 'oppositeTipe', 'oppositeCount'));
     }
 
     public function cloneFromEvent(Request $request, Event $event, string $tipe): RedirectResponse
@@ -47,8 +50,8 @@ class SoalController extends Controller
         ]);
 
         $sourceEventId = (int) $data['source_event_id'];
-        if ($sourceEventId === (int) $event->id) {
-            return back()->with('error', 'Event sumber tidak boleh sama dengan kegiatan saat ini.');
+        if ($sourceEventId === (int) $event->id && $data['source_tipe'] === $tipe) {
+            return back()->with('error', 'Tidak dapat menyalin dari jenis tes yang sama pada kegiatan ini.');
         }
 
         $sourceSoal = Soal::where('event_id', $sourceEventId)
@@ -58,7 +61,7 @@ class SoalController extends Controller
             ->get();
 
         if ($sourceSoal->isEmpty()) {
-            return back()->with('error', 'Tidak ditemukan butir soal pada kegiatan sumber.');
+            return back()->with('error', 'Tidak ditemukan butir soal pada kegiatan/jenis tes sumber.');
         }
 
         $copiedCount = 0;
@@ -86,7 +89,12 @@ class SoalController extends Controller
             }
         });
 
-        return back()->with('success', "Berhasil menyalin {$copiedCount} butir soal {$tipe} dari kegiatan sumber.");
+        $sourceEvent = Event::find($sourceEventId);
+        $sourceLabel = $sourceEventId === (int) $event->id
+            ? ucfirst($data['source_tipe']).' kegiatan ini'
+            : ucfirst($data['source_tipe'])." kegiatan \"{$sourceEvent?->nama_event}\"";
+
+        return back()->with('success', "Berhasil menyalin {$copiedCount} butir soal {$tipe} dari {$sourceLabel}.");
     }
 
     public function store(Request $request, Event $event, string $tipe): RedirectResponse

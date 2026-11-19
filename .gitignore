@@ -33,3 +33,6 @@ yarn-error.log
 /public/idcard-generator.html
 /tmp_visual_verification/
 /storage/app/tmp_visual_verification/
+/scratch/
+/artifacts/
+/server.php

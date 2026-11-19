@@ -42,6 +42,22 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-19: Presensi Manual Checklist Sesi Berdekatan & Akses Terpadu Poin Keaktifan Forum Peserta:
+  - **Presensi Manual Checklist (Solusi Sesi Berdekatan Tanpa Scan Barcode)**:
+    - Membangun antarmuka presensi manual tabel checklist (`/admin/events/{event}/sesi/{sesi}/presensi`) sehingga panitia tidak perlu meminta peserta memindai QR code dua kali berturut-turut pada sesi yang jadwalnya berdekatan di ruangan yang sama.
+    - Menyediakan tombol aksi cepat:
+      1. `⚡ Tandai Semua Hadir`: Menandai seluruh peserta aktif yang belum hadir menjadi hadir secara instan (1-klik).
+      2. `⚡ Salin Kehadiran dari Sesi Sebelumnya`: Menyalin daftar presensi hadir dari sesi sebelumnya yang dipilih panitia ke sesi saat ini.
+      3. Tombol toggle individual `Centang Hadir` dan `Batal Hadir` per peserta dengan rekalkulasi nilai otomatis.
+      4. Pencarian instan nama peserta / NBM dan filter status (Semua / Hadir / Belum Hadir) berbasis Alpine.js.
+      5. Menambahkan tombol akses cepat `[Checklist]` pada setiap baris sesi agenda di dashboard event dan tombol beralih cepat di halaman scanner QR (`scan.blade.php`).
+  - **Akses Poin Keaktifan & Penilaian Psikomotor (Tanya, Jawab, Adzan, Kultum/Presentasi, Juara Outbound)**:
+    - Menjawab kebingungan penempatan nilai keaktifan dengan menambahkan kartu rujukan `Poin Keaktifan & Partisipasi Forum` langsung di dalam **Tab "CBT & Asesmen" &rarr; Sub-tab "Psikomotor"** di samping menu utama di **Tab "Keaktifan & Outbound" &rarr; Sub-tab "Poin Keaktifan Forum"**.
+    - Memperkaya halaman pencatatan keaktifan (`admin.events.keaktifan`):
+      1. Dropdown pemilihan Sesi Agenda opsional.
+      2. Pelabelan aksi yang jelas: *Tanya (Forum)*, *Jawab (Forum)*, *Kultum / Presentasi*, *Imam Shalat*, *Adzan*, dan *Juara Outbound / Games*.
+      3. Tabel log riwayat 50 pencatatan keaktifan terbaru lengkap dengan tombol hapus (rollback) jika panitia salah input.
+  - **Verifikasi**: Automated test `AbsensiTest` (9 tests passed), `OutboundPdfAndKeaktifanPortalTest` passed, Laravel Pint 0 violations, Vite production build sukses, dan dev server aktif di port 8000.
 - 2026-11-13: Integrasi Modul Tab "Feedback & Evaluasi" pada Navigasi Horizontal Event Dashboard (`show.blade.php`):
   - **Penambahan Tab Feedback Tingkat 1 (Workspace Module Nav)**: Menempatkan tab `Feedback` di samping `RTL` sebelum `Laporan` pada bilah navigasi horizontal *sticky* (`admin.events.show`). Dilengkapi indikator badge jumlah responden yang telah mengisi evaluasi.
   - **Arsitektur 3 Sub-Navigasi (Level 2 Sub-Tabs)**:

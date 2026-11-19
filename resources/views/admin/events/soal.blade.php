@@ -25,26 +25,39 @@
                 <p class="text-xs text-slate-600 mt-0.5 font-normal">Kelola butir soal pilihan ganda dan status sesi pengerjaan peserta</p>
             </div>
             <div class="flex gap-2 items-center flex-wrap">
-                @if(isset($otherEvents) && $otherEvents->isNotEmpty())
+                @if(isset($oppositeCount) && $oppositeCount > 0)
+                <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="inline-flex" onsubmit="return confirm('Salin {{ $oppositeCount }} butir soal dari {{ ucfirst($oppositeTipe) }} kegiatan ini ke {{ ucfirst($tipe) }}?')">
+                    @csrf
+                    <input type="hidden" name="source_event_id" value="{{ $event->id }}">
+                    <input type="hidden" name="source_tipe" value="{{ $oppositeTipe }}">
+                    <button type="submit" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 hover:border-emerald-400 text-xs font-bold rounded-lg transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                        </svg>
+                        <span>Salin dari {{ ucfirst($oppositeTipe) }} Kegiatan Ini ({{ $oppositeCount }})</span>
+                    </button>
+                </form>
+                @endif
+
                 <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="flex items-center gap-1.5 flex-wrap" onsubmit="return confirm('Salin soal dari kegiatan dan jenis tes yang dipilih ke {{ $tipe }} kegiatan ini?')">
                     @csrf
                     <select name="source_event_id" required class="px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
                         <option value="">-- Salin dari Kegiatan Lain --</option>
-                        @foreach($otherEvents as $oe)
-                        <option value="{{ $oe->id }}">{{ $oe->nama_event }}</option>
-                        @endforeach
+                        <option value="{{ $event->id }}">⭐ [Kegiatan Ini] {{ $event->nama_event }}</option>
+                        @if(isset($otherEvents) && $otherEvents->isNotEmpty())
+                            @foreach($otherEvents as $oe)
+                            <option value="{{ $oe->id }}">{{ $oe->nama_event }}</option>
+                            @endforeach
+                        @endif
                     </select>
                     <select name="source_tipe" required aria-label="Jenis soal sumber" class="px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
-                        <option value="pretest" @selected($tipe === 'pretest')>Dari Pretest</option>
-                        <option value="posttest" @selected($tipe === 'posttest')>Dari Posttest</option>
+                        <option value="pretest" @selected($tipe === 'posttest')>Dari Pretest</option>
+                        <option value="posttest" @selected($tipe === 'pretest')>Dari Posttest</option>
                     </select>
                     <button type="submit" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-sky-800 border border-slate-200 hover:border-sky-300 text-xs font-semibold rounded-lg transition shadow-2xs">
                         Salin Soal
                     </button>
                 </form>
-                @else
-                <p class="max-w-64 text-xs text-slate-500" role="status">Belum ada BA lain sebagai sumber. Buat atau pilih BA lain untuk menyalin soal.</p>
-                @endif
 
                 @if($sesi && $sesi->status === 'aktif')
                     <form method="POST" action="{{ route('admin.events.soal.close', [$event, $tipe]) }}">
@@ -117,7 +130,30 @@
         </div>
     </div>
     @empty
-    <div class="bg-white rounded-xl border border-slate-200/90 p-10 text-center text-slate-400 text-xs shadow-2xs font-normal">Belum ada soal {{ $tipe }} yang ditambahkan.</div>
+    <div class="bg-white rounded-xl border border-slate-200/90 p-8 text-center text-xs shadow-2xs font-normal">
+        <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-xl mb-3 text-slate-500">
+            📝
+        </div>
+        <p class="font-semibold text-slate-700 text-sm">Belum ada butir soal {{ $tipe }} yang ditambahkan.</p>
+        @if(isset($oppositeCount) && $oppositeCount > 0)
+        <p class="text-slate-500 mt-1 max-w-md mx-auto">
+            Kegiatan ini sudah memiliki <strong>{{ $oppositeCount }} butir soal di {{ ucfirst($oppositeTipe) }}</strong>. Anda dapat langsung menyalinnya ke {{ ucfirst($tipe) }} tanpa harus input ulang satu per satu.
+        </p>
+        <form method="POST" action="{{ route('admin.events.soal.clone', [$event, $tipe]) }}" class="mt-4" onsubmit="return confirm('Salin {{ $oppositeCount }} butir soal dari {{ ucfirst($oppositeTipe) }} kegiatan ini ke {{ ucfirst($tipe) }}?')">
+            @csrf
+            <input type="hidden" name="source_event_id" value="{{ $event->id }}">
+            <input type="hidden" name="source_tipe" value="{{ $oppositeTipe }}">
+            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-lg transition shadow-2xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                </svg>
+                <span>Salin {{ $oppositeCount }} Butir Soal dari {{ ucfirst($oppositeTipe) }} Sekarang</span>
+            </button>
+        </form>
+        @else
+        <p class="text-slate-400 mt-1">Gunakan formulir di atas untuk menambahkan butir soal baru atau gunakan fitur salin dari kegiatan lain.</p>
+        @endif
+    </div>
     @endforelse
 </div>
 @endsection

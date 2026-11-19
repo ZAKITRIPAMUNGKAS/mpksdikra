@@ -149,6 +149,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::post('/events/{event}/smart-enroll/match', [SmartEnrollController::class, 'match'])->name('events.smart-enroll.match');
         Route::post('/events/{event}/smart-enroll/recommend', [SmartEnrollController::class, 'recommend'])->name('events.smart-enroll.recommend');
         Route::post('/events/{event}/smart-enroll/ai-prompt', [SmartEnrollController::class, 'aiPrompt'])->name('events.smart-enroll.ai-prompt');
+        Route::post('/events/{event}/smart-enroll/event-update/confirm', [SmartEnrollController::class, 'confirmEventUpdate'])->name('events.smart-enroll.event-update.confirm');
         Route::post('/events/{event}/smart-enroll/execute', [SmartEnrollController::class, 'execute'])->name('events.smart-enroll.execute');
         Route::post('/events/{event}/smart-enroll/undo', [SmartEnrollController::class, 'undo'])->name('events.smart-enroll.undo');
         Route::post('/events/{event}/smart-enroll/feedback', [SmartEnrollController::class, 'feedback'])->name('events.smart-enroll.feedback');
@@ -199,6 +200,10 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::post('/events/{event}/keaktifan', [KeaktifanController::class, 'store'])->name('events.keaktifan.store');
         Route::delete('/events/{event}/keaktifan/{keaktifan}', [KeaktifanController::class, 'destroy'])->name('events.keaktifan.destroy');
         Route::get('/events/{event}/sesi/{sesi}/scan', [AbsensiController::class, 'scanPage'])->name('events.absensi.scan');
+        Route::get('/events/{event}/sesi/{sesi}/presensi', [AbsensiController::class, 'manualPage'])->name('events.absensi.manual-page');
+        Route::post('/events/{event}/sesi/{sesi}/presensi/toggle/{anggota}', [AbsensiController::class, 'toggle'])->name('events.absensi.toggle');
+        Route::post('/events/{event}/sesi/{sesi}/presensi/bulk-all', [AbsensiController::class, 'bulkAll'])->name('events.absensi.bulk-all');
+        Route::post('/events/{event}/sesi/{sesi}/presensi/copy', [AbsensiController::class, 'copyFromSession'])->name('events.absensi.copy');
         Route::get('/events/{event}/sesi/{sesi}/recent', [AbsensiController::class, 'recent'])->name('events.absensi.recent');
         Route::get('/events/{event}/sesi/{sesi}/cetak-lembar', [AbsensiController::class, 'cetakLembar'])->name('events.absensi.cetak');
         Route::post('/events/{event}/absensi/process', [AbsensiController::class, 'process'])->name('events.absensi.process');

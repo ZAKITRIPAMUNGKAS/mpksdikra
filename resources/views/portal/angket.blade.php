@@ -50,7 +50,7 @@
                     <div class="grid grid-cols-5 gap-2 sm:gap-3">
                         @foreach([1, 2, 3, 4, 5] as $val)
                         <label class="cursor-pointer select-none">
-                            <input type="radio" name="jawaban[{{ $item->id }}]" value="{{ $val }}" required class="peer sr-only">
+                            <input type="radio" name="jawaban[{{ $item->id }}]" value="{{ $val }}" @checked(($jawabanLama[$item->id] ?? null) === $val) required class="peer sr-only">
                             <span class="flex flex-col items-center justify-center min-h-[52px] sm:min-h-[56px] py-2.5 rounded-2xl border-2 border-slate-300 bg-white text-base sm:text-lg font-black text-slate-800 peer-checked:bg-sky-600 peer-checked:border-sky-600 peer-checked:text-white peer-checked:ring-2 peer-checked:ring-sky-300 shadow-xs hover:bg-sky-50 hover:border-sky-400 transition active:scale-[0.98]">
                                 <span>{{ $val }}</span>
                                 @if($val === 1)
@@ -73,16 +73,39 @@
         @endforelse
 
         @if($items->count())
-        <div class="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-7 shadow-sm">
-            <label class="block text-base sm:text-lg font-black text-slate-900 mb-1">Komentar, Saran, &amp; Kritik Konstruktif</label>
-            <p class="text-xs sm:text-sm text-slate-600 mb-3 font-medium">Tuliskan masukan Anda untuk panitia dan pimpinan MPKSDI Karanganyar.</p>
-            <textarea name="komentar" rows="4" placeholder="Tuliskan masukan Anda di sini..."
-                class="w-full px-4 py-3.5 border-2 border-slate-300 rounded-2xl outline-none focus:border-sky-600 focus:ring-4 focus:ring-sky-100 transition resize-none text-base bg-white font-medium placeholder:text-slate-400"></textarea>
+        {{-- PERTANYAAN TERAKHIR (ISIAN): PERASAAN MENGIKUTI PERKADERAN --}}
+        <div class="bg-white rounded-2xl border-2 border-emerald-200/90 p-5 sm:p-7 shadow-sm">
+            <div class="flex items-center gap-2 mb-3 pb-3 border-b-2 border-emerald-100">
+                <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                    Pertanyaan Terakhir (Isian Terbuka)
+                </span>
+            </div>
+
+            <label class="block text-base sm:text-lg font-black text-slate-900 mb-1">
+                Bagaimana perasaan Anda setelah mengikuti perkaderan Baitul Arqam ini?
+            </label>
+            <p class="text-xs sm:text-sm text-slate-600 mb-3.5 font-medium leading-relaxed">
+                Ceritakan perasaan, kesan, pengalaman batin, atau perubahan motivasi ber-Muhammadiyah yang Anda rasakan selama dan setelah mengikuti seluruh rangkaian perkaderan.
+            </p>
+            <textarea name="perasaan" rows="4" placeholder="Tuliskan perasaan, kesan, dan refleksi Anda selama mengikuti perkaderan di sini..."
+                class="w-full px-4 py-3.5 border-2 border-slate-300 rounded-2xl outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 transition resize-none text-base bg-white font-medium placeholder:text-slate-400 mb-4">{{ old('perasaan', $komentarLama->perasaan ?? '') }}</textarea>
+
+            <div class="pt-4 border-t-2 border-slate-100">
+                <label class="block text-sm sm:text-base font-bold text-slate-900 mb-1">
+                    Komentar, Saran, &amp; Kritik Konstruktif untuk Penyelenggara (Opsional)
+                </label>
+                <p class="text-xs text-slate-500 mb-2 font-medium">
+                    Tuliskan masukan Anda untuk panitia dan pimpinan MPKSDI Karanganyar terkait sarana, konsumsi, atau penyelenggaraan berikutnya.
+                </p>
+                <textarea name="komentar" rows="3" placeholder="Tuliskan masukan tambahan Anda di sini..."
+                    class="w-full px-4 py-3 border-2 border-slate-200 rounded-2xl outline-none focus:border-sky-600 focus:ring-4 focus:ring-sky-100 transition resize-none text-sm bg-white font-medium placeholder:text-slate-400">{{ old('komentar', $komentarLama->komentar ?? '') }}</textarea>
+            </div>
         </div>
 
         <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border-2 border-slate-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
             <p class="text-xs sm:text-sm text-slate-600 font-semibold">Angket ini bersifat anonim untuk evaluasi perkaderan.</p>
-            <button type="submit" class="w-full sm:w-auto min-h-[52px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+            <button type="submit" class="w-full sm:w-auto min-h-[52px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
                 <span>Kirim Angket Evaluasi</span>
                 <span class="text-lg leading-none">&rarr;</span>
             </button>

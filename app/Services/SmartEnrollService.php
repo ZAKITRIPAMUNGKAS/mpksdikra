@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\EventSesi;
 use App\Models\PenilaianAkhir;
+use App\Models\Soal;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -843,8 +844,15 @@ class SmartEnrollService
                 'undangan', 'wa', 'blast' => 'whatsapp_invite',
                 'ranking', 'peringkat' => 'analytics',
                 'export', 'unduh', 'cetak' => 'export_docs',
+                'soal', 'cbt' => 'cbt_soal',
                 default => 'info',
             };
+        }
+
+        // CBT, Soal Pretest & Posttest, atau Salin Soal
+        if (preg_match('/\b(salin\s+soal|copy\s+soal|klon(ing)?\s+soal|duplika(si|t)\s+soal|pindah(kan)?\s+soal|posttest\s+ke\s+pretest|pretest\s+ke\s+posttest|soal\s+posttest|soal\s+pretest|bank\s+soal)\b/iu', $clean)
+            || (preg_match('/\b(soal|cbt)\b/iu', $clean) && preg_match('/\b(salin|copy|klon|duplikat|pindah|sama|pretest|posttest)\b/iu', $clean))) {
+            return 'cbt_soal';
         }
 
         // Undangan WhatsApp, Broadcast, Blast
@@ -1166,10 +1174,61 @@ class SmartEnrollService
         ];
     }
 
+    /**
+     * Panduan & Akses Cepat Bank Soal CBT Pretest/Posttest.
+     */
+    public function handleCbtSoalInquiry(Event $event, array $k, array $allSources): array
+    {
+        $pretestCount = Soal::where('event_id', $event->id)->where('tipe', 'pretest')->count();
+        $posttestCount = Soal::where('event_id', $event->id)->where('tipe', 'posttest')->count();
+
+        $msg = "📝 <strong>Salin & Sinkronisasi Soal CBT (Pretest & Posttest):</strong> [3]\n\n"
+            ."<strong>Ya, tentu saja!</strong> Sistem perkaderan Arqam MPKSDI sangat mendukung penyalinan butir soal antara <strong>Pretest</strong> dan <strong>Posttest</strong>, baik <strong>di dalam kegiatan yang sama ({$k['nama_event']})</strong> maupun dari kegiatan Baitul Arqam lainnya [3].\n\n"
+            ."🎯 <strong>Mengapa Pretest dan Posttest Identik di Baitul Arqam?</strong>\n"
+            ."Dalam metodologi perkaderan formal Muhammadiyah, butir soal evaluasi kognitif pretest dan posttest memang seharusnya identik agar pengukuran peningkatan pemahaman materi melalui rumus <strong>N-Gain Score</strong> valid secara ilmiah [3].\n\n"
+            ."📊 <strong>Status Bank Soal Kegiatan Ini ({$k['nama_event']}):</strong>\n"
+            ."• Pretest: <strong>{$pretestCount} butir soal</strong>\n"
+            ."• Posttest: <strong>{$posttestCount} butir soal</strong>\n\n"
+            ."⚡ <strong>Cara Salin Soal 1-Klik di Web Admin:</strong>\n"
+            ."1. Buka halaman Bank Soal tujuan (misalnya jika ingin mengisi Posttest, buka <strong>Bank Soal Posttest</strong>).\n"
+            ."2. Di bilah atas (atau pada kotak notifikasi jika soal masih kosong), klik tombol hijau <strong>\"Salin dari Pretest Kegiatan Ini\"</strong>.\n"
+            ."3. Seluruh butir pertanyaan, pilihan jawaban A-D, dan kunci jawaban akan langsung terduplikasi otomatis!\n\n"
+            .'Silakan klik tombol aksi di bawah untuk langsung menuju halaman Bank Soal:';
+
+        return [
+            'success' => true,
+            'source' => 'rag_local',
+            'intent' => 'cbt_soal',
+            'needs_candidate_card' => false,
+            'candidates' => [],
+            'sources' => [$allSources[2], $allSources[0]],
+            'action_buttons' => [
+                [
+                    'label' => "Bank Soal Pretest ({$pretestCount})",
+                    'url' => route('admin.events.soal.index', [$event, 'pretest']),
+                    'icon' => 'document',
+                    'style' => 'primary',
+                ],
+                [
+                    'label' => "Bank Soal Posttest ({$posttestCount})",
+                    'url' => route('admin.events.soal.index', [$event, 'posttest']),
+                    'icon' => 'document',
+                    'style' => 'primary',
+                ],
+            ],
+            'message' => trim($msg),
+        ];
+    }
+
     public function answerWithRag(string $prompt, Event $event, array $k, string $intent): array
     {
         $clean = mb_strtolower(trim($prompt));
         $allSources = $this->buildRagSources($k);
+
+        // 👉 INTENT: CBT & SALIN SOAL PRETEST/POSTTEST
+        if ($intent === 'cbt_soal') {
+            return $this->handleCbtSoalInquiry($event, $k, $allSources);
+        }
 
         // 👉 INTENT: ANALYTICS & RISK DETECTION (Copilot Analitik Penilaian 4 Pilar)
         if ($intent === 'analytics') {
@@ -1824,7 +1883,7 @@ class SmartEnrollService
         $intent = $this->classifyIntent($prompt);
 
         // Operasi Deterministik & Slash Commands langsung dieksekusi tanpa jeda LLM eksternal
-        if (in_array($intent, ['analytics', 'whatsapp_invite', 'export_docs'], true) || str_starts_with(trim($prompt), '/')) {
+        if (in_array($intent, ['analytics', 'whatsapp_invite', 'export_docs', 'cbt_soal'], true) || str_starts_with(trim($prompt), '/')) {
             return $this->answerWithRag($prompt, $event, $knowledge, $intent);
         }
 

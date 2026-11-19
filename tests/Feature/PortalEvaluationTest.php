@@ -88,9 +88,16 @@ class PortalEvaluationTest extends TestCase
         $item = AngketItem::create(['event_id' => $event->id, 'kategori' => 'A', 'teks_item' => 'Materi jelas', 'urutan' => 1]);
 
         $this->actingAs($this->ctx['anggotaUser'])
+            ->get(route('portal.angket.index', $event))
+            ->assertOk()
+            ->assertSee('Pertanyaan Terakhir (Isian Terbuka)')
+            ->assertSee('Bagaimana perasaan Anda setelah mengikuti perkaderan Baitul Arqam ini?');
+
+        $this->actingAs($this->ctx['anggotaUser'])
             ->post(route('portal.angket.save', $event), [
                 'jawaban' => [$item->id => 5],
-                'komentar' => 'Sangat baik',
+                'perasaan' => 'Sangat tercerahkan dan bersemangat mengabdi di persyarikatan',
+                'komentar' => 'Sangat baik, fasilitas memuaskan',
             ])
             ->assertRedirect();
 
@@ -98,6 +105,13 @@ class PortalEvaluationTest extends TestCase
             'event_id' => $event->id,
             'item_id' => $item->id,
             'skor' => 5,
+        ]);
+
+        $this->assertDatabaseHas('angket_komentar', [
+            'event_id' => $event->id,
+            'anggota_id' => $this->ctx['anggotaUser']->anggota->id,
+            'perasaan' => 'Sangat tercerahkan dan bersemangat mengabdi di persyarikatan',
+            'komentar' => 'Sangat baik, fasilitas memuaskan',
         ]);
     }
 

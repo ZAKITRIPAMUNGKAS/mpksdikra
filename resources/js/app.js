@@ -245,7 +245,9 @@ function initLinkPrefetch() {
         document.head.appendChild(link);
     };
 
-    document.addEventListener('pointerenter', (e) => {
+    document.addEventListener('pointerover', (e) => {
+        if (!(e.target instanceof Element)) return;
+
         const link = e.target.closest('a');
         if (!link || !link.href) return;
         if (link.target === '_blank' || link.hasAttribute('download') || link.dataset.noPrefetch === 'true') return;

@@ -908,4 +908,44 @@ class SmartEnrollFeatureTest extends TestCase
         $this->assertNotEmpty($data['candidates']);
         $this->assertStringContainsString('Sesuai instruksi Anda', $data['message']);
     }
+
+    public function test_ai_can_prepare_and_confirm_event_update(): void
+    {
+        Http::fake(['https://ai.geraikita.com/*' => Http::response([], 500)]);
+        $admin = $this->admin();
+        $event = $this->makeEvent($admin);
+        $originalName = $event->nama_event;
+
+        $preview = $this->actingAs($admin)->postJson(route('admin.events.smart-enroll.ai-prompt', $event), [
+            'prompt' => 'Ubah lokasi menjadi Gedung Dakwah dan kuota menjadi 40',
+        ])->assertOk()->assertJsonPath('intent', 'event_update_confirmation');
+
+        $this->assertDatabaseHas('events', ['id' => $event->id, 'nama_event' => $originalName, 'kuota' => $event->kuota]);
+        $token = $preview->json('event_update.token');
+        $this->postJson(route('admin.events.smart-enroll.event-update.confirm', $event), ['token' => $token])
+            ->assertOk()->assertJsonPath('event.lokasi', 'Gedung Dakwah')->assertJsonPath('event.kuota', 40);
+        $this->assertDatabaseHas('events', ['id' => $event->id, 'lokasi' => 'Gedung Dakwah', 'kuota' => 40]);
+    }
+
+    public function test_ai_prompt_answers_cbt_soal_clone_inquiry_with_action_buttons(): void
+    {
+        Http::fake(['https://ai.geraikita.com/*' => Http::response([], 500)]);
+        $admin = $this->admin();
+        $event = $this->makeEvent($admin);
+
+        $response = $this->actingAs($admin)->postJson(route('admin.events.smart-enroll.ai-prompt', $event), [
+            'prompt' => 'apakah ai sikader bisa membantu menyalin soal dari posttest ke pretest',
+        ]);
+
+        $response->assertOk();
+        $data = $response->json();
+        $this->assertTrue($data['success']);
+        $this->assertSame('cbt_soal', $data['intent']);
+        $this->assertStringContainsString('Salin & Sinkronisasi Soal CBT', $data['message']);
+        $this->assertStringContainsString('N-Gain Score', $data['message']);
+        $this->assertNotEmpty($data['action_buttons']);
+        $this->assertCount(2, $data['action_buttons']);
+        $this->assertSame(route('admin.events.soal.index', [$event, 'pretest']), $data['action_buttons'][0]['url']);
+        $this->assertSame(route('admin.events.soal.index', [$event, 'posttest']), $data['action_buttons'][1]['url']);
+    }
 }

@@ -12,6 +12,7 @@ class AngketKomentar extends Model
     protected $fillable = [
         'event_id',
         'anggota_id',
+        'perasaan',
         'komentar',
     ];
 

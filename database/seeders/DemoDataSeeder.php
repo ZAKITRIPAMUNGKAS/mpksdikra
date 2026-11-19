@@ -1130,6 +1130,14 @@ class DemoDataSeeder extends Seeder
             'Secara umum sangat memuaskan, jadwal shalat berjamaah dan qiyamul lail sangat disiplin dan membina ruhani.',
         ];
 
+        $samplePerasaan = [
+            'Sangat bersyukur dan bangga bisa mengikuti Baitul Arqam ini. Hati terasa lebih sejuk, pemahaman Al-Islam dan Kemuhammadiyahan semakin kokoh, serta tumbuh ghiroh berjuang yang luar biasa.',
+            'Merasa tercerahkan dan tercharge kembali semangat dakwahnya. Kebersamaan shalat berjamaah dan tadabbur memberikan ketenangan batin yang mendalam.',
+            'Awalnya merasa tegang karena jadwalnya padat, tetapi setelah dijalani suasananya sangat menyenangkan, akrab, dan penuh hikmah persaudaraan.',
+            'Luar biasa berkesan! Materi yang disampaikan membuka mata hati saya untuk lebih ikhlas dan istiqomah mengabdi di persyarikatan dan AUM.',
+            'Merasa lebih mantap dan percaya diri dalam mengamalkan ibadah sesuai HPT, serta termotivasi untuk terus menyebarkan syiar amar ma\'ruf nahi munkar.',
+        ];
+
         foreach ($events as $event) {
             foreach ($defaultItems as $kategori => $teksList) {
                 foreach ($teksList as $urutan => $teks) {
@@ -1155,10 +1163,13 @@ class DemoDataSeeder extends Seeder
                     );
                 }
 
-                if (isset($sampleComments[$idx])) {
+                if (isset($sampleComments[$idx]) || isset($samplePerasaan[$idx])) {
                     AngketKomentar::updateOrCreate(
                         ['event_id' => $event->id, 'anggota_id' => $p->anggota_id],
-                        ['komentar' => $sampleComments[$idx]]
+                        [
+                            'perasaan' => $samplePerasaan[$idx] ?? null,
+                            'komentar' => $sampleComments[$idx] ?? null,
+                        ]
                     );
                 }
                 $idx++;

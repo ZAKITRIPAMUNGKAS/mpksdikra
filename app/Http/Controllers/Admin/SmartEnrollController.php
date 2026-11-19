@@ -120,7 +120,92 @@ class SmartEnrollController extends Controller
 
         $result = $this->smartEnroll->consultAi($data['prompt'], $event);
 
+        if (preg_match('/\b(ubah|ganti|perbarui|update|edit)\b/iu', $data['prompt'])) {
+            $changes = $this->parseEventChanges($data['prompt']);
+            if ($changes === []) {
+                return response()->json([
+                    'success' => true,
+                    'intent' => 'event_update_help',
+                    'message' => 'Saya bisa membantu mengubah nama kegiatan, tanggal mulai/selesai, lokasi, atau kuota. Sebutkan perubahan yang diinginkan, misalnya: “Ubah lokasi menjadi Gedung Dakwah dan kuota menjadi 40”.',
+                ]);
+            }
+
+            $token = Str::random(48);
+            Cache::put('sikader:event-update:'.$event->id.':'.auth()->id().':'.$token, $changes, now()->addMinutes(10));
+
+            return response()->json([
+                'success' => true,
+                'intent' => 'event_update_confirmation',
+                'event_update' => [
+                    'token' => $token,
+                    'changes' => collect($changes)->map(fn ($value, $key) => [
+                        'field' => $key,
+                        'label' => ['nama_event' => 'Nama kegiatan', 'tanggal_mulai' => 'Tanggal mulai', 'tanggal_selesai' => 'Tanggal selesai', 'lokasi' => 'Lokasi', 'kuota' => 'Kuota', 'status' => 'Status kegiatan'][$key],
+                        'value' => $value,
+                    ])->values(),
+                ],
+                'message' => 'Saya siapkan perubahan berikut. Perubahan baru disimpan setelah Anda menekan Konfirmasi.',
+            ]);
+        }
+
         return response()->json($result);
+    }
+
+    public function confirmEventUpdate(Request $request, Event $event): JsonResponse
+    {
+        $data = $request->validate(['token' => ['required', 'string', 'size:48']]);
+        $key = 'sikader:event-update:'.$event->id.':'.auth()->id().':'.$data['token'];
+        $changes = Cache::pull($key);
+
+        if (! is_array($changes) || $changes === []) {
+            return response()->json(['success' => false, 'message' => 'Pratinjau perubahan sudah kedaluwarsa. Silakan minta perubahan lagi.'], 422);
+        }
+
+        $validated = validator($changes, [
+            'nama_event' => ['sometimes', 'string', 'max:255'],
+            'tanggal_mulai' => ['sometimes', 'date'],
+            'tanggal_selesai' => ['sometimes', 'date', 'after_or_equal:tanggal_mulai'],
+            'lokasi' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'kuota' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:65535'],
+            'status' => ['sometimes', 'in:persiapan,berlangsung,selesai'],
+        ])->validate();
+
+        $event->fill($validated)->save();
+
+        return response()->json(['success' => true, 'message' => 'Perubahan kegiatan berhasil disimpan.', 'event' => [
+            'nama_event' => $event->nama_event,
+            'tanggal_mulai' => $event->tanggal_mulai->format('Y-m-d'),
+            'tanggal_selesai' => $event->tanggal_selesai->format('Y-m-d'),
+            'lokasi' => $event->lokasi,
+            'kuota' => $event->kuota,
+        ]]);
+    }
+
+    private function parseEventChanges(string $prompt): array
+    {
+        $changes = [];
+        $patterns = [
+            'nama_event' => '/(?:nama(?: kegiatan)?(?: menjadi| dengan)?|judul(?: menjadi)?)\s+["“]?(.+?)["”]?(?=\s+(?:lokasi|kuota|tanggal|mulai|selesai)\b|$)/iu',
+            'lokasi' => '/(?:lokasi|tempat)(?:\s+(?:menjadi|ke|diganti))?\s+["“]?(.+?)["”]?(?=\s+(?:dan|nama|kuota|tanggal|mulai|selesai)\b|$)/iu',
+        ];
+        foreach ($patterns as $field => $pattern) {
+            if (preg_match($pattern, $prompt, $match)) {
+                $changes[$field] = trim($match[1], " \\t\\n\\r\\0\\x0B\\\"'“”.,");
+            }
+        }
+        if (preg_match('/\bkuota\s+(?:menjadi\s+)?(\d{1,5})\b/iu', $prompt, $match)) {
+            $changes['kuota'] = (int) $match[1];
+        }
+        if (preg_match('/\bstatus(?: kegiatan)?\s+(?:menjadi\s+)?(persiapan|berlangsung|selesai)\b/iu', $prompt, $match)) {
+            $changes['status'] = mb_strtolower($match[1]);
+        }
+        foreach (['tanggal_mulai' => 'mulai', 'tanggal_selesai' => 'selesai'] as $field => $label) {
+            if (preg_match('/(?:tanggal\s+'.$label.'|'.$label.')(?:\s+(?:menjadi|tanggal))?\s+(\d{4}-\d{2}-\d{2})/iu', $prompt, $match)) {
+                $changes[$field] = $match[1];
+            }
+        }
+
+        return $changes;
     }
 
     /**

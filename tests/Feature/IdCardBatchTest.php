@@ -16,6 +16,15 @@ class IdCardBatchTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_id_card_qr_and_labels_have_clear_separation(): void
+    {
+        $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
+
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 92pt;[^}]*\}/', $template);
+        $this->assertMatchesRegularExpression('/\.qr-label \{[^}]*font-size:/', $template);
+        $this->assertMatchesRegularExpression('/\.footer-wrap \{[^}]*text-align: center;/', $template);
+    }
+
     public function test_admin_can_download_batch_id_cards_pdf(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);

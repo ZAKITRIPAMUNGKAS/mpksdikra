@@ -12,6 +12,7 @@
         executeUrl: {{ json_encode(route('admin.events.smart-enroll.execute', $event)) }},
         undoUrl: {{ json_encode(route('admin.events.smart-enroll.undo', $event)) }},
         feedbackUrl: {{ json_encode(route('admin.events.smart-enroll.feedback', $event)) }},
+        eventUpdateConfirmUrl: {{ json_encode(route('admin.events.smart-enroll.event-update.confirm', $event)) }},
         quota: {{ (int) ($event->kuota ?? 0) }},
         registeredCount: {{ (int) ($event->peserta_aktif_count ?? $event->pesertaAktif()->count()) }},
      })"
@@ -252,6 +253,21 @@
                                     <div class="whitespace-pre-line leading-relaxed"
                                          @click="if ($event.target.closest('[data-cite-id]')) { const cid = parseInt($event.target.closest('[data-cite-id]').dataset.citeId); openPreviewFromId(cid, msg.data?.sources); }"
                                          x-html="renderMessageWithCitations(msg.content, msg.data?.sources, activePreviewSource?.id)"></div>
+
+                                    <template x-if="msg.data?.event_update">
+                                        <div class="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-slate-800 dark:border-amber-700 dark:bg-amber-950/30 dark:text-slate-100">
+                                            <p class="text-xs font-bold">Pratinjau perubahan kegiatan</p>
+                                            <dl class="mt-2 space-y-1.5 text-xs">
+                                                <template x-for="change in msg.data.event_update.changes" :key="change.field">
+                                                    <div class="flex flex-wrap gap-1"><dt class="font-semibold" x-text="change.label + ':'"></dt><dd x-text="change.value"></dd></div>
+                                                </template>
+                                            </dl>
+                                            <div class="mt-3 flex gap-2">
+                                                <button type="button" @click="confirmEventUpdate(msg.data.event_update.token, $event.currentTarget)" class="min-h-10 rounded-lg bg-amber-500 px-3 text-xs font-bold text-slate-950 hover:bg-amber-400">Konfirmasi perubahan</button>
+                                                <button type="button" @click="$el.closest('.rounded-xl').remove()" class="min-h-10 rounded-lg border border-slate-300 px-3 text-xs font-semibold dark:border-slate-600">Batal</button>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                     {{-- Action Buttons (WhatsApp Blast, Export Excel, Berita Acara, Ranking) --}}
                                     <template x-if="msg.data && msg.data.action_buttons && msg.data.action_buttons.length > 0">
@@ -1410,6 +1426,11 @@ window.smartEnrollChatbot = function(config) {
                 this.removeThinking(thinkingId);
                 if (!res.ok) throw new Error(data.message || 'Gagal memproses pesan.');
 
+                if (data.event_update) {
+                    this.pushMsg('assistant', 'text', data.message, data);
+                    return;
+                }
+
                 const isChat = data.intent === 'chat' || data.is_chat === true;
                 const normalized = window.SiKaderAdapter?.normalizeRagResponse(data, { eventTitle: config.eventTitle }) || {
                     content: data.message || data.reply || 'Berikut respons saya.',
@@ -1429,6 +1450,25 @@ window.smartEnrollChatbot = function(config) {
                 this.pushMsg('assistant', 'text', '❌ Maaf, asisten tidak dapat memproses permintaan ini: <strong>' + err.message + '</strong>');
             } finally {
                 this.isLoading = false;
+            }
+        },
+
+        async confirmEventUpdate(token, button) {
+            button.disabled = true;
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            try {
+                const response = await fetch(config.eventUpdateConfirmUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                    body: JSON.stringify({ token }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Perubahan gagal disimpan.');
+                this.pushMsg('assistant', 'text', data.message);
+                this.quota = Number(data.event.kuota || 0);
+            } catch (error) {
+                button.disabled = false;
+                this.pushMsg('assistant', 'text', 'Perubahan belum tersimpan: ' + error.message);
             }
         },
 

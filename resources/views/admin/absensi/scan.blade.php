@@ -80,6 +80,14 @@
 
                 {{-- Action Controls (Subtle, Projector Friendly) --}}
                 <div class="flex items-center gap-2">
+                    {{-- Mode Checklist Manual --}}
+                    <a href="{{ route('admin.events.absensi.manual-page', [$event, $sesi]) }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200/90 text-xs font-semibold text-amber-900 shadow-2xs transition"
+                       title="Beralih ke Presensi Checklist Manual">
+                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        <span>Checklist Manual</span>
+                    </a>
+
                     {{-- Fullscreen Mode Toggle --}}
                     <button type="button"
                             @click="toggleFullscreen"

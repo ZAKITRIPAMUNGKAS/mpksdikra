@@ -20,14 +20,24 @@ class KeaktifanController extends Controller
         $peserta = EventPeserta::where('event_id', $event->id)
             ->where('status_aktif', true)
             ->with('anggota')
-            ->get();
+            ->get()
+            ->sortBy('anggota.nama_lengkap')
+            ->values();
 
         $counts = Keaktifan::where('event_id', $event->id)
             ->selectRaw('anggota_id, count(*) as total')
             ->groupBy('anggota_id')
             ->pluck('total', 'anggota_id');
 
-        return view('admin.events.keaktifan', compact('event', 'peserta', 'counts'));
+        $sesiList = $event->sesi()->orderBy('urutan')->get();
+
+        $riwayatKeaktifan = Keaktifan::where('event_id', $event->id)
+            ->with(['anggota', 'sesi'])
+            ->latest()
+            ->take(50)
+            ->get();
+
+        return view('admin.events.keaktifan', compact('event', 'peserta', 'counts', 'sesiList', 'riwayatKeaktifan'));
     }
 
     public function store(Request $request, Event $event): RedirectResponse

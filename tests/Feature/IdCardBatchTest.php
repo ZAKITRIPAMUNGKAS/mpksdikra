@@ -20,8 +20,8 @@ class IdCardBatchTest extends TestCase
     {
         $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
 
-        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 80pt;[^}]*\}/', $template);
-        $this->assertMatchesRegularExpression('/\.qr-label \{[^}]*font-size:/', $template);
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 82pt;[^}]*\}/', $template);
+        $this->assertStringContainsString('.qr-img { width: 77pt; height: 77pt;', $template);
         $this->assertMatchesRegularExpression('/\.footer-wrap \{[^}]*text-align: center;/', $template);
     }
 
@@ -70,6 +70,7 @@ class IdCardBatchTest extends TestCase
         $this->assertStringContainsString('>CONTOH NAMA PESERTA</div>', $html);
         $this->assertStringContainsString('<div class="kader-gelar">Amd.Kep</div>', $html);
         $this->assertStringContainsString('NBM 123', $html);
+        $this->assertStringContainsString('NO. 00007', $html);
         $this->assertStringContainsString('<div class="subtitle-event">Karyawan Contoh · 2026</div>', $html);
     }
 
@@ -95,14 +96,14 @@ class IdCardBatchTest extends TestCase
         $this->assertStringContainsString('font-size: 8pt;', $html);
     }
 
-    public function test_id_card_uses_a_compact_qr_block_below_the_identity(): void
+    public function test_id_card_uses_a_full_qr_block_below_the_identity(): void
     {
         $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
         $face = file_get_contents(resource_path('views/admin/events/partials/idcard-face.blade.php'));
 
-        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 80pt;[^}]*\}/', $template);
-        $this->assertStringContainsString('.qr-img { width: 48pt; height: 48pt;', $template);
-        $this->assertStringContainsString('$top + 258', $face);
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 82pt;[^}]*\}/', $template);
+        $this->assertStringContainsString('.qr-img { width: 77pt; height: 77pt;', $template);
+        $this->assertStringContainsString('$top + 252', $face);
     }
 
     public function test_admin_can_download_batch_id_cards_pdf(): void

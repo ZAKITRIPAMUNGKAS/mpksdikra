@@ -48,17 +48,17 @@
                         <span class="sub-dot">&bull;</span>
                         <span class="sub-nbm">NBM {{ $nbm }}</span>
                     @endif
+                    <span class="sub-dot">&bull;</span>
+                    <span class="sub-no">NO. {{ $noPeserta }}</span>
                 </div>
             </td>
         </tr>
     </table>
 </div>
 
-{{-- 4. QR presensi --}}
-<div class="layer qr-card-wrap" style="top: {{ $top + 258 }}pt; left: {{ $left + 92.875 }}pt;">
+{{-- 4. QR presensi dibuat full --}}
+<div class="layer qr-card-wrap" style="top: {{ $top + 252 }}pt; left: {{ $left + 91.875 }}pt;">
     <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
-    <div class="qr-label">Presensi Kehadiran</div>
-    <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
 </div>
 
 {{-- 5. Footer --}}

@@ -42,6 +42,10 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-20: Pembesaran Penuh (Full QR) pada ID Card Baitul Arqam:
+  - **QR Code Full Ukuran Maksimal**: Mengubah kontainer QR menjadi `width: 82pt; height: 82pt;` dengan gambar QR `width: 77pt; height: 77pt;` yang mengisi penuh wadah kartu (meningkat lebih dari 2.5 kali luas area dibandingkan versi ringkas 48pt sebelumnya). Lebar dan posisi horizontal QR kini sejajar presisi 100% dengan bingkai pasfoto (`width: 82pt; left: 91.875pt;`).
+  - **Penyatuan Metadata Kader**: Menghapus label teks berlebih di dalam kotak QR ("PRESENSI KEHADIRAN") dan memindahkan nomor urut peserta ke baris identitas kader (`NO. 00045`), sehingga area QR murni difokuskan untuk kecepatan pemindaian barcode/kamera smartphone dari jarak pandang fleksibel panitia.
+  - **Verifikasi**: 282 automated tests lulus 100% (1.354 assertions), Laravel Pint lulus 0 violations, pratinjau rendering PDF/PNG diverifikasi tajam.
 - 2026-11-20: Perapian Visual & Estetika ID Card (Baitul Arqam - Massal & Portal):
   - **Penyatuan Header & Artwork Latar Alami**: Menghapus blok persegi navy kaku (`.header-band`) yang memotong sudut batik dan meninggalkan celah pohon/bangunan. Header kini menyatu secara elegan dengan ilustrasi latar belakang (kubah Edutorium dan langit biru tua), memperlihatkan lengkungan ornamen batik di sudut atas.
   - **Badge Logo Melingkar Emas**: Mengganti pelat kotak putih (`.brand-plate`) yang menyerupai stiker tempelan dengan lencana melingkar berbingkai emas (`badge-muhammadiyah.png` dan `badge-mpksdi.png`) dengan latar transparan.

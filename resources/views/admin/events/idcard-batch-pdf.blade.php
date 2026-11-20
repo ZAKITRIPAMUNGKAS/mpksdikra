@@ -66,7 +66,7 @@
             text-transform: uppercase;
         }
 
-        /* 3. Identity Block: nama 1 baris (font menyesuaikan), gelar, lalu PCM/NBM */
+        /* 3. Identity Block: nama 1 baris (font menyesuaikan), gelar, lalu PCM/NBM/No */
         .identity-wrap { width: 245.75pt; height: 38pt; }
         .identity-table { width: 100%; height: 38pt; border-collapse: collapse; }
         .identity-cell { vertical-align: middle; text-align: center; }
@@ -83,32 +83,19 @@
         }
         .sub-dot { color: #f8bb00; padding: 0 4pt; font-weight: bold; }
         .sub-nbm { color: #64748b; font-weight: bold; }
+        .sub-no { color: #005c8a; font-weight: bold; }
 
-        /* 4. QR ringkas agar identitas tetap menjadi fokus utama */
+        /* 4. QR dibuat full agar mudah dan cepat dipindai panitia */
         .qr-card-wrap {
-            width: 80pt;
+            width: 82pt;
+            height: 82pt;
             background: #ffffff;
             border: 1pt solid #041c38;
             border-radius: 6pt;
-            padding: 3.5pt 3pt 3pt 3pt;
+            padding: 2.5pt;
             text-align: center;
         }
-        .qr-img { width: 48pt; height: 48pt; display: block; margin: 0 auto; }
-        .qr-label {
-            font-size: 5.4pt;
-            font-weight: bold;
-            color: #041c38;
-            text-transform: uppercase;
-            letter-spacing: 0.4pt;
-            margin-top: 2pt;
-        }
-        .qr-no {
-            font-size: 4.8pt;
-            color: #64748b;
-            letter-spacing: 0.3pt;
-            margin-top: 0.8pt;
-            font-weight: bold;
-        }
+        .qr-img { width: 77pt; height: 77pt; display: block; margin: 0 auto; }
 
         /* 5. Footer: kapsul melayang rapi di atas lengkungan batik */
         .footer-wrap { width: 265.75pt; text-align: center; }

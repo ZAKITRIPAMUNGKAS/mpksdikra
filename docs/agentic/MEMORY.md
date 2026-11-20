@@ -42,6 +42,12 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-20: Perapian Visual & Estetika ID Card (Baitul Arqam - Massal & Portal):
+  - **Penyatuan Header & Artwork Latar Alami**: Menghapus blok persegi navy kaku (`.header-band`) yang memotong sudut batik dan meninggalkan celah pohon/bangunan. Header kini menyatu secara elegan dengan ilustrasi latar belakang (kubah Edutorium dan langit biru tua), memperlihatkan lengkungan ornamen batik di sudut atas.
+  - **Badge Logo Melingkar Emas**: Mengganti pelat kotak putih (`.brand-plate`) yang menyerupai stiker tempelan dengan lencana melingkar berbingkai emas (`badge-muhammadiyah.png` dan `badge-mpksdi.png`) dengan latar transparan.
+  - **Harmoni Tipografi & Penghapusan Glitch Glif**: Judul "Baitul Arqam" menggunakan DejaVu Serif tebal putih, subjudul event dibersihkan dari redundansi nama acara ganda serta menggunakan titik pemisah aman (tanpa karakter asing `??`), dan rentang tanggal menggunakan tanda hubung standar anti-glitch `???`.
+  - **Kapsul Melayang (Footer Pill)**: Membungkus masa berlaku kartu dalam kontainer kapsul melayang putih bersih (`.footer-pill`) di atas lengkungan batik bawah sehingga teks tidak lagi bertubrukan dengan ornamen gelap.
+  - **Verifikasi**: 282 automated tests lulus 100% (1.353 assertions), Laravel Pint lulus 0 violations, dan pratinjau rendering PDF/PNG diverifikasi tajam dan presisi.
 - 2026-11-20: Redesain header ID Card agar tidak generik + anti-gepeng:
   - Header jadi pita navy penuh rata kiri (logo berwarna asli di pelat putih — versi putih MPKSDI hanya siluet   - Header jadi pita navy penuh rata kiri (logo putih `logo-*-putih.png`, label lembaga, aksen emas tunggal, logo hijau Muhammadiyah tenggelam di navy; `logo-mpksdi-warna.png` = versi 240px; garis emas di tepi bawah pita, judul DejaVu Serif, subjudul huruf biasa). Badge jadi "PESERTA" polos; footer hanya teks "Berlaku …" (rentang tanggal diringkas bila sebulan).
   - DomPDF mengabaikan `box-sizing: border-box` pada `.header-band`, jadi lebarnya ditulis content-box (229.75pt + padding 2×18pt).

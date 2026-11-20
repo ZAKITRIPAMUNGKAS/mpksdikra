@@ -9,12 +9,12 @@
     $nbm = $card['nbm'] ?? null;
 @endphp
 
-{{-- 1. Header: pita navy penuh, rata kiri --}}
-<div class="layer header-band" style="top: {{ $top }}pt; left: {{ $left }}pt;">
+{{-- 1. Header: menyatu alami dengan ilustrasi background --}}
+<div class="layer header-wrap" style="top: {{ $top + 10 }}pt; left: {{ $left + 15 }}pt;">
     <table class="brand-table" role="presentation">
         <tr>
             <td style="vertical-align: middle;">
-                <div class="brand-plate"><img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah"><img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI"></div>
+                <img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah"><img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI">
             </td>
             <td class="brand-org">MPKSDI<br><span class="brand-org-sub">PDM Karanganyar</span></td>
         </tr>
@@ -24,7 +24,7 @@
 </div>
 
 {{-- 2. Foto 3:4 & label --}}
-<div class="layer photo-wrap" style="top: {{ $top + 90 }}pt; left: {{ $left + 91.875 }}pt;">
+<div class="layer photo-wrap" style="top: {{ $top + 88 }}pt; left: {{ $left + 91.875 }}pt;">
     @if($card['foto'])
         <img src="{{ $card['foto'] }}" class="photo-img" alt="Foto {{ $namaUtama }}">
     @endif
@@ -34,7 +34,7 @@
 </div>
 
 {{-- 3. Identitas (tinggi tetap, isi di tengah) --}}
-<div class="layer identity-wrap" style="top: {{ $top + 213 }}pt; left: {{ $left + 12 }}pt;">
+<div class="layer identity-wrap" style="top: {{ $top + 212 }}pt; left: {{ $left + 10 }}pt;">
     <table class="identity-table" role="presentation">
         <tr>
             <td class="identity-cell">
@@ -46,7 +46,7 @@
                     <span>{{ $pcm }}</span>
                     @if($nbm)
                         <span class="sub-dot">&bull;</span>
-                        <span>NBM {{ $nbm }}</span>
+                        <span class="sub-nbm">NBM {{ $nbm }}</span>
                     @endif
                 </div>
             </td>
@@ -62,6 +62,8 @@
 </div>
 
 {{-- 5. Footer --}}
-<div class="layer footer-wrap" style="top: {{ $top + 345 }}pt; left: {{ $left }}pt;">
-    <span class="validity-text">Berlaku {{ $masaBerlaku }}</span>
+<div class="layer footer-wrap" style="top: {{ $top + 342 }}pt; left: {{ $left }}pt;">
+    <div class="footer-pill">
+        <span class="validity-text">Berlaku {{ $masaBerlaku }}</span>
+    </div>
 </div>

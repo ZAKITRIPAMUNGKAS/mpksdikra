@@ -31,19 +31,21 @@
         .header-band {
             box-sizing: content-box;
             width: 229.75pt;
-            height: 67pt;
-            padding: 11pt 18pt 0 18pt;
+            height: 70pt;
+            padding: 10pt 18pt 0 18pt;
             background: #041c38;
+            border-bottom: 1.4pt solid #f8bb00;
             border-top-left-radius: 8pt;
             border-top-right-radius: 8pt;
             text-align: left;
         }
         .brand-table { border-collapse: collapse; }
-        .brand-cell { padding: 0 5pt 0 0; vertical-align: middle; }
-        .brand-logo { width: 17pt; height: 17pt; display: block; }
-        .brand-org { padding-left: 3pt; vertical-align: middle; color: #b9c6da; font-size: 5.6pt; font-weight: bold; letter-spacing: 1pt; text-transform: uppercase; }
-        .title-rule { width: 20pt; height: 1.6pt; background: #f8bb00; margin: 6pt 0 5pt 0; }
-        .title-main { color: #ffffff; font-family: DejaVu Serif, serif; font-size: 15pt; font-weight: bold; letter-spacing: 0.3pt; line-height: 1.1; }
+        .brand-plate { display: inline-block; background: #ffffff; border-radius: 3pt; padding: 1.5pt 3pt; }
+        .brand-logo { width: 22pt; height: 22pt; display: inline-block; vertical-align: middle; }
+        .brand-logo + .brand-logo { margin-left: 3pt; }
+        .brand-org { padding-left: 7pt; vertical-align: middle; color: #dbe3ee; font-size: 5.8pt; font-weight: bold; letter-spacing: 1pt; text-transform: uppercase; line-height: 1.35; }
+        .brand-org-sub { color: #f8bb00; letter-spacing: 0.6pt; }
+        .title-main { color: #ffffff; font-family: DejaVu Serif, serif; font-size: 16pt; font-weight: bold; letter-spacing: 0.3pt; line-height: 1.1; margin-top: 5pt; }
         .subtitle-event { color: #b9c6da; font-size: 6pt; line-height: 1.35; margin-top: 2pt; }
 
         /* 2. Foto (rasio 3:4 terkunci; gambar sudah di-crop server-side) */
@@ -96,7 +98,7 @@
             padding: 3.5pt 4pt 3pt 4pt;
             text-align: center;
         }
-        .qr-img { width: 44pt; height: 44pt; display: block; margin: 0 auto; }
+        .qr-img { width: 52pt; height: 52pt; display: block; margin: 0 auto; }
         .qr-label {
             font-size: 5.4pt;
             font-weight: bold;
@@ -137,15 +139,10 @@
         : public_path('aset/idcard/idcard-satu-sisi-bg.png');
     $background = $asDataUri($bgFile);
 
-    $logoMFile = file_exists(public_path('aset/idcard/logo-muhammadiyah-putih.png'))
-        ? public_path('aset/idcard/logo-muhammadiyah-putih.png')
-        : (file_exists(public_path('aset/logo-muhammadiyah.png')) ? public_path('aset/logo-muhammadiyah.png') : public_path('assets/logo/muhammadiyah.png'));
-    $logoMuhammadiyah = $asDataUri($logoMFile);
-
-    $logoKFile = file_exists(public_path('aset/idcard/logo-mpksdi-putih.png'))
-        ? public_path('aset/idcard/logo-mpksdi-putih.png')
-        : (file_exists(public_path('aset/logo-mpksdi.png')) ? public_path('aset/logo-mpksdi.png') : public_path('assets/logo/mpksdi.png'));
-    $logoMpksdi = $asDataUri($logoKFile);
+    $logoMuhammadiyah = $asDataUri(public_path('aset/logo-muhammadiyah.png'));
+    $logoMpksdi = $asDataUri(file_exists(public_path('aset/idcard/logo-mpksdi-warna.png'))
+        ? public_path('aset/idcard/logo-mpksdi-warna.png')
+        : public_path('aset/logo-mpksdi.png'));
 
     $tahun = $event->tanggal_mulai?->format('Y') ?? date('Y');
     $mulai = $event->tanggal_mulai;

@@ -13,12 +13,12 @@
 <div class="layer header-band" style="top: {{ $top }}pt; left: {{ $left }}pt;">
     <table class="brand-table" role="presentation">
         <tr>
-            @if($logoMuhammadiyah)<td class="brand-cell"><img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah"></td>@endif
-            @if($logoMpksdi)<td class="brand-cell"><img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI"></td>@endif
-            <td class="brand-org">MPKSDI PDM Karanganyar</td>
+            <td style="vertical-align: middle;">
+                <div class="brand-plate"><img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah"><img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI"></div>
+            </td>
+            <td class="brand-org">MPKSDI<br><span class="brand-org-sub">PDM Karanganyar</span></td>
         </tr>
     </table>
-    <div class="title-rule"></div>
     <div class="title-main">Baitul Arqam</div>
     <div class="subtitle-event">{{ $cleanSubtitle }}</div>
 </div>
@@ -34,7 +34,7 @@
 </div>
 
 {{-- 3. Identitas (tinggi tetap, isi di tengah) --}}
-<div class="layer identity-wrap" style="top: {{ $top + 211 }}pt; left: {{ $left + 12 }}pt;">
+<div class="layer identity-wrap" style="top: {{ $top + 212 }}pt; left: {{ $left + 12 }}pt;">
     <table class="identity-table" role="presentation">
         <tr>
             <td class="identity-cell">
@@ -55,13 +55,13 @@
 </div>
 
 {{-- 4. QR presensi --}}
-<div class="layer qr-card-wrap" style="top: {{ $top + 256 }}pt; left: {{ $left + 88.875 }}pt;">
+<div class="layer qr-card-wrap" style="top: {{ $top + 255 }}pt; left: {{ $left + 88.875 }}pt;">
     <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
     <div class="qr-label">Presensi Kehadiran</div>
     <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
 </div>
 
 {{-- 5. Footer --}}
-<div class="layer footer-wrap" style="top: {{ $top + 340 }}pt; left: {{ $left }}pt;">
+<div class="layer footer-wrap" style="top: {{ $top + 343 }}pt; left: {{ $left }}pt;">
     <span class="validity-text">Berlaku {{ $masaBerlaku }}</span>
 </div>

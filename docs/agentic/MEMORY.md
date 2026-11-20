@@ -43,7 +43,7 @@ Pola berguna dari referensi:
 
 ## Log keputusan
 - 2026-11-20: Redesain header ID Card agar tidak generik + anti-gepeng:
-  - Header jadi pita navy penuh rata kiri (logo putih `logo-*-putih.png`, label lembaga, aksen emas tunggal, judul DejaVu Serif, subjudul huruf biasa). Badge jadi "PESERTA" polos; footer hanya teks "Berlaku …" (rentang tanggal diringkas bila sebulan).
+  - Header jadi pita navy penuh rata kiri (logo berwarna asli di pelat putih — versi putih MPKSDI hanya siluet   - Header jadi pita navy penuh rata kiri (logo putih `logo-*-putih.png`, label lembaga, aksen emas tunggal, logo hijau Muhammadiyah tenggelam di navy; `logo-mpksdi-warna.png` = versi 240px; garis emas di tepi bawah pita, judul DejaVu Serif, subjudul huruf biasa). Badge jadi "PESERTA" polos; footer hanya teks "Berlaku …" (rentang tanggal diringkas bila sebulan).
   - DomPDF mengabaikan `box-sizing: border-box` pada `.header-band`, jadi lebarnya ditulis content-box (229.75pt + padding 2×18pt).
   - Foto ID card di-crop tengah ke 3:4 dan diperkecil (maks 480px) oleh `ImageCutoutService::coverCropDataUri()` karena DomPDF tidak mendukung `object-fit`; foto default persegi sebelumnya tergencet.
   - `idcard-satu-sisi-bg.jpg` dibuat ulang dari PNG dengan crop ke rasio kartu (1024×1479) agar latar tidak teregang.

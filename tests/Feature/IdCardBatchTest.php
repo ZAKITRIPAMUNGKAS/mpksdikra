@@ -73,6 +73,28 @@ class IdCardBatchTest extends TestCase
         $this->assertStringContainsString('<div class="subtitle-event">Karyawan Contoh · 2026</div>', $html);
     }
 
+    public function test_id_card_keeps_a_long_participant_name_legible(): void
+    {
+        $event = new Event([
+            'nama_event' => 'Baitul Arqam Karyawan Contoh',
+            'tanggal_mulai' => '2026-02-14',
+            'tanggal_selesai' => '2026-02-15',
+        ]);
+        $cards = [[
+            'id' => 1,
+            'no_peserta' => 7,
+            'nama' => 'Nama Peserta Dengan Rangkaian Nama Panjang Sekali',
+            'pcm' => 'Karanganyar',
+            'nbm' => null,
+            'foto' => null,
+            'qr' => 'data:image/png;base64,',
+        ]];
+
+        $html = view('admin.events.idcard-batch-pdf', ['event' => $event, 'cards' => $cards, 'isSingle' => true])->render();
+
+        $this->assertStringContainsString('font-size: 8pt;', $html);
+    }
+
     public function test_admin_can_download_batch_id_cards_pdf(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);

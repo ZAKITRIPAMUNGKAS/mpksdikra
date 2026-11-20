@@ -73,8 +73,8 @@
         }
 
         /* 3. Identity Block: nama 1 baris (font menyesuaikan), gelar, lalu PCM/NBM */
-        .identity-wrap { width: 241.75pt; height: 41pt; }
-        .identity-table { width: 100%; height: 41pt; border-collapse: collapse; }
+        .identity-wrap { width: 241.75pt; height: 40pt; }
+        .identity-table { width: 100%; height: 40pt; border-collapse: collapse; }
         .identity-cell { vertical-align: middle; text-align: center; }
         .kader-name { font-weight: bold; color: #062a58; line-height: 1.15; letter-spacing: 0.2pt; white-space: nowrap; }
         .kader-gelar { font-size: 6.6pt; color: #334155; line-height: 1.2; margin-top: 0; }
@@ -98,9 +98,9 @@
             padding: 3.5pt 4pt 3pt 4pt;
             text-align: center;
         }
-        .qr-img { width: 52pt; height: 52pt; display: block; margin: 0 auto; }
+        .qr-img { width: 53pt; height: 53pt; display: block; margin: 0 auto; }
         .qr-label {
-            font-size: 5.4pt;
+            font-size: 5.6pt;
             font-weight: bold;
             color: #062a58;
             text-transform: uppercase;
@@ -108,7 +108,7 @@
             margin-top: 2pt;
         }
         .qr-no {
-            font-size: 4.8pt;
+            font-size: 5pt;
             color: #64748b;
             letter-spacing: 0.3pt;
             margin-top: 0.8pt;

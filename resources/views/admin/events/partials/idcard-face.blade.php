@@ -3,7 +3,7 @@
     $namaUtama = mb_strtoupper(trim($parts[0]));
     $gelar = trim(preg_replace('/\s*,\s*/', ', ', $parts[1] ?? ''));
     $len = max(1, mb_strlen($namaUtama));
-    $nameFontSize = max(7, min(13, round(236 / ($len * 0.8), 1)));
+    $nameFontSize = max(8, min(12, round(236 / ($len * 0.8), 1)));
     $pcm = mb_strtoupper($card['pcm'] ?: 'Utusan Muhammadiyah');
     $noPeserta = str_pad((string) $card['no_peserta'], 5, '0', STR_PAD_LEFT);
     $nbm = $card['nbm'] ?? null;
@@ -34,7 +34,7 @@
 </div>
 
 {{-- 3. Identitas (tinggi tetap, isi di tengah) --}}
-<div class="layer identity-wrap" style="top: {{ $top + 212 }}pt; left: {{ $left + 12 }}pt;">
+<div class="layer identity-wrap" style="top: {{ $top + 213 }}pt; left: {{ $left + 12 }}pt;">
     <table class="identity-table" role="presentation">
         <tr>
             <td class="identity-cell">
@@ -55,13 +55,13 @@
 </div>
 
 {{-- 4. QR presensi --}}
-<div class="layer qr-card-wrap" style="top: {{ $top + 255 }}pt; left: {{ $left + 88.875 }}pt;">
+<div class="layer qr-card-wrap" style="top: {{ $top + 256 }}pt; left: {{ $left + 88.875 }}pt;">
     <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
     <div class="qr-label">Presensi Kehadiran</div>
     <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
 </div>
 
 {{-- 5. Footer --}}
-<div class="layer footer-wrap" style="top: {{ $top + 343 }}pt; left: {{ $left }}pt;">
+<div class="layer footer-wrap" style="top: {{ $top + 345 }}pt; left: {{ $left }}pt;">
     <span class="validity-text">Berlaku {{ $masaBerlaku }}</span>
 </div>

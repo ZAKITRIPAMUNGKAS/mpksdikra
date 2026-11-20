@@ -9,41 +9,32 @@
     $nbm = $card['nbm'] ?? null;
 @endphp
 
-{{-- 1. Header --}}
-<div class="layer header-plaque" style="top: {{ $top + 10 }}pt; left: {{ $left + 20 }}pt;">
-    <table class="header-table" role="presentation">
+{{-- 1. Header: pita navy penuh, rata kiri --}}
+<div class="layer header-band" style="top: {{ $top }}pt; left: {{ $left }}pt;">
+    <table class="brand-table" role="presentation">
         <tr>
-            <td class="header-cell">
-                <table class="brand-table" role="presentation">
-                    <tr>
-                        <td class="brand-cell">
-                            @if($logoMuhammadiyah)<img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah">@endif
-                        </td>
-                        <td class="brand-bullet">&bull;</td>
-                        <td class="brand-cell">
-                            @if($logoMpksdi)<img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI">@endif
-                        </td>
-                    </tr>
-                </table>
-                <div class="title-main">BAITUL ARQAM</div>
-                <div class="subtitle-event">{{ $cleanSubtitle }}</div>
-            </td>
+            @if($logoMuhammadiyah)<td class="brand-cell"><img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah"></td>@endif
+            @if($logoMpksdi)<td class="brand-cell"><img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI"></td>@endif
+            <td class="brand-org">MPKSDI PDM Karanganyar</td>
         </tr>
     </table>
+    <div class="title-rule"></div>
+    <div class="title-main">Baitul Arqam</div>
+    <div class="subtitle-event">{{ $cleanSubtitle }}</div>
 </div>
 
-{{-- 2. Foto 3:4 & badge --}}
-<div class="layer photo-wrap" style="top: {{ $top + 80 }}pt; left: {{ $left + 86.875 }}pt;">
+{{-- 2. Foto 3:4 & label --}}
+<div class="layer photo-wrap" style="top: {{ $top + 86 }}pt; left: {{ $left + 88.875 }}pt;">
     @if($card['foto'])
         <img src="{{ $card['foto'] }}" class="photo-img" alt="Foto {{ $namaUtama }}">
     @endif
 </div>
-<div class="layer photo-badge" style="top: {{ $top + 196 }}pt; left: {{ $left }}pt;">
-    <span class="badge-kader">Peserta Baitul Arqam</span>
+<div class="layer photo-badge" style="top: {{ $top + 198 }}pt; left: {{ $left }}pt;">
+    <span class="badge-kader">Peserta</span>
 </div>
 
 {{-- 3. Identitas (tinggi tetap, isi di tengah) --}}
-<div class="layer identity-wrap" style="top: {{ $top + 212 }}pt; left: {{ $left + 12 }}pt;">
+<div class="layer identity-wrap" style="top: {{ $top + 211 }}pt; left: {{ $left + 12 }}pt;">
     <table class="identity-table" role="presentation">
         <tr>
             <td class="identity-cell">
@@ -64,16 +55,13 @@
 </div>
 
 {{-- 4. QR presensi --}}
-<div class="layer qr-card-wrap" style="top: {{ $top + 257 }}pt; left: {{ $left + 86.875 }}pt;">
+<div class="layer qr-card-wrap" style="top: {{ $top + 256 }}pt; left: {{ $left + 88.875 }}pt;">
     <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
     <div class="qr-label">Presensi Kehadiran</div>
     <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
 </div>
 
 {{-- 5. Footer --}}
-<div class="layer footer-wrap" style="top: {{ $top + 334 }}pt; left: {{ $left + 25 }}pt;">
-    <div class="footer-box">
-        <div class="validity-text">Masa Berlaku: {{ $masaBerlaku }}</div>
-        <div class="authority-text">MPKSDI PDM Karanganyar</div>
-    </div>
+<div class="layer footer-wrap" style="top: {{ $top + 340 }}pt; left: {{ $left }}pt;">
+    <span class="validity-text">Berlaku {{ $masaBerlaku }}</span>
 </div>

@@ -27,47 +27,46 @@
         /* Layer Helper */
         .layer { position: absolute; z-index: 2; text-align: center; }
 
-        /* 1. Header (tinggi tetap agar posisi foto stabil) */
-        .header-plaque {
-            width: 225.75pt;
-            height: 64pt;
+        /* 1. Header: pita navy penuh tanpa bingkai */
+        .header-band {
+            box-sizing: content-box;
+            width: 229.75pt;
+            height: 67pt;
+            padding: 11pt 18pt 0 18pt;
             background: #041c38;
-            border: 1.2pt solid #f8bb00;
-            border-radius: 8pt;
+            border-top-left-radius: 8pt;
+            border-top-right-radius: 8pt;
+            text-align: left;
         }
-        .header-table { width: 100%; height: 61.6pt; border-collapse: collapse; }
-        .header-cell { vertical-align: middle; text-align: center; padding: 0 8pt; }
-        .brand-table { margin: 0 auto 2pt auto; border-collapse: collapse; }
-        .brand-logo { width: 20pt; height: 20pt; display: block; margin: 0 auto; }
-        .brand-cell { padding: 0 5pt; vertical-align: middle; }
-        .brand-bullet { font-size: 8pt; color: #f8bb00; vertical-align: middle; padding: 0 2pt; line-height: 1; text-align: center; }
+        .brand-table { border-collapse: collapse; }
+        .brand-cell { padding: 0 5pt 0 0; vertical-align: middle; }
+        .brand-logo { width: 17pt; height: 17pt; display: block; }
+        .brand-org { padding-left: 3pt; vertical-align: middle; color: #b9c6da; font-size: 5.6pt; font-weight: bold; letter-spacing: 1pt; text-transform: uppercase; }
+        .title-rule { width: 20pt; height: 1.6pt; background: #f8bb00; margin: 6pt 0 5pt 0; }
+        .title-main { color: #ffffff; font-family: DejaVu Serif, serif; font-size: 15pt; font-weight: bold; letter-spacing: 0.3pt; line-height: 1.1; }
+        .subtitle-event { color: #b9c6da; font-size: 6pt; line-height: 1.35; margin-top: 2pt; }
 
-        .title-main { color: #ffffff; font-size: 12.5pt; font-weight: bold; letter-spacing: 2pt; text-transform: uppercase; line-height: 1.15; }
-        .subtitle-event { color: #f8bb00; font-size: 5.6pt; font-weight: bold; letter-spacing: 0.5pt; text-transform: uppercase; line-height: 1.3; margin-top: 1pt; }
-
-        /* 2. Photo Frame (Locked 3:4 Aspect Ratio, Width: 92pt) */
+        /* 2. Foto (rasio 3:4 terkunci; gambar sudah di-crop server-side) */
         .photo-wrap {
-            width: 92pt;
-            height: 122.67pt;
-            padding: 2.5pt;
+            width: 88pt;
+            height: 117.33pt;
+            padding: 2pt;
             background: #ffffff;
-            border: 2pt solid #f8bb00;
-            border-radius: 9pt;
-            text-align: center;
+            border: 1.2pt solid #f8bb00;
+            border-radius: 3pt;
         }
-        .photo-img { width: 100%; height: 100%; border-radius: 6pt; display: block; margin: 0 auto; }
+        .photo-img { width: 100%; height: 100%; display: block; }
 
         .photo-badge { width: 265.75pt; text-align: center; }
         .badge-kader {
             display: inline-block;
-            padding: 2.2pt 10pt;
-            background: #062a58;
-            border: 1pt solid #f8bb00;
-            border-radius: 4pt;
+            padding: 2pt 9pt;
+            background: #041c38;
+            border-radius: 2pt;
             color: #ffffff;
             font-size: 5.6pt;
             font-weight: bold;
-            letter-spacing: 0.9pt;
+            letter-spacing: 1.5pt;
             text-transform: uppercase;
         }
 
@@ -88,12 +87,12 @@
         }
         .sub-dot { color: #f8bb00; padding: 0 4pt; font-weight: bold; }
 
-        /* 4. Unified QR Credential Card (Grid-Aligned to Photo Frame: Width 92pt) */
+        /* 4. QR (lebar sama dengan bingkai foto) */
         .qr-card-wrap {
-            width: 92pt;
+            width: 88pt;
             background: #ffffff;
-            border: 1.2pt solid #062a58;
-            border-radius: 8pt;
+            border: 0.8pt solid #cbd5e1;
+            border-radius: 4pt;
             padding: 3.5pt 4pt 3pt 4pt;
             text-align: center;
         }
@@ -113,11 +112,10 @@
             margin-top: 0.8pt;
         }
 
-        /* 5. Footer */
-        .footer-wrap { width: 215.75pt; text-align: center; }
-        .footer-box { display: inline-block; padding: 3pt 12pt; background: #ffffff; border: 0.8pt solid #e2e8f0; border-radius: 6pt; }
-        .validity-text { font-size: 5.6pt; font-weight: bold; color: #062a58; letter-spacing: 0.2pt; }
-        .authority-text { font-size: 4.8pt; font-weight: bold; color: #b45309; letter-spacing: 0.6pt; margin-top: 1pt; text-transform: uppercase; }
+        /* 5. Footer: teks saja */
+        .footer-wrap { width: 265.75pt; text-align: center; }
+        .validity-text { font-size: 5.8pt; font-weight: bold; color: #041c38; letter-spacing: 0.3pt; }
+        @if($isSingle) .header-band { border-top-left-radius: 0; border-top-right-radius: 0; } @endif
     </style>
 </head>
 <body>
@@ -139,18 +137,24 @@
         : public_path('aset/idcard/idcard-satu-sisi-bg.png');
     $background = $asDataUri($bgFile);
 
-    $logoMFile = file_exists(public_path('aset/idcard/badge-muhammadiyah.png'))
-        ? public_path('aset/idcard/badge-muhammadiyah.png')
+    $logoMFile = file_exists(public_path('aset/idcard/logo-muhammadiyah-putih.png'))
+        ? public_path('aset/idcard/logo-muhammadiyah-putih.png')
         : (file_exists(public_path('aset/logo-muhammadiyah.png')) ? public_path('aset/logo-muhammadiyah.png') : public_path('assets/logo/muhammadiyah.png'));
     $logoMuhammadiyah = $asDataUri($logoMFile);
 
-    $logoKFile = file_exists(public_path('aset/idcard/badge-mpksdi.png'))
-        ? public_path('aset/idcard/badge-mpksdi.png')
+    $logoKFile = file_exists(public_path('aset/idcard/logo-mpksdi-putih.png'))
+        ? public_path('aset/idcard/logo-mpksdi-putih.png')
         : (file_exists(public_path('aset/logo-mpksdi.png')) ? public_path('aset/logo-mpksdi.png') : public_path('assets/logo/mpksdi.png'));
     $logoMpksdi = $asDataUri($logoKFile);
 
     $tahun = $event->tanggal_mulai?->format('Y') ?? date('Y');
-    $masaBerlaku = trim(($event->tanggal_mulai?->translatedFormat('d F Y') ?? '') . ' – ' . ($event->tanggal_selesai?->translatedFormat('d F Y') ?? ''));
+    $mulai = $event->tanggal_mulai;
+    $selesai = $event->tanggal_selesai;
+    if ($mulai && $selesai && $mulai->format('Y-m') === $selesai->format('Y-m')) {
+        $masaBerlaku = $mulai->format('j').'–'.$selesai->translatedFormat('j F Y');
+    } else {
+        $masaBerlaku = trim(($mulai?->translatedFormat('j F Y') ?? '').' – '.($selesai?->translatedFormat('j F Y') ?? ''), ' –');
+    }
 
     // Bersihkan judul event agar tidak terjadi redundansi "Baitul Arqam Baitul Arqam" atau tahun ganda
     $rawEventName = $event->nama_event;

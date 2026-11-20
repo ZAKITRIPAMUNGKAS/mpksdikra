@@ -20,7 +20,7 @@ class IdCardBatchTest extends TestCase
     {
         $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
 
-        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 92pt;[^}]*\}/', $template);
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 88pt;[^}]*\}/', $template);
         $this->assertMatchesRegularExpression('/\.qr-label \{[^}]*font-size:/', $template);
         $this->assertMatchesRegularExpression('/\.footer-wrap \{[^}]*text-align: center;/', $template);
     }
@@ -32,6 +32,20 @@ class IdCardBatchTest extends TestCase
         $this->assertStringContainsString('@page { size: a4 portrait; margin: 0; }', $template);
         $this->assertStringContainsString('.card-cut-guide', $template);
         $this->assertStringContainsString('$cardList->chunk(4)', $template);
+    }
+
+    public function test_id_card_photo_is_cropped_to_three_by_four_without_stretching(): void
+    {
+        $square = imagecreatetruecolor(900, 900);
+        ob_start();
+        imagejpeg($square);
+        $raw = ob_get_clean();
+
+        $dataUri = app(ImageCutoutService::class)->coverCropDataUri($raw);
+
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $dataUri);
+        [$w, $h] = getimagesizefromstring(base64_decode(substr($dataUri, strlen('data:image/jpeg;base64,'))));
+        $this->assertSame([480, 640], [$w, $h]);
     }
 
     public function test_id_card_normalizes_name_gelar_and_event_subtitle(): void

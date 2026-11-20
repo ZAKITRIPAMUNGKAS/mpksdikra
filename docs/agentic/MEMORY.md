@@ -42,6 +42,11 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-20: Redesain header ID Card agar tidak generik + anti-gepeng:
+  - Header jadi pita navy penuh rata kiri (logo putih `logo-*-putih.png`, label lembaga, aksen emas tunggal, judul DejaVu Serif, subjudul huruf biasa). Badge jadi "PESERTA" polos; footer hanya teks "Berlaku …" (rentang tanggal diringkas bila sebulan).
+  - DomPDF mengabaikan `box-sizing: border-box` pada `.header-band`, jadi lebarnya ditulis content-box (229.75pt + padding 2×18pt).
+  - Foto ID card di-crop tengah ke 3:4 dan diperkecil (maks 480px) oleh `ImageCutoutService::coverCropDataUri()` karena DomPDF tidak mendukung `object-fit`; foto default persegi sebelumnya tergencet.
+  - `idcard-satu-sisi-bg.jpg` dibuat ulang dari PNG dengan crop ke rasio kartu (1024×1479) agar latar tidak teregang.
 - 2026-11-20: Perapian tata letak ID Card (massal & portal):
   - Markup satu kartu dipindah ke partial `admin/events/partials/idcard-face.blade.php` (parameter `card`, `top`, `left`); mode tunggal dan grid A4 sama-sama memakainya.
   - Nama: bagian sebelum koma pertama jadi nama utama KAPITAL satu baris (font menyusut otomatis 13–7pt), sisanya tampil sebagai baris gelar kecil. Mencegah nama 2 baris menimpa QR.

@@ -528,11 +528,8 @@ class ImageCutoutService
     public function resolveOriginalForAnggota(Anggota $anggota): array
     {
         if ($anggota->foto && Storage::disk('local')->exists($anggota->foto)) {
-            $raw = Storage::disk('local')->get($anggota->foto);
-            $mime = $this->detectMime($raw);
-
             return [
-                'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                'dataUri' => $this->coverCropDataUri(Storage::disk('local')->get($anggota->foto)),
                 'mode' => 'original',
             ];
         }
@@ -542,16 +539,51 @@ class ImageCutoutService
             : public_path('aset/default-profile-pria.jpg');
 
         if (file_exists($defaultPath)) {
-            $raw = file_get_contents($defaultPath);
-            $mime = $this->detectMime($raw);
-
             return [
-                'dataUri' => 'data:'.$mime.';base64,'.base64_encode($raw),
+                'dataUri' => $this->coverCropDataUri(file_get_contents($defaultPath)),
                 'mode' => 'original',
             ];
         }
 
         return ['dataUri' => null, 'mode' => 'original'];
+    }
+
+    /**
+     * Crop tengah ke rasio bingkai (default 3:4) lalu perkecil, karena DomPDF tidak mendukung object-fit.
+     */
+    public function coverCropDataUri(string $raw, int $ratioW = 3, int $ratioH = 4, int $maxWidth = 480): string
+    {
+        $src = @imagecreatefromstring($raw);
+        if ($src === false) {
+            return 'data:'.$this->detectMime($raw).';base64,'.base64_encode($raw);
+        }
+
+        $w = imagesx($src);
+        $h = imagesy($src);
+        if ($w * $ratioH > $h * $ratioW) {
+            $cropH = $h;
+            $cropW = (int) round($h * $ratioW / $ratioH);
+            $x = (int) floor(($w - $cropW) / 2);
+            $y = 0;
+        } else {
+            $cropW = $w;
+            $cropH = (int) round($w * $ratioH / $ratioW);
+            $x = 0;
+            $y = (int) floor(($h - $cropH) * 0.35);
+        }
+
+        $outW = min($maxWidth, $cropW);
+        $outH = (int) round($outW * $ratioH / $ratioW);
+        $dst = imagecreatetruecolor($outW, $outH);
+        imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
+        imagecopyresampled($dst, $src, 0, 0, $x, $y, $outW, $outH, $cropW, $cropH);
+        imagedestroy($src);
+
+        ob_start();
+        imagejpeg($dst, null, 88);
+        imagedestroy($dst);
+
+        return 'data:image/jpeg;base64,'.base64_encode(ob_get_clean());
     }
 
     /**

@@ -42,6 +42,18 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-20: Otomasi Format Cetak ID Card Massal Menjadi Grid A4 Berjajar (2x2) Siap Cetak & Potong:
+  - **Latar Belakang & Kebutuhan**:
+    - Sebelumnya cetak massal ID card menghasilkan 1 kartu per halaman kustom (B3 ~9.4x13.5 cm), sehingga saat dicetak menggunakan printer kantor/A4 menjadi boros kertas (1 lembar A4 hanya terisi 1 kartu kecil) atau merepotkan pengaturan printer.
+  - **Penyusunan Grid 2x2 pada A4 Portrait**:
+    - Mengubah dokumen cetak massal panitia (`admin.events.idcards.batch`) menjadi standar kertas **A4 Portrait** (595.28pt &times; 841.89pt).
+    - Membagi peserta ke dalam lembaran per 4 kartu (`$cardList->chunk(4)`), disusun berjajar rapi 2 kolom &times; 2 baris dengan koordinat dan margin presisi.
+    - Dimensi fisik tiap kartu dipertahankan 100% presisi standar fisik B3 (265.75pt &times; 383.75pt atau ~9.3 &times; 13.5 cm), pas dimasukkan ke plastik mika gantungan peserta.
+    - Dilengkapi garis putus-putus panduan potong halus (`.card-cut-guide`) di sekeliling kartu agar panitia mudah memotong rapi dengan gunting/cutter.
+  - **Kompatibilitas Unduhan Mandiri Peserta**:
+    - Unduhan mandiri ID Card perorangan di portal peserta (`portal.idcard.download` via `KehadiranController::idCard`) tetap mempertahankan format kartu tunggal B3 (`$isSingle = true`) agar nyaman dibuka dan disimpan di ponsel/laptop kader.
+  - **Verifikasi**:
+    - 278 automated tests suite (1.343 assertions) lulus 100%, Laravel Pint lulus bersih, dan Vite production build sukses.
 - 2026-11-19: Presensi Manual Checklist Sesi Berdekatan & Akses Terpadu Poin Keaktifan Forum Peserta:
   - **Presensi Manual Checklist (Solusi Sesi Berdekatan Tanpa Scan Barcode)**:
     - Membangun antarmuka presensi manual tabel checklist (`/admin/events/{event}/sesi/{sesi}/presensi`) sehingga panitia tidak perlu meminta peserta memindai QR code dua kali berturut-turut pada sesi yang jadwalnya berdekatan di ruangan yang sama.

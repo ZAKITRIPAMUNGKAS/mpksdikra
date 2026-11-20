@@ -642,6 +642,7 @@ class ImageCutoutService
         if (class_exists(\finfo::class)) {
             try {
                 $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
                 return $finfo->buffer($raw) ?: 'image/jpeg';
             } catch (Throwable) {
                 // Fallback

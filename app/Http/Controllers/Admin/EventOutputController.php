@@ -223,8 +223,9 @@ class EventOutputController extends Controller
             ];
         })->filter()->values();
 
-        $pdf = Pdf::loadView('admin.events.idcard-batch-pdf', compact('event', 'cards'))
-            ->setPaper([0, 0, 265.75, 383.75], 'portrait');
+        $isSingle = false;
+        $pdf = Pdf::loadView('admin.events.idcard-batch-pdf', compact('event', 'cards', 'isSingle'))
+            ->setPaper('a4', 'portrait');
 
         $slug = str($event->nama_event)->slug();
 

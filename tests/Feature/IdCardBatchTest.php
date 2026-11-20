@@ -25,6 +25,15 @@ class IdCardBatchTest extends TestCase
         $this->assertMatchesRegularExpression('/\.footer-wrap \{[^}]*text-align: center;/', $template);
     }
 
+    public function test_batch_id_cards_uses_a4_portrait_grid_with_cutting_guides(): void
+    {
+        $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
+
+        $this->assertStringContainsString('@page { size: a4 portrait; margin: 0; }', $template);
+        $this->assertStringContainsString('.card-cut-guide', $template);
+        $this->assertStringContainsString('$cardList->chunk(4)', $template);
+    }
+
     public function test_admin_can_download_batch_id_cards_pdf(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);

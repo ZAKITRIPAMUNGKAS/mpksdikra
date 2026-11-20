@@ -59,7 +59,8 @@ class KehadiranController extends Controller
             'qr' => $qrPng,
         ]];
 
-        $pdf = Pdf::loadView('admin.events.idcard-batch-pdf', compact('event', 'cards'))
+        $isSingle = true;
+        $pdf = Pdf::loadView('admin.events.idcard-batch-pdf', compact('event', 'cards', 'isSingle'))
             ->setPaper([0, 0, 265.75, 383.75], 'portrait');
 
         return $pdf->download('id-card-'.str($ep->anggota->nama_lengkap)->slug().'.pdf');

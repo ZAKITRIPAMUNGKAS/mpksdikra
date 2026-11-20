@@ -42,6 +42,12 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-20: Perapian tata letak ID Card (massal & portal):
+  - Markup satu kartu dipindah ke partial `admin/events/partials/idcard-face.blade.php` (parameter `card`, `top`, `left`); mode tunggal dan grid A4 sama-sama memakainya.
+  - Nama: bagian sebelum koma pertama jadi nama utama KAPITAL satu baris (font menyusut otomatis 13–7pt), sisanya tampil sebagai baris gelar kecil. Mencegah nama 2 baris menimpa QR.
+  - Blok identitas & header bertinggi tetap (tabel `vertical-align: middle`) agar posisi foto/QR stabil.
+  - Subjudul membuang awalan `Baitul Arqam/Arqom`.
+  - Unduhan portal kini ikut menampilkan NBM.
 - 2026-11-20: Otomasi Format Cetak ID Card Massal Menjadi Grid A4 Berjajar (2x2) Siap Cetak & Potong:
   - **Latar Belakang & Kebutuhan**:
     - Sebelumnya cetak massal ID card menghasilkan 1 kartu per halaman kustom (B3 ~9.4x13.5 cm), sehingga saat dicetak menggunakan printer kantor/A4 menjadi boros kertas (1 lembar A4 hanya terisi 1 kartu kecil) atau merepotkan pengaturan printer.

@@ -27,22 +27,23 @@
         /* Layer Helper */
         .layer { position: absolute; z-index: 2; text-align: center; }
 
-        /* 1. Executive Header Plaque */
+        /* 1. Header (tinggi tetap agar posisi foto stabil) */
         .header-plaque {
             width: 225.75pt;
+            height: 64pt;
             background: #041c38;
             border: 1.2pt solid #f8bb00;
             border-radius: 8pt;
-            padding: 5pt 8pt 6pt 8pt;
-            text-align: center;
         }
-        .brand-table { margin: 0 auto 3pt auto; border-collapse: collapse; }
-        .brand-logo { width: 22pt; height: 22pt; display: block; margin: 0 auto; }
+        .header-table { width: 100%; height: 61.6pt; border-collapse: collapse; }
+        .header-cell { vertical-align: middle; text-align: center; padding: 0 8pt; }
+        .brand-table { margin: 0 auto 2pt auto; border-collapse: collapse; }
+        .brand-logo { width: 20pt; height: 20pt; display: block; margin: 0 auto; }
         .brand-cell { padding: 0 5pt; vertical-align: middle; }
         .brand-bullet { font-size: 8pt; color: #f8bb00; vertical-align: middle; padding: 0 2pt; line-height: 1; text-align: center; }
-        
-        .title-main { color: #ffffff; font-size: 13pt; font-weight: bold; letter-spacing: 2pt; text-transform: uppercase; margin: 1pt 0; }
-        .subtitle-event { color: #f8bb00; font-size: 5.8pt; font-weight: bold; letter-spacing: 0.6pt; text-transform: uppercase; line-height: 1.25; }
+
+        .title-main { color: #ffffff; font-size: 12.5pt; font-weight: bold; letter-spacing: 2pt; text-transform: uppercase; line-height: 1.15; }
+        .subtitle-event { color: #f8bb00; font-size: 5.6pt; font-weight: bold; letter-spacing: 0.5pt; text-transform: uppercase; line-height: 1.3; margin-top: 1pt; }
 
         /* 2. Photo Frame (Locked 3:4 Aspect Ratio, Width: 92pt) */
         .photo-wrap {
@@ -54,9 +55,8 @@
             border-radius: 9pt;
             text-align: center;
         }
-        .photo-img { width: 100%; height: 100%; border-radius: 6pt; display: block; margin: 0 auto; object-fit: cover; }
-        
-        /* Photo Badge */
+        .photo-img { width: 100%; height: 100%; border-radius: 6pt; display: block; margin: 0 auto; }
+
         .photo-badge { width: 265.75pt; text-align: center; }
         .badge-kader {
             display: inline-block;
@@ -71,16 +71,20 @@
             text-transform: uppercase;
         }
 
-        /* 3. Identity Block (Clean 2-Line Architecture) */
-        .identity-wrap { width: 235.75pt; text-align: center; }
-        .kader-name { font-weight: bold; color: #062a58; line-height: 1.2; letter-spacing: 0.1pt; }
+        /* 3. Identity Block: nama 1 baris (font menyesuaikan), gelar, lalu PCM/NBM */
+        .identity-wrap { width: 241.75pt; height: 41pt; }
+        .identity-table { width: 100%; height: 41pt; border-collapse: collapse; }
+        .identity-cell { vertical-align: middle; text-align: center; }
+        .kader-name { font-weight: bold; color: #062a58; line-height: 1.15; letter-spacing: 0.2pt; white-space: nowrap; }
+        .kader-gelar { font-size: 6.6pt; color: #334155; line-height: 1.2; margin-top: 0; }
         .kader-sub {
-            margin-top: 3pt;
-            font-size: 6.8pt;
+            margin-top: 2pt;
+            font-size: 6.4pt;
             font-weight: bold;
             color: #854d0e;
             letter-spacing: 0.5pt;
             text-transform: uppercase;
+            white-space: nowrap;
         }
         .sub-dot { color: #f8bb00; padding: 0 4pt; font-weight: bold; }
 
@@ -90,10 +94,10 @@
             background: #ffffff;
             border: 1.2pt solid #062a58;
             border-radius: 8pt;
-            padding: 4.5pt 4pt 3.5pt 4pt;
+            padding: 3.5pt 4pt 3pt 4pt;
             text-align: center;
         }
-        .qr-img { width: 50pt; height: 50pt; display: block; margin: 0 auto; }
+        .qr-img { width: 44pt; height: 44pt; display: block; margin: 0 auto; }
         .qr-label {
             font-size: 5.4pt;
             font-weight: bold;
@@ -109,7 +113,7 @@
             margin-top: 0.8pt;
         }
 
-        /* 5. Footer (Clean White Zone) */
+        /* 5. Footer */
         .footer-wrap { width: 215.75pt; text-align: center; }
         .footer-box { display: inline-block; padding: 3pt 12pt; background: #ffffff; border: 0.8pt solid #e2e8f0; border-radius: 6pt; }
         .validity-text { font-size: 5.6pt; font-weight: bold; color: #062a58; letter-spacing: 0.2pt; }
@@ -150,7 +154,7 @@
 
     // Bersihkan judul event agar tidak terjadi redundansi "Baitul Arqam Baitul Arqam" atau tahun ganda
     $rawEventName = $event->nama_event;
-    $cleanSubtitle = preg_replace('/^Baitul\s+Arqam\s+/i', '', $rawEventName);
+    $cleanSubtitle = trim(preg_replace('/^Baitul\s+Arq[ao]m\s*/iu', '', $rawEventName));
     if (!str_contains($cleanSubtitle, $tahun)) {
         $cleanSubtitle .= ' · ' . $tahun;
     }
@@ -166,155 +170,26 @@
 @endphp
 
 @if($isSingle)
-    {{-- Single Card Mode (Portal Participant Download - B3 Size) --}}
+    {{-- Mode kartu tunggal (unduhan portal peserta) --}}
     @foreach($cardList as $card)
-        @php
-            $nama = $card['nama'];
-            $len = mb_strlen($nama);
-            $nameFontSize = $len > 28 ? '10pt' : ($len > 22 ? '11.5pt' : '13pt');
-            $pcm = $card['pcm'] ?: 'Utusan Muhammadiyah';
-            $noPeserta = str_pad((string) $card['no_peserta'], 5, '0', STR_PAD_LEFT);
-            $nbm = $card['nbm'] ?? null;
-        @endphp
         <div class="card">
             @if($background)
                 <img src="{{ $background }}" class="single-bg" alt="">
             @endif
-
-            {{-- 1. Header Plaque --}}
-            <div class="layer header-plaque" style="top: 10pt; left: 20pt;">
-                <table class="brand-table" role="presentation">
-                    <tr>
-                        <td class="brand-cell">
-                            @if($logoMuhammadiyah)<img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah">@endif
-                        </td>
-                        <td class="brand-bullet">&bull;</td>
-                        <td class="brand-cell">
-                            @if($logoMpksdi)<img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI">@endif
-                        </td>
-                    </tr>
-                </table>
-                <div class="title-main">BAITUL ARQAM</div>
-                <div class="subtitle-event">{{ $cleanSubtitle }}</div>
-            </div>
-
-            {{-- 2. Photo Frame & Badge --}}
-            <div class="layer photo-wrap" style="top: 79pt; left: 86.875pt;">
-                @if($card['foto'])
-                    <img src="{{ $card['foto'] }}" class="photo-img" alt="Foto {{ $nama }}">
-                @endif
-            </div>
-            <div class="layer photo-badge" style="top: 193pt; left: 0;">
-                <span class="badge-kader">Peserta Baitul Arqam</span>
-            </div>
-
-            {{-- 3. Identity Block --}}
-            <div class="layer identity-wrap" style="top: 211pt; left: 15pt;">
-                <div class="kader-name" style="font-size: {{ $nameFontSize }};">{{ $nama }}</div>
-                <div class="kader-sub">
-                    <span>{{ $pcm }}</span>
-                    @if($nbm)
-                        <span class="sub-dot">&bull;</span>
-                        <span>NBM: {{ $nbm }}</span>
-                    @endif
-                </div>
-            </div>
-
-            {{-- 4. Unified QR Credential Card --}}
-            <div class="layer qr-card-wrap" style="top: 247pt; left: 86.875pt;">
-                <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
-                <div class="qr-label">Presensi Kehadiran</div>
-                <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
-            </div>
-
-            {{-- 5. Footer --}}
-            <div class="layer footer-wrap" style="top: 334pt; left: 25pt;">
-                <div class="footer-box">
-                    <div class="validity-text">Masa Berlaku: {{ $masaBerlaku }}</div>
-                    <div class="authority-text">MPKSDI PDM Karanganyar</div>
-                </div>
-            </div>
+            @include('admin.events.partials.idcard-face', ['card' => $card, 'top' => 0, 'left' => 0])
         </div>
     @endforeach
 @else
-    {{-- Batch Mode (A4 Grid 2x2 with Cutting Guides for Admin Printing) --}}
+    {{-- Mode massal: grid 2x2 A4 dengan garis potong --}}
     @foreach($cardList->chunk(4) as $chunk)
         <div class="sheet">
             @foreach($chunk as $card)
-                @php
-                    $slot = $slots[$loop->index];
-                    $top = $slot['top'];
-                    $left = $slot['left'];
-
-                    $nama = $card['nama'];
-                    $len = mb_strlen($nama);
-                    $nameFontSize = $len > 28 ? '10pt' : ($len > 22 ? '11.5pt' : '13pt');
-                    $pcm = $card['pcm'] ?: 'Utusan Muhammadiyah';
-                    $noPeserta = str_pad((string) $card['no_peserta'], 5, '0', STR_PAD_LEFT);
-                    $nbm = $card['nbm'] ?? null;
-                @endphp
-
-                {{-- Background Graphic Template --}}
+                @php $slot = $slots[$loop->index]; @endphp
                 @if($background)
-                    <img src="{{ $background }}" class="card-bg" style="top: {{ $top }}pt; left: {{ $left }}pt;" alt="">
+                    <img src="{{ $background }}" class="card-bg" style="top: {{ $slot['top'] }}pt; left: {{ $slot['left'] }}pt;" alt="">
                 @endif
-
-                {{-- Cutting Guide Border (Panduan Potong) --}}
-                <div class="card-cut-guide" style="top: {{ $top }}pt; left: {{ $left }}pt;"></div>
-
-                {{-- 1. Executive Header Plaque --}}
-                <div class="layer header-plaque" style="top: {{ $top + 10 }}pt; left: {{ $left + 20 }}pt;">
-                    <table class="brand-table" role="presentation">
-                        <tr>
-                            <td class="brand-cell">
-                                @if($logoMuhammadiyah)<img src="{{ $logoMuhammadiyah }}" class="brand-logo" alt="Logo Muhammadiyah">@endif
-                            </td>
-                            <td class="brand-bullet">&bull;</td>
-                            <td class="brand-cell">
-                                @if($logoMpksdi)<img src="{{ $logoMpksdi }}" class="brand-logo" alt="Logo MPKSDI">@endif
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="title-main">BAITUL ARQAM</div>
-                    <div class="subtitle-event">{{ $cleanSubtitle }}</div>
-                </div>
-
-                {{-- 2. Photo Frame with 3:4 Lock & Kader Badge --}}
-                <div class="layer photo-wrap" style="top: {{ $top + 79 }}pt; left: {{ $left + 86.875 }}pt;">
-                    @if($card['foto'])
-                        <img src="{{ $card['foto'] }}" class="photo-img" alt="Foto {{ $nama }}">
-                    @endif
-                </div>
-                <div class="layer photo-badge" style="top: {{ $top + 193 }}pt; left: {{ $left }}pt;">
-                    <span class="badge-kader">Peserta Baitul Arqam</span>
-                </div>
-
-                {{-- 3. Identity Block (2-Line Architecture) --}}
-                <div class="layer identity-wrap" style="top: {{ $top + 211 }}pt; left: {{ $left + 15 }}pt;">
-                    <div class="kader-name" style="font-size: {{ $nameFontSize }};">{{ $nama }}</div>
-                    <div class="kader-sub">
-                        <span>{{ $pcm }}</span>
-                        @if($nbm)
-                            <span class="sub-dot">&bull;</span>
-                            <span>NBM: {{ $nbm }}</span>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- 4. Unified QR Credential Card --}}
-                <div class="layer qr-card-wrap" style="top: {{ $top + 247 }}pt; left: {{ $left + 86.875 }}pt;">
-                    <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
-                    <div class="qr-label">Presensi Kehadiran</div>
-                    <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>
-                </div>
-
-                {{-- 5. Footer (Clean White Zone) --}}
-                <div class="layer footer-wrap" style="top: {{ $top + 334 }}pt; left: {{ $left + 25 }}pt;">
-                    <div class="footer-box">
-                        <div class="validity-text">Masa Berlaku: {{ $masaBerlaku }}</div>
-                        <div class="authority-text">MPKSDI PDM Karanganyar</div>
-                    </div>
-                </div>
+                <div class="card-cut-guide" style="top: {{ $slot['top'] }}pt; left: {{ $slot['left'] }}pt;"></div>
+                @include('admin.events.partials.idcard-face', ['card' => $card, 'top' => $slot['top'], 'left' => $slot['left']])
             @endforeach
         </div>
     @endforeach

@@ -54,6 +54,7 @@ class KehadiranController extends Controller
             'id' => $ep->id,
             'no_peserta' => $ep->id,
             'nama' => $ep->anggota->nama_lengkap,
+            'nbm' => $ep->anggota->nbm,
             'pcm' => $ep->anggota->pcm ?: ($ep->anggota->kecamatan ?: '-'),
             'foto' => $photoInfo['dataUri'],
             'qr' => $qrPng,

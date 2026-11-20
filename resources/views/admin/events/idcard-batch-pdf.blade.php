@@ -50,8 +50,8 @@
 
         /* 2. Foto (rasio 3:4 terkunci; gambar sudah di-crop server-side) */
         .photo-wrap {
-            width: 88pt;
-            height: 117.33pt;
+            width: 82pt;
+            height: 109.33pt;
             padding: 2pt;
             background: #ffffff;
             border: 1.2pt solid #f8bb00;
@@ -89,16 +89,16 @@
         }
         .sub-dot { color: #f8bb00; padding: 0 4pt; font-weight: bold; }
 
-        /* 4. QR (lebar sama dengan bingkai foto) */
+        /* 4. QR ringkas agar identitas tetap menjadi fokus utama */
         .qr-card-wrap {
-            width: 88pt;
+            width: 80pt;
             background: #ffffff;
             border: 0.8pt solid #cbd5e1;
             border-radius: 4pt;
             padding: 3.5pt 4pt 3pt 4pt;
             text-align: center;
         }
-        .qr-img { width: 53pt; height: 53pt; display: block; margin: 0 auto; }
+        .qr-img { width: 48pt; height: 48pt; display: block; margin: 0 auto; }
         .qr-label {
             font-size: 5.6pt;
             font-weight: bold;

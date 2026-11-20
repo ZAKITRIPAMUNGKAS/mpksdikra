@@ -20,7 +20,7 @@ class IdCardBatchTest extends TestCase
     {
         $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
 
-        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 88pt;[^}]*\}/', $template);
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 80pt;[^}]*\}/', $template);
         $this->assertMatchesRegularExpression('/\.qr-label \{[^}]*font-size:/', $template);
         $this->assertMatchesRegularExpression('/\.footer-wrap \{[^}]*text-align: center;/', $template);
     }
@@ -93,6 +93,16 @@ class IdCardBatchTest extends TestCase
         $html = view('admin.events.idcard-batch-pdf', ['event' => $event, 'cards' => $cards, 'isSingle' => true])->render();
 
         $this->assertStringContainsString('font-size: 8pt;', $html);
+    }
+
+    public function test_id_card_uses_a_compact_qr_block_below_the_identity(): void
+    {
+        $template = file_get_contents(resource_path('views/admin/events/idcard-batch-pdf.blade.php'));
+        $face = file_get_contents(resource_path('views/admin/events/partials/idcard-face.blade.php'));
+
+        $this->assertMatchesRegularExpression('/\.qr-card-wrap \{[^}]*width: 80pt;[^}]*\}/', $template);
+        $this->assertStringContainsString('.qr-img { width: 48pt; height: 48pt;', $template);
+        $this->assertStringContainsString('$top + 258', $face);
     }
 
     public function test_admin_can_download_batch_id_cards_pdf(): void

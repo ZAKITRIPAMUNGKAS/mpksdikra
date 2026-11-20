@@ -24,12 +24,12 @@
 </div>
 
 {{-- 2. Foto 3:4 & label --}}
-<div class="layer photo-wrap" style="top: {{ $top + 86 }}pt; left: {{ $left + 88.875 }}pt;">
+<div class="layer photo-wrap" style="top: {{ $top + 90 }}pt; left: {{ $left + 91.875 }}pt;">
     @if($card['foto'])
         <img src="{{ $card['foto'] }}" class="photo-img" alt="Foto {{ $namaUtama }}">
     @endif
 </div>
-<div class="layer photo-badge" style="top: {{ $top + 198 }}pt; left: {{ $left }}pt;">
+<div class="layer photo-badge" style="top: {{ $top + 195 }}pt; left: {{ $left }}pt;">
     <span class="badge-kader">Peserta</span>
 </div>
 
@@ -55,7 +55,7 @@
 </div>
 
 {{-- 4. QR presensi --}}
-<div class="layer qr-card-wrap" style="top: {{ $top + 256 }}pt; left: {{ $left + 88.875 }}pt;">
+<div class="layer qr-card-wrap" style="top: {{ $top + 258 }}pt; left: {{ $left + 92.875 }}pt;">
     <img src="{{ $card['qr'] }}" class="qr-img" alt="QR Presensi">
     <div class="qr-label">Presensi Kehadiran</div>
     <div class="qr-no">No. Peserta: {{ $noPeserta }}</div>

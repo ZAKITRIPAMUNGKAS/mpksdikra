@@ -799,7 +799,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="shrink-0 flex items-center">
+                        <div class="shrink-0 flex items-center gap-2">
+                            @if(auth()->user()->isAdminDaerah())
+                            <a href="{{ route('admin.events.tes-manual.index', [$event, 'pretest']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-xs font-semibold text-slate-700 hover:text-amber-900 shadow-2xs transition">
+                                Input Jawaban Kertas
+                            </a>
+                            @endif
                             <a href="{{ route('admin.events.soal.index', [$event, 'pretest']) }}"
                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
                                 <span>Kelola Pretest</span>
@@ -829,7 +835,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="shrink-0 flex items-center">
+                        <div class="shrink-0 flex items-center gap-2">
+                            @if(auth()->user()->isAdminDaerah())
+                            <a href="{{ route('admin.events.tes-manual.index', [$event, 'posttest']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-xs font-semibold text-slate-700 hover:text-amber-900 shadow-2xs transition">
+                                Input Jawaban Kertas
+                            </a>
+                            @endif
                             <a href="{{ route('admin.events.soal.index', [$event, 'posttest']) }}"
                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
                                 <span>Kelola Posttest</span>

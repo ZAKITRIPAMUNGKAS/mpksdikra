@@ -383,14 +383,15 @@
             @php
                 $ng = $p->nilai_pretest >= 100 ? 0 : round(($p->nilai_posttest - $p->nilai_pretest) / (100 - $p->nilai_pretest), 3);
                 $status = $p->status_kelulusan ?? '-';
+                $kertas = $tesKertas[$p->anggota_id] ?? [];
             @endphp
             <tr>
                 <td class="font-bold">{{ $p->ranking ?? '-' }}</td>
                 <td style="font-family: monospace; font-size: 6.8pt; color: #475569;">{{ $p->anggota->nik ?? '-' }}</td>
                 <td class="text-left font-bold" style="color: #0f172a;">{{ $p->anggota->nama_lengkap }}</td>
                 <td class="text-left" style="color: #334155;">{{ $p->anggota->kecamatan ? 'PCM ' . $p->anggota->kecamatan : ($p->anggota->aum_tempat_tugas ?? 'Karanganyar') }}</td>
-                <td>{{ number_format($p->nilai_pretest, 1) }}</td>
-                <td>{{ number_format($p->nilai_posttest, 1) }}</td>
+                <td>{{ number_format($p->nilai_pretest, 1) }}@if(in_array('pretest', $kertas, true))<sup style="color:#b45309;font-weight:bold;">K</sup>@endif</td>
+                <td>{{ number_format($p->nilai_posttest, 1) }}@if(in_array('posttest', $kertas, true))<sup style="color:#b45309;font-weight:bold;">K</sup>@endif</td>
                 <td>{{ number_format($ng, 2) }}</td>
                 <td>{{ number_format($p->nilai_afektif, 1) }}</td>
                 <td>{{ number_format($p->nilai_psikomotor, 1) }}</td>
@@ -423,6 +424,7 @@
     <div class="formula-note">
         <b>Pedoman Standar Nilai &amp; Kelulusan Baitul Arqam MPKSDI:</b><br>
         1. <b>Nilai Akhir (NA)</b> = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Praktik Lapangan + 10% Poin Keaktifan) + 25% Afektif (Angket Sikap &amp; Kedisiplinan).<br>
+        @if($tesKertas->isNotEmpty())<sup style="color:#b45309;font-weight:bold;">K</sup> = nilai pretest/posttest diinput admin dari lembar jawaban kertas, dinilai dengan kunci jawaban yang sama.<br>@endif
         2. <b>Syarat Kelulusan Terpadu</b>: Presensi kehadiran &ge; 100%, menyelesaikan Posttest, dan menyerahkan RTL dinyatakan <i>Lulus</i>; presensi 75% s.d. 99% atau tugas RTL/Posttest dalam proses dinyatakan <i>Lulus Bersyarat</i>; kehadiran &lt; 75% dinyatakan <i>Tidak Lulus</i>.
     </div>
 

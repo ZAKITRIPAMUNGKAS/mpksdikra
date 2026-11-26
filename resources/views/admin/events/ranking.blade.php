@@ -86,8 +86,8 @@
                         @endif
                     </td>
                     <td class="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">{{ $p->anggota->nama_lengkap }}</td>
-                    <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_pretest, 1) }}</td>
-                    <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_posttest, 1) }}</td>
+                    <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_pretest, 1) }}@if(in_array('pretest', $tesKertas[$p->anggota_id] ?? [], true))<div class="text-[10px] font-sans font-semibold text-amber-700" title="Diinput admin dari lembar kertas">kertas</div>@endif</td>
+                    <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_posttest, 1) }}@if(in_array('posttest', $tesKertas[$p->anggota_id] ?? [], true))<div class="text-[10px] font-sans font-semibold text-amber-700" title="Diinput admin dari lembar kertas">kertas</div>@endif</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($nGain, 2) }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_afektif, 1) }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_psikomotor, 1) }}</td>

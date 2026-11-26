@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\RtlAdminController;
 use App\Http\Controllers\Admin\SesiController;
 use App\Http\Controllers\Admin\SmartEnrollController;
 use App\Http\Controllers\Admin\SoalController;
+use App\Http\Controllers\Admin\TesManualController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AnggotaRegistrationController;
 use App\Http\Controllers\Auth\LoginController;
@@ -188,6 +189,11 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/rtl/{rtl}/bukti/{jawabanId}', [RtlAdminController::class, 'downloadBukti'])->name('events.rtl.bukti');
 
         Route::get('/events/{event}/peserta/{peserta}/certificate', [EventOutputController::class, 'certificate'])->name('events.certificate');
+
+        Route::get('/events/{event}/tes-manual/{tipe}', [TesManualController::class, 'index'])->name('events.tes-manual.index');
+        Route::post('/events/{event}/tes-manual/{tipe}', [TesManualController::class, 'store'])->name('events.tes-manual.store');
+        Route::delete('/events/{event}/tes-manual/{tipe}/{anggota}', [TesManualController::class, 'destroy'])->whereNumber('anggota')->name('events.tes-manual.destroy');
+        Route::get('/events/{event}/tes-manual/{tipe}/cetak/{lembar}', [TesManualController::class, 'cetak'])->whereIn('lembar', ['soal', 'jawaban'])->name('events.tes-manual.cetak');
     });
 
     // Operational routes: admin + assigned facilitator (event_access)

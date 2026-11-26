@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventPeserta;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use App\Services\ImageCutoutService;
 use App\Services\NilaiService;
 use App\Services\QrService;
@@ -33,7 +34,9 @@ class EventOutputController extends Controller
         $epMap = EventPeserta::where('event_id', $event->id)
             ->pluck('id', 'anggota_id');
 
-        return view('admin.events.ranking', compact('event', 'ranking', 'epMap'));
+        $tesKertas = PesertaTesMulai::tesKertasMap($event->id);
+
+        return view('admin.events.ranking', compact('event', 'ranking', 'epMap', 'tesKertas'));
     }
 
     public function report(Event $event)
@@ -51,9 +54,11 @@ class EventOutputController extends Controller
         $rerataNA = $ranking->avg('nilai_akhir') ?? 0;
         $tertinggiNA = $ranking->max('nilai_akhir') ?? 0;
         $terendahNA = $ranking->min('nilai_akhir') ?? 0;
+        $tesKertas = PesertaTesMulai::tesKertasMap($event->id);
 
         $pdf = Pdf::loadView('admin.events.report-pdf', compact(
             'event',
+            'tesKertas',
             'ranking',
             'totalPeserta',
             'totalLulus',

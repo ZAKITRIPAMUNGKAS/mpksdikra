@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Event;
 use App\Models\PenilaianAkhir;
+use App\Models\PesertaTesMulai;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -27,6 +28,7 @@ class LaporanEventExport implements FromView
         $totalBersyarat = $ranking->where('status_kelulusan', 'Lulus Bersyarat')->count();
         $totalTidakLulus = $ranking->where('status_kelulusan', 'Tidak Lulus')->count();
         $rerataNA = $ranking->avg('nilai_akhir') ?? 0;
+        $tesKertas = PesertaTesMulai::tesKertasMap($this->eventId);
 
         return view('exports.laporan-event', compact(
             'ranking',
@@ -35,7 +37,8 @@ class LaporanEventExport implements FromView
             'totalLulus',
             'totalBersyarat',
             'totalTidakLulus',
-            'rerataNA'
+            'rerataNA',
+            'tesKertas'
         ));
     }
 }

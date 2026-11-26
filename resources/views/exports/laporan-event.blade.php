@@ -73,6 +73,7 @@
         @forelse($ranking as $p)
         @php
             $ng = $p->nilai_pretest >= 100 ? 0 : round(($p->nilai_posttest - $p->nilai_pretest) / (100 - $p->nilai_pretest), 3);
+            $kertas = $tesKertas[$p->anggota_id] ?? [];
         @endphp
         <tr>
             <td style="text-align: center; font-weight: bold;">{{ $p->ranking ?? '-' }}</td>
@@ -82,8 +83,8 @@
             <td style="text-align: center;">{{ $p->anggota->jenis_kelamin ?? '-' }}</td>
             <td>{{ $p->anggota->pcm ? 'PCM ' . $p->anggota->pcm : ($p->anggota->kecamatan ? 'PCM ' . $p->anggota->kecamatan : '-') }}</td>
             <td>{{ $p->anggota->prm ?: ($p->anggota->desa_kelurahan ?? ($p->anggota->aum_tempat_tugas ?? '-')) }}</td>
-            <td style="text-align: center;">{{ number_format($p->nilai_pretest, 1) }}</td>
-            <td style="text-align: center;">{{ number_format($p->nilai_posttest, 1) }}</td>
+            <td style="text-align: center;{{ in_array('pretest', $kertas, true) ? ' background-color: #fef3c7;' : '' }}">{{ number_format($p->nilai_pretest, 1) }}</td>
+            <td style="text-align: center;{{ in_array('posttest', $kertas, true) ? ' background-color: #fef3c7;' : '' }}">{{ number_format($p->nilai_posttest, 1) }}</td>
             <td style="text-align: center;">{{ number_format($ng, 2) }}</td>
             <td style="text-align: center;">{{ number_format($p->nilai_afektif, 1) }}</td>
             <td style="text-align: center;">{{ number_format($p->nilai_psikomotor, 1) }}</td>
@@ -105,5 +106,12 @@
                 * NA = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Praktik + 10% Keaktifan) + 25% Afektif. Kehadiran minimal 75%.
             </td>
         </tr>
+        @if($tesKertas->isNotEmpty())
+        <tr>
+            <td colspan="16" style="font-size: 8pt; font-style: italic; color: #92400e;">
+                * Sel Pretest/Posttest berlatar kuning = nilai diinput admin dari lembar jawaban kertas (dinilai dengan kunci jawaban yang sama).
+            </td>
+        </tr>
+        @endif
     </tbody>
 </table>

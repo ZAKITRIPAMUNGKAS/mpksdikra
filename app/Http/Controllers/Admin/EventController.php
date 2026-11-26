@@ -168,8 +168,10 @@ class EventController extends Controller
             ->keyBy('item_id');
         $angketKomentarList = AngketKomentar::where('event_id', $event->id)
             ->with('anggota')
-            ->whereNotNull('komentar')
-            ->where('komentar', '!=', '')
+            ->where(function ($q) {
+                $q->where(fn ($sub) => $sub->whereNotNull('komentar')->where('komentar', '!=', ''))
+                    ->orWhere(fn ($sub) => $sub->whereNotNull('perasaan')->where('perasaan', '!=', ''));
+            })
             ->latest()
             ->get();
 

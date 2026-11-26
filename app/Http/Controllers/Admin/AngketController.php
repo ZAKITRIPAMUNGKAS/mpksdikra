@@ -12,11 +12,7 @@ class AngketController extends Controller
 {
     public function index(Event $event): RedirectResponse
     {
-        return redirect()->route('admin.events.show', [
-            'event' => $event,
-            'tab' => 'feedback',
-            'sub_feedback' => 'kelola',
-        ]);
+        return $this->redirectToFeedbackKelola($event);
     }
 
     public function store(Request $request, Event $event): RedirectResponse
@@ -35,7 +31,8 @@ class AngketController extends Controller
             'urutan' => $urutan,
         ]));
 
-        return back()->with('success', 'Item angket ditambahkan.');
+        return $this->redirectToFeedbackKelola($event)
+            ->with('success', 'Item angket ditambahkan.');
     }
 
     public function destroy(Event $event, AngketItem $item): RedirectResponse
@@ -46,41 +43,28 @@ class AngketController extends Controller
 
         $item->delete();
 
-        return back()->with('success', 'Item dihapus.');
+        return $this->redirectToFeedbackKelola($event)
+            ->with('success', 'Item dihapus.');
     }
 
     public function seedDefaults(Event $event): RedirectResponse
     {
-        $defaultItems = [
-            'A' => [
-                'Materi perkaderan relevan dengan penguatan ideologi & kebutuhan persyarikatan.',
-                'Alokasi waktu pemaparan materi dan forum diskusi/tanya-jawab memadai.',
-                'Materi mudah dipahami dan aplikatif untuk diterapkan di Cabang/Ranting/AUM.',
-            ],
-            'B' => [
-                'Narasumber menguasai materi secara mendalam, inspiratif, dan komunikatif.',
-                'Master of Training / Tim Instruktur mendampingi dinamika kelas dengan disiplin dan solutif.',
-                'Keteladanan ibadah dan kedisiplinan tim fasilitator sangat baik.',
-            ],
-            'C' => [
-                'Kenyamanan ruangan, pencahayaan, proyektor, dan tata suara audio memuaskan.',
-                'Kualitas konsumsi, kudapan, dan ketepatan jadwal istirahat/ibadah terjaga baik.',
-                'Kesiapan panitia dalam melayani kebutuhan dan respon kendala peserta sangat memuaskan.',
-            ],
-        ];
+        $added = AngketItem::seedDefaultsFor($event);
 
-        foreach ($defaultItems as $kategori => $teksList) {
-            foreach ($teksList as $urutan => $teks) {
-                AngketItem::firstOrCreate([
-                    'event_id' => $event->id,
-                    'kategori' => $kategori,
-                    'urutan' => $urutan + 1,
-                ], [
-                    'teks_item' => $teks,
-                ]);
-            }
-        }
+        $message = $added > 0
+            ? 'Instrumen feedback & angket standar Baitul Arqam berhasil disiapkan.'
+            : 'Seluruh butir standar feedback & angket sudah tersedia.';
 
-        return back()->with('success', 'Instrumen feedback & angket standar Baitul Arqam berhasil disiapkan.');
+        return $this->redirectToFeedbackKelola($event)
+            ->with('success', $message);
+    }
+
+    private function redirectToFeedbackKelola(Event $event): RedirectResponse
+    {
+        return redirect()->route('admin.events.show', [
+            'event' => $event,
+            'tab' => 'feedback',
+            'sub_feedback' => 'kelola',
+        ]);
     }
 }

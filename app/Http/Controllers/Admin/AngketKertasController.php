@@ -68,7 +68,7 @@ class AngketKertasController extends Controller
                 ->values()->all(),
             'kosong' => $jenis === 'afektif'
                 ? ['pesan' => 'Kuesioner sikap belum punya butir aktif.', 'url' => route('admin.events.afektif', $event), 'link' => 'Tambahkan butir afektif']
-                : ['pesan' => 'Angket kepuasan belum punya butir.', 'url' => route('admin.events.show', $event), 'link' => 'Siapkan butir angket'],
+                : ['pesan' => 'Angket kepuasan belum punya butir.', 'url' => route('admin.events.show', [$event, 'tab' => 'feedback', 'sub_feedback' => 'kelola']), 'link' => 'Siapkan butir angket'],
             'cetak' => [
                 ['label' => 'Cetak Lembar Pernyataan', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'pernyataan']), 'tabBaru' => true],
                 ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'jawaban']), 'tabBaru' => false],

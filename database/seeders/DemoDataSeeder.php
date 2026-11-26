@@ -1104,24 +1104,6 @@ class DemoDataSeeder extends Seeder
 
     private function seedAngketDemo(array $events): void
     {
-        $defaultItems = [
-            'A' => [
-                'Materi perkaderan relevan dengan penguatan ideologi & kebutuhan persyarikatan.',
-                'Alokasi waktu pemaparan materi dan forum diskusi/tanya-jawab memadai.',
-                'Materi mudah dipahami dan aplikatif untuk diterapkan di Cabang/Ranting/AUM.',
-            ],
-            'B' => [
-                'Narasumber menguasai materi secara mendalam, inspiratif, dan komunikatif.',
-                'Master of Training / Tim Instruktur mendampingi dinamika kelas dengan disiplin dan solutif.',
-                'Keteladanan ibadah dan kedisiplinan tim fasilitator sangat baik.',
-            ],
-            'C' => [
-                'Kenyamanan ruangan, pencahayaan, proyektor, dan tata suara audio memuaskan.',
-                'Kualitas konsumsi, kudapan, dan ketepatan jadwal istirahat/ibadah terjaga baik.',
-                'Kesiapan panitia dalam melayani kebutuhan dan respon kendala peserta sangat memuaskan.',
-            ],
-        ];
-
         $sampleComments = [
             'Alhamdulillah materi Manhaj Tarjih & Ideologi Muhammadiyah sangat membuka wawasan dan aplikatif untuk pembinaan di Cabang kami.',
             'Pelayanan panitia MPKSDI sangat ramah dan sigap. Fasilitas aula nyaman, hanya sound system perlu sedikit penyesuaian saat sesi malam.',
@@ -1139,20 +1121,10 @@ class DemoDataSeeder extends Seeder
         ];
 
         foreach ($events as $event) {
-            foreach ($defaultItems as $kategori => $teksList) {
-                foreach ($teksList as $urutan => $teks) {
-                    AngketItem::firstOrCreate([
-                        'event_id' => $event->id,
-                        'kategori' => $kategori,
-                        'urutan' => $urutan + 1,
-                    ], [
-                        'teks_item' => $teks,
-                    ]);
-                }
-            }
+            AngketItem::seedDefaultsFor($event);
 
             $items = AngketItem::where('event_id', $event->id)->get();
-            $peserta = EventPeserta::where('event_id', $event->id)->where('status', 'terdaftar')->take(6)->get();
+            $peserta = EventPeserta::where('event_id', $event->id)->where('status_aktif', true)->take(6)->get();
 
             $idx = 0;
             foreach ($peserta as $p) {

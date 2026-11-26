@@ -214,4 +214,61 @@ class EventDashboardTest extends TestCase
             ->get(route('admin.events.angket', $event))
             ->assertRedirect(route('admin.events.show', [$event, 'tab' => 'feedback', 'sub_feedback' => 'kelola']));
     }
+
+    public function test_feedback_tab_shows_perasaan_only_entries_and_crud_stays_in_kelola_tab(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'BA Feedback Perasaan',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDay()->toDateString(),
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+
+        $kaderUser = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $kaderUser->id, 'nama_lengkap' => 'Kader Refleksi']);
+
+        // Peserta hanya mengisi kolom perasaan dan mengosongkan komentar opsional
+        AngketKomentar::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'perasaan' => 'Hati terasa tenang dan semangat bermuhammadiyah meningkat.',
+            'komentar' => null,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.events.show', [$event, 'tab' => 'feedback']));
+        $response->assertOk();
+        $response->assertSee('Hati terasa tenang dan semangat bermuhammadiyah meningkat.');
+        $response->assertSee('1 masukan tercatat');
+        $response->assertDontSee(route('portal.angket.index', $event), false);
+        $response->assertDontSee('Self Assessment');
+        $response->assertSee(route('admin.events.angket-kertas.index', [$event, 'angket']), false);
+
+        $expectedRedirect = route('admin.events.show', [$event, 'tab' => 'feedback', 'sub_feedback' => 'kelola']);
+
+        // Tambah item manual lalu seed defaults tidak menduplikasi dan tetap di tab kelola
+        $this->actingAs($admin)
+            ->from(route('admin.events.show', $event))
+            ->post(route('admin.events.angket.item.store', $event), [
+                'kategori' => 'A',
+                'teks_item' => AngketItem::DEFAULT_ITEMS['A'][0],
+            ])
+            ->assertRedirect($expectedRedirect);
+
+        $this->actingAs($admin)
+            ->from(route('admin.events.show', $event))
+            ->post(route('admin.events.angket.seed-defaults', $event))
+            ->assertRedirect($expectedRedirect);
+
+        $this->assertSame(9, AngketItem::where('event_id', $event->id)->count());
+
+        $item = AngketItem::where('event_id', $event->id)->firstOrFail();
+        $this->actingAs($admin)
+            ->from(route('admin.events.show', $event))
+            ->delete(route('admin.events.angket.item.destroy', [$event, $item]))
+            ->assertRedirect($expectedRedirect);
+
+        $this->assertSame(8, AngketItem::where('event_id', $event->id)->count());
+    }
 }

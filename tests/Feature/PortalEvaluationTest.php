@@ -115,6 +115,28 @@ class PortalEvaluationTest extends TestCase
         ]);
     }
 
+    public function test_angket_orders_categories_consistently_and_skips_blank_komentar_row(): void
+    {
+        $event = $this->ctx['event'];
+        $itemC = AngketItem::create(['event_id' => $event->id, 'kategori' => 'C', 'teks_item' => 'Aspek C dulu', 'urutan' => 1]);
+        $itemA = AngketItem::create(['event_id' => $event->id, 'kategori' => 'A', 'teks_item' => 'Aspek A belakangan', 'urutan' => 1]);
+
+        $this->actingAs($this->ctx['anggotaUser'])
+            ->get(route('portal.angket.index', $event))
+            ->assertOk()
+            ->assertSeeInOrder(['Aspek A', 'Aspek C']);
+
+        $this->actingAs($this->ctx['anggotaUser'])
+            ->post(route('portal.angket.save', $event), [
+                'jawaban' => [$itemA->id => 4, $itemC->id => 5],
+                'perasaan' => '   ',
+                'komentar' => '',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseCount('angket_komentar', 0);
+    }
+
     public function test_rtl_essay_and_upload_saved_and_locked(): void
     {
         Storage::fake('local');

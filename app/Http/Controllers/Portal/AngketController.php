@@ -19,7 +19,12 @@ class AngketController extends Controller
     {
         $this->authorize('participate', $event);
         $anggota = auth()->user()->anggota;
-        $items = AngketItem::where('event_id', $event->id)->orderBy('urutan')->get()->groupBy('kategori');
+        $items = AngketItem::where('event_id', $event->id)
+            ->orderBy('kategori')
+            ->orderBy('urutan')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('kategori');
         $jawabanLama = $anggota
             ? AngketJawaban::where('event_id', $event->id)->where('anggota_id', $anggota->id)->pluck('skor', 'item_id')->toArray()
             : [];
@@ -47,7 +52,12 @@ class AngketController extends Controller
             return back()->with('warning', 'Angket Anda sudah diisikan panitia dari lembar kertas.');
         }
 
-        DB::transaction(function () use ($event, $data, $anggota) {
+        $perasaan = trim((string) ($data['perasaan'] ?? ''));
+        $komentar = trim((string) ($data['komentar'] ?? ''));
+        $perasaan = $perasaan !== '' ? $perasaan : null;
+        $komentar = $komentar !== '' ? $komentar : null;
+
+        DB::transaction(function () use ($event, $data, $anggota, $perasaan, $komentar) {
             foreach ($data['jawaban'] as $itemId => $skor) {
                 if (! AngketItem::where('event_id', $event->id)->where('id', (int) $itemId)->exists()) {
                     continue;
@@ -59,13 +69,19 @@ class AngketController extends Controller
                 );
             }
 
-            AngketKomentar::updateOrCreate(
-                ['event_id' => $event->id, 'anggota_id' => $anggota->id],
-                [
-                    'perasaan' => $data['perasaan'] ?? null,
-                    'komentar' => $data['komentar'] ?? null,
-                ]
-            );
+            if ($perasaan !== null || $komentar !== null) {
+                AngketKomentar::updateOrCreate(
+                    ['event_id' => $event->id, 'anggota_id' => $anggota->id],
+                    [
+                        'perasaan' => $perasaan,
+                        'komentar' => $komentar,
+                    ]
+                );
+            } else {
+                AngketKomentar::where('event_id', $event->id)
+                    ->where('anggota_id', $anggota->id)
+                    ->delete();
+            }
         });
 
         return back()->with('success', 'Angket dan feedback perkaderan berhasil disimpan.');

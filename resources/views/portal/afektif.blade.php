@@ -33,6 +33,12 @@
         </div>
     </div>
 
+        @if(! empty($diisiKertas))
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900">
+                Jawaban Anda untuk formulir ini sudah diisikan panitia dari <b>lembar kertas</b>, sehingga tidak perlu diisi lagi di sini.
+                Hubungi panitia bila ada yang perlu diperbaiki.
+            </div>
+        @else
     <form method="POST" action="{{ route('portal.afektif.save', $event) }}" class="space-y-6">
         @csrf
         @forelse($subAspek as $sa)
@@ -77,5 +83,6 @@
         </div>
         @endif
     </form>
+        @endif
 </div>
 @endsection

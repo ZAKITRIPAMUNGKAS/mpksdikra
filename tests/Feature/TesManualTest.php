@@ -223,12 +223,35 @@ class TesManualTest extends TestCase
     {
         $this->peserta();
 
-        foreach (['soal', 'jawaban'] as $lembar) {
-            $this->actingAs($this->admin)
-                ->get(route('admin.events.tes-manual.cetak', [$this->event, 'posttest', $lembar]))
-                ->assertOk()
-                ->assertHeader('content-type', 'application/pdf');
-        }
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.cetak', [$this->event, 'posttest', 'jawaban']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.cetak', [$this->event, 'posttest', 'soal']))
+            ->assertOk()
+            ->assertSee('Cetak / Simpan PDF')
+            ->assertSee('Soal 4');
+    }
+
+    public function test_question_sheet_renders_arabic_for_browser_and_strips_duplicate_numbering(): void
+    {
+        $soal = Soal::where('event_id', $this->event->id)->where('tipe', 'posttest')->orderBy('urutan')->first();
+        $soal->update(['teks_soal' => '23. Ayat manakah yang menganjurkan berorganisasi? وَاعْتَصِمُوا بِحَبْلِ اللَّهِ']);
+        $soal->pilihan()->where('label', 'D')->update(['teks' => 'd. Tabligh']);
+
+        $html = $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.cetak', [$this->event, 'posttest', 'soal']))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('<span class="ar" dir="rtl" lang="ar">وَاعْتَصِمُوا بِحَبْلِ اللَّهِ</span>', $html);
+        $this->assertStringContainsString('family=Amiri', $html);
+        $this->assertStringNotContainsString('23. Ayat', $html);
+        $this->assertStringContainsString('>Ayat manakah', $html);
+        $this->assertStringNotContainsString('d. Tabligh', $html);
+        $this->assertStringContainsString('<span dir="auto">Tabligh</span>', $html);
     }
 
     public function test_answer_sheet_lists_participants_and_question_sheet_hides_key(): void
@@ -237,11 +260,11 @@ class TesManualTest extends TestCase
         $soal = app(TesService::class)->soalBerurutan($this->event, 'posttest');
         $data = ['event' => $this->event, 'tipe' => 'posttest', 'label' => 'Posttest', 'soal' => $soal, 'layout' => LembarJawabanLayout::build(4, ['A', 'B', 'C', 'D'])];
 
-        $jawaban = view('admin.events.tes-manual-cetak', $data + ['lembar' => 'jawaban', 'peserta' => $this->event->pesertaAktif()->with('anggota')->get()])->render();
+        $jawaban = view('admin.events.tes-manual-cetak', $data + ['peserta' => $this->event->pesertaAktif()->with('anggota')->get()])->render();
         $this->assertStringContainsString(e($anggota->nama_lengkap), $jawaban);
         $this->assertStringContainsString('No. 1', $jawaban);
 
-        $lembarSoal = view('admin.events.tes-manual-cetak', $data + ['lembar' => 'soal', 'peserta' => collect()])->render();
+        $lembarSoal = view('admin.events.tes-manual-soal', $data)->render();
         $this->assertStringContainsString('Soal 4', $lembarSoal);
         $this->assertStringNotContainsString('is_benar', $lembarSoal);
         $this->assertStringNotContainsString('Kunci', $lembarSoal);

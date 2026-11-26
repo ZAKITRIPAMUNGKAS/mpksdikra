@@ -1,12 +1,10 @@
 @extends('layouts.app')
 
-@php $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest'; @endphp
-
-@section('title', 'Input Jawaban Kertas '.$label.' — '.$event->nama_event)
+@section('title', $cfg['judul'].' — '.$event->nama_event)
 
 @section('content')
 <script>
-    window.tesManualRow = (kunci, awal) => ({
+    window.tesManualRow = (kunci, awal, izin, jumlah) => ({
         val: awal || '',
         scan: null,
         isiDariScan(d) {
@@ -16,18 +14,32 @@
         },
         kembalikan() { this.val = this.scan.sebelum; this.scan = null; },
         get bersih() { return this.val.toUpperCase().replace(/\s+/g, ''); },
-        get invalid() { return /[^A-E-]/.test(this.bersih); },
+        get invalid() { return this.bersih.split('').some(c => c !== '-' && !izin.includes(c)); },
         get benar() {
+            if (!kunci) return 0;
             let b = 0;
             for (let i = 0; i < kunci.length; i++) { if (this.bersih[i] && this.bersih[i] === kunci[i]) b++; }
             return b;
         },
-        get skor() { return kunci.length ? (this.benar / kunci.length * 100).toFixed(1) : '0.0'; },
-        get lengkap() { return this.bersih.length === kunci.length && !this.invalid; },
+        get rata() {
+            const n = this.bersih.split('').filter(c => /[0-9]/.test(c)).map(Number);
+            return n.length ? (n.reduce((a, b) => a + b, 0) / n.length).toFixed(2) : '–';
+        },
+        get skor() {
+            if (!kunci) return this.rata;
+            return kunci.length ? (this.benar / kunci.length * 100).toFixed(1) : '0.0';
+        },
+        get lengkap() { return this.bersih.length === jumlah && !this.invalid; },
+        warna(c, idx) {
+            if (c === '-') return 'bg-slate-100 text-slate-400';
+            if (!kunci) return izin.includes(c) ? 'bg-sky-100 text-sky-800' : 'bg-rose-100 text-rose-700';
+            return c === kunci[idx] ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700';
+        },
         get pesan() {
             if (this.bersih.includes('?')) return 'Ada jawaban ganda (?) — cek kertas';
-            if (this.invalid) return 'Huruf tidak valid';
-            return this.benar + ' benar · ' + this.bersih.length + '/' + kunci.length + ' terisi';
+            if (this.invalid) return kunci ? 'Huruf tidak valid' : 'Isi angka ' + izin.split('').join('/') + ' atau -';
+            const terisi = this.bersih.length + '/' + jumlah + ' terisi';
+            return kunci ? this.benar + ' benar · ' + terisi : 'rata-rata · ' + terisi;
         },
     });
 
@@ -230,7 +242,7 @@
         terapkan(item, id, paksa = false) {
             const p = peserta[id];
             if (!p) { Object.assign(item, { status: 'gagal', pesan: 'Peserta di lembar ini tidak terdaftar aktif di kegiatan ini.' }); return; }
-            if (p.online) { Object.assign(item, { status: 'gagal', pesan: 'No. ' + p.no + ' ' + p.nama + ' sudah mengerjakan online — dilewati.' }); return; }
+            if (p.online) { Object.assign(item, { status: 'gagal', pesan: 'No. ' + p.no + ' ' + p.nama + ' sudah mengisi online — dilewati.' }); return; }
             const lama = this.terisi[id];
             if (lama && lama !== item && !paksa) {
                 Object.assign(item, { status: 'timpa', timpaId: id, pesan: 'No. ' + p.no + ' ' + p.nama + ' sudah terisi dari foto ' + lama.nama + '. Foto ganda?' });
@@ -241,8 +253,8 @@
             }
             this.terisi[id] = item;
             window.dispatchEvent(new CustomEvent('omr-isi', { detail: { id: Number(id), jawaban: item.jawaban, ragu: item.ragu } }));
-            const kosong = !/[A-Z]/.test(item.jawaban);
-            const catatan = kosong ? ' — tidak ada bulatan hitam terbaca, cek kertas' : (item.ragu.length ? ' — cek soal ' + item.ragu.join(', ') : '');
+            const kosong = !/[^-?]/.test(item.jawaban);
+            const catatan = kosong ? ' — tidak ada bulatan hitam terbaca, cek kertas' : (item.ragu.length ? ' — cek nomor ' + item.ragu.join(', ') : '');
             Object.assign(item, { status: kosong || item.ragu.length ? 'cek' : 'ok', timpaId: null, pesan: 'Masuk ke No. ' + p.no + ' ' + p.nama + catatan });
         },
         };
@@ -260,51 +272,60 @@
         <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Input Jawaban Kertas — {{ $label }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $cfg['judul'] }}</h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
-                        Untuk peserta yang mengerjakan {{ strtolower($label) }} di lembar kertas. Ketik jawaban berurutan, satu huruf per soal
-                        (contoh <span class="font-mono font-semibold text-slate-700">ACBDA BCDAB</span>; spasi boleh). Pakai <span class="font-mono font-semibold">-</span> untuk soal yang tidak dijawab.
-                        Nilai dihitung otomatis dengan rumus yang sama seperti tes online.
+                        {{ $cfg['pengantar'] }}
+                        Contoh isian: <span class="font-mono font-semibold text-slate-700">{{ $cfg['contoh'] }}</span> (spasi boleh); pakai <span class="font-mono font-semibold">-</span> untuk {{ $cfg['satuan'] }} yang tidak dijawab.
                     </p>
                 </div>
-                <div class="flex gap-2">
-                    @foreach(['pretest' => 'Pretest', 'posttest' => 'Posttest'] as $t => $l)
-                        <a href="{{ route('admin.events.tes-manual.index', [$event, $t]) }}"
-                           class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition {{ $t === $tipe ? 'bg-sky-600 text-white border-sky-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50' }}">{{ $l }}</a>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($cfg['tabs'] as $tab)
+                        <a href="{{ $tab['url'] }}"
+                           class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition {{ $tab['aktif'] ? 'bg-sky-600 text-white border-sky-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50' }}">{{ $tab['label'] }}</a>
                     @endforeach
                 </div>
             </div>
         </div>
     </div>
 
-    @if($soal->isEmpty())
+    @if($cfg['jumlah'] === 0)
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900">
-            Bank soal {{ strtolower($label) }} masih kosong.
-            <a href="{{ route('admin.events.soal.index', [$event, $tipe]) }}" class="font-semibold underline">Tambahkan soal</a> terlebih dahulu.
+            {{ $cfg['kosong']['pesan'] }}
+            <a href="{{ $cfg['kosong']['url'] }}" class="font-semibold underline">{{ $cfg['kosong']['link'] }}</a> terlebih dahulu.
         </div>
     @else
         <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100">
                 <p class="text-xs text-slate-500">Cetak untuk peserta yang mengerjakan di kertas. Lembar jawaban sudah bernama dan bernomor sesuai urutan tabel di bawah (plus 1 lembar kosong).</p>
-                <div class="flex gap-2">
-                    <a href="{{ route('admin.events.tes-manual.cetak', [$event, $tipe, 'soal']) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">Cetak Lembar Soal</a>
-                    <a href="{{ route('admin.events.tes-manual.cetak', [$event, $tipe, 'jawaban']) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">Cetak Lembar Jawaban</a>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($cfg['cetak'] as $c)
+                        <a href="{{ $c['url'] }}" @if($c['tabBaru']) target="_blank" rel="noopener" @endif class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">{{ $c['label'] }}</a>
+                    @endforeach
                 </div>
             </div>
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="font-bold text-slate-900 text-sm">Kunci Jawaban ({{ $soal->count() }} soal)</h2>
-                @if(str_contains($kunci, '?'))
-                    <span class="text-xs font-semibold text-rose-700">Ada soal tanpa kunci (?) — periksa bank soal.</span>
-                @endif
-            </div>
-            <div class="flex flex-wrap gap-x-4 gap-y-2 font-mono text-sm">
-                @foreach(str_split($kunci, 5) as $g => $kelompok)
-                    <div class="flex flex-col">
-                        <span class="text-[10px] text-slate-400">{{ $g * 5 + 1 }}–{{ $g * 5 + strlen($kelompok) }}</span>
-                        <span class="font-bold tracking-[0.3em] text-slate-800">{{ $kelompok }}</span>
-                    </div>
-                @endforeach
-            </div>
+            @if($cfg['kunci'] !== null)
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-bold text-slate-900 text-sm">Kunci Jawaban ({{ $cfg['jumlah'] }} soal)</h2>
+                    @if(str_contains($cfg['kunci'], '?'))
+                        <span class="text-xs font-semibold text-rose-700">Ada soal tanpa kunci (?) — periksa bank soal.</span>
+                    @endif
+                </div>
+                <div class="flex flex-wrap gap-x-4 gap-y-2 font-mono text-sm">
+                    @foreach(str_split($cfg['kunci'], 5) as $g => $kelompok)
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400">{{ $g * 5 + 1 }}–{{ $g * 5 + strlen($kelompok) }}</span>
+                            <span class="font-bold tracking-[0.3em] text-slate-800">{{ $kelompok }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <h2 class="font-bold text-slate-900 text-sm mb-2">Skala Jawaban ({{ $cfg['jumlah'] }} {{ $cfg['satuan'] }})</h2>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    @foreach($cfg['skala'] as $angka => $arti)
+                        <span class="px-2 py-1 rounded-md bg-slate-50 border border-slate-200"><b class="font-mono">{{ $angka }}</b> = {{ $arti }}</span>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         @if($layout)
@@ -312,11 +333,11 @@
             $pesertaScan = $peserta->values()->mapWithKeys(fn ($ep, $i) => [$ep->anggota_id => [
                 'no' => $i + 1,
                 'nama' => $ep->anggota->nama_lengkap,
-                'online' => (bool) (($st = $status->get($ep->anggota_id)) && $st->sumber === 'online' && $st->waktu_selesai),
+                'online' => ($baris[$ep->anggota_id]['status'] ?? null) === 'online',
             ]]);
         @endphp
         <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs"
-             x-data="omrScanner(@js($layout), @js(['eventId' => $event->id, 'tipe' => $tipe]), @js($pesertaScan))"
+             x-data="omrScanner(@js($layout), @js(['eventId' => $event->id, 'tipe' => $cfg['kodeLembar']]), @js($pesertaScan))"
              @pagehide.window="tutupKamera()" @keydown.escape.window="kamera && tutupKamera()"
              @visibilitychange.document="if (document.hidden && kamera) { tutupKamera(); kameraPesan = 'Kamera dimatikan karena halaman ditinggalkan. Tekan tombol scan lagi untuk melanjutkan.'; }">
             <div class="flex flex-wrap items-start justify-between gap-3">
@@ -325,7 +346,7 @@
                     <p class="text-xs text-slate-500 mt-1">
                         Foto lembar jawaban (cetakan dari tombol di atas) lurus dari atas dengan keempat kotak hitam terlihat. Bisa pilih banyak foto sekaligus.
                         Foto <b>dibaca di perangkat ini</b>, tidak diunggah ke server. Hasilnya otomatis mengisi baris peserta di tabel &mdash;
-                        <b>cocokkan dengan kertas</b>, terutama soal yang ditandai, lalu klik Simpan.
+                        <b>cocokkan dengan kertas</b>, terutama nomor yang ditandai, lalu klik Simpan.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -389,9 +410,9 @@
         @endif
 
         @php
-            $bisaDiisi = $peserta->contains(fn ($ep) => ! (($st = $status->get($ep->anggota_id)) && $st->sumber === 'online' && $st->waktu_selesai));
+            $bisaDiisi = $peserta->contains(fn ($ep) => ($baris[$ep->anggota_id]['status'] ?? null) !== 'online');
         @endphp
-        <form method="POST" action="{{ route('admin.events.tes-manual.store', [$event, $tipe]) }}" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <form method="POST" action="{{ $cfg['storeUrl'] }}" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
             @csrf
             @error('jawaban')
                 <div class="px-4 py-3 bg-rose-50 border-b border-rose-100 text-xs font-semibold text-rose-700">Belum ada jawaban yang diisi.</div>
@@ -402,7 +423,7 @@
                         <tr>
                             <th class="py-3 px-4 text-left w-10">#</th>
                             <th class="py-3 px-4 text-left">Peserta</th>
-                            <th class="py-3 px-4 text-left">Jawaban (urut nomor soal)</th>
+                            <th class="py-3 px-4 text-left">Jawaban (urut nomor {{ $cfg['satuan'] }})</th>
                             <th class="py-3 px-4 text-center w-36">Hasil</th>
                         </tr>
                     </thead>
@@ -410,13 +431,13 @@
                         @foreach($peserta as $i => $ep)
                             @php
                                 $aid = $ep->anggota_id;
-                                $st = $status->get($aid);
-                                $online = $st && $st->sumber === 'online' && $st->waktu_selesai;
-                                $manual = $st && $st->sumber === 'manual';
-                                $sedangOnline = $st && $st->sumber === 'online' && ! $st->waktu_selesai;
+                                $st = $baris[$aid] ?? ['status' => 'belum', 'waktu' => null, 'nilai' => null];
+                                $online = $st['status'] === 'online';
+                                $manual = $st['status'] === 'manual';
+                                $sedangOnline = $st['status'] === 'sedang';
                                 $awal = old("jawaban.$aid", $tersimpan[$aid] ?? '');
                             @endphp
-                            <tr class="align-top {{ $errors->has("jawaban.$aid") ? 'bg-rose-50/60' : '' }}" @unless($online) x-data="tesManualRow(@js($kunci), @js($awal))" @omr-isi.window="if ($event.detail.id === {{ $aid }}) { isiDariScan($event.detail); $el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }" :class="scan ? 'bg-amber-50/40' : ''" @endunless>
+                            <tr class="align-top {{ $errors->has("jawaban.$aid") ? 'bg-rose-50/60' : '' }}" @unless($online) x-data="tesManualRow(@js($cfg['kunci']), @js($awal), @js(implode('', $cfg['labels'])), {{ $cfg['jumlah'] }})" @omr-isi.window="if ($event.detail.id === {{ $aid }}) { isiDariScan($event.detail); $el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }" :class="scan ? 'bg-amber-50/40' : ''" @endunless>
                                 <td class="py-3 px-4 text-slate-400 font-mono text-xs">{{ $i + 1 }}</td>
                                 <td class="py-3 px-4">
                                     <div class="font-semibold text-slate-900">{{ $ep->anggota->nama_lengkap }}</div>
@@ -425,11 +446,11 @@
                                             <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">Online</span>
                                         @elseif($manual)
                                             <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">Kertas</span>
-                                            <span class="text-[11px] text-slate-400">{{ $st->updated_at?->translatedFormat('d M H:i') }}</span>
+                                            <span class="text-[11px] text-slate-400">{{ $st['waktu']?->translatedFormat('d M H:i') }}</span>
                                             <button type="submit" form="hapus-{{ $aid }}" class="ml-1 text-[11px] font-semibold text-rose-600 hover:text-rose-800 hover:underline">Hapus</button>
                                         @else
                                             @if($sedangOnline)
-                                                <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200" title="Peserta sudah membuka tes online tetapi belum mengirim. Jika diisi dari kertas, tes onlinenya ditutup.">Sedang online</span>
+                                                <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200" title="Peserta sudah membuka formulir online tetapi belum mengirim. Jika diisi dari kertas, isian onlinenya ditutup.">Sedang online</span>
                                             @else
                                                 <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">Belum</span>
                                             @endif
@@ -437,24 +458,24 @@
                                     </div>
                                 </td>
                                 @if($online)
-                                    <td class="py-3 px-4 text-xs text-slate-500">Sudah mengerjakan online — nilai tidak bisa ditimpa dari sini.</td>
-                                    <td class="py-3 px-4 text-center font-mono font-bold text-slate-800">{{ number_format((float) ($nilai[$aid] ?? 0), 1) }}</td>
+                                    <td class="py-3 px-4 text-xs text-slate-500">{{ $cfg['onlinePesan'] }}</td>
+                                    <td class="py-3 px-4 text-center font-mono font-bold text-slate-800">{{ $st['nilai'] ?? '—' }}</td>
                                 @else
                                     <td class="py-3 px-4">
                                         <input type="text" name="jawaban[{{ $aid }}]" x-model="val"
                                                autocomplete="off" spellcheck="false" autocapitalize="characters"
-                                               placeholder="{{ str_repeat('·', min(40, $soal->count())) }}"
+                                               placeholder="{{ str_repeat('·', min(40, $cfg['jumlah'])) }}"
                                                class="w-full min-w-[260px] px-3 py-2 font-mono text-sm uppercase tracking-[0.25em] bg-slate-50/60 border rounded-lg outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition"
                                                :class="invalid ? 'border-rose-400' : 'border-slate-200/90'">
                                         <div class="mt-1.5 flex flex-wrap gap-px font-mono text-[11px]" x-show="bersih.length">
                                             <template x-for="(c, idx) in bersih.split('')" :key="idx">
                                                 <span class="w-4 text-center rounded-sm"
-                                                      :class="c === @js($kunci)[idx] ? 'bg-emerald-100 text-emerald-800' : (c === '-' ? 'bg-slate-100 text-slate-400' : 'bg-rose-100 text-rose-700')"
-                                                      :title="'Soal ' + (idx + 1)" x-text="c"></span>
+                                                      :class="warna(c, idx)"
+                                                      :title="'Nomor ' + (idx + 1)" x-text="c"></span>
                                             </template>
                                         </div>
                                         <p class="mt-1 text-[11px] font-semibold text-amber-700" x-show="scan" x-cloak>
-                                            Dari foto &mdash; cocokkan dengan kertas<span x-show="scan && scan.ragu.length" x-text="'; cek soal ' + (scan ? scan.ragu.join(', ') : '')"></span>.
+                                            Dari foto &mdash; cocokkan dengan kertas<span x-show="scan && scan.ragu.length" x-text="'; cek nomor ' + (scan ? scan.ragu.join(', ') : '')"></span>.
                                         </p>
                                         <p class="mt-1 text-[11px] text-slate-600" x-show="scan && scan.sebelum" x-cloak>
                                             Menggantikan isian sebelumnya <span class="font-mono" x-text="scan ? scan.sebelum : ''"></span>.
@@ -485,17 +506,17 @@
             <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                 <p class="text-xs text-slate-500">Hanya baris yang baru diisi atau diubah yang disimpan. Jika ada baris yang salah, tidak ada yang disimpan.</p>
                 @if($bisaDiisi)
-                    <button class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">Simpan &amp; Hitung Nilai</button>
+                    <button class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">{{ $cfg['simpanLabel'] }}</button>
                 @else
-                    <span class="text-xs font-semibold text-slate-500">{{ $peserta->isEmpty() ? 'Belum ada peserta aktif.' : 'Semua peserta sudah mengerjakan online.' }}</span>
+                    <span class="text-xs font-semibold text-slate-500">{{ $peserta->isEmpty() ? 'Belum ada peserta aktif.' : $cfg['semuaOnlinePesan'] }}</span>
                 @endif
             </div>
         </form>
 
         @foreach($peserta as $ep)
-            @if(optional($status->get($ep->anggota_id))->sumber === 'manual')
-                <form id="hapus-{{ $ep->anggota_id }}" method="POST" action="{{ route('admin.events.tes-manual.destroy', [$event, $tipe, $ep->anggota_id]) }}" class="hidden"
-                      onsubmit="return confirm({{ \Illuminate\Support\Js::from('Hapus input kertas '.strtolower($label).' untuk '.$ep->anggota->nama_lengkap.'? Nilainya kembali 0 dan peserta bisa mengerjakan lagi.') }})">
+            @if(($baris[$ep->anggota_id]['status'] ?? null) === 'manual')
+                <form id="hapus-{{ $ep->anggota_id }}" method="POST" action="{{ str_replace('__ID__', $ep->anggota_id, $cfg['destroyUrl']) }}" class="hidden"
+                      onsubmit="return confirm({{ \Illuminate\Support\Js::from(str_replace(':nama', $ep->anggota->nama_lengkap, $cfg['hapusKonfirmasi'])) }})">
                     @csrf
                     @method('DELETE')
                 </form>

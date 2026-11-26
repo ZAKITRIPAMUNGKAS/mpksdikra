@@ -44,7 +44,16 @@ class LembarJawabanGrafik
         $r = $layout['r'] * $k;
         $tebal = max(2, (int) round(0.9 * $k));
         $ukuranHuruf = $layout['r'] * 0.95;
+        $judulOpsi = $layout['judulOpsi'] ?? null;
+        $sudahJudul = [];
         foreach ($layout['soal'] as $s) {
+            $kolom = (string) round($s['x']);
+            if ($judulOpsi && $adaFont && ! isset($sudahJudul[$kolom])) {
+                $sudahJudul[$kolom] = true;
+                foreach ($s['opsi'] as $i => $o) {
+                    self::teks($img, 6.5, $o['x'], $s['y'] - $layout['rowH'] / 2 - 6, (string) ($judulOpsi[$i] ?? ''), $nomor, $font, 'tengah');
+                }
+            }
             if ($adaFont) {
                 self::teks($img, 9.0, $s['x'] - 2, $s['y'], (string) $s['no'].'.', $nomor, $font, 'kanan');
             }

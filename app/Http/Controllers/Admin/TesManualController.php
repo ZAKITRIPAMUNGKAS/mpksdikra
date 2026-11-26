@@ -60,7 +60,50 @@ class TesManualController extends Controller
             }
         }
 
-        return view('admin.events.tes-manual', compact('event', 'tipe', 'soal', 'kunci', 'peserta', 'status', 'nilai', 'tersimpan', 'layout', 'layoutError'));
+        $baris = $peserta->mapWithKeys(function ($ep) use ($status, $nilai) {
+            $st = $status->get($ep->anggota_id);
+            $kode = match (true) {
+                ! $st => 'belum',
+                $st->sumber === 'manual' => 'manual',
+                (bool) $st->waktu_selesai => 'online',
+                default => 'sedang',
+            };
+
+            return [$ep->anggota_id => [
+                'status' => $kode,
+                'waktu' => $st?->updated_at,
+                'nilai' => number_format((float) ($nilai[$ep->anggota_id] ?? 0), 1),
+            ]];
+        })->all();
+
+        $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest';
+        $cfg = [
+            'judul' => 'Input Jawaban Kertas — '.$label,
+            'pengantar' => 'Untuk peserta yang mengerjakan '.strtolower($label).' di lembar kertas. Ketik jawaban berurutan, satu huruf per soal. Nilai dihitung otomatis dengan rumus yang sama seperti tes online.',
+            'contoh' => 'ACBDA BCDAB',
+            'satuan' => 'soal',
+            'jumlah' => $soal->count(),
+            'kunci' => $kunci,
+            'skala' => [],
+            'labels' => $soal->isNotEmpty() ? $this->labelPilihan($soal) : ['A', 'B', 'C', 'D'],
+            'kodeLembar' => $tipe,
+            'tabs' => collect(['pretest' => 'Pretest', 'posttest' => 'Posttest'])
+                ->map(fn ($l, $t) => ['label' => $l, 'url' => route('admin.events.tes-manual.index', [$event, $t]), 'aktif' => $t === $tipe])
+                ->values()->all(),
+            'kosong' => ['pesan' => 'Bank soal '.strtolower($label).' masih kosong.', 'url' => route('admin.events.soal.index', [$event, $tipe]), 'link' => 'Tambahkan soal'],
+            'cetak' => [
+                ['label' => 'Cetak Lembar Soal', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'soal']), 'tabBaru' => true],
+                ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'jawaban']), 'tabBaru' => false],
+            ],
+            'storeUrl' => route('admin.events.tes-manual.store', [$event, $tipe]),
+            'destroyUrl' => route('admin.events.tes-manual.destroy', [$event, $tipe, '__ID__']),
+            'hapusKonfirmasi' => 'Hapus input kertas '.strtolower($label).' untuk :nama? Nilainya kembali 0 dan peserta bisa mengerjakan lagi.',
+            'onlinePesan' => 'Sudah mengerjakan online — nilai tidak bisa ditimpa dari sini.',
+            'semuaOnlinePesan' => 'Semua peserta sudah mengerjakan online.',
+            'simpanLabel' => 'Simpan & Hitung Nilai',
+        ];
+
+        return view('admin.events.input-kertas', compact('event', 'cfg', 'peserta', 'baris', 'tersimpan', 'layout', 'layoutError'));
     }
 
     public function store(Request $request, Event $event, string $tipe): RedirectResponse
@@ -153,28 +196,27 @@ class TesManualController extends Controller
 
         $soal = $this->tes->soalBerurutan($event, $tipe);
         abort_if($soal->isEmpty(), 404, 'Bank soal masih kosong.');
+        $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest';
 
-        $peserta = $lembar === 'jawaban'
-            ? $event->pesertaAktif()->whereHas('anggota')->with('anggota')->get()->sortBy('anggota.nama_lengkap')->values()
-            : collect();
-
-        $layout = null;
-        $latar = null;
-        if ($lembar === 'jawaban') {
-            try {
-                $layout = LembarJawabanLayout::build($soal->count(), $this->labelPilihan($soal));
-            } catch (InvalidArgumentException $e) {
-                abort(422, $e->getMessage());
-            }
-            @ini_set('memory_limit', '512M');
-            $latar = LembarJawabanGrafik::latarDataUri($layout);
+        // Lembar soal dicetak lewat browser: DomPDF tidak bisa menyambung huruf Arab / RTL.
+        if ($lembar === 'soal') {
+            return response()->view('admin.events.tes-manual-soal', compact('event', 'tipe', 'label', 'soal'));
         }
 
-        $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest';
-        $pdf = Pdf::loadView('admin.events.tes-manual-cetak', compact('event', 'tipe', 'label', 'lembar', 'soal', 'peserta', 'layout', 'latar'))
+        $peserta = $event->pesertaAktif()->whereHas('anggota')->with('anggota')->get()->sortBy('anggota.nama_lengkap')->values();
+
+        try {
+            $layout = LembarJawabanLayout::build($soal->count(), $this->labelPilihan($soal));
+        } catch (InvalidArgumentException $e) {
+            abort(422, $e->getMessage());
+        }
+        @ini_set('memory_limit', '512M');
+        $latar = LembarJawabanGrafik::latarDataUri($layout);
+
+        $pdf = Pdf::loadView('admin.events.tes-manual-cetak', compact('event', 'tipe', 'label', 'soal', 'peserta', 'layout', 'latar'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download(($lembar === 'soal' ? 'lembar-soal-' : 'lembar-jawaban-').$tipe.'-'.str($event->nama_event)->slug().'.pdf');
+        return $pdf->download('lembar-jawaban-'.$tipe.'-'.str($event->nama_event)->slug().'.pdf');
     }
 
     /**

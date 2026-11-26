@@ -2,25 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>{{ $lembar === 'soal' ? 'Lembar Soal' : 'Lembar Jawaban' }} {{ $label }} — {{ $event->nama_event }}</title>
+    <title>Lembar Jawaban {{ $label }} — {{ $event->nama_event }}</title>
     <style>
-        @if($lembar === 'soal')
-        @page { size: a4 portrait; margin: 14mm 15mm 14mm 15mm; }
-        @else
         @page { size: a4 portrait; margin: 0; }
-        @endif
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 10pt; color: #0f172a; margin: 0; line-height: 1.4; }
         .kop { border-bottom: 1.5pt solid #041c38; padding-bottom: 6pt; margin-bottom: 10pt; }
         .kop-org { font-size: 8.5pt; font-weight: bold; letter-spacing: 0.4pt; color: #041c38; text-transform: uppercase; }
         .kop-judul { font-family: 'DejaVu Serif', serif; font-size: 15pt; font-weight: bold; margin-top: 2pt; }
         .kop-sub { font-size: 8.5pt; color: #475569; }
         .petunjuk { font-size: 9pt; background: #f8fafc; border: 0.6pt solid #cbd5e1; padding: 6pt 8pt; margin-bottom: 12pt; }
-        .soal { page-break-inside: avoid; margin-bottom: 9pt; }
-        .soal-no { font-weight: bold; width: 22pt; vertical-align: top; }
-        .soal-teks { vertical-align: top; }
-        .pilihan { margin-top: 2pt; }
-        .pilihan td { padding: 1pt 0; vertical-align: top; }
-        .pil-label { width: 18pt; font-weight: bold; }
         table { border-collapse: collapse; }
 
         .lj-page { position: relative; width: 595pt; height: 841pt; overflow: hidden; }
@@ -45,29 +35,6 @@
     };
 @endphp
 
-@if($lembar === 'soal')
-    {!! $kop('Lembar Soal') !!}
-    <div class="petunjuk">
-        Bacalah setiap soal dengan teliti. Tuliskan jawaban pada <b>lembar jawaban</b> dengan menghitamkan bulatan huruf A, B, C, atau D. Lembar soal ini tidak perlu ditulisi.
-    </div>
-    @foreach($soal as $i => $s)
-        <div class="soal">
-            <table style="width:100%;">
-                <tr>
-                    <td class="soal-no">{{ $i + 1 }}.</td>
-                    <td class="soal-teks">
-                        {!! nl2br(e($s->teks_soal)) !!}
-                        <table class="pilihan">
-                            @foreach($s->pilihan as $p)
-                                <tr><td class="pil-label">{{ strtoupper($p->label) }}.</td><td>{{ $p->teks }}</td></tr>
-                            @endforeach
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    @endforeach
-@else
     @php
         $L = $layout;
         $bs = $L['bitSize'];
@@ -91,14 +58,14 @@
                     <tr><td class="lbl">Cabang (PCM)</td><td class="isi">{{ $lj['cabang'] }}</td></tr>
                 </table>
                 <div class="petunjuk" style="margin-top: 8pt;">
+                    @isset($skalaTeks)<b>Pilihan:</b> {{ $skalaTeks }}<br>@endisset
                     <b>Hitamkan penuh</b> satu bulatan untuk setiap nomor memakai pulpen atau spidol hitam. Jangan dicoret silang.
                     Jika salah, beri tahu panitia. Jangan melipat lembar ini dan jangan menulis di dekat kotak hitam di pojok.
                 </div>
             </div>
 
-            <div class="abs catatan">Jumlah soal: {{ count($L['soal']) }} · Lembar ini dibaca otomatis dengan kamera; panitia tetap memeriksa hasilnya sebelum disimpan.</div>
+            <div class="abs catatan">Jumlah {{ $satuan ?? 'soal' }}: {{ count($L['soal']) }} · Lembar ini dibaca otomatis dengan kamera; panitia tetap memeriksa hasilnya sebelum disimpan.</div>
         </div>
     @endforeach
-@endif
 </body>
 </html>

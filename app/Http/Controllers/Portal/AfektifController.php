@@ -7,6 +7,7 @@ use App\Models\AfektifButir;
 use App\Models\AfektifJawaban;
 use App\Models\AfektifSubAspek;
 use App\Models\Event;
+use App\Models\InputKertas;
 use App\Services\NilaiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,7 +27,9 @@ class AfektifController extends Controller
             ->where('anggota_id', auth()->user()->anggota->id)
             ->pluck('skor', 'butir_id');
 
-        return view('portal.afektif', compact('event', 'subAspek', 'existing'));
+        $diisiKertas = InputKertas::ada($event->id, auth()->user()->anggota->id, 'afektif');
+
+        return view('portal.afektif', compact('event', 'subAspek', 'existing', 'diisiKertas'));
     }
 
     public function save(Request $request, Event $event): RedirectResponse
@@ -34,6 +37,10 @@ class AfektifController extends Controller
         $this->authorize('participate', $event);
         $data = $request->validate(['jawaban' => ['required', 'array'], 'jawaban.*' => ['required', 'integer', 'min:1', 'max:4']]);
         $anggota = auth()->user()->anggota;
+
+        if (InputKertas::ada($event->id, $anggota->id, 'afektif')) {
+            return back()->with('warning', 'Kuesioner sikap Anda sudah diisikan panitia dari lembar kertas.');
+        }
 
         DB::transaction(function () use ($event, $data, $anggota) {
             foreach ($data['jawaban'] as $butirId => $skor) {

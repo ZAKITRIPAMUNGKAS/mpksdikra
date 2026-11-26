@@ -926,7 +926,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="shrink-0 flex items-center">
+                    <div class="shrink-0 flex items-center gap-2">
+                            @if(auth()->user()->isAdminDaerah())
+                            <a href="{{ route('admin.events.angket-kertas.index', [$event, 'afektif']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-xs font-semibold text-slate-700 hover:text-amber-900 shadow-2xs transition">
+                                Input Jawaban Kertas
+                            </a>
+                            @endif
                         <a href="{{ route('admin.events.afektif', $event) }}"
                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-2xs transition">
                             <span>Input Nilai Sikap</span>
@@ -950,7 +956,13 @@
                             <p class="text-xs text-slate-500">Evaluasi mandiri peserta dan feedback komprehensif terhadap materi, narasumber, serta fasilitas Baitul Arqam</p>
                         </div>
                     </div>
-                    <div class="shrink-0 flex items-center">
+                    <div class="shrink-0 flex items-center gap-2">
+                            @if(auth()->user()->isAdminDaerah())
+                            <a href="{{ route('admin.events.angket-kertas.index', [$event, 'angket']) }}"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-xs font-semibold text-slate-700 hover:text-amber-900 shadow-2xs transition">
+                                Input Jawaban Kertas
+                            </a>
+                            @endif
                         <button type="button" @click="activeTab = 'feedback'; subTabFeedback = 'kelola'"
                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-900 shadow-2xs transition">
                             <span>Kelola Angket Evaluasi</span>

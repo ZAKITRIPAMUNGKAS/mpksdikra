@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AfektifController;
 use App\Http\Controllers\Admin\AnggotaController as AdminAnggotaController;
 use App\Http\Controllers\Admin\AnggotaImportController;
 use App\Http\Controllers\Admin\AngketController;
+use App\Http\Controllers\Admin\AngketKertasController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventOutputController;
@@ -195,6 +196,11 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::post('/events/{event}/tes-manual/{tipe}', [TesManualController::class, 'store'])->name('events.tes-manual.store');
         Route::delete('/events/{event}/tes-manual/{tipe}/{anggota}', [TesManualController::class, 'destroy'])->whereNumber('anggota')->name('events.tes-manual.destroy');
         Route::get('/events/{event}/tes-manual/{tipe}/cetak/{lembar}', [TesManualController::class, 'cetak'])->whereIn('lembar', ['soal', 'jawaban'])->name('events.tes-manual.cetak');
+
+        Route::get('/events/{event}/angket-kertas/{jenis}', [AngketKertasController::class, 'index'])->whereIn('jenis', ['afektif', 'angket'])->name('events.angket-kertas.index');
+        Route::post('/events/{event}/angket-kertas/{jenis}', [AngketKertasController::class, 'store'])->whereIn('jenis', ['afektif', 'angket'])->name('events.angket-kertas.store');
+        Route::delete('/events/{event}/angket-kertas/{jenis}/{anggota}', [AngketKertasController::class, 'destroy'])->whereIn('jenis', ['afektif', 'angket'])->whereNumber('anggota')->name('events.angket-kertas.destroy');
+        Route::get('/events/{event}/angket-kertas/{jenis}/cetak/{lembar}', [AngketKertasController::class, 'cetak'])->whereIn('jenis', ['afektif', 'angket'])->whereIn('lembar', ['pernyataan', 'jawaban'])->name('events.angket-kertas.cetak');
     });
 
     // Operational routes: admin + assigned facilitator (event_access)

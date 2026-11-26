@@ -22,8 +22,9 @@ class LembarJawabanLayout
 
     /**
      * @param  array<int, string>  $labels
+     * @param  array<int, string>|null  $judulOpsi  judul kecil di atas tiap kolom bulatan (mis. STS/TS/S/SS)
      */
-    public static function build(int $jumlahSoal, array $labels): array
+    public static function build(int $jumlahSoal, array $labels, ?array $judulOpsi = null): array
     {
         if ($jumlahSoal < 1) {
             throw new InvalidArgumentException('Bank soal masih kosong.');
@@ -79,6 +80,7 @@ class LembarJawabanLayout
             'r' => $r,
             'rowH' => $rowH,
             'soal' => $soal,
+            'judulOpsi' => $judulOpsi,
         ];
     }
 

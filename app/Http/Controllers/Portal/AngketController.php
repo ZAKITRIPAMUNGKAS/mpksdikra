@@ -7,6 +7,7 @@ use App\Models\AngketItem;
 use App\Models\AngketJawaban;
 use App\Models\AngketKomentar;
 use App\Models\Event;
+use App\Models\InputKertas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,9 @@ class AngketController extends Controller
             ? AngketKomentar::where('event_id', $event->id)->where('anggota_id', $anggota->id)->first()
             : null;
 
-        return view('portal.angket', compact('event', 'items', 'jawabanLama', 'komentarLama'));
+        $diisiKertas = $anggota && InputKertas::ada($event->id, $anggota->id, 'angket');
+
+        return view('portal.angket', compact('event', 'items', 'jawabanLama', 'komentarLama', 'diisiKertas'));
     }
 
     public function save(Request $request, Event $event): RedirectResponse
@@ -39,6 +42,10 @@ class AngketController extends Controller
             'komentar' => ['nullable', 'string', 'max:2000'],
         ]);
         $anggota = auth()->user()->anggota;
+
+        if (InputKertas::ada($event->id, $anggota->id, 'angket')) {
+            return back()->with('warning', 'Angket Anda sudah diisikan panitia dari lembar kertas.');
+        }
 
         DB::transaction(function () use ($event, $data, $anggota) {
             foreach ($data['jawaban'] as $itemId => $skor) {

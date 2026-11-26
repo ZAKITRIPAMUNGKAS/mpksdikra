@@ -9,7 +9,12 @@
     window.tesManualRow = (kunci, awal) => ({
         val: awal || '',
         scan: null,
-        isiDariScan(d) { this.val = d.jawaban; this.scan = d; },
+        isiDariScan(d) {
+            const sebelum = this.val.trim();
+            this.scan = Object.assign({}, d, { sebelum: sebelum && sebelum.toUpperCase().replace(/\s+/g, '') !== d.jawaban ? sebelum : '' });
+            this.val = d.jawaban;
+        },
+        kembalikan() { this.val = this.scan.sebelum; this.scan = null; },
         get bersih() { return this.val.toUpperCase().replace(/\s+/g, ''); },
         get invalid() { return /[^A-E-]/.test(this.bersih); },
         get benar() {
@@ -26,29 +31,196 @@
         },
     });
 
-    window.omrScanner = (layout, ctx, peserta) => ({
+    window.omrScanner = (layout, ctx, peserta) => {
+        let stream = null, timer = null, kanvas = null, audio = null, membuka = false, uid = 0;
+        let kandidat = null, stabil = 0, kandidatId = null, stabilId = 0, menunggu = null, kosongBeruntun = 0, riwayat = [];
+        let sudahIds = new Set(), sudahKosong = new Set();
+        const itemBaru = (nama, pesan) => ({ uid: ++uid, nama, status: 'proses', pesan, pratinjau: null, jawaban: '', ragu: [], pilihId: '', timpaId: null });
+        const resetKandidat = () => { kandidat = null; stabil = 0; kandidatId = null; stabilId = 0; riwayat = []; };
+
+        return {
         hasil: [],
         proses: 0,
         terisi: {},
+        kamera: false,
+        kameraPesan: '',
+        kameraOk: false,
+        jumlahKamera: 0,
+        olah(item, r) {
+            if (!r.ok) {
+                Object.assign(item, { status: 'gagal', pesan: r.pesan });
+                return;
+            }
+            Object.assign(item, { jawaban: r.jawaban, ragu: r.ragu, pratinjau: r.pratinjau });
+            if (r.anggotaId === 0) {
+                Object.assign(item, { status: 'pilih', pesan: 'Lembar kosong tanpa nama — pilih pesertanya.' });
+            } else {
+                this.terapkan(item, r.anggotaId);
+            }
+        },
+        async mulaiKamera() {
+            if (this.kamera || membuka) return;
+            this.kameraPesan = '';
+            if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                this.kameraPesan = 'Kamera hanya bisa dipakai lewat alamat https:// (atau localhost). Gunakan tombol foto sebagai gantinya.';
+                return;
+            }
+            membuka = true;
+            try {
+                audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+                if (audio.state === 'suspended') audio.resume();
+            } catch (e) { audio = null; }
+            let s;
+            try {
+                s = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                });
+            } catch (err) {
+                membuka = false;
+                this.kameraPesan = err && err.name === 'NotAllowedError'
+                    ? 'Izin kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi.'
+                    : 'Kamera tidak bisa dibuka: ' + (err && err.message ? err.message : 'tidak ditemukan') + '.';
+                return;
+            }
+            membuka = false;
+            stream = s;
+            stream.getVideoTracks().forEach(t => t.addEventListener('ended', () => {
+                if (stream === s) { this.tutupKamera(); this.kameraPesan = 'Kamera terputus. Tekan tombol scan lagi untuk melanjutkan.'; }
+            }));
+            kanvas = kanvas || document.createElement('canvas');
+            resetKandidat();
+            menunggu = null; kosongBeruntun = 0;
+            sudahIds = new Set(); sudahKosong = new Set();
+            document.documentElement.style.overflow = 'hidden';
+            this.kamera = true;
+            this.kameraOk = false;
+            this.kameraPesan = 'Arahkan kamera ke lembar jawaban sampai keempat kotak hitam terlihat.';
+            await this.$nextTick();
+            const v = document.getElementById('omr-video');
+            v.srcObject = stream;
+            try { await v.play(); } catch (e) {}
+            this.putar();
+        },
+        tutupKamera() {
+            this.kamera = false;
+            clearTimeout(timer);
+            document.documentElement.style.overflow = '';
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+            const o = document.getElementById('omr-overlay');
+            if (o) o.getContext('2d').clearRect(0, 0, o.width, o.height);
+        },
+        putar() {
+            if (!this.kamera) return;
+            const v = document.getElementById('omr-video');
+            if (v && v.readyState >= 2) {
+                let r;
+                try { r = window.OmrLembar.bacaVideo(v, layout, Object.assign({}, ctx, { pratinjau: false }), kanvas, 1280); }
+                catch (e) { r = { ok: false }; }
+                this.gambarSudut(r);
+                this.prosesFrame(r);
+            }
+            timer = setTimeout(() => this.putar(), 220);
+        },
+        gambarSudut(r) {
+            const v = document.getElementById('omr-video'), o = document.getElementById('omr-overlay');
+            if (!v || !o) return;
+            o.width = o.clientWidth;
+            o.height = o.clientHeight;
+            const g = o.getContext('2d');
+            g.clearRect(0, 0, o.width, o.height);
+            if (!r.ok || !r.sudut) return;
+            const s = Math.min(o.width / v.videoWidth, o.height / v.videoHeight);
+            const ox = (o.width - v.videoWidth * s) / 2, oy = (o.height - v.videoHeight * s) / 2;
+            const k = r.lebar / v.videoWidth;
+            const pt = ([x, y]) => [ox + (x / k) * s, oy + (y / k) * s];
+            g.strokeStyle = menunggu !== null && r.anggotaId === menunggu ? '#38bdf8' : '#22c55e';
+            g.lineWidth = 4;
+            g.beginPath();
+            r.sudut.map(pt).forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
+            g.closePath();
+            g.stroke();
+        },
+        prosesFrame(r) {
+            if (!r.ok) {
+                this.kameraOk = false;
+                resetKandidat();
+                if (++kosongBeruntun >= 3) menunggu = null;
+                this.kameraPesan = menunggu !== null
+                    ? 'Terbaca. Ganti ke lembar berikutnya…'
+                    : 'Arahkan kamera ke lembar jawaban sampai keempat kotak hitam terlihat.';
+                return;
+            }
+            kosongBeruntun = 0;
+            this.kameraOk = true;
+            const p = peserta[r.anggotaId];
+            if (menunggu !== null && r.anggotaId === menunggu) {
+                this.kameraPesan = 'Sudah terbaca. Ganti ke lembar berikutnya…';
+                return;
+            }
+            if (r.anggotaId !== 0 && sudahIds.has(r.anggotaId)) {
+                this.kameraPesan = (p ? 'No. ' + p.no + ' ' + p.nama : 'Lembar ini') + ' sudah discan. Ganti lembar.';
+                return;
+            }
+            if (r.anggotaId === 0 && sudahKosong.has(r.jawaban)) {
+                this.kameraPesan = 'Lembar tanpa nama ini sudah discan. Ganti lembar.';
+                return;
+            }
+            const kunci = r.anggotaId + ':' + r.jawaban;
+            stabil = kunci === kandidat ? stabil + 1 : 1;
+            kandidat = kunci;
+            if (r.anggotaId !== kandidatId) riwayat = [];
+            stabilId = r.anggotaId === kandidatId ? stabilId + 1 : 1;
+            kandidatId = r.anggotaId;
+            riwayat.push(r.jawaban);
+            if (stabil < 2 && stabilId < 4) {
+                this.kameraPesan = 'Lembar terdeteksi, tahan sebentar…';
+                return;
+            }
+            const lengkap = window.OmrLembar.bacaCanvas(kanvas, layout, ctx);
+            const final = lengkap.ok && lengkap.anggotaId === r.anggotaId ? lengkap : r;
+            const goyah = [];
+            for (let i = 0; i < final.jawaban.length; i++) {
+                if (riwayat.some(j => j[i] !== final.jawaban[i])) goyah.push(i + 1);
+            }
+            final.ragu = Array.from(new Set(final.ragu.concat(goyah))).sort((a, b) => a - b);
+            const item = itemBaru('Kamera', '');
+            this.hasil.unshift(item);
+            this.olah(this.hasil[0], final);
+            const berhasil = this.hasil[0].status !== 'gagal';
+            if (berhasil) this.jumlahKamera++;
+            this.hasil[0].nama = 'Kamera #' + (berhasil ? this.jumlahKamera : '–');
+            if (final.anggotaId !== 0) sudahIds.add(final.anggotaId); else sudahKosong.add(final.jawaban);
+            menunggu = final.anggotaId;
+            resetKandidat();
+            this.kameraPesan = this.hasil[0].pesan || 'Terbaca.';
+            this.bip(berhasil);
+        },
+        bip(berhasil = true) {
+            try {
+                if (audio) {
+                    if (audio.state === 'suspended') audio.resume();
+                    const nada = berhasil ? [[1320, 0]] : [[330, 0], [330, 0.2]];
+                    nada.forEach(([f, t]) => {
+                        const o = audio.createOscillator(), g = audio.createGain();
+                        o.frequency.value = f;
+                        g.gain.value = 0.12;
+                        o.connect(g); g.connect(audio.destination);
+                        o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.14);
+                    });
+                }
+            } catch (e) {}
+            if (navigator.vibrate) navigator.vibrate(berhasil ? 80 : [60, 80, 60]);
+        },
         async pilih(e) {
             const files = Array.from(e.target.files || []);
             e.target.value = '';
             for (const file of files) {
                 this.proses++;
-                this.hasil.unshift({ nama: file.name, status: 'proses', pesan: 'Membaca…', pratinjau: null, jawaban: '', ragu: [], pilihId: '', timpaId: null });
+                this.hasil.unshift(itemBaru(file.name, 'Membaca…'));
                 const item = this.hasil[0];
                 try {
-                    const r = await window.OmrLembar.baca(file, layout, ctx);
-                    if (!r.ok) {
-                        Object.assign(item, { status: 'gagal', pesan: r.pesan });
-                    } else {
-                        Object.assign(item, { jawaban: r.jawaban, ragu: r.ragu, pratinjau: r.pratinjau });
-                        if (r.anggotaId === 0) {
-                            Object.assign(item, { status: 'pilih', pesan: 'Lembar kosong tanpa nama — pilih pesertanya.' });
-                        } else {
-                            this.terapkan(item, r.anggotaId);
-                        }
-                    }
+                    this.olah(item, await window.OmrLembar.baca(file, layout, ctx));
                 } catch (err) {
                     Object.assign(item, { status: 'gagal', pesan: err.message || 'Gagal membaca foto.' });
                 }
@@ -73,7 +245,8 @@
             const catatan = kosong ? ' — tidak ada bulatan hitam terbaca, cek kertas' : (item.ragu.length ? ' — cek soal ' + item.ragu.join(', ') : '');
             Object.assign(item, { status: kosong || item.ragu.length ? 'cek' : 'ok', timpaId: null, pesan: 'Masuk ke No. ' + p.no + ' ' + p.nama + catatan });
         },
-    });
+        };
+    };
 </script>
 @if($layout)
 <script src="{{ asset('aset/js/omr-lembar.js') }}?v={{ @filemtime(public_path('aset/js/omr-lembar.js')) }}"></script>
@@ -143,7 +316,9 @@
             ]]);
         @endphp
         <div class="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs"
-             x-data="omrScanner(@js($layout), @js(['eventId' => $event->id, 'tipe' => $tipe]), @js($pesertaScan))">
+             x-data="omrScanner(@js($layout), @js(['eventId' => $event->id, 'tipe' => $tipe]), @js($pesertaScan))"
+             @pagehide.window="tutupKamera()" @keydown.escape.window="kamera && tutupKamera()"
+             @visibilitychange.document="if (document.hidden && kamera) { tutupKamera(); kameraPesan = 'Kamera dimatikan karena halaman ditinggalkan. Tekan tombol scan lagi untuk melanjutkan.'; }">
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="max-w-2xl">
                     <h2 class="font-bold text-slate-900 text-sm">Pindai Foto Lembar Jawaban</h2>
@@ -153,14 +328,33 @@
                         <b>cocokkan dengan kertas</b>, terutama soal yang ditandai, lalu klik Simpan.
                     </p>
                 </div>
-                <label class="cursor-pointer px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
-                    <span x-text="proses ? 'Membaca ' + proses + ' foto…' : 'Pilih / Ambil Foto'">Pilih / Ambil Foto</span>
-                    <input type="file" accept="image/*" multiple class="hidden" @change="pilih($event)">
-                </label>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" @click="mulaiKamera()" :disabled="kamera" class="disabled:opacity-60 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">Scan Langsung dengan Kamera</button>
+                    <label class="cursor-pointer px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
+                        <span x-text="proses ? 'Membaca ' + proses + ' foto…' : 'Pilih / Ambil Foto'">Pilih / Ambil Foto</span>
+                        <input type="file" accept="image/*" multiple class="hidden" @change="pilih($event)">
+                    </label>
+                </div>
             </div>
+            <p class="mt-3 text-xs font-semibold text-rose-700" x-show="!kamera && kameraPesan" x-text="kameraPesan" x-cloak></p>
+
+            <template x-teleport="body">
+            <div x-show="kamera" x-cloak class="fixed inset-0 z-[1000] bg-black flex flex-col" role="dialog" aria-modal="true" aria-label="Scan lembar jawaban dengan kamera">
+                <div class="relative flex-1 min-h-0">
+                    <video id="omr-video" playsinline muted autoplay class="absolute inset-0 w-full h-full object-contain"></video>
+                    <canvas id="omr-overlay" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                </div>
+                <div class="bg-slate-950 text-white px-4 py-3 flex flex-wrap items-center gap-3">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="kameraOk ? 'bg-emerald-400' : 'bg-slate-500'"></span>
+                    <p class="flex-1 min-w-[180px] text-sm" x-text="kameraPesan" aria-live="polite"></p>
+                    <span class="text-xs text-slate-400" x-text="jumlahKamera + ' lembar terbaca'"></span>
+                    <button type="button" @click="tutupKamera()" class="px-4 py-2 bg-white text-slate-900 text-xs font-bold rounded-lg">Selesai</button>
+                </div>
+            </div>
+            </template>
             <template x-if="hasil.length">
                 <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    <template x-for="(h, i) in hasil" :key="i">
+                    <template x-for="h in hasil" :key="h.uid">
                         <li class="border rounded-lg p-3 text-xs"
                             :class="{ 'border-emerald-200 bg-emerald-50/50': h.status === 'ok', 'border-amber-300 bg-amber-50/60': ['cek', 'pilih', 'timpa'].includes(h.status), 'border-rose-200 bg-rose-50/60': h.status === 'gagal', 'border-slate-200': h.status === 'proses' }">
                             <div class="font-semibold text-slate-700 truncate" x-text="h.nama"></div>
@@ -261,6 +455,10 @@
                                         </div>
                                         <p class="mt-1 text-[11px] font-semibold text-amber-700" x-show="scan" x-cloak>
                                             Dari foto &mdash; cocokkan dengan kertas<span x-show="scan && scan.ragu.length" x-text="'; cek soal ' + (scan ? scan.ragu.join(', ') : '')"></span>.
+                                        </p>
+                                        <p class="mt-1 text-[11px] text-slate-600" x-show="scan && scan.sebelum" x-cloak>
+                                            Menggantikan isian sebelumnya <span class="font-mono" x-text="scan ? scan.sebelum : ''"></span>.
+                                            <button type="button" class="ml-1 font-semibold text-sky-700 hover:underline" @click="kembalikan()">Kembalikan</button>
                                         </p>
                                         @error("jawaban.$aid")
                                             <p class="mt-1 text-xs font-semibold text-rose-700">{{ $message }}</p>

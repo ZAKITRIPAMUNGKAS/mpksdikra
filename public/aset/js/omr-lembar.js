@@ -45,14 +45,32 @@
         return c;
     }
 
+    const buf = { n: 0, ni: 0 };
+    function ambilBuffer(w, h) {
+        const n = w * h, ni = (w + 1) * (h + 1);
+        if (buf.n !== n) {
+            buf.n = n;
+            buf.gray = new Uint8Array(n);
+            buf.dark = new Uint8Array(n);
+            buf.label = new Int32Array(n);
+            buf.stack = new Int32Array(n);
+        }
+        if (buf.ni !== ni) {
+            buf.ni = ni;
+            buf.integral = new Float64Array(ni);
+        }
+        return buf;
+    }
+
     function siapkan(imageData) {
         const { width: w, height: h, data } = imageData;
-        const gray = new Uint8Array(w * h);
+        const b = ambilBuffer(w, h);
+        const gray = b.gray;
         for (let i = 0, j = 0; i < gray.length; i++, j += 4) {
             gray[i] = (data[j] * 299 + data[j + 1] * 587 + data[j + 2] * 114) / 1000;
         }
         const iw = w + 1;
-        const integral = new Float64Array(iw * (h + 1));
+        const integral = b.integral;
         for (let y = 0; y < h; y++) {
             let row = 0;
             for (let x = 0; x < w; x++) {
@@ -72,15 +90,16 @@
 
     function cariBlob(img) {
         const { w, h, gray, mean } = img;
-        const dark = new Uint8Array(w * h);
+        const dark = buf.dark;
         for (let y = 0; y < h; y++) {
             for (let x = 0; x < w; x++) {
                 const i = y * w + x;
                 dark[i] = gray[i] < mean(x, y) * 0.72 && gray[i] < 170 ? 1 : 0;
             }
         }
-        const label = new Int32Array(w * h);
-        const stack = new Int32Array(w * h);
+        const label = buf.label;
+        label.fill(0);
+        const stack = buf.stack;
         const blobs = [];
         const minArea = Math.max(25, (w * h) / 40000);
         const maxArea = (w * h) * 0.02;
@@ -230,7 +249,7 @@
             for (let rot = 0; rot < 4; rot++) {
                 const quad = [0, 1, 2, 3].map(i => q[(i + rot) % 4]);
                 const hasil = cobaPeta(img, L, quad, quad, ctx);
-                if (hasil) return hasil;
+                if (hasil) return Object.assign(hasil, { sudut: quad.map(b => [b.x, b.y]) });
             }
         }
         return null;
@@ -302,6 +321,9 @@
         return {
             ok: true,
             anggotaId: lembar.anggotaId,
+            sudut: lembar.sudut,
+            lebar: canvas.width,
+            tinggi: canvas.height,
             jawaban: hasil.jawaban,
             ragu: hasil.ragu,
             pratinjau: ctx.pratinjau === false ? null : pratinjau(canvas, L, lembar.map, hasil.titik),
@@ -313,5 +335,18 @@
         return bacaCanvas(keCanvas(src), L, ctx);
     }
 
-    window.OmrLembar = { baca, bacaCanvas, checksum };
+    function bacaVideo(video, L, ctx, kanvas, maxDim) {
+        const vw = video.videoWidth, vh = video.videoHeight;
+        if (!vw || !vh) return { ok: false, pesan: 'Kamera belum siap.' };
+        const k = Math.min(1, (maxDim || 1280) / Math.max(vw, vh));
+        const cw = Math.round(vw * k), ch = Math.round(vh * k);
+        if (kanvas.width !== cw || kanvas.height !== ch) {
+            kanvas.width = cw;
+            kanvas.height = ch;
+        }
+        kanvas.getContext('2d', { willReadFrequently: true }).drawImage(video, 0, 0, kanvas.width, kanvas.height);
+        return bacaCanvas(kanvas, L, ctx);
+    }
+
+    window.OmrLembar = { baca, bacaCanvas, bacaVideo, checksum };
 })();

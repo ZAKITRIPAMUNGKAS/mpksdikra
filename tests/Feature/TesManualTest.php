@@ -186,6 +186,8 @@ class TesManualTest extends TestCase
             ->assertSee('form="hapus-'.$anggota->id.'"', false)
             ->assertSee('Cetak Lembar Jawaban')
             ->assertSee('Pindai Foto Lembar Jawaban')
+            ->assertSee('Scan Langsung dengan Kamera')
+            ->assertSee('id="omr-video"', false)
             ->assertSee('aset/js/omr-lembar.js', false);
 
         $this->actingAs($this->admin)

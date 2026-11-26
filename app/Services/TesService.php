@@ -143,6 +143,10 @@ class TesService
                 continue;
             }
 
+            if ($huruf[$i] === '?') {
+                throw new InvalidArgumentException('Soal nomor '.($i + 1).' terbaca ganda (?). Cek kertas lalu ganti dengan huruf yang benar atau "-".');
+            }
+
             $pilihan = $s->pilihan->first(fn ($p) => strtoupper($p->label) === $huruf[$i]);
             if (! $pilihan) {
                 throw new InvalidArgumentException('Soal nomor '.($i + 1).' tidak punya pilihan "'.$huruf[$i].'".');

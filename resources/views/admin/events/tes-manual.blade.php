@@ -194,8 +194,14 @@
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900">Pindai foto tidak tersedia: {{ $layoutError }} Jawaban tetap bisa diketik manual.</div>
         @endif
 
+        @php
+            $bisaDiisi = $peserta->contains(fn ($ep) => ! (($st = $status->get($ep->anggota_id)) && $st->sumber === 'online' && $st->waktu_selesai));
+        @endphp
         <form method="POST" action="{{ route('admin.events.tes-manual.store', [$event, $tipe]) }}" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
             @csrf
+            @error('jawaban')
+                <div class="px-4 py-3 bg-rose-50 border-b border-rose-100 text-xs font-semibold text-rose-700">Belum ada jawaban yang diisi.</div>
+            @enderror
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
@@ -213,6 +219,7 @@
                                 $st = $status->get($aid);
                                 $online = $st && $st->sumber === 'online' && $st->waktu_selesai;
                                 $manual = $st && $st->sumber === 'manual';
+                                $sedangOnline = $st && $st->sumber === 'online' && ! $st->waktu_selesai;
                                 $awal = old("jawaban.$aid", $tersimpan[$aid] ?? '');
                             @endphp
                             <tr class="align-top {{ $errors->has("jawaban.$aid") ? 'bg-rose-50/60' : '' }}" @unless($online) x-data="tesManualRow(@js($kunci), @js($awal))" @omr-isi.window="if ($event.detail.id === {{ $aid }}) { isiDariScan($event.detail); $el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }" :class="scan ? 'bg-amber-50/40' : ''" @endunless>
@@ -227,7 +234,11 @@
                                             <span class="text-[11px] text-slate-400">{{ $st->updated_at?->translatedFormat('d M H:i') }}</span>
                                             <button type="submit" form="hapus-{{ $aid }}" class="ml-1 text-[11px] font-semibold text-rose-600 hover:text-rose-800 hover:underline">Hapus</button>
                                         @else
-                                            <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">Belum</span>
+                                            @if($sedangOnline)
+                                                <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200" title="Peserta sudah membuka tes online tetapi belum mengirim. Jika diisi dari kertas, tes onlinenya ditutup.">Sedang online</span>
+                                            @else
+                                                <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">Belum</span>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -275,7 +286,11 @@
             </div>
             <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                 <p class="text-xs text-slate-500">Hanya baris yang baru diisi atau diubah yang disimpan. Jika ada baris yang salah, tidak ada yang disimpan.</p>
-                <button class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">Simpan &amp; Hitung Nilai</button>
+                @if($bisaDiisi)
+                    <button class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition">Simpan &amp; Hitung Nilai</button>
+                @else
+                    <span class="text-xs font-semibold text-slate-500">{{ $peserta->isEmpty() ? 'Belum ada peserta aktif.' : 'Semua peserta sudah mengerjakan online.' }}</span>
+                @endif
             </div>
         </form>
 

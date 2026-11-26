@@ -25,7 +25,6 @@
 
         .lj-page { position: relative; width: 595pt; height: 841pt; overflow: hidden; }
         .abs { position: absolute; }
-        .marker { background: #000; }
         .bit { border: 0.5pt solid #94a3b8; }
         .bit-on { background: #000; border-color: #000; }
         .lj-head { left: 64pt; width: 467pt; top: 62pt; }
@@ -33,8 +32,6 @@
         .identitas td { padding: 5pt 0; vertical-align: bottom; }
         .identitas .lbl { width: 100pt; font-weight: bold; }
         .identitas .isi { border-bottom: 0.7pt solid #334155; }
-        .lj-no { width: 20pt; text-align: right; font-weight: bold; font-size: 9pt; line-height: 10pt; }
-        .bulat { border: 0.9pt solid #475569; text-align: center; color: #b6bfcc; font-weight: bold; }
         .no-urut { left: 470pt; width: 61pt; text-align: right; top: 62pt; font-size: 8pt; color: #64748b; }
         .catatan { left: 64pt; width: 467pt; top: 786pt; font-size: 7.5pt; color: #64748b; text-align: center; }
     </style>
@@ -73,18 +70,15 @@
 @else
     @php
         $L = $layout;
-        $ms = $L['marker'];
         $bs = $L['bitSize'];
-        $r = $L['r'];
+        $latar ??= \App\Support\LembarJawabanGrafik::latarDataUri($L);
         $lembarList = $peserta->map(fn ($ep, $i) => ['no' => $i + 1, 'id' => $ep->anggota_id, 'nama' => $ep->anggota->nama_lengkap, 'cabang' => $ep->anggota->pcm ?: $ep->anggota->kecamatan])
             ->push(['no' => null, 'id' => 0, 'nama' => null, 'cabang' => null]);
     @endphp
     @foreach($lembarList as $lj)
         @php $kode = \App\Support\LembarJawabanLayout::kode($event->id, $tipe, $lj['id']); @endphp
         <div class="lj-page" @unless($loop->last) style="page-break-after: always;" @endunless>
-            @foreach($L['markers'] as $mk)
-                <div class="abs marker" style="left: {{ $mk['x'] - $ms / 2 }}pt; top: {{ $mk['y'] - $ms / 2 }}pt; width: {{ $ms }}pt; height: {{ $ms }}pt;"></div>
-            @endforeach
+            <img class="abs" src="{{ $latar }}" style="left: 0; top: 0; width: {{ $L['page']['w'] }}pt; height: {{ $L['page']['h'] }}pt;" alt="">
             @foreach($L['bits'] as $bi => $b)
                 <div class="abs bit {{ $kode[$bi] ? 'bit-on' : '' }}" style="left: {{ $b['x'] - $bs / 2 }}pt; top: {{ $b['y'] - $bs / 2 }}pt; width: {{ $bs - 1 }}pt; height: {{ $bs - 1 }}pt;"></div>
             @endforeach
@@ -101,13 +95,6 @@
                     Jika salah, beri tahu panitia. Jangan melipat lembar ini dan jangan menulis di dekat kotak hitam di pojok.
                 </div>
             </div>
-
-            @foreach($L['soal'] as $s)
-                <div class="abs lj-no" style="left: {{ $s['x'] - 20 }}pt; top: {{ $s['y'] - 5.5 }}pt;">{{ $s['no'] }}.</div>
-                @foreach($s['opsi'] as $o)
-                    <div class="abs bulat" style="left: {{ $o['x'] - $r }}pt; top: {{ $o['y'] - $r }}pt; width: {{ $r * 2 - 1.8 }}pt; height: {{ $r * 1.25 - 1.8 }}pt; padding-top: {{ $r * 0.75 }}pt; border-radius: {{ $r }}pt; font-size: {{ round($r * 1.0, 1) }}pt; line-height: {{ $r * 0.9 }}pt;">{{ $o['label'] }}</div>
-                @endforeach
-            @endforeach
 
             <div class="abs catatan">Jumlah soal: {{ count($L['soal']) }} · Lembar ini dibaca otomatis dengan kamera; panitia tetap memeriksa hasilnya sebelum disimpan.</div>
         </div>

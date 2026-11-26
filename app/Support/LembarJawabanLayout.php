@@ -83,13 +83,17 @@ class LembarJawabanLayout
     }
 
     /**
-     * 24 bit anggota_id + 8 bit checksum (event, tipe). anggota_id 0 = lembar kosong.
+     * 20 bit anggota_id + 12 bit checksum (event, tipe). anggota_id 0 = lembar kosong.
      *
      * @return array<int, int>
      */
     public static function kode(int $eventId, string $tipe, int $anggotaId): array
     {
-        $nilai = (($anggotaId & 0xFFFFFF) << 8) | self::checksum($eventId, $tipe, $anggotaId);
+        if ($anggotaId < 0 || $anggotaId > 0xFFFFF) {
+            throw new InvalidArgumentException('ID peserta di luar jangkauan kode lembar.');
+        }
+
+        $nilai = ($anggotaId << 12) | self::checksum($eventId, $tipe, $anggotaId);
         $bits = [];
         for ($i = self::BITS - 1; $i >= 0; $i--) {
             $bits[] = ($nilai >> $i) & 1;
@@ -98,8 +102,16 @@ class LembarJawabanLayout
         return $bits;
     }
 
+    /**
+     * FNV-1a 32 bit atas "event|tipe|anggota", dilipat ke 12 bit. Harus identik dengan omr-lembar.js.
+     */
     public static function checksum(int $eventId, string $tipe, int $anggotaId): int
     {
-        return (($anggotaId % 251) * 7 + ($eventId % 251) * 13 + ($tipe === 'posttest' ? 101 : 37)) % 256;
+        $h = 0x811C9DC5;
+        foreach (str_split($eventId.'|'.$tipe.'|'.$anggotaId) as $c) {
+            $h = (($h ^ ord($c)) * 0x01000193) & 0xFFFFFFFF;
+        }
+
+        return ($h ^ ($h >> 16)) & 0xFFF;
     }
 }

@@ -14,8 +14,24 @@ class LembarJawabanLayoutTest extends TestCase
         $this->assertCount(32, $bits);
 
         $nilai = array_reduce($bits, fn ($c, $b) => $c * 2 + $b, 0);
-        $this->assertSame(1234, $nilai >> 8);
-        $this->assertSame(LembarJawabanLayout::checksum(7, 'posttest', 1234), $nilai & 255);
+        $this->assertSame(1234, $nilai >> 12);
+        $this->assertSame(LembarJawabanLayout::checksum(7, 'posttest', 1234), $nilai & 0xFFF);
+    }
+
+    public function test_checksum_matches_known_vector_shared_with_javascript(): void
+    {
+        $this->assertSame(886, LembarJawabanLayout::checksum(7, 'posttest', 1234));
+    }
+
+    public function test_checksum_has_no_systematic_collision_between_events(): void
+    {
+        $bentrok = 0;
+        for ($e = 2; $e <= 300; $e++) {
+            if (LembarJawabanLayout::checksum($e, 'pretest', 5) === LembarJawabanLayout::checksum(1, 'posttest', 5)) {
+                $bentrok++;
+            }
+        }
+        $this->assertLessThanOrEqual(1, $bentrok);
     }
 
     public function test_checksum_differs_between_pretest_and_posttest(): void

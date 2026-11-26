@@ -317,4 +317,32 @@ class TesManualTest extends TestCase
         $this->assertSame('manual', PesertaTesMulai::first()->sumber);
         $this->assertEquals(100.0, (float) PenilaianAkhir::where('anggota_id', $anggota->id)->value('nilai_posttest'));
     }
+
+    public function test_double_mark_from_scan_gets_clear_error_message(): void
+    {
+        $anggota = $this->peserta();
+
+        $this->actingAs($this->admin)
+            ->from(route('admin.events.tes-manual.index', [$this->event, 'posttest']))
+            ->post(route('admin.events.tes-manual.store', [$this->event, 'posttest']), ['jawaban' => [$anggota->id => 'AC?D']])
+            ->assertSessionHasErrors(["jawaban.{$anggota->id}" => 'Soal nomor 3 terbaca ganda (?). Cek kertas lalu ganti dengan huruf yang benar atau "-".']);
+    }
+
+    public function test_page_flags_in_progress_online_attempt_and_hides_save_when_all_online(): void
+    {
+        $anggota = $this->peserta();
+        PesertaTesMulai::create(['event_id' => $this->event->id, 'anggota_id' => $anggota->id, 'tipe' => 'posttest', 'waktu_mulai' => now()]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.index', [$this->event, 'posttest']))
+            ->assertSee('Sedang online')
+            ->assertSee('Simpan &amp; Hitung Nilai', false);
+
+        PesertaTesMulai::query()->update(['waktu_selesai' => now()]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.index', [$this->event, 'posttest']))
+            ->assertSee('Semua peserta sudah mengerjakan online.')
+            ->assertDontSee('Simpan &amp; Hitung Nilai', false);
+    }
 }

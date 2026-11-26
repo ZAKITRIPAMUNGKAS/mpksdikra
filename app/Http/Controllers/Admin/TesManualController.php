@@ -9,6 +9,7 @@ use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Services\NilaiService;
 use App\Services\TesService;
+use App\Support\LembarJawabanGrafik;
 use App\Support\LembarJawabanLayout;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -158,16 +159,19 @@ class TesManualController extends Controller
             : collect();
 
         $layout = null;
+        $latar = null;
         if ($lembar === 'jawaban') {
             try {
                 $layout = LembarJawabanLayout::build($soal->count(), $this->labelPilihan($soal));
             } catch (InvalidArgumentException $e) {
                 abort(422, $e->getMessage());
             }
+            @ini_set('memory_limit', '512M');
+            $latar = LembarJawabanGrafik::latarDataUri($layout);
         }
 
         $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest';
-        $pdf = Pdf::loadView('admin.events.tes-manual-cetak', compact('event', 'tipe', 'label', 'lembar', 'soal', 'peserta', 'layout'))
+        $pdf = Pdf::loadView('admin.events.tes-manual-cetak', compact('event', 'tipe', 'label', 'lembar', 'soal', 'peserta', 'layout', 'latar'))
             ->setPaper('a4', 'portrait');
 
         return $pdf->download(($lembar === 'soal' ? 'lembar-soal-' : 'lembar-jawaban-').$tipe.'-'.str($event->nama_event)->slug().'.pdf');

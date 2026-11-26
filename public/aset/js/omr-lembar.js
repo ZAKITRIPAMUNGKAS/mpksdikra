@@ -10,7 +10,12 @@
     const BATAS_RAGU = 0.55;
 
     function checksum(eventId, tipe, anggotaId) {
-        return ((anggotaId % 251) * 7 + (eventId % 251) * 13 + (tipe === 'posttest' ? 101 : 37)) % 256;
+        const s = eventId + '|' + tipe + '|' + anggotaId;
+        let h = 0x811c9dc5;
+        for (let i = 0; i < s.length; i++) {
+            h = Math.imul(h ^ s.charCodeAt(i), 0x01000193) >>> 0;
+        }
+        return ((h ^ (h >>> 16)) & 0xfff) >>> 0;
     }
 
     function muatGambar(file) {
@@ -194,8 +199,8 @@
             if (f < 0) return null;
             nilai = nilai * 2 + (f > 0.5 ? 1 : 0);
         }
-        const anggotaId = Math.floor(nilai / 256);
-        if (nilai % 256 !== checksum(ctx.eventId, ctx.tipe, anggotaId)) return null;
+        const anggotaId = Math.floor(nilai / 4096);
+        if (nilai % 4096 !== checksum(ctx.eventId, ctx.tipe, anggotaId)) return null;
         return { map, anggotaId };
     }
 

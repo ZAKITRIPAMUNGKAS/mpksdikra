@@ -3,14 +3,44 @@
 @section('title', 'Dashboard Pelatihan — ' . $event->nama_event)
 
 @section('content')
+@php
+    $sesiFormMode = $errors->any() ? old('_sesi_form') : null;
+    $isSesiValidationError = in_array($sesiFormMode, ['create', 'edit'], true);
+    $defaultTab = (request('sub') === 'angket' || in_array(request('tab'), ['angket', 'feedback']))
+        ? 'feedback'
+        : (in_array(request('tab'), ['evaluasi', 'cbt'])
+            ? 'cbt'
+            : (in_array(request('tab'), ['unduh_data', 'laporan']) ? 'laporan' : request('tab', 'peserta')));
+    $initialActiveTab = $isSesiValidationError ? 'sesi' : $defaultTab;
+
+    $initialEditSesi = null;
+    if ($sesiFormMode === 'edit' && old('_sesi_id')) {
+        $editingSesi = $sesi->firstWhere('id', (int) old('_sesi_id'));
+        if ($editingSesi) {
+            $initialEditSesi = [
+                'id' => $editingSesi->id,
+                'nama_sesi' => (string) old('nama_sesi', $editingSesi->nama_sesi),
+                'jenis' => (string) old('jenis', $editingSesi->jenis),
+                'pemateri' => (string) old('pemateri', $editingSesi->pemateri ?? ''),
+                'tanggal' => (string) old('tanggal', $editingSesi->tanggal?->format('Y-m-d') ?? ''),
+                'jam_mulai' => (string) old('jam_mulai', $editingSesi->jam_mulai ? substr((string) $editingSesi->jam_mulai, 0, 5) : ''),
+                'jam_selesai' => (string) old('jam_selesai', $editingSesi->jam_selesai ? substr((string) $editingSesi->jam_selesai, 0, 5) : ''),
+                'link_materi' => (string) old('link_materi', $editingSesi->link_materi ?? ''),
+                'deskripsi' => (string) old('deskripsi', $editingSesi->deskripsi ?? ''),
+                'file_materi_name' => $editingSesi->file_materi ? basename($editingSesi->file_materi) : null,
+                'update_url' => route('admin.events.sesi.update', [$event, $editingSesi]),
+            ];
+        }
+    }
+@endphp
 <div class="space-y-3.5 sm:space-y-4" x-data="{ 
-    activeTab: '{{ (request('sub') === 'angket' || in_array(request('tab'), ['angket', 'feedback'])) ? 'feedback' : (in_array(request('tab'), ['evaluasi', 'cbt']) ? 'cbt' : (in_array(request('tab'), ['unduh_data', 'laporan']) ? 'laporan' : request('tab', 'peserta'))) }}', 
+    activeTab: '{{ $initialActiveTab }}', 
     subTabCbt: '{{ request('sub') === 'angket' ? 'tes' : request('sub', 'tes') }}', 
     subTabOutbound: 'regu', 
     subTabFeedback: '{{ request('sub_feedback', 'rekap') }}',
     subTabLaporan: 'rekap', 
-    modalSesi: false, 
-    editSesi: null, 
+    modalSesi: {{ $sesiFormMode === 'create' ? 'true' : 'false' }}, 
+    editSesi: @js($initialEditSesi), 
     searchPeserta: '' 
 }">
 
@@ -700,6 +730,23 @@
                             @endif
 
                             @if($canManage)
+                            <button type="button"
+                                @click="editSesi = @js([
+                                    'id' => $s->id,
+                                    'nama_sesi' => $s->nama_sesi,
+                                    'jenis' => $s->jenis,
+                                    'pemateri' => $s->pemateri ?? '',
+                                    'tanggal' => $s->tanggal?->format('Y-m-d') ?? '',
+                                    'jam_mulai' => $s->jam_mulai ? substr((string) $s->jam_mulai, 0, 5) : '',
+                                    'jam_selesai' => $s->jam_selesai ? substr((string) $s->jam_selesai, 0, 5) : '',
+                                    'link_materi' => $s->link_materi ?? '',
+                                    'deskripsi' => $s->deskripsi ?? '',
+                                    'file_materi_name' => $s->file_materi ? basename($s->file_materi) : null,
+                                    'update_url' => route('admin.events.sesi.update', [$event, $s]),
+                                ])"
+                                class="px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:text-sky-800 hover:border-sky-200 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                                Edit
+                            </button>
                             <form method="POST" action="{{ route('admin.events.sesi.destroy', [$event, $s]) }}" onsubmit="return confirm('Hapus sesi agenda ini?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="px-2 py-1 rounded-md border border-red-200 text-red-700 hover:bg-red-50 text-xs font-semibold transition shadow-2xs">
@@ -1734,60 +1781,86 @@
 
     </div>
 
-    {{-- 6. MODAL TAMBAH SESI AGENDA DENGAN BERKAS MATERI --}}
+    {{-- 6. MODAL TAMBAH & EDIT SESI AGENDA DENGAN BERKAS MATERI --}}
     @if($canManage)
-    <div x-show="modalSesi" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs" style="display: none;">
-        <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-xl space-y-4" @click.away="modalSesi = false">
+    <div x-show="modalSesi" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs" style="display: none;" role="dialog" aria-modal="true" aria-label="Tambah Sesi Agenda" @keydown.escape.window="modalSesi = false">
+        <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-4" @click.away="modalSesi = false">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h3 class="text-base font-bold text-slate-900">Tambah Sesi Agenda &amp; Materi</h3>
                 <button type="button" @click="modalSesi = false" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">&times;</button>
             </div>
 
+            @if($sesiFormMode === 'create' && $errors->any())
+            <div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700">
+                <p class="font-bold text-rose-800 mb-1">Gagal menyimpan sesi:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
             <form method="POST" action="{{ route('admin.events.sesi.store', $event) }}" enctype="multipart/form-data" class="space-y-3.5 text-xs">
                 @csrf
+                <input type="hidden" name="_sesi_form" value="create">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Nama Sesi Agenda <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama_sesi" required placeholder="Contoh: AIK & Kemuhammadiyahan" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    <input type="text" name="nama_sesi" value="{{ $sesiFormMode === 'create' ? old('nama_sesi') : '' }}" required placeholder="Contoh: AIK & Kemuhammadiyahan" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    @if($sesiFormMode === 'create') @error('nama_sesi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Jenis Sesi <span class="text-red-500">*</span></label>
                         <select name="jenis" required class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500 cursor-pointer">
-                            <option value="materi">Materi</option>
-                            <option value="sholat">Ibadah Sholat</option>
-                            <option value="outbound">Outbound</option>
+                            <option value="materi" @selected($sesiFormMode === 'create' && old('jenis') === 'materi')>Materi</option>
+                            <option value="sholat" @selected($sesiFormMode === 'create' && old('jenis') === 'sholat')>Ibadah Sholat</option>
+                            <option value="outbound" @selected($sesiFormMode === 'create' && old('jenis') === 'outbound')>Outbound</option>
                         </select>
+                        @if($sesiFormMode === 'create') @error('jenis') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Narasumber / Pemateri</label>
-                        <input type="text" name="pemateri" placeholder="Nama Pemateri" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                        <input type="text" name="pemateri" value="{{ $sesiFormMode === 'create' ? old('pemateri') : '' }}" placeholder="Nama Pemateri" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                        @if($sesiFormMode === 'create') @error('pemateri') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Tanggal</label>
-                        <input type="date" name="tanggal" value="{{ $event->tanggal_mulai?->format('Y-m-d') }}" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        <input type="date" name="tanggal" value="{{ $sesiFormMode === 'create' ? old('tanggal', $event->tanggal_mulai?->format('Y-m-d')) : $event->tanggal_mulai?->format('Y-m-d') }}" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        @if($sesiFormMode === 'create') @error('tanggal') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Jam Mulai</label>
-                        <input type="time" name="jam_mulai" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        <input type="time" name="jam_mulai" value="{{ $sesiFormMode === 'create' ? old('jam_mulai') : '' }}" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        @if($sesiFormMode === 'create') @error('jam_mulai') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Jam Selesai</label>
-                        <input type="time" name="jam_selesai" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        <input type="time" name="jam_selesai" value="{{ $sesiFormMode === 'create' ? old('jam_selesai') : '' }}" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                        @if($sesiFormMode === 'create') @error('jam_selesai') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Unggah Berkas Modul / Slide (PDF, PPT, DOCX, ZIP max 15MB)</label>
                     <input type="file" name="file_materi" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer">
+                    @if($sesiFormMode === 'create') @error('file_materi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Tautan Materi Eksternal (Google Drive / Video / Bahan Bacaan)</label>
-                    <input type="url" name="link_materi" placeholder="https://..." class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                    <input type="url" name="link_materi" value="{{ $sesiFormMode === 'create' ? old('link_materi') : '' }}" placeholder="https://..." class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                    @if($sesiFormMode === 'create') @error('link_materi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Deskripsi Singkat Sesi</label>
+                    <textarea name="deskripsi" rows="2" placeholder="Catatan agenda atau ringkasan materi..." class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">{{ $sesiFormMode === 'create' ? old('deskripsi') : '' }}</textarea>
+                    @if($sesiFormMode === 'create') @error('deskripsi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
@@ -1797,6 +1870,102 @@
             </form>
         </div>
     </div>
+
+    <template x-if="editSesi">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs" role="dialog" aria-modal="true" aria-label="Edit Sesi Agenda" @click.self="editSesi = null" @keydown.escape.window="editSesi = null">
+            <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-base font-bold text-slate-900">Edit Sesi Agenda &amp; Materi</h3>
+                    <button type="button" @click="editSesi = null" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer" aria-label="Tutup modal edit sesi">&times;</button>
+                </div>
+
+                @if($sesiFormMode === 'edit' && $errors->any())
+                <div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700">
+                    <p class="font-bold text-rose-800 mb-1">Gagal memperbarui sesi:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
+                <form method="POST" :action="editSesi.update_url" enctype="multipart/form-data" class="space-y-3.5 text-xs">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="_sesi_form" value="edit">
+                    <input type="hidden" name="_sesi_id" :value="editSesi.id">
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Sesi Agenda <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_sesi" x-model="editSesi.nama_sesi" required placeholder="Contoh: AIK & Kemuhammadiyahan" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                        @if($sesiFormMode === 'edit') @error('nama_sesi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Jenis Sesi <span class="text-red-500">*</span></label>
+                            <select name="jenis" x-model="editSesi.jenis" required class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500 cursor-pointer">
+                                <option value="materi">Materi</option>
+                                <option value="sholat">Ibadah Sholat</option>
+                                <option value="outbound">Outbound</option>
+                            </select>
+                            @if($sesiFormMode === 'edit') @error('jenis') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Narasumber / Pemateri</label>
+                            <input type="text" name="pemateri" x-model="editSesi.pemateri" placeholder="Nama Pemateri" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                            @if($sesiFormMode === 'edit') @error('pemateri') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Tanggal</label>
+                            <input type="date" name="tanggal" x-model="editSesi.tanggal" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                            @if($sesiFormMode === 'edit') @error('tanggal') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Jam Mulai</label>
+                            <input type="time" name="jam_mulai" x-model="editSesi.jam_mulai" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                            @if($sesiFormMode === 'edit') @error('jam_mulai') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Jam Selesai</label>
+                            <input type="time" name="jam_selesai" x-model="editSesi.jam_selesai" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg outline-none focus:border-sky-500 text-xs">
+                            @if($sesiFormMode === 'edit') @error('jam_selesai') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Ganti Berkas Modul / Slide (Opsional, max 15MB)</label>
+                        <p x-show="editSesi.file_materi_name" class="mb-1 text-[11px] text-slate-500">
+                            Berkas saat ini: <span class="font-semibold text-slate-700" x-text="editSesi.file_materi_name"></span>
+                        </p>
+                        <input type="file" name="file_materi" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer">
+                        @if($sesiFormMode === 'edit') @error('file_materi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tautan Materi Eksternal (Google Drive / Video / Bahan Bacaan)</label>
+                        <input type="url" name="link_materi" x-model="editSesi.link_materi" placeholder="https://..." class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500">
+                        @if($sesiFormMode === 'edit') @error('link_materi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Deskripsi Singkat Sesi</label>
+                        <textarea name="deskripsi" rows="2" x-model="editSesi.deskripsi" placeholder="Catatan agenda atau ringkasan materi..." class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:border-sky-500"></textarea>
+                        @if($sesiFormMode === 'edit') @error('deskripsi') <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror @endif
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                        <button type="button" @click="editSesi = null" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold shadow-2xs cursor-pointer">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
     @endif
 
 </div>

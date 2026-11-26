@@ -1595,7 +1595,7 @@
     </main>
 
     {{-- SECTION 9: Multi-Column Themed Footer --}}
-    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-8 sm:pt-12 pb-14 sm:pb-16 lg:pb-10 text-slate-600 relative overflow-hidden reveal">
+    <footer id="kontak" class="bg-slate-50 border-t border-slate-200/80 pt-8 sm:pt-12 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-10 text-slate-600 relative overflow-hidden reveal">
         {{-- Batik Solo Surya Pattern Corners: Hidden on mobile to avoid overlapping brand text --}}
         <x-batik-corner position="top-right" class="hidden sm:block w-48 h-48 sm:w-64 sm:h-64 text-sky-900 opacity-[0.22] reveal-fade reveal-delay-100" />
         <x-batik-corner position="bottom-left" class="hidden sm:block w-40 h-40 sm:w-56 sm:h-56 text-[#005c8a] opacity-[0.20] reveal-fade reveal-delay-150" />
@@ -1642,7 +1642,7 @@
                             </div>
                             <div class="text-left">
                                 <span class="text-xs text-slate-400 uppercase font-bold block leading-none">Email</span>
-                                <span class="font-bold text-slate-800 group-hover:text-sky-700 text-xs truncate max-w-[150px] sm:max-w-none block">mpksdi@pdmkaranganyar.org</span>
+                                <span class="font-bold text-slate-800 group-hover:text-sky-700 text-xs block">mpksdi@<wbr>pdmkaranganyar.org</span>
                             </div>
                         </a>
                     </div>
@@ -1716,16 +1716,19 @@
                         <p class="font-semibold text-slate-700 whitespace-nowrap">&copy; {{ date('Y') }} MPKSDI PDM Karanganyar.</p>
                     </div>
                     <span class="hidden sm:inline text-slate-300">&bull;</span>
-                    <span class="text-slate-400 text-[11px] whitespace-nowrap">Sistem Perkaderan Terpadu Baitul Arqam &bull; Bumi Intanpari</span>
+                    <span class="text-slate-400 text-[11px] sm:whitespace-nowrap">Sistem Perkaderan Terpadu Baitul Arqam &bull; Bumi Intanpari</span>
                 </div>
 
                 {{-- Right: Policy Links, Developed by gemala.dev, and Back to Top --}}
-                <div class="flex flex-wrap items-center justify-center gap-3.5 text-[11px] text-slate-500 font-medium reveal-right reveal-delay-200">
-                    <a href="#beranda" class="hover:text-sky-600 transition">Kebijakan Privasi</a>
-                    <span class="text-slate-300">&bull;</span>
-                    <a href="#beranda" class="hover:text-sky-600 transition">Ketentuan Layanan</a>
-                    <span class="text-slate-300">&bull;</span>
-                    
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-3.5 text-[11px] text-slate-500 font-medium reveal-right reveal-delay-200">
+                    <div class="flex items-center gap-2.5">
+                        <a href="#beranda" class="hover:text-sky-600 transition">Kebijakan Privasi</a>
+                        <span class="text-slate-300" aria-hidden="true">&bull;</span>
+                        <a href="#beranda" class="hover:text-sky-600 transition">Ketentuan Layanan</a>
+                    </div>
+                    <span class="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span>
+
+                    <div class="flex items-center gap-2">
                     {{-- Developed by gemala.dev (href to Instagram) --}}
                     <a href="https://instagram.com/gemala.dev" target="_blank" rel="noopener noreferrer"
                        class="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 transition-all text-slate-600 hover:text-sky-700 shadow-2xs">
@@ -1739,12 +1742,13 @@
                     {{-- Back to Top Button --}}
                     <button type="button" 
                             onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" 
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 font-semibold transition border border-slate-200/80 shadow-2xs shrink-0 text-xs">
+                            class="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 font-semibold transition border border-slate-200/80 shadow-2xs shrink-0 text-xs">
                         <span>Ke Atas</span>
                         <svg class="w-3 h-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                         </svg>
                     </button>
+                    </div>
                 </div>
             </div>
         </div>

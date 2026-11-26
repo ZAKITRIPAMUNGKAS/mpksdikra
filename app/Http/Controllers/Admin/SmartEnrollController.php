@@ -218,59 +218,59 @@ class SmartEnrollController extends Controller
             'anggota_ids.*' => ['integer', 'exists:anggota,id'],
         ]);
 
-        if ($event->kuota) {
-            $currentCount = EventPeserta::where('event_id', $event->id)->where('status_aktif', true)->count();
-            if ($currentCount + count($data['anggota_ids']) > $event->kuota) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Pendaftaran melebihi kapasitas kuota event ('.$event->kuota.' kader).',
-                ], 422);
+        $result = DB::transaction(function () use ($event, $data) {
+            $event = Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+            $anggotaIds = Anggota::whereIn('id', $data['anggota_ids'])
+                ->whereHas('user', fn ($q) => $q->where('status', 'aktif'))
+                ->whereNotIn('id', $event->pesertaAktif()->select('anggota_id'))
+                ->orderBy('id')
+                ->pluck('id');
+
+            if ($event->kuota && $event->pesertaAktif()->count() + $anggotaIds->count() > $event->kuota) {
+                return null;
             }
+
+            $created = [];
+            $reactivated = [];
+            foreach ($anggotaIds as $anggotaId) {
+                $participant = EventPeserta::firstOrCreate([
+                    'event_id' => $event->id,
+                    'anggota_id' => $anggotaId,
+                ], [
+                    'qr_token' => $this->qr->generateToken(),
+                    'status_aktif' => true,
+                ]);
+                if ($participant->wasRecentlyCreated) {
+                    $created[] = $participant->id;
+                } elseif (! $participant->status_aktif) {
+                    $participant->update(['status_aktif' => true]);
+                    $reactivated[] = $participant->id;
+                }
+            }
+
+            return [$created, $reactivated];
+        }, 3);
+
+        if ($result === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pendaftaran melebihi kapasitas kuota event ('.$event->kuota.' kader).',
+            ], 422);
         }
 
-        $enrolledCount = 0;
-        $createdParticipantIds = [];
-
-        DB::transaction(function () use ($event, $data, &$enrolledCount, &$createdParticipantIds) {
-            foreach ($data['anggota_ids'] as $anggotaId) {
-                $member = Anggota::where('id', $anggotaId)
-                    ->whereHas('user', fn ($q) => $q->where('status', 'aktif'))
-                    ->first();
-
-                if (! $member) {
-                    continue;
-                }
-
-                $alreadyEnrolled = EventPeserta::where('event_id', $event->id)
-                    ->where('anggota_id', $anggotaId)
-                    ->exists();
-
-                if (! $alreadyEnrolled) {
-                    $token = method_exists($this->qr, 'generateToken')
-                        ? $this->qr->generateToken($event->id, $anggotaId)
-                        : Str::random(32);
-
-                    $participant = EventPeserta::create([
-                        'event_id' => $event->id,
-                        'anggota_id' => $anggotaId,
-                        'qr_token' => $token,
-                        'status_aktif' => true,
-                    ]);
-                    $createdParticipantIds[] = $participant->id;
-                    $enrolledCount++;
-                }
-            }
-        });
+        [$createdParticipantIds, $reactivatedParticipantIds] = $result;
+        $enrolledCount = count($createdParticipantIds) + count($reactivatedParticipantIds);
 
         $undoToken = null;
         $undoExpiresAt = null;
-        if ($createdParticipantIds !== []) {
+        if ($enrolledCount > 0) {
             $undoToken = Str::random(64);
             $undoExpiresAt = now()->addSeconds(10);
             Cache::put($this->undoCacheKey($undoToken), [
                 'event_id' => $event->id,
                 'admin_id' => $request->user()->id,
                 'participant_ids' => $createdParticipantIds,
+                'reactivated_participant_ids' => $reactivatedParticipantIds,
             ], $undoExpiresAt);
         }
 
@@ -300,10 +300,18 @@ class SmartEnrollController extends Controller
             ], 422);
         }
 
-        $removed = DB::transaction(fn () => EventPeserta::query()
-            ->where('event_id', $event->id)
-            ->whereIn('id', $batch['participant_ids'])
-            ->delete());
+        $removed = DB::transaction(function () use ($event, $batch) {
+            Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+
+            $deleted = EventPeserta::where('event_id', $event->id)
+                ->whereIn('id', $batch['participant_ids'])
+                ->delete();
+            $deactivated = $event->pesertaAktif()
+                ->whereIn('id', $batch['reactivated_participant_ids'] ?? [])
+                ->update(['status_aktif' => false]);
+
+            return $deleted + $deactivated;
+        }, 3);
 
         return response()->json([
             'success' => true,

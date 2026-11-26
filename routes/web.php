@@ -226,6 +226,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
 });
 
 Route::middleware(['auth', 'role:anggota'])->prefix('portal')->name('portal.')->group(function () {
+    Route::get('/', fn () => to_route('portal.dashboard'));
     Route::get('/dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profil', [PortalProfileController::class, 'index'])->name('profile.index');
     Route::put('/profil', [PortalProfileController::class, 'update'])->name('profile.update');
@@ -234,6 +235,7 @@ Route::middleware(['auth', 'role:anggota'])->prefix('portal')->name('portal.')->
     Route::get('/tes', [PortalTesController::class, 'index'])->name('tes.index');
     Route::get('/tes/{event}/{tipe}', [PortalTesController::class, 'show'])->name('tes.show');
     Route::post('/tes/{event}/{tipe}', [PortalTesController::class, 'submit'])->name('tes.submit');
+    Route::post('/tes/{event}/{tipe}/autosave', [PortalTesController::class, 'autosave'])->name('tes.autosave');
 
     Route::get('/afektif/{event}', [PortalAfektifController::class, 'index'])->name('afektif.index');
     Route::post('/afektif/{event}', [PortalAfektifController::class, 'save'])->name('afektif.save');

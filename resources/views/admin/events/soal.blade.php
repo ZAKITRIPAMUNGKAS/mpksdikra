@@ -79,24 +79,68 @@
             </div>
         </div>
 
+        @php
+            $oldPilihan = old('pilihan');
+            $initialPilihan = is_array($oldPilihan) && count($oldPilihan) >= 2
+                ? collect($oldPilihan)->values()->map(fn ($p) => [
+                    'teks' => (string) ($p['teks'] ?? ''),
+                    'is_benar' => ! empty($p['is_benar']),
+                ])->all()
+                : [
+                    ['teks' => '', 'is_benar' => true],
+                    ['teks' => '', 'is_benar' => false],
+                    ['teks' => '', 'is_benar' => false],
+                    ['teks' => '', 'is_benar' => false],
+                ];
+
+            $pilihanErrors = [];
+            foreach ($errors->getMessages() as $key => $messages) {
+                if (preg_match('/^pilihan\.(\d+)\.teks$/', $key, $matches)) {
+                    $pilihanErrors[(int) $matches[1]] = $messages[0];
+                }
+            }
+        @endphp
+
         <form method="POST" action="{{ route('admin.events.soal.store', [$event, $tipe]) }}" class="border border-slate-200 rounded-lg p-5 bg-slate-50/50 shadow-2xs"
-            x-data="{ pilihan: [{teks: '', is_benar: true}, {teks: '', is_benar: false}, {teks: '', is_benar: false}, {teks: '', is_benar: false}] }">
+            x-data="{ pilihan: @js($initialPilihan), pilihanErrors: @js($pilihanErrors) }">
             @csrf
+            @if($errors->any())
+                <div role="alert" class="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700">
+                    <p class="font-bold text-rose-800 mb-1">Periksa kembali isian butir soal:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Tambah Butir Soal Baru</label>
             <textarea name="teks_soal" rows="2" required placeholder="Tuliskan pertanyaan soal…"
-                class="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition resize-none mb-3">{{ old('teks_soal') }}</textarea>
+                class="w-full px-3.5 py-2 bg-white border rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition resize-none {{ $errors->has('teks_soal') ? 'border-rose-400' : 'border-slate-200 mb-3' }}">{{ old('teks_soal') }}</textarea>
+            @error('teks_soal')
+                <p class="mt-1 mb-3 text-xs font-semibold text-rose-600">{{ $message }}</p>
+            @enderror
+
+            @error('pilihan')
+                <p class="mb-2 text-xs font-semibold text-rose-600">{{ $message }}</p>
+            @enderror
 
             <template x-for="(p, i) in pilihan" :key="i">
-                <div class="flex items-center gap-2 mb-2">
-                    <input type="radio" name="benar_idx" :value="i" x-model.number="pilihan.findIndex(x => x.is_benar)" hidden>
-                    <span class="w-8 h-8 grid place-items-center rounded-lg bg-white text-xs font-bold text-slate-700 font-mono border border-slate-200" x-text="['A','B','C','D','E','F'][i]"></span>
-                    <input :name="`pilihan[${i}][teks]`" x-model="p.teks" required placeholder="Teks pilihan…"
-                        class="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition">
-                    <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 shrink-0 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-                        <input type="checkbox" :name="`pilihan[${i}][is_benar]`" :value="1" x-model="p.is_benar" @change="pilihan.forEach((x, j) => { if (j !== i) x.is_benar = false })" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                        <span>Kunci Benar</span>
-                    </label>
-                    <button type="button" @click="pilihan.length > 2 && pilihan.splice(i, 1)" class="text-slate-400 hover:text-red-600 text-base font-bold px-2 transition">&times;</button>
+                <div class="mb-2">
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="benar_idx" :value="i" :checked="p.is_benar" hidden>
+                        <span class="w-8 h-8 grid place-items-center rounded-lg bg-white text-xs font-bold text-slate-700 font-mono border border-slate-200" x-text="['A','B','C','D','E','F'][i]"></span>
+                        <input :name="`pilihan[${i}][teks]`" x-model="p.teks" required placeholder="Teks pilihan…"
+                            :class="pilihanErrors[i] ? 'border-rose-400' : 'border-slate-200'"
+                            class="flex-1 px-3 py-1.5 bg-white border rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition">
+                        <label class="flex items-center gap-1.5 text-xs font-medium text-slate-700 shrink-0 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+                            <input type="checkbox" :name="`pilihan[${i}][is_benar]`" :value="1" x-model="p.is_benar" @change="pilihan.forEach((x, j) => { if (j !== i) x.is_benar = false })" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                            <span>Kunci Benar</span>
+                        </label>
+                        <button type="button" @click="pilihan.length > 2 && pilihan.splice(i, 1)" class="text-slate-400 hover:text-red-600 text-base font-bold px-2 transition">&times;</button>
+                    </div>
+                    <p x-show="pilihanErrors[i]" x-text="pilihanErrors[i]" x-cloak class="mt-1 ml-10 text-xs font-semibold text-rose-600"></p>
                 </div>
             </template>
 

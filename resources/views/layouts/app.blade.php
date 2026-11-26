@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name')) - MPKSDI Karanganyar</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
@@ -22,12 +22,18 @@
               localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed);
           }
       }">
+    @php
+        $isExamTaking = request()->routeIs('portal.tes.show') && isset($questions);
+        $hasMobileSubmitBar = request()->routeIs('portal.afektif.*', 'portal.angket.*', 'portal.rtl.*', 'portal.profile.*');
+    @endphp
+
     {{-- Global Page Transition & Smooth Preloader --}}
     <x-page-loader />
 
     {{-- Global Scroll Progress Indicator --}}
     <div id="scroll-progress-bar" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-[#f8bb00] z-[999] transition-[width] duration-75 ease-out pointer-events-none" style="width: 0%;"></div>
 
+    @if(! $isExamTaking)
     {{-- Mobile Off-Canvas Backdrop --}}
     <div x-show="sidebarOpen" 
          x-transition:enter="transition-opacity ease-linear duration-300"
@@ -261,7 +267,7 @@
                             </svg>
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Update Sistem</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20 shrink-0" :class="{ 'lg:hidden': sidebarCollapsed }">v2.3</span>
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20 shrink-0" :class="{ 'lg:hidden': sidebarCollapsed }">v2.6</span>
                     </a>
                 </div>
 
@@ -332,24 +338,32 @@
         </div>
         @endauth
     </aside>
+    @endif
 
     {{-- MAIN CONTENT WRAPPER --}}
-    <div :class="{
+    <div @if(! $isExamTaking)
+         :class="{
              'lg:pl-64': !sidebarCollapsed,
              'lg:pl-20': sidebarCollapsed
          }"
+         @endif
          class="flex-1 flex flex-col min-w-0 min-h-screen bg-slate-50/60 bg-batik-subtle transition-all duration-300 ease-in-out">
         
+        @php
+            $showKaderBottomNav = auth()->check() && auth()->user()->isAnggota() && ! $isExamTaking;
+        @endphp
+
         {{-- Top Application Header Bar --}}
         <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-            <div class="w-full px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16 gap-4">
+            <div class="w-full px-3 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-14 lg:h-16 gap-3">
                     
                     {{-- Left Action: Toggle Buttons & Workspace Indicator --}}
-                    <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+                        @if(! $isExamTaking)
                         {{-- Mobile Drawer Trigger --}}
                         <button type="button" @click="sidebarOpen = true" 
-                                class="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition focus:outline-none" 
+                                class="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 transition focus:outline-none shrink-0" 
                                 aria-label="Buka Navigasi">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -366,15 +380,23 @@
                         </button>
 
                         <div class="h-6 w-px bg-slate-200 hidden lg:block"></div>
+                        @else
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-bold shrink-0">
+                            <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <span>Ujian Terkunci</span>
+                        </span>
+                        @endif
 
                         {{-- Current Contextual Label --}}
                         @auth
-                            <div class="flex items-center gap-2 text-xs sm:text-sm">
-                                <span class="text-slate-500 font-medium">
+                            <div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm min-w-0">
+                                <span class="hidden sm:inline text-slate-500 font-medium truncate">
                                     {{ auth()->user()->isAdminCabang() ? ('PCM ' . auth()->user()->pcm) : 'MPKSDI PDM Karanganyar' }}
                                 </span>
-                                <span class="text-slate-300">/</span>
-                                <span class="font-bold text-slate-800">
+                                <span class="hidden sm:inline text-slate-300">/</span>
+                                <span class="font-bold text-slate-800 truncate">
                                     {{ auth()->user()->isAnggota() ? 'Portal Kader' : (auth()->user()->isExecutive() ? 'Executive Desk' : (auth()->user()->isFasilitator() ? 'Panel Fasilitator' : (auth()->user()->isAdminCabang() ? 'Panel Admin Cabang' : 'Panel Administrasi'))) }}
                                 </span>
                             </div>
@@ -414,7 +436,7 @@
         </header>
 
         {{-- Main Page Content Shell --}}
-        <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
+        <main class="flex-1 w-full px-3.5 sm:px-6 lg:px-8 pt-4 sm:py-8 max-w-7xl mx-auto {{ $isExamTaking ? 'pb-24 lg:pb-8' : ($hasMobileSubmitBar ? 'pb-36 lg:pb-8' : 'pb-4') }}">
             {{-- Flash Messages --}}
             @if(session('success'))
                 <div class="mb-6 px-4 py-3 rounded-lg bg-sky-50 border border-sky-200 text-sky-950 text-sm flex items-start gap-3 shadow-2xs">
@@ -459,31 +481,59 @@
             @yield('content')
         </main>
 
-        {{-- Standardized Footer --}}
-        <footer class="mt-auto border-t border-slate-200/80 bg-white/80 backdrop-blur-xs py-5">
-            <div class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-                <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <p>&copy; {{ date('Y') }} MPKSDI PDM Karanganyar &bull; Sistem Perkaderan Baitul Arqam</p>
-                    <span class="hidden md:inline text-slate-300">|</span>
-                    <div class="flex items-center gap-2 text-xs">
-                        <a href="{{ route('panduan') }}" class="hover:text-[#005c8a] font-medium transition">Panduan Sistem</a>
-                        <span class="text-slate-300">&bull;</span>
-                        <a href="{{ route('updates') }}" class="hover:text-[#005c8a] font-medium transition">Pembaruan v2.3</a>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
+        {{-- Standardized Footer (disembunyikan saat ujian terkunci; hidden di HP saat ada bar submit tetap) --}}
+        @if(! $isExamTaking)
+        <footer class="mt-auto border-t border-slate-200/70 bg-white/80 pt-3 {{ $hasMobileSubmitBar ? 'hidden lg:block pb-3' : ($showKaderBottomNav ? 'pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-3' : 'pb-3') }}">
+            <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center sm:justify-end text-xs text-slate-500">
+                <nav aria-label="Tautan footer" class="flex flex-wrap items-center justify-center gap-x-0.5 gap-y-0">
+                    <a href="{{ route('panduan') }}" class="inline-flex items-center px-2 py-1 rounded-md hover:bg-slate-100 hover:text-[#005c8a] transition">Panduan</a>
+                    <span class="text-slate-300" aria-hidden="true">&middot;</span>
+                    <a href="{{ route('updates') }}" class="inline-flex items-center px-2 py-1 rounded-md hover:bg-slate-100 hover:text-[#005c8a] transition">Pembaruan</a>
+                    <span class="text-slate-300" aria-hidden="true">&middot;</span>
                     <a href="https://instagram.com/gemala.dev" target="_blank" rel="noopener noreferrer"
-                       class="group inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 text-xs text-slate-600 hover:text-sky-700 transition">
-                        <img src="{{ asset('aset/logo-gemaladev.png') }}" alt="Logo gemala.dev" class="h-3.5 w-3.5 object-contain group-hover:scale-110 transition-transform">
-                        <span>Developed by <strong class="text-slate-700 group-hover:text-sky-700">gemala.dev</strong></span>
+                       class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition">
+                        <img src="{{ asset('aset/logo-gemaladev.png') }}" alt="" aria-hidden="true" class="block h-3.5 w-3.5 object-contain">
+                        <span>by <strong class="font-semibold text-slate-700">gemala.dev</strong></span>
                     </a>
-                    <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="px-2.5 py-1 rounded-full text-slate-400 hover:text-sky-600 hover:bg-slate-100 text-xs font-semibold transition">
+                    <span class="hidden lg:inline text-slate-300" aria-hidden="true">&middot;</span>
+                    <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+                            class="hidden lg:inline-flex px-2 py-1 rounded-md text-slate-400 hover:bg-slate-100 hover:text-sky-600 font-medium transition cursor-pointer"
+                            aria-label="Kembali ke atas">
                         Ke Atas &uarr;
                     </button>
-                </div>
+                </nav>
             </div>
         </footer>
+        @endif
     </div>
+
+    {{-- Mobile Bottom Navigation Bar (Kader Portal, di luar layar ujian aktif) --}}
+    @if($showKaderBottomNav)
+    <nav aria-label="Navigasi Portal Kader" class="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-2px_10px_rgba(15,23,42,0.05)] pb-safe">
+        <div class="grid grid-cols-3 h-14 max-w-lg mx-auto">
+            <a href="{{ route('portal.dashboard') }}"
+               class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition {{ request()->routeIs('portal.dashboard', 'portal.kehadiran.*', 'portal.afektif.*', 'portal.angket.*', 'portal.rtl.*') ? 'text-[#005c8a]' : 'text-slate-500 hover:text-slate-800' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>Beranda</span>
+            </a>
+            <a href="{{ route('portal.tes.index') }}"
+               class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition {{ request()->routeIs('portal.tes.*') ? 'text-[#005c8a]' : 'text-slate-500 hover:text-slate-800' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                <span>Ujian</span>
+            </a>
+            <a href="{{ route('portal.profile.index') }}"
+               class="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition {{ request()->routeIs('portal.profile.*') ? 'text-[#005c8a]' : 'text-slate-500 hover:text-slate-800' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span>Profil</span>
+            </a>
+        </div>
+    </nav>
+    @endif
 </body>
 </html>

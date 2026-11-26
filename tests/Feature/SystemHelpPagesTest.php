@@ -52,7 +52,9 @@ class SystemHelpPagesTest extends TestCase
         $response = $this->actingAs($user)->get('/updates');
         $response->assertStatus(200);
         $response->assertSee('Pusat Informasi &amp; Pembaruan Sistem', false);
-        $response->assertSee('Versi 2.4.0 Stable', false);
+        $response->assertSee('Versi 2.6.0 Stable', false);
+        $response->assertSee('v2.6.0', false);
+        $response->assertSee('v2.5.0', false);
         $response->assertSee('v2.4.0', false);
         $response->assertSee('v2.3.0', false);
         $response->assertSee('v2.2.0', false);

@@ -211,7 +211,7 @@ class AngketKertasTest extends TestCase
     public function test_portal_still_works_for_participants_without_paper_input(): void
     {
         $a = $this->peserta();
-        $butir = AfektifButir::where('teks_butir', 'Datang tepat waktu')->first();
+        $butirAktif = AfektifButir::whereHas('subAspek', fn ($q) => $q->where('event_id', $this->event->id)->where('aktif', true))->pluck('id');
 
         $this->actingAs($a->user)
             ->get(route('portal.afektif.index', $this->event))
@@ -220,7 +220,7 @@ class AngketKertasTest extends TestCase
             ->assertSee(route('portal.afektif.save', $this->event));
 
         $this->actingAs($a->user)
-            ->post(route('portal.afektif.save', $this->event), ['jawaban' => [$butir->id => 3]])
+            ->post(route('portal.afektif.save', $this->event), ['jawaban' => $butirAktif->mapWithKeys(fn ($id) => [$id => 3])->all()])
             ->assertSessionHas('success');
     }
 

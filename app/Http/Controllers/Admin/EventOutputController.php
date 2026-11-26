@@ -25,14 +25,9 @@ class EventOutputController extends Controller
 
     public function ranking(Event $event): View
     {
-        $this->nilai->hitungUlang($event);
-        $ranking = PenilaianAkhir::where('event_id', $event->id)
-            ->with('anggota')
-            ->orderBy('ranking')
-            ->get();
+        $ranking = $this->nilai->rankingAktif($event);
 
-        $epMap = EventPeserta::where('event_id', $event->id)
-            ->pluck('id', 'anggota_id');
+        $epMap = $event->pesertaAktif()->pluck('id', 'anggota_id');
 
         $tesKertas = PesertaTesMulai::tesKertasMap($event->id);
 
@@ -41,11 +36,7 @@ class EventOutputController extends Controller
 
     public function report(Event $event)
     {
-        $this->nilai->hitungUlang($event);
-        $ranking = PenilaianAkhir::where('event_id', $event->id)
-            ->with('anggota')
-            ->orderBy('ranking')
-            ->get();
+        $ranking = $this->nilai->rankingAktif($event);
 
         $totalPeserta = $ranking->count();
         $totalLulus = $ranking->where('status_kelulusan', 'Lulus')->count();
@@ -74,11 +65,7 @@ class EventOutputController extends Controller
 
     public function beritaAcara(Event $event)
     {
-        $this->nilai->hitungUlang($event);
-        $ranking = PenilaianAkhir::where('event_id', $event->id)
-            ->with('anggota')
-            ->orderBy('ranking')
-            ->get();
+        $ranking = $this->nilai->rankingAktif($event);
 
         $totalPeserta = $ranking->count();
         $totalLulus = $ranking->where('status_kelulusan', 'Lulus')->count();
@@ -183,8 +170,6 @@ class EventOutputController extends Controller
 
     public function exportExcel(Event $event)
     {
-        $this->nilai->hitungUlang($event);
-
         return Excel::download(
             new LaporanEventExport($event->id),
             'laporan-'.str($event->nama_event)->slug().'.xlsx'

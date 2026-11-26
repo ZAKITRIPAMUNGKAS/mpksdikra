@@ -3,35 +3,38 @@
 @section('title', 'RTL — ' . $event->nama_event)
 
 @section('content')
-<div class="max-w-3xl mx-auto space-y-6">
-    <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs relative overflow-hidden">
-        <x-batik-corner position="top-right" class="w-36 h-36 text-[#005c8a] opacity-[0.18]" />
-        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-start gap-4">
-                <div class="w-11 h-11 rounded-lg bg-sky-50 border border-sky-200/80 flex items-center justify-center text-sky-700 shrink-0 shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-200/80 text-xs font-semibold text-sky-800 uppercase tracking-wider mb-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
-                        Komitmen &amp; Rencana Aksi
-                    </span>
-                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Rencana Tindak Lanjut (RTL)</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1 font-normal">{{ $event->nama_event }}</p>
-                </div>
-            </div>
+<div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
+    <div class="flex items-center justify-between gap-3">
+        <a href="{{ route('portal.dashboard') }}" class="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200/90 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>Kembali</span>
+        </a>
+        @if($rtl)
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-2xs
+            {{ $rtl->status === 'terkirim' ? 'bg-sky-50 text-sky-900 border border-sky-300/80' : 'bg-amber-50 text-amber-900 border border-amber-300/80' }}">
+            <span class="w-1.5 h-1.5 rounded-full {{ $rtl->status === 'terkirim' ? 'bg-[#005c8a]' : 'bg-amber-500' }}"></span>
+            {{ ucfirst($rtl->status) }}
+        </span>
+        @endif
+    </div>
 
-            @if($rtl)
-            <div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider shadow-2xs
-                    {{ $rtl->status === 'terkirim' ? 'bg-sky-50 text-sky-900 border border-sky-300/80' : 'bg-amber-50 text-amber-900 border border-amber-300/80' }}">
-                    <span class="w-2 h-2 rounded-full {{ $rtl->status === 'terkirim' ? 'bg-[#005c8a] animate-pulse' : 'bg-amber-500' }}"></span>
-                    Status: {{ $rtl->status }}
-                </span>
+    <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-6 shadow-2xs relative overflow-hidden">
+        <x-batik-corner position="top-right" class="w-28 h-28 sm:w-36 sm:h-36 text-[#005c8a] opacity-[0.16]" />
+        <div class="relative z-10 flex items-start gap-3 sm:gap-4">
+            <div class="hidden sm:flex w-11 h-11 rounded-lg bg-sky-50 border border-sky-200/80 items-center justify-center text-sky-700 shrink-0 shadow-2xs">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
             </div>
-            @endif
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sky-50 border border-sky-200/80 text-[11px] font-semibold text-sky-800 uppercase tracking-wider mb-1">
+                    Komitmen &amp; Rencana Aksi
+                </span>
+                <h1 class="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight">Rencana Tindak Lanjut (RTL)</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5 font-normal">{{ $event->nama_event }}</p>
+            </div>
         </div>
     </div>
 
@@ -85,12 +88,12 @@
         @endforeach
 
         @if(! ($rtl && $rtl->status === 'terkirim'))
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border-2 border-slate-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs sm:text-sm text-slate-600 font-semibold">RTL yang telah dikirim akan dikunci untuk ditinjau panitia.</p>
+        <div class="fixed bottom-[calc(3.5rem+max(0.5rem,env(safe-area-inset-bottom,0px)))] inset-x-0 z-20 lg:sticky lg:bottom-4 lg:inset-auto px-4 py-3 lg:p-4 bg-white/95 backdrop-blur-md lg:rounded-2xl border-t lg:border border-slate-200/90 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] lg:shadow-md flex items-center justify-between gap-3">
+            <p class="text-[11px] sm:text-xs text-slate-600 font-medium">Dikunci setelah pengiriman.</p>
             <button type="submit" onclick="return confirm('Kirimkan RTL? Jawaban akan dikunci setelah pengiriman.')"
-                class="w-full sm:w-auto min-h-[52px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                class="min-h-11 px-5 sm:px-7 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
                 <span>Kirim Dokumen RTL</span>
-                <span class="text-lg leading-none">&rarr;</span>
+                <span>&rarr;</span>
             </button>
         </div>
         @else

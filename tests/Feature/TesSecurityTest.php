@@ -134,4 +134,49 @@ class TesSecurityTest extends TestCase
             ->post(route('portal.tes.submit', [$event, 'posttest']), ['answers' => []])
             ->assertForbidden();
     }
+
+    public function test_exam_view_enables_anti_navigation_anti_copy_and_two_strike_autosubmit(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $event = Event::create([
+            'nama_event' => 'BA Anti Curang',
+            'tanggal_mulai' => '2026-09-01',
+            'tanggal_selesai' => '2026-09-02',
+            'status' => 'berlangsung',
+            'created_by' => $admin->id,
+        ]);
+
+        $soal = Soal::create([
+            'event_id' => $event->id,
+            'tipe' => 'pretest',
+            'teks_soal' => 'Soal Terkunci',
+            'urutan' => 1,
+        ]);
+        $benar = PilihanJawaban::create(['soal_id' => $soal->id, 'label' => 'A', 'teks' => 'Benar', 'is_benar' => true]);
+        SesiTes::create(['event_id' => $event->id, 'tipe' => 'pretest', 'status' => 'aktif', 'durasi_menit' => 30]);
+
+        $user = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $anggota = Anggota::factory()->create(['user_id' => $user->id]);
+        EventPeserta::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggota->id,
+            'qr_token' => app(QrService::class)->generateToken(),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('portal.tes.show', [$event, 'pretest']));
+        $response->assertOk()
+            ->assertSee('Ujian Terkunci')
+            ->assertSee('maxViolations: 2')
+            ->assertSee('visibilitychange')
+            ->assertSee('select-none')
+            ->assertDontSee('Navigasi Portal Kader');
+
+        $this->actingAs($user)
+            ->post(route('portal.tes.submit', [$event, 'pretest']), [
+                'auto_submitted' => '1',
+                'answers' => [['soal_id' => $soal->id, 'pilihan_id' => $benar->id]],
+            ])
+            ->assertRedirect(route('portal.tes.index'))
+            ->assertSessionHas('warning', 'Ujian otomatis dikumpulkan karena terdeteksi 2 kali pelanggaran (pindah halaman/tab atau menyalin soal). Nilai: 100');
+    }
 }

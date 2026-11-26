@@ -74,7 +74,6 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse($ranking as $p)
                 @php
-                    $nGain = $p->nilai_pretest >= 100 ? 0 : round(($p->nilai_posttest - $p->nilai_pretest) / (100 - $p->nilai_pretest), 3);
                     $epId = $epMap->get($p->anggota_id);
                 @endphp
                 <tr class="hover:bg-slate-50/70 transition {{ $p->ranking === 1 ? 'bg-amber-50/40' : '' }}">
@@ -88,7 +87,7 @@
                     <td class="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">{{ $p->anggota->nama_lengkap }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_pretest, 1) }}@if(in_array('pretest', $tesKertas[$p->anggota_id] ?? [], true))<div class="text-[10px] font-sans font-semibold text-amber-700" title="Diinput admin dari lembar kertas">kertas</div>@endif</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_posttest, 1) }}@if(in_array('posttest', $tesKertas[$p->anggota_id] ?? [], true))<div class="text-[10px] font-sans font-semibold text-amber-700" title="Diinput admin dari lembar kertas">kertas</div>@endif</td>
-                    <td class="py-3 px-3 text-center font-mono">{{ number_format($nGain, 2) }}</td>
+                    <td class="py-3 px-3 text-center font-mono">{{ number_format($p->n_gain, 2) }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_afektif, 1) }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_psikomotor, 1) }}</td>
                     <td class="py-3 px-3 text-center font-mono">{{ number_format($p->nilai_keaktifan, 1) }}</td>

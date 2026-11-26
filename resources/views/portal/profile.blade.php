@@ -72,21 +72,21 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 flex-wrap">
-                <a href="{{ route('portal.profile.cetak-pdf') }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-300 transition shadow-2xs">
-                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                <a href="{{ route('portal.profile.cetak-pdf') }}" target="_blank" class="min-h-11 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-300 transition shadow-2xs">
+                    <svg class="w-4 h-4 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
-                    <span>Lihat Biodata (PDF)</span>
+                    <span>Lihat PDF</span>
                 </a>
-                <a href="{{ route('portal.profile.cetak-pdf') }}?download" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 transition shadow-2xs">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('portal.profile.cetak-pdf') }}?download" class="min-h-11 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 transition shadow-2xs">
+                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
                     <span>Unduh PDF</span>
                 </a>
-                <a href="{{ route('portal.dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-700 bg-white hover:bg-sky-50 hover:text-sky-800 border border-slate-200/90 transition shadow-2xs">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <a href="{{ route('portal.dashboard') }}" class="col-span-2 sm:col-span-1 min-h-11 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-sky-50 hover:text-sky-800 border border-slate-200/90 transition shadow-2xs">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Kembali ke Portal</span>
                 </a>
             </div>
@@ -103,25 +103,28 @@
     </div>
 
     @if($anggota)
-    {{-- Tab Selector --}}
-    <div class="bg-white rounded-2xl border-2 border-slate-200 p-2 flex gap-2 shadow-xs">
+    {{-- Tab Selector (Kompak & tidak meluber di layar HP) --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-1.5 grid grid-cols-3 gap-1.5 shadow-xs">
         <button type="button" @click="tab = 'identitas'"
-            :class="tab === 'identitas' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
-            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            <span>1. Identitas &amp; Domisili</span>
+            :class="tab === 'identitas' ? 'bg-sky-600 text-white shadow-sm font-bold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-semibold'"
+            class="min-h-11 py-2 px-2 sm:px-3 text-[11px] sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-1.5 cursor-pointer">
+            <svg class="hidden sm:block w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="sm:hidden">1. Identitas</span>
+            <span class="hidden sm:inline">1. Identitas &amp; Domisili</span>
         </button>
         <button type="button" @click="tab = 'agama'"
-            :class="tab === 'agama' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
-            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            <span>2. Ibadah &amp; Keagamaan</span>
+            :class="tab === 'agama' ? 'bg-sky-600 text-white shadow-sm font-bold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-semibold'"
+            class="min-h-11 py-2 px-2 sm:px-3 text-[11px] sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-1.5 cursor-pointer">
+            <svg class="hidden sm:block w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="sm:hidden">2. Ibadah</span>
+            <span class="hidden sm:inline">2. Ibadah &amp; Keagamaan</span>
         </button>
         <button type="button" @click="tab = 'kemuhammadiyahan'"
-            :class="tab === 'kemuhammadiyahan' ? 'bg-sky-600 text-white shadow-sm font-extrabold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold'"
-            class="flex-1 py-3 px-3 text-xs sm:text-sm md:text-base rounded-xl transition text-center flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            <span>3. Kemuhammadiyahan</span>
+            :class="tab === 'kemuhammadiyahan' ? 'bg-sky-600 text-white shadow-sm font-bold' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-semibold'"
+            class="min-h-11 py-2 px-2 sm:px-3 text-[11px] sm:text-sm rounded-xl transition text-center flex items-center justify-center gap-1.5 cursor-pointer">
+            <svg class="hidden sm:block w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span class="sm:hidden">3. Organisasi</span>
+            <span class="hidden sm:inline">3. Kemuhammadiyahan</span>
         </button>
     </div>
 
@@ -962,14 +965,15 @@
         </div>
 
         {{-- Submission Bar --}}
-        <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border-2 border-slate-300 shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="text-xs sm:text-sm text-slate-700 text-center sm:text-left flex items-center gap-2.5 font-medium">
+        <div class="fixed bottom-[calc(3.5rem+max(0.5rem,env(safe-area-inset-bottom,0px)))] inset-x-0 z-20 lg:sticky lg:bottom-4 lg:inset-auto px-4 py-3 lg:p-4 bg-white/95 backdrop-blur-md lg:rounded-2xl border-t lg:border border-slate-200/90 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] lg:shadow-md flex items-center justify-between gap-3">
+            <div class="hidden sm:flex text-xs sm:text-sm text-slate-700 items-center gap-2.5 font-medium">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                 <span>Perubahan data profil akan langsung tersimpan di pangkalan data MPKSDI PDM Karanganyar.</span>
             </div>
-            <button type="submit" class="w-full sm:w-auto min-h-[52px] sm:min-h-[54px] px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-black text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2 shrink-0">
-                <span>Simpan Seluruh Perubahan Profil</span>
-                <span class="text-lg leading-none">&rarr;</span>
+            <span class="sm:hidden text-xs text-slate-600 font-medium">Simpan perubahan profil</span>
+            <button type="submit" class="min-h-11 px-5 sm:px-8 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold text-xs sm:text-base rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
+                <span>Simpan Profil</span>
+                <span>&rarr;</span>
             </button>
         </div>
     </form>

@@ -7,14 +7,18 @@ use App\Models\JawabanPeserta;
 use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Models\PilihanJawaban;
+use App\Models\SesiTes;
 use App\Models\Soal;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 class TesService
 {
+    private const GRACE_SECONDS = 45;
+
     public function grade(Event $event, int $anggotaId, string $tipe): float
     {
         $totalSoal = Soal::where('event_id', $event->id)->where('tipe', $tipe)->count();
@@ -42,50 +46,103 @@ class TesService
         return $score;
     }
 
-    public function submitAnswers(Event $event, int $anggotaId, string $tipe, array $answers): float
+    public function startAttempt(Event $event, int $anggotaId, string $tipe): PesertaTesMulai
     {
-        if ($this->hasSubmitted($event, $anggotaId, $tipe)) {
-            return $this->grade($event, $anggotaId, $tipe);
-        }
-
-        $mulai = PesertaTesMulai::firstOrCreate([
+        return PesertaTesMulai::firstOrCreate([
             'event_id' => $event->id,
             'anggota_id' => $anggotaId,
             'tipe' => $tipe,
         ], ['waktu_mulai' => now()]);
+    }
 
-        $soalIds = Soal::where('event_id', $event->id)
-            ->where('tipe', $tipe)
-            ->pluck('id')
-            ->all();
+    public function remainingSeconds(PesertaTesMulai $mulai, SesiTes $sesi): int
+    {
+        return $mulai->waktu_mulai->copy()->addMinutes($sesi->durasi_menit)->getTimestamp() - now()->getTimestamp();
+    }
 
-        $validPilihan = PilihanJawaban::whereIn('soal_id', $soalIds)->pluck('id')->flip();
+    public function submitAnswers(Event $event, PesertaTesMulai $mulai, array $answers, bool $automatic = false, bool $recoverExpired = false): ?float
+    {
+        return DB::transaction(function () use ($event, $mulai, $answers, $automatic, $recoverExpired) {
+            $mulai = PesertaTesMulai::whereKey($mulai->id)->lockForUpdate()->firstOrFail();
+            if ($mulai->waktu_selesai !== null) {
+                return null;
+            }
+
+            $remaining = $this->remainingSeconds($mulai, $this->activeSession($mulai));
+            if ($recoverExpired) {
+                abort_if($remaining > 0, 409, 'Waktu tes masih tersedia.');
+            } else {
+                abort_if($automatic ? $remaining < -self::GRACE_SECONDS : $remaining <= 0, 403, 'Waktu tes telah habis.');
+            }
+
+            if ($answers !== []) {
+                $this->persistAnswers($mulai, $answers);
+            }
+            $mulai->update(['waktu_selesai' => now()]);
+
+            return $this->grade($event, $mulai->anggota_id, $mulai->tipe);
+        });
+    }
+
+    public function saveDraft(PesertaTesMulai $mulai, array $answer): void
+    {
+        DB::transaction(function () use ($mulai, $answer) {
+            $mulai = PesertaTesMulai::whereKey($mulai->id)->lockForUpdate()->firstOrFail();
+            abort_if($mulai->waktu_selesai !== null, 403, 'Tes ini sudah diserahkan sebelumnya.');
+            abort_if($this->remainingSeconds($mulai, $this->activeSession($mulai)) < -self::GRACE_SECONDS, 403, 'Waktu tes telah habis.');
+
+            $valid = Soal::whereKey($answer['soal_id'])
+                ->where('event_id', $mulai->event_id)
+                ->where('tipe', $mulai->tipe)
+                ->whereHas('pilihan', fn ($query) => $query->whereKey($answer['pilihan_id']))
+                ->exists();
+
+            if (! $valid) {
+                throw ValidationException::withMessages(['pilihan_id' => 'Pilihan jawaban tidak sesuai dengan soal.']);
+            }
+
+            $this->storeAnswer($mulai, $answer['soal_id'], $answer['pilihan_id']);
+        });
+    }
+
+    private function activeSession(PesertaTesMulai $mulai): SesiTes
+    {
+        $sesi = SesiTes::where('event_id', $mulai->event_id)->where('tipe', $mulai->tipe)->sharedLock()->first();
+        abort_unless($sesi && $sesi->status === 'aktif', 403, 'Sesi tes tidak aktif.');
+
+        return $sesi;
+    }
+
+    private function persistAnswers(PesertaTesMulai $mulai, array $answers): void
+    {
+        $soalIds = Soal::where('event_id', $mulai->event_id)->where('tipe', $mulai->tipe)->pluck('id')->flip();
+        $pilihanSoal = PilihanJawaban::whereIn('soal_id', $soalIds->keys())->pluck('soal_id', 'id');
 
         foreach ($answers as $answer) {
-            $soalId = (int) ($answer['soal_id'] ?? 0);
-            $pilihanId = $answer['pilihan_id'] ?? null;
-
-            if (! in_array($soalId, $soalIds, true)) {
+            $soalId = (int) $answer['soal_id'];
+            if (! $soalIds->has($soalId) || ! array_key_exists('pilihan_id', $answer)) {
                 continue;
             }
 
-            if ($pilihanId !== null && ! $validPilihan->has((int) $pilihanId)) {
-                $pilihanId = null;
+            $pilihanId = $answer['pilihan_id'];
+            if ($pilihanId !== null && (int) $pilihanSoal->get($pilihanId) !== $soalId) {
+                continue;
             }
 
-            JawabanPeserta::updateOrCreate(
-                [
-                    'event_id' => $event->id,
-                    'anggota_id' => $anggotaId,
-                    'soal_id' => $soalId,
-                ],
-                ['pilihan_id' => $pilihanId]
-            );
+            $this->storeAnswer($mulai, $soalId, $pilihanId);
         }
+    }
 
-        $mulai->update(['waktu_selesai' => now()]);
-
-        return $this->grade($event, $anggotaId, $tipe);
+    private function storeAnswer(PesertaTesMulai $mulai, int $soalId, ?int $pilihanId): void
+    {
+        JawabanPeserta::updateOrCreate(
+            [
+                'event_id' => $mulai->event_id,
+                'anggota_id' => $mulai->anggota_id,
+                'soal_id' => $soalId,
+            ],
+            ['pilihan_id' => $pilihanId]
+        );
     }
 
     public function hasSubmitted(Event $event, int $anggotaId, string $tipe): bool
@@ -181,21 +238,18 @@ class TesService
         $peta = $this->petakanJawabanManual($this->soalBerurutan($event, $tipe), $jawaban);
 
         return DB::transaction(function () use ($event, $anggotaId, $tipe, $peta, $adminId) {
-            foreach ($peta as $soalId => $pilihanId) {
-                JawabanPeserta::updateOrCreate(
-                    ['event_id' => $event->id, 'anggota_id' => $anggotaId, 'soal_id' => $soalId],
-                    ['pilihan_id' => $pilihanId]
-                );
+            $mulai = $this->startAttempt($event, $anggotaId, $tipe);
+            $mulai = PesertaTesMulai::whereKey($mulai->id)->lockForUpdate()->firstOrFail();
+            if ($mulai->sumber === 'online' && $mulai->waktu_selesai !== null) {
+                throw new InvalidArgumentException('Peserta sudah mengerjakan tes ini secara online; nilai online tidak ditimpa.');
             }
 
-            $mulai = PesertaTesMulai::firstOrNew([
-                'event_id' => $event->id,
-                'anggota_id' => $anggotaId,
-                'tipe' => $tipe,
-            ]);
+            foreach ($peta as $soalId => $pilihanId) {
+                $this->storeAnswer($mulai, $soalId, $pilihanId);
+            }
+
             $mulai->fill([
                 'sumber' => 'manual',
-                'waktu_mulai' => $mulai->waktu_mulai ?? now(),
                 'waktu_selesai' => now(),
                 'diinput_oleh' => $adminId,
             ])->save();

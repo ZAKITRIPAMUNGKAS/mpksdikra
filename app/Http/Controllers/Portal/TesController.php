@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventPeserta;
+use App\Models\JawabanPeserta;
+use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Models\SesiTes;
 use App\Models\Soal;
 use App\Services\TesService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class TesController extends Controller
@@ -25,6 +28,42 @@ class TesController extends Controller
             ->with('event')
             ->latest()
             ->get();
+
+        $eventIds = $events->pluck('event_id');
+        $sesiMap = SesiTes::whereIn('event_id', $eventIds)
+            ->get()
+            ->groupBy('event_id')
+            ->map(fn ($items) => $items->keyBy('tipe'));
+
+        $mulaiMap = PesertaTesMulai::whereIn('event_id', $eventIds)
+            ->where('anggota_id', $anggota->id)
+            ->get()
+            ->groupBy('event_id')
+            ->map(fn ($items) => $items->keyBy('tipe'));
+
+        $nilaiMap = PenilaianAkhir::whereIn('event_id', $eventIds)
+            ->where('anggota_id', $anggota->id)
+            ->get()
+            ->keyBy('event_id');
+
+        foreach ($events as $ep) {
+            $sesiEvent = $sesiMap->get($ep->event_id, collect());
+            $mulaiEvent = $mulaiMap->get($ep->event_id, collect());
+            $nilai = $nilaiMap->get($ep->event_id);
+
+            $ep->tes_status = [
+                'pretest' => [
+                    'aktif' => ($sesiEvent->get('pretest')?->status === 'aktif'),
+                    'selesai' => $mulaiEvent->get('pretest')?->waktu_selesai !== null,
+                    'nilai' => $nilai?->nilai_pretest,
+                ],
+                'posttest' => [
+                    'aktif' => ($sesiEvent->get('posttest')?->status === 'aktif'),
+                    'selesai' => $mulaiEvent->get('posttest')?->waktu_selesai !== null,
+                    'nilai' => $nilai?->nilai_posttest,
+                ],
+            ];
+        }
 
         return view('portal.tes.index', compact('events'));
     }
@@ -41,20 +80,47 @@ class TesController extends Controller
             return view('portal.tes.closed', compact('event', 'tipe'));
         }
 
-        if ($this->tes->hasSubmitted($event, $anggota->id, $tipe)) {
+        $mulai = $this->tes->startAttempt($event, $anggota->id, $tipe);
+        if ($mulai->waktu_selesai !== null) {
             return redirect()->route('portal.tes.index');
         }
 
-        $questions = Soal::where('event_id', $event->id)->where('tipe', $tipe)->with('pilihan')->orderBy('urutan')->get();
-        $mulai = PesertaTesMulai::firstOrCreate([
-            'event_id' => $event->id,
-            'anggota_id' => $anggota->id,
-            'tipe' => $tipe,
-        ], ['waktu_mulai' => now()]);
-        $endsAt = $mulai->waktu_mulai->copy()->addMinutes($sesi->durasi_menit);
-        $remaining = max(0, $endsAt->getTimestamp() - now()->getTimestamp());
+        $remaining = $this->tes->remainingSeconds($mulai, $sesi);
+        if ($remaining <= 0) {
+            $score = $this->tes->submitAnswers($event, $mulai, [], recoverExpired: true);
 
-        return view('portal.tes.take', compact('event', 'tipe', 'questions', 'remaining'));
+            return $this->submissionResponse($score);
+        }
+
+        $questions = Soal::where('event_id', $event->id)->where('tipe', $tipe)->with('pilihan')->orderBy('urutan')->get();
+        $savedAnswers = JawabanPeserta::where('event_id', $event->id)
+            ->where('anggota_id', $anggota->id)
+            ->whereIn('soal_id', $questions->modelKeys())
+            ->whereNotNull('pilihan_id')
+            ->pluck('pilihan_id', 'soal_id')
+            ->all();
+
+        return view('portal.tes.take', compact('event', 'tipe', 'questions', 'remaining', 'mulai', 'savedAnswers'));
+    }
+
+    public function autosave(Request $request, Event $event, string $tipe): Response
+    {
+        $this->authorize('participate', $event);
+        abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
+
+        $data = $request->validate([
+            'soal_id' => ['required', 'integer'],
+            'pilihan_id' => ['required', 'integer'],
+        ]);
+        $mulai = PesertaTesMulai::where('event_id', $event->id)
+            ->where('anggota_id', auth()->user()->anggota->id)
+            ->where('tipe', $tipe)
+            ->first();
+        abort_unless($mulai, 403, 'Tes belum dimulai.');
+
+        $this->tes->saveDraft($mulai, $data);
+
+        return response()->noContent();
     }
 
     public function submit(Request $request, Event $event, string $tipe): RedirectResponse
@@ -62,27 +128,34 @@ class TesController extends Controller
         $this->authorize('participate', $event);
         abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
 
-        $anggotaId = auth()->user()->anggota->id;
-
         $sesi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->first();
         abort_unless($sesi && $sesi->status === 'aktif', 403, 'Sesi tes tidak aktif.');
 
-        $mulai = PesertaTesMulai::where('event_id', $event->id)
-            ->where('anggota_id', $anggotaId)
-            ->where('tipe', $tipe)
-            ->first();
-        abort_if(
-            $mulai && $mulai->waktu_mulai->copy()->addMinutes($sesi->durasi_menit)->isPast(),
-            403,
-            'Waktu tes telah habis.'
-        );
+        $data = $request->validate([
+            'answers' => ['nullable', 'array'],
+            'answers.*' => ['array:soal_id,pilihan_id'],
+            'answers.*.soal_id' => ['required', 'integer'],
+            'answers.*.pilihan_id' => ['nullable', 'integer'],
+            'auto_submitted' => ['nullable', 'boolean'],
+            'timed_out' => ['nullable', 'boolean'],
+        ]);
+        $autoViolation = $request->boolean('auto_submitted');
+        $mulai = $this->tes->startAttempt($event, auth()->user()->anggota->id, $tipe);
+        $score = $this->tes->submitAnswers($event, $mulai, $data['answers'] ?? [], $autoViolation || $request->boolean('timed_out'));
 
-        if ($this->tes->hasSubmitted($event, $anggotaId, $tipe)) {
+        return $this->submissionResponse($score, $autoViolation);
+    }
+
+    private function submissionResponse(?float $score, bool $autoViolation = false): RedirectResponse
+    {
+        if ($score === null) {
             return redirect()->route('portal.tes.index')->with('warning', 'Tes ini sudah diserahkan sebelumnya.');
         }
 
-        $data = $request->validate(['answers' => ['nullable', 'array']]);
-        $score = $this->tes->submitAnswers($event, $anggotaId, $tipe, $data['answers'] ?? []);
+        if ($autoViolation) {
+            return redirect()->route('portal.tes.index')
+                ->with('warning', "Ujian otomatis dikumpulkan karena terdeteksi 2 kali pelanggaran (pindah halaman/tab atau menyalin soal). Nilai: {$score}");
+        }
 
         return redirect()->route('portal.tes.index')->with('success', "Tes selesai. Nilai: {$score}");
     }

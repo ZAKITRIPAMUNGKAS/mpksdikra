@@ -37,7 +37,9 @@ class SesiController extends Controller
             'urutan' => $urutan,
         ]));
 
-        return back()->with('success', 'Sesi ditambahkan.');
+        return redirect()
+            ->route('admin.events.show', [$event, 'tab' => 'sesi'])
+            ->with('success', 'Sesi ditambahkan.');
     }
 
     public function update(Request $request, Event $event, EventSesi $sesi): RedirectResponse
@@ -67,7 +69,9 @@ class SesiController extends Controller
 
         $sesi->update($data);
 
-        return back()->with('success', 'Sesi diperbarui.');
+        return redirect()
+            ->route('admin.events.show', [$event, 'tab' => 'sesi'])
+            ->with('success', 'Sesi diperbarui.');
     }
 
     public function destroy(Event $event, EventSesi $sesi): RedirectResponse
@@ -82,7 +86,9 @@ class SesiController extends Controller
 
         $sesi->delete();
 
-        return back()->with('success', 'Sesi dihapus.');
+        return redirect()
+            ->route('admin.events.show', [$event, 'tab' => 'sesi'])
+            ->with('success', 'Sesi dihapus.');
     }
 
     public function downloadMateri(EventSesi $sesi): BinaryFileResponse

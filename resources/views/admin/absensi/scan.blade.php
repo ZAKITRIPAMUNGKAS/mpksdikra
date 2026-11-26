@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/qr-scanner.js'])
     <style>
         [x-cloak] { display: none !important; }
         @keyframes fadeInScale {
@@ -56,7 +56,11 @@
 <body class="min-h-full flex flex-col font-['Plus_Jakarta_Sans',sans-serif] antialiased text-slate-800 bg-[#f8fafc] selection:bg-[#063A60] selection:text-white relative overflow-x-hidden"
       x-data="attendanceDisplayApp()"
       @click="refocusInput($event)"
-      @keydown="handleGlobalKey($event)">
+      @keydown="handleGlobalKey($event)"
+      @pagehide.window="stopCamera()"
+      @beforeunload.window="stopCamera()"
+      @keydown.escape.window="cameraActive && stopCamera()"
+      @visibilitychange.document="handleVisibilityChange()">
 
     {{-- Global Page Transition & Smooth Preloader --}}
     <x-page-loader />
@@ -163,19 +167,54 @@
                     <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-sky-100/50 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
                     {{-- Card Header Bar (Symmetrical with Right Card) --}}
-                    <div class="scan-card-header px-6 py-4 flex items-center justify-between shrink-0 relative z-10">
+                    <div class="scan-card-header px-6 py-4 flex flex-wrap items-center justify-between gap-2 shrink-0 relative z-10">
                         <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#063A60]">
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span>Terminal Scanner Presensi</span>
                         </div>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-white border border-slate-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                            <span>Auto-Focus Scanner Aktif</span>
-                        </span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button"
+                                    x-show="!cameraActive"
+                                    @click="startCamera()"
+                                    :disabled="isOpeningCamera"
+                                    class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#063A60] hover:bg-[#004d73] disabled:opacity-60 px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span x-text="isOpeningCamera ? 'Membuka Kamera...' : 'Scan dengan Kamera'">Scan dengan Kamera</span>
+                            </button>
+                            <button type="button"
+                                    x-show="cameraActive"
+                                    x-cloak
+                                    @click="stopCamera()"
+                                    class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                <span>Tutup Kamera</span>
+                            </button>
+                            <span x-show="!cameraActive" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-white border border-slate-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                <span>Auto-Focus Scanner Aktif</span>
+                            </span>
+                        </div>
                     </div>
 
                     {{-- Interactive Scanner Workspace Area --}}
                     <div class="flex-1 flex flex-col justify-center p-6 relative z-10">
+                        {{-- Camera Error / Notice Banner --}}
+                        <div x-show="cameraError"
+                             x-cloak
+                             role="alert"
+                             class="mb-4 max-w-md w-full mx-auto rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700 flex items-start gap-2">
+                            <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="flex-1 text-left" x-text="cameraError"></span>
+                            <button type="button" @click="cameraError = ''" class="text-rose-500 hover:text-rose-800 font-bold cursor-pointer">&times;</button>
+                        </div>
+
                         {{-- STATE A: IDLE / SCANNER HERO --}}
                         <div x-show="feedbackState === 'idle'"
                              x-transition:enter="transition ease-out duration-200"
@@ -183,8 +222,48 @@
                              x-transition:enter-end="opacity-100 scale-100"
                              class="flex-1 flex flex-col justify-center items-center text-center">
 
-                            {{-- Viewfinder Target Box --}}
-                            <div class="max-w-md w-full mx-auto rounded-3xl border-2 border-dashed border-sky-300 bg-gradient-to-b from-sky-50/70 via-sky-50/30 to-white p-5 relative shadow-inner">
+                            {{-- Camera Viewfinder Panel (Active when cameraActive === true) --}}
+                            <div x-show="cameraActive"
+                                 x-cloak
+                                 class="max-w-md w-full mx-auto rounded-3xl border-2 border-[#063A60]/40 bg-slate-950 p-3 relative shadow-lg overflow-hidden">
+                                <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-900">
+                                    <video x-ref="cameraVideo"
+                                           playsinline
+                                           muted
+                                           autoplay
+                                           class="w-full h-full object-cover"></video>
+                                    {{-- Target Corner Accents --}}
+                                    <div class="pointer-events-none absolute inset-5">
+                                        <div class="absolute top-0 left-0 w-6 h-6 border-t-3 border-l-3 border-emerald-400 rounded-tl-lg"></div>
+                                        <div class="absolute top-0 right-0 w-6 h-6 border-t-3 border-r-3 border-emerald-400 rounded-tr-lg"></div>
+                                        <div class="absolute bottom-0 left-0 w-6 h-6 border-b-3 border-l-3 border-emerald-400 rounded-bl-lg"></div>
+                                        <div class="absolute bottom-0 right-0 w-6 h-6 border-b-3 border-r-3 border-emerald-400 rounded-br-lg"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-left">
+                                    <div class="flex items-center gap-2 text-xs font-semibold text-emerald-300 min-w-0">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                                        <span class="truncate" x-text="cameraStatus || 'Mencari QR Code peserta...'"></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <button type="button"
+                                                x-show="videoDevices.length > 1"
+                                                @click="switchCamera()"
+                                                class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold border border-slate-700 transition cursor-pointer">
+                                            Ganti Kamera
+                                        </button>
+                                        <button type="button"
+                                                @click="stopCamera()"
+                                                class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-bold transition cursor-pointer">
+                                            Tutup
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Viewfinder Target Box (Barcode Gun / Manual Input) --}}
+                            <div x-show="!cameraActive"
+                                 class="max-w-md w-full mx-auto rounded-3xl border-2 border-dashed border-sky-300 bg-gradient-to-b from-sky-50/70 via-sky-50/30 to-white p-5 relative shadow-inner">
                                 {{-- Target Corner Accents --}}
                                 <div class="absolute top-2.5 left-2.5 w-4 h-4 border-t-2 border-l-2 border-[#063A60] rounded-tl-md"></div>
                                 <div class="absolute top-2.5 right-2.5 w-4 h-4 border-t-2 border-r-2 border-[#063A60] rounded-tr-md"></div>
@@ -203,7 +282,7 @@
                                 </h2>
 
                                 <p class="mx-auto mt-1 text-xs leading-relaxed text-slate-500 max-w-xs">
-                                    Arahkan scanner ke kartu peserta atau ketik kode ID / NBM manual di bawah.
+                                    Arahkan barcode gun ke kartu peserta, ketik kode ID / NBM manual, atau gunakan kamera perangkat.
                                 </p>
 
                                 {{-- High-Visibility Input Box Inside Target Focal Area --}}
@@ -211,8 +290,7 @@
                                     <div class="flex items-center overflow-hidden rounded-2xl border-2 border-[#063A60]/30 bg-white shadow-sm transition-all duration-200 focus-within:border-[#063A60] focus-within:ring-4 focus-within:ring-[#063A60]/10">
                                         <div class="shrink-0 border-r border-slate-200 bg-slate-50 px-3.5 py-2.5 text-[#063A60]">
                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                                             </svg>
                                         </div>
                                         <input type="text"
@@ -234,9 +312,21 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-2 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-800">
-                                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span>Scanner aktif & siap menerima input</span>
+                                    <div class="mt-3 flex flex-wrap items-center justify-center gap-3">
+                                        <div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-800">
+                                            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            <span>Scanner aktif &amp; siap menerima input</span>
+                                        </div>
+                                        <button type="button"
+                                                @click="startCamera()"
+                                                :disabled="isOpeningCamera"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-[#063A60] border border-sky-200 text-xs font-bold transition shadow-2xs cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span>Scan dengan Kamera</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -255,11 +345,11 @@
 
                                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2">
                                     <div class="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="text-[11px] font-bold text-slate-800">Input Manual</div>
-                                        <div class="text-[10px] text-slate-500 leading-tight">NBM/ID lalu Enter</div>
+                                        <div class="text-[11px] font-bold text-slate-800">Kamera Langsung</div>
+                                        <div class="text-[10px] text-slate-500 leading-tight">HP &amp; laptop</div>
                                     </div>
                                 </div>
 
@@ -508,6 +598,17 @@
             clockText: '',
             clockInterval: null,
             storageKey: 'arqam_attendance_queue_{{ $sesi->id }}',
+            cameraActive: false,
+            isOpeningCamera: false,
+            cameraError: '',
+            cameraStatus: '',
+            cameraStream: null,
+            cameraLoopTimer: null,
+            cameraCanvas: null,
+            lastCameraToken: null,
+            lastCameraAt: 0,
+            videoDevices: [],
+            selectedDeviceId: '',
 
             get attendancePercent() {
                 const total = {{ max(1, (int) $totalPeserta) }};
@@ -554,20 +655,20 @@
             },
 
             focusInput() {
-                if (this.$refs.scanInput) {
+                if (!this.cameraActive && this.$refs.scanInput) {
                     this.$refs.scanInput.focus();
                 }
             },
 
             refocusInput(e) {
-                // If user clicks anywhere that is not a button or link, refocus scanner input
-                if (e.target.closest('button, a, input')) return;
+                // If user clicks anywhere that is not a control or camera mode is active, skip refocus
+                if (this.cameraActive || e.target.closest('button, a, input, select, video')) return;
                 this.focusInput();
             },
 
             handleGlobalKey(e) {
                 // If not typing in input, focus input automatically on alphanumeric keypress
-                if (document.activeElement !== this.$refs.scanInput && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                if (!this.cameraActive && document.activeElement !== this.$refs.scanInput && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
                     this.focusInput();
                 }
             },
@@ -580,8 +681,174 @@
                 }
             },
 
+            async startCamera(deviceId = '') {
+                if (this.isOpeningCamera) return;
+                this.cameraError = '';
+
+                if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    this.cameraError = 'Kamera membutuhkan koneksi aman (HTTPS) atau localhost. Silakan gunakan input barcode gun atau akses melalui HTTPS.';
+                    return;
+                }
+
+                this.isOpeningCamera = true;
+                this.stopStreamOnly();
+
+                const videoConstraints = deviceId
+                    ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                    : { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } };
+
+                let stream;
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        audio: false,
+                        video: videoConstraints,
+                    });
+                } catch (err) {
+                    this.isOpeningCamera = false;
+                    const name = err && err.name ? err.name : '';
+                    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+                        this.cameraError = 'Izin kamera ditolak. Izinkan akses kamera di pengaturan browser lalu coba lagi.';
+                    } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+                        this.cameraError = 'Perangkat kamera tidak ditemukan pada perangkat ini.';
+                    } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+                        this.cameraError = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi tersebut lalu coba lagi.';
+                    } else {
+                        this.cameraError = 'Kamera tidak dapat dibuka: ' + (err && err.message ? err.message : 'terjadi kesalahan') + '.';
+                    }
+                    return;
+                }
+
+                this.isOpeningCamera = false;
+                this.cameraStream = stream;
+                this.cameraCanvas = this.cameraCanvas || document.createElement('canvas');
+                this.lastCameraToken = null;
+                this.lastCameraAt = 0;
+                this.feedbackState = 'idle';
+
+                const activeTrack = stream.getVideoTracks()[0];
+                if (activeTrack && activeTrack.getSettings) {
+                    const settings = activeTrack.getSettings();
+                    if (settings.deviceId) {
+                        this.selectedDeviceId = settings.deviceId;
+                    }
+                }
+
+                stream.getVideoTracks().forEach((track) => {
+                    track.addEventListener('ended', () => {
+                        if (this.cameraStream === stream) {
+                            this.stopCamera('Kamera terputus. Tekan "Scan dengan Kamera" untuk mengaktifkan kembali.');
+                        }
+                    });
+                });
+
+                try {
+                    if (navigator.mediaDevices.enumerateDevices) {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        this.videoDevices = devices.filter((d) => d.kind === 'videoinput');
+                    }
+                } catch (e) {}
+
+                this.cameraActive = true;
+                this.cameraStatus = 'Arahkan kamera ke QR ID Card peserta...';
+
+                await this.$nextTick();
+                const video = this.$refs.cameraVideo;
+                if (video) {
+                    video.srcObject = stream;
+                    try {
+                        await video.play();
+                    } catch (e) {}
+                }
+
+                this.scheduleCameraScan(120);
+            },
+
+            async switchCamera() {
+                if (!this.videoDevices || this.videoDevices.length < 2) return;
+                const currentIdx = this.videoDevices.findIndex((d) => d.deviceId === this.selectedDeviceId);
+                const nextDevice = this.videoDevices[(currentIdx + 1) % this.videoDevices.length];
+                if (nextDevice && nextDevice.deviceId) {
+                    await this.startCamera(nextDevice.deviceId);
+                }
+            },
+
+            scheduleCameraScan(delay = 180) {
+                clearTimeout(this.cameraLoopTimer);
+                if (!this.cameraActive) return;
+                this.cameraLoopTimer = setTimeout(() => this.scanCameraFrame(), delay);
+            },
+
+            async scanCameraFrame() {
+                if (!this.cameraActive) return;
+
+                if (this.isProcessing || this.feedbackState !== 'idle') {
+                    this.scheduleCameraScan(220);
+                    return;
+                }
+
+                const video = this.$refs.cameraVideo;
+                if (video && this.cameraCanvas && window.ArqamQrScanner) {
+                    try {
+                        const decoded = await window.ArqamQrScanner.decodeQrFromVideo(video, this.cameraCanvas);
+                        if (decoded) {
+                            const token = String(decoded).trim();
+                            const now = Date.now();
+                            // Avoid spamming identical QR reads while held steadily in front of camera
+                            if (token && !(token === this.lastCameraToken && (now - this.lastCameraAt) < 5000)) {
+                                this.lastCameraToken = token;
+                                this.lastCameraAt = now;
+                                this.cameraStatus = 'QR terdeteksi, memproses presensi...';
+                                await this.submitQrCode(token);
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                if (this.cameraActive) {
+                    if (this.feedbackState === 'idle') {
+                        this.cameraStatus = 'Arahkan kamera ke QR ID Card peserta...';
+                    }
+                    this.scheduleCameraScan(180);
+                }
+            },
+
+            stopStreamOnly() {
+                clearTimeout(this.cameraLoopTimer);
+                this.cameraLoopTimer = null;
+                if (this.cameraStream) {
+                    this.cameraStream.getTracks().forEach((t) => t.stop());
+                    this.cameraStream = null;
+                }
+                if (this.$refs.cameraVideo) {
+                    this.$refs.cameraVideo.srcObject = null;
+                }
+            },
+
+            stopCamera(reason = '') {
+                this.stopStreamOnly();
+                this.cameraActive = false;
+                this.isOpeningCamera = false;
+                this.lastCameraToken = null;
+                this.lastCameraAt = 0;
+                this.cameraStatus = '';
+                if (reason) {
+                    this.cameraError = reason;
+                }
+                this.$nextTick(() => this.focusInput());
+            },
+
+            handleVisibilityChange() {
+                if (document.hidden && this.cameraActive) {
+                    this.stopCamera('Kamera dimatikan otomatis karena halaman disembunyikan. Tekan "Scan dengan Kamera" untuk melanjutkan.');
+                }
+            },
+
             async processScan() {
-                const token = this.qrCode.trim();
+                await this.submitQrCode(this.qrCode);
+            },
+
+            async submitQrCode(rawToken) {
+                const token = String(rawToken || '').trim();
                 if (!token || this.isProcessing) return;
 
                 this.isProcessing = true;

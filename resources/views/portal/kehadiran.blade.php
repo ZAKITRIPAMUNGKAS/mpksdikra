@@ -3,47 +3,62 @@
 @section('title', 'ID Card & Kehadiran — ' . $event->nama_event)
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
-    {{-- Header Banner with Batik Corner --}}
-    <div class="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs relative overflow-hidden">
-        <x-batik-corner position="top-right" class="w-36 h-36 text-[#005c8a] opacity-[0.18]" />
-        
-        <div class="relative z-10">
-            <a href="{{ route('portal.dashboard') }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200/90 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs mb-3">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                <span>Kembali ke Dashboard</span>
-            </a>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $event->nama_event }}</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1 font-normal">Kartu Tanda Peserta &amp; Presensi Sesi Perkaderan Baitul Arqam</p>
-        </div>
+<div class="max-w-4xl mx-auto space-y-4 sm:space-y-6" x-data="{ mobileTab: 'qr' }">
+    {{-- Compact Top Bar --}}
+    <div class="flex items-center justify-between gap-3">
+        <a href="{{ route('portal.dashboard') }}" class="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200/90 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>Kembali</span>
+        </a>
+        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold {{ count($hadir) === $sesi->count() && $sesi->count() > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-300/80' : 'bg-white text-slate-700 border border-slate-200' }}">
+            Hadir: {{ count($hadir) }}/{{ $sesi->count() }} Sesi
+        </span>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-6 items-start">
+    <div>
+        <h1 class="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $event->nama_event }}</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Kartu Tanda Peserta &amp; Presensi Sesi Perkaderan</p>
+    </div>
+
+    {{-- Mobile Tab Switcher (Membuat QR & Jadwal sama-sama 1 tap di HP) --}}
+    <div class="md:hidden grid grid-cols-2 gap-1.5 p-1 bg-slate-200/70 rounded-xl">
+        <button type="button" @click="mobileTab = 'qr'"
+            :class="mobileTab === 'qr' ? 'bg-white text-[#005c8a] shadow-xs font-bold' : 'text-slate-600 font-semibold'"
+            class="min-h-11 rounded-lg text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>Kartu QR</span>
+        </button>
+        <button type="button" @click="mobileTab = 'sesi'"
+            :class="mobileTab === 'sesi' ? 'bg-white text-[#005c8a] shadow-xs font-bold' : 'text-slate-600 font-semibold'"
+            class="min-h-11 rounded-lg text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>Jadwal &amp; Materi ({{ $sesi->count() }})</span>
+        </button>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5 sm:gap-6 items-start">
         {{-- Digital Card Pass --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
-            <div class="bg-gradient-to-b from-slate-950 via-[#003d5c] to-[#005c8a] p-6 text-white text-center relative border-b-2 border-[#005c8a]">
-                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-10 w-auto mx-auto mb-2 drop-shadow-xs">
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/10 text-xs font-semibold tracking-wider text-amber-300 uppercase mb-2 border border-white/15">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#f8bb00] animate-pulse"></span>
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" :class="mobileTab === 'qr' ? 'block' : 'hidden md:block'">
+            <div class="bg-gradient-to-b from-slate-950 via-[#003d5c] to-[#005c8a] p-4 sm:p-6 text-white text-center relative border-b-2 border-[#005c8a]">
+                <img src="{{ asset('aset/logo-mpksdi.webp') }}" alt="Logo MPKSDI" class="h-8 sm:h-10 w-auto mx-auto mb-1.5 drop-shadow-xs">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/10 text-[11px] font-semibold tracking-wider text-amber-300 uppercase mb-1.5 border border-white/15">
                     Kartu Peserta Baitul Arqam
                 </div>
-                <h2 class="text-lg font-bold leading-tight">{{ $ep->anggota->nama_lengkap }}</h2>
-                <p class="text-xs text-slate-300 mt-1">NIK: {{ substr($ep->anggota->nik, 0, 6) }}******</p>
+                <h2 class="text-base sm:text-lg font-bold leading-tight">{{ $ep->anggota->nama_lengkap }}</h2>
+                <p class="text-xs text-slate-300 mt-0.5">NIK: {{ substr($ep->anggota->nik, 0, 6) }}******</p>
             </div>
 
-            <div class="p-6 text-center">
-                <div class="inline-block p-4 bg-white border-2 border-dashed border-sky-300 rounded-xl shadow-2xs">
+            <div class="p-5 sm:p-6 text-center">
+                <div class="inline-block p-3.5 bg-white border-2 border-dashed border-sky-300 rounded-xl shadow-2xs">
                     {!! $qrSvg !!}
                 </div>
-                <p class="text-xs text-slate-500 mt-4 max-w-xs mx-auto font-normal">
+                <p class="text-xs text-slate-500 mt-3 max-w-xs mx-auto font-normal">
                     Tunjukkan QR Code ini ke petugas pemindai presensi di setiap sesi kegiatan.
                 </p>
 
-                <div class="mt-6 pt-5 border-t border-slate-100">
-                    <a href="{{ route('portal.idcard.download', $event) }}" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold shadow-2xs transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                    <a href="{{ route('portal.idcard.download', $event) }}" class="min-h-12 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs sm:text-sm font-bold shadow-2xs transition">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         <span>Unduh ID Card PDF Resmi</span>
@@ -53,7 +68,7 @@
         </div>
 
         {{-- Attendance Timeline --}}
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6">
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-6" :class="mobileTab === 'sesi' ? 'block' : 'hidden md:block'">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
                 <div>
                     <h2 class="font-bold text-slate-900 text-base tracking-tight">Rekap Kehadiran Sesi</h2>

@@ -381,7 +381,6 @@
         <tbody>
             @forelse($ranking as $p)
             @php
-                $ng = $p->nilai_pretest >= 100 ? 0 : round(($p->nilai_posttest - $p->nilai_pretest) / (100 - $p->nilai_pretest), 3);
                 $status = $p->status_kelulusan ?? '-';
                 $kertas = $tesKertas[$p->anggota_id] ?? [];
             @endphp
@@ -392,7 +391,7 @@
                 <td class="text-left" style="color: #334155;">{{ $p->anggota->kecamatan ? 'PCM ' . $p->anggota->kecamatan : ($p->anggota->aum_tempat_tugas ?? 'Karanganyar') }}</td>
                 <td>{{ number_format($p->nilai_pretest, 1) }}@if(in_array('pretest', $kertas, true))<sup style="color:#b45309;font-weight:bold;">K</sup>@endif</td>
                 <td>{{ number_format($p->nilai_posttest, 1) }}@if(in_array('posttest', $kertas, true))<sup style="color:#b45309;font-weight:bold;">K</sup>@endif</td>
-                <td>{{ number_format($ng, 2) }}</td>
+                <td>{{ number_format($p->n_gain, 2) }}</td>
                 <td>{{ number_format($p->nilai_afektif, 1) }}</td>
                 <td>{{ number_format($p->nilai_psikomotor, 1) }}</td>
                 <td>{{ number_format($p->nilai_keaktifan ?? 0, 1) }}</td>

@@ -27,7 +27,7 @@ class PesertaController extends Controller
         $ortom = $request->string('ortom')->toString();
         $sort = $request->string('sort')->toString();
 
-        $enrolled = EventPeserta::where('event_id', $event->id)->pluck('anggota_id')->all();
+        $enrolled = $event->pesertaAktif()->pluck('anggota_id')->all();
 
         $kandidat = Anggota::whereHas('user', fn ($q) => $q->where('status', 'aktif'))
             ->when($query, function ($q) use ($query) {
@@ -113,37 +113,40 @@ class PesertaController extends Controller
             'anggota_ids.*' => ['integer', 'exists:anggota,id'],
         ]);
 
-        if ($event->kuota) {
-            $current = EventPeserta::where('event_id', $event->id)->where('status_aktif', true)->count();
-            if ($current + count($data['anggota_ids']) > $event->kuota) {
+        return DB::transaction(function () use ($event, $data) {
+            $event = Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+            $anggotaIds = Anggota::whereIn('id', $data['anggota_ids'])
+                ->whereHas('user', fn ($q) => $q->where('status', 'aktif'))
+                ->whereNotIn('id', $event->pesertaAktif()->select('anggota_id'))
+                ->orderBy('id')
+                ->pluck('id');
+
+            if ($event->kuota && $event->pesertaAktif()->count() + $anggotaIds->count() > $event->kuota) {
                 return back()->with('error', 'Melebihi kuota event.');
             }
-        }
 
-        DB::transaction(function () use ($event, $data) {
-            foreach ($data['anggota_ids'] as $anggotaId) {
-                $member = Anggota::find($anggotaId);
-
-                if (! $member || $member->user->status !== 'aktif') {
-                    continue;
-                }
-
-                EventPeserta::create([
+            foreach ($anggotaIds as $anggotaId) {
+                $peserta = EventPeserta::firstOrCreate([
                     'event_id' => $event->id,
                     'anggota_id' => $anggotaId,
+                ], [
                     'qr_token' => $this->qr->generateToken(),
+                    'status_aktif' => true,
                 ]);
+                if (! $peserta->status_aktif) {
+                    $peserta->update(['status_aktif' => true]);
+                }
 
                 PenilaianAkhir::firstOrCreate([
                     'event_id' => $event->id,
                     'anggota_id' => $anggotaId,
                 ]);
             }
-        });
 
-        return redirect()
-            ->route('admin.events.show', $event)
-            ->with('success', 'Peserta berhasil di-enroll.');
+            return redirect()
+                ->route('admin.events.show', $event)
+                ->with('success', 'Peserta berhasil di-enroll.');
+        }, 3);
     }
 
     public function remove(Event $event, EventPeserta $peserta): RedirectResponse

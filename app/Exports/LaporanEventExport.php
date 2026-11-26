@@ -3,8 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Event;
-use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
+use App\Services\NilaiService;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -17,12 +17,8 @@ class LaporanEventExport implements FromView
 
     public function view(): View
     {
-        $ranking = PenilaianAkhir::where('event_id', $this->eventId)
-            ->with('anggota')
-            ->orderBy('ranking')
-            ->get();
-
         $event = Event::findOrFail($this->eventId);
+        $ranking = app(NilaiService::class)->rankingAktif($event);
         $totalPeserta = $ranking->count();
         $totalLulus = $ranking->where('status_kelulusan', 'Lulus')->count();
         $totalBersyarat = $ranking->where('status_kelulusan', 'Lulus Bersyarat')->count();

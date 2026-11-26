@@ -42,6 +42,7 @@ Pola berguna dari referensi:
 - `php artisan migrate:fresh --seed --force` — reset skema lokal + seed admin (jangan di produksi).
 
 ## Log keputusan
+- 2026-11-26: Salin instrumen penilaian sikap (afektif) dari kegiatan lain (`admin.events.afektif.clone`, Admin Daerah). Sub-aspek dicocokkan per nama dan butir per teks (case-insensitive) sehingga salin ulang tidak menduplikasi. Ditegaskan: angket kepuasan / tab "Self Assessment" **tidak** masuk perhitungan nilai; afektif (diisi mandiri peserta di portal) **masuk** 25% nilai akhir.
 - 2026-11-20: Input jawaban pretest/posttest dari lembar kertas (arahan PDM untuk peserta yang kesulitan teknologi):
   - Keputusan pemilik: **hanya Admin Daerah (`role:admin`)**, soal kertas = bank soal sistem, input berupa jawaban A/B/C/D per soal (bukan nilai langsung).
   - Halaman `admin.events.tes-manual.index` / `.store` (`/admin/events/{event}/tes-manual/{tipe}`), `Admin\TesManualController`. Admin mengetik satu huruf per soal berurutan (`-` = kosong, spasi diabaikan); pratinjau benar/nilai langsung via Alpine.

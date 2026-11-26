@@ -22,6 +22,23 @@
         <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1">Kuesioner Afektif (Likert 1–4)</h1>
         <p class="text-xs text-slate-500 mb-5 font-normal">Peserta mengisi mandiri; nilai dikonversi ke skala 0–100. Butir negatif dihitung terbalik secara otomatis.</p>
 
+        <form method="POST" action="{{ route('admin.events.afektif.clone', $event) }}" class="flex items-center gap-1.5 flex-wrap mb-3"
+              onsubmit="return confirm('Salin instrumen penilaian sikap dari kegiatan yang dipilih? Butir yang sudah ada tidak akan diduplikasi.')">
+            @csrf
+            <select name="source_event_id" required aria-label="Kegiatan sumber" class="min-w-0 flex-1 sm:flex-none px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
+                <option value="">-- Salin dari Kegiatan Lain --</option>
+                @foreach($sumberLain as $oe)
+                    <option value="{{ $oe->id }}">{{ $oe->nama_event }} ({{ $oe->jumlah_butir }} butir)</option>
+                @endforeach
+            </select>
+            <button type="submit" @disabled($sumberLain->isEmpty()) class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-sky-800 border border-slate-200 hover:border-sky-300 text-xs font-semibold rounded-lg transition shadow-2xs disabled:opacity-50">
+                Salin Penilaian Sikap
+            </button>
+            @if($sumberLain->isEmpty())
+                <span class="text-[11px] text-slate-400">Belum ada kegiatan lain yang punya instrumen sikap.</span>
+            @endif
+        </form>
+
         <form method="POST" action="{{ route('admin.events.afektif.sub.store', $event) }}" class="flex gap-2 mb-6">
             @csrf
             <input name="nama_sub_aspek" required placeholder="Nama sub-aspek (contoh: Kedisiplinan, Integritas)"

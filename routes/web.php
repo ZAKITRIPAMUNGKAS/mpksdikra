@@ -173,6 +173,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
 
         Route::get('/events/{event}/afektif', [AfektifController::class, 'index'])->name('events.afektif');
         Route::post('/events/{event}/afektif/sub-aspek', [AfektifController::class, 'storeSubAspek'])->name('events.afektif.sub.store');
+        Route::post('/events/{event}/afektif/clone', [AfektifController::class, 'cloneFromEvent'])->name('events.afektif.clone');
         Route::post('/events/{event}/afektif/sub-aspek/{subAspek}/butir', [AfektifController::class, 'storeButir'])->name('events.afektif.butir.store');
         Route::delete('/events/{event}/afektif/butir/{butir}', [AfektifController::class, 'destroyButir'])->name('events.afektif.butir.destroy');
 

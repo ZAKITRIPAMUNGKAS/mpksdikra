@@ -66,9 +66,10 @@
             </div>
 
             <ul class="mt-3 space-y-1.5 text-xs text-slate-600 list-disc pl-4 leading-relaxed">
-                <li><strong>Navigasi &amp; Tampilan Mobile:</strong> <em>Bottom navigation bar</em> 3-tab (Beranda, Ujian, Profil), kartu kegiatan ringkas, dan tata letak responsif untuk layar ponsel.</li>
-                <li><strong>Kunci Ujian &amp; Anti-Curang:</strong> Pemblokiran pindah halaman/tab dan <em>copy-paste</em> selama ujian berlangsung, dengan auto-kumpul otomatis saat pelanggaran ke-2.</li>
-                <li><strong>Fokus Pengerjaan Soal:</strong> Bilah aksi bawah ujian menempel rapi tanpa celah serta daftar nomor soal cepat diakses tanpa menutupi soal.</li>
+                <li><strong>Navigasi &amp; UI Mobile-First:</strong> <em>Bottom navigation bar</em> 3-tab (Beranda, Ujian, Profil), desain ulang halaman masuk hingga evaluasi portal agar ringkas dan nyaman di layar ponsel.</li>
+                <li><strong>Kunci Ujian &amp; Simpan Otomatis CBT:</strong> Blokir pindah halaman/tab dan <em>copy-paste</em> (auto-kumpul pada pelanggaran ke-2), <em>autosave</em> draf jawaban langsung ke server, serta finalisasi atomik anti-duplikat.</li>
+                <li><strong>Scan Kamera Langsung &amp; Kelola Sesi:</strong> Pemindaian presensi QR langsung via kamera (<em>jsQR</em>), edit sesi lewat modal, serta <em>enroll</em> ulang peserta nonaktif tanpa mengubah QR lama.</li>
+                <li><strong>Keandalan Penilaian &amp; Ranking:</strong> Perhitungan N-Gain konsisten (0 sebelum posttest selesai), penyaringan peserta aktif pada ranking/PDF/Excel, dan validasi penuh seluruh butir afektif.</li>
             </ul>
         </article>
 

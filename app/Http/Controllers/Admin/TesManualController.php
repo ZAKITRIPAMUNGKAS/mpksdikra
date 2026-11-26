@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\JawabanPeserta;
 use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
+use App\Models\SesiTes;
 use App\Services\NilaiService;
 use App\Services\TesService;
 use App\Support\LembarJawabanGrafik;
@@ -200,7 +201,9 @@ class TesManualController extends Controller
 
         // Lembar soal dicetak lewat browser: DomPDF tidak bisa menyambung huruf Arab / RTL.
         if ($lembar === 'soal') {
-            return response()->view('admin.events.tes-manual-soal', compact('event', 'tipe', 'label', 'soal'));
+            $durasi = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->value('durasi_menit');
+
+            return response()->view('admin.events.tes-manual-soal', compact('event', 'tipe', 'label', 'soal', 'durasi'));
         }
 
         $peserta = $event->pesertaAktif()->whereHas('anggota')->with('anggota')->get()->sortBy('anggota.nama_lengkap')->values();

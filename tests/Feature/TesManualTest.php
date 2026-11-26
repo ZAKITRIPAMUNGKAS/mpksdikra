@@ -262,7 +262,9 @@ class TesManualTest extends TestCase
 
         $jawaban = view('admin.events.tes-manual-cetak', $data + ['peserta' => $this->event->pesertaAktif()->with('anggota')->get()])->render();
         $this->assertStringContainsString(e($anggota->nama_lengkap), $jawaban);
-        $this->assertStringContainsString('No. 1', $jawaban);
+        $this->assertStringContainsString('NO. PESERTA', $jawaban);
+        $this->assertStringContainsString('>01</div>', $jawaban);
+        $this->assertStringContainsString('MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI', $jawaban);
 
         $lembarSoal = view('admin.events.tes-manual-soal', $data)->render();
         $this->assertStringContainsString('Soal 4', $lembarSoal);

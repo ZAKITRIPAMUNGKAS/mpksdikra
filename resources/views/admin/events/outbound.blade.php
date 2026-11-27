@@ -69,9 +69,11 @@
                             Kriteria Penyeimbangan:
                         </label>
                         <select name="kriteria" class="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200/90 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white outline-none cursor-pointer">
-                            <option value="seimbang_gender" selected>Seimbang Gender (Putra & Putri Merata)</option>
-                            <option value="seimbang_cabang">Seimbang Cabang (Asal PCM Tidak Menumpuk)</option>
-                            <option value="acak_murni">Acak Murni (Random Tanpa Filter)</option>
+                            @php $kriteriaDipilih = old('kriteria', $kelompoks->isNotEmpty() ? $kriteriaTerakhir : 'pisah_gender'); @endphp
+                            <option value="pisah_gender" @selected($kriteriaDipilih === 'pisah_gender')>Pisah Putra & Putri (Kelompok Terpisah)</option>
+                            <option value="seimbang_gender" @selected($kriteriaDipilih === 'seimbang_gender')>Seimbang Gender (Putra & Putri Campur Merata)</option>
+                            <option value="seimbang_cabang" @selected($kriteriaDipilih === 'seimbang_cabang')>Seimbang Cabang (Asal PCM Tidak Menumpuk)</option>
+                            <option value="acak_murni" @selected($kriteriaDipilih === 'acak_murni')>Acak Murni (Random Tanpa Filter)</option>
                         </select>
                         <p class="text-xs text-slate-500 mt-1">Algoritma otomatis mendistribusikan peserta.</p>
                     </div>
@@ -98,7 +100,7 @@
         <form method="POST" action="{{ route('admin.events.outbound.generate', $event) }}">
             @csrf
             <input type="hidden" name="jumlah_kelompok" value="{{ $kelompoks->count() }}">
-            <input type="hidden" name="kriteria" value="seimbang_gender">
+            <input type="hidden" name="kriteria" value="{{ $kriteriaTerakhir }}">
             <button type="submit" class="underline font-semibold text-amber-900 hover:text-amber-800">
                 Acak Ulang untuk Memasukkan Semua
             </button>

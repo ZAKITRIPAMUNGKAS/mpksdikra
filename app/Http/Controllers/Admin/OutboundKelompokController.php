@@ -32,14 +32,18 @@ class OutboundKelompokController extends Controller
             ->where('status_aktif', true)
             ->count();
 
-        return view('admin.events.outbound', compact('event', 'kelompoks', 'unassignedPeserta', 'totalAktif'));
+        $kriteriaTerakhir = $kelompoks->contains(fn ($k) => preg_match('/^Kelompok Putr[ai] \d+$/', $k->nama_kelompok))
+            ? 'pisah_gender'
+            : 'seimbang_gender';
+
+        return view('admin.events.outbound', compact('event', 'kelompoks', 'unassignedPeserta', 'totalAktif', 'kriteriaTerakhir'));
     }
 
     public function generate(Request $request, Event $event, OutboundGroupService $service): RedirectResponse
     {
         $data = $request->validate([
             'jumlah_kelompok' => ['required', 'integer', 'min:1', 'max:50'],
-            'kriteria' => ['required', Rule::in(['seimbang_gender', 'seimbang_cabang', 'acak_murni'])],
+            'kriteria' => ['required', Rule::in(['pisah_gender', 'seimbang_gender', 'seimbang_cabang', 'acak_murni'])],
         ]);
 
         try {

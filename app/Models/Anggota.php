@@ -85,6 +85,14 @@ class Anggota extends Model
         'custom_fields' => 'array',
     ];
 
+    /**
+     * URL foto untuk daftar presensi; route foto.anggota memberi foto default bila belum ada.
+     */
+    public function fotoPresensiUrl(): string
+    {
+        return route('foto.anggota', ['anggota' => $this->id, 'v' => $this->updated_at?->timestamp]);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

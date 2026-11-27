@@ -71,6 +71,34 @@ class AbsensiTest extends TestCase
         ]);
     }
 
+    public function test_scan_dan_daftar_hadir_menyertakan_foto_peserta(): void
+    {
+        [$admin, $event, $anggota, $ep] = $this->setupEvent(1);
+        $sesi = $event->sesi()->first();
+        $fotoUrl = route('foto.anggota', $anggota);
+
+        $scan = $this->actingAs($admin)
+            ->postJson(route('admin.events.absensi.process', $event), [
+                'qr_code' => app(QrService::class)->payload($ep),
+                'sesi_id' => $sesi->id,
+            ])
+            ->assertOk()
+            ->json();
+        $this->assertStringStartsWith($fotoUrl, $scan['foto']);
+
+        $recent = $this->actingAs($admin)
+            ->getJson(route('admin.events.absensi.recent', [$event, $sesi]))
+            ->assertOk()
+            ->json('records.0');
+        $this->assertSame($anggota->nama_lengkap, $recent['nama']);
+        $this->assertStringStartsWith($fotoUrl, $recent['foto']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.events.absensi.scan', [$event, $sesi]))
+            ->assertOk()
+            ->assertSee('data-foto-hadir', false);
+    }
+
     public function test_duplicate_scan_rejected(): void
     {
         [$admin, $event, $anggota, $ep] = $this->setupEvent();

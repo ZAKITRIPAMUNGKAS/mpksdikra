@@ -495,9 +495,13 @@
                                 
                                 {{-- Left: Number & Avatar --}}
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200"
-                                         x-text="item.nama ? item.nama.charAt(0).toUpperCase() : '?'">
-                                        A
+                                    <div class="relative w-10 h-10 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden" data-foto-hadir>
+                                        <span x-text="item.nama ? item.nama.charAt(0).toUpperCase() : '?'">A</span>
+                                        <template x-if="item.foto">
+                                            <img :src="item.foto" alt="" loading="lazy" decoding="async"
+                                                 class="absolute inset-0 w-full h-full object-cover object-top"
+                                                 x-on:error="$el.remove()">
+                                        </template>
                                     </div>
                                     <div class="min-w-0">
                                         <div class="text-xs sm:text-sm font-bold text-slate-900 truncate" x-text="item.nama">
@@ -872,6 +876,7 @@
                     this.records.unshift({
                         id: Date.now(),
                         nama: data.nama,
+                        foto: data.foto || '',
                         waktu: waktuFormatted,
                         isNew: true
                     });
@@ -995,6 +1000,7 @@
                         this.records = data.records.map(r => ({
                             id: r.id,
                             nama: r.nama,
+                            foto: r.foto || '',
                             waktu: this.formatTime(r.waktu),
                             isNew: false
                         }));

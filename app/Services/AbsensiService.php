@@ -68,6 +68,7 @@ class AbsensiService
             return [
                 'status' => 'duplicate',
                 'nama' => $nama,
+                'foto' => $ep->anggota->fotoPresensiUrl(),
                 'waktu_scan' => $existing->waktu_scan->format('H:i:s'),
             ];
         }
@@ -88,6 +89,7 @@ class AbsensiService
         return [
             'status' => 'success',
             'nama' => $nama,
+            'foto' => $ep->anggota->fotoPresensiUrl(),
             'waktu_scan' => $now->format('H:i:s'),
         ];
     }

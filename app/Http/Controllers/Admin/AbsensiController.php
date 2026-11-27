@@ -198,13 +198,14 @@ class AbsensiController extends Controller
         }
 
         $records = Absensi::where('sesi_id', $sesi->id)
-            ->with('anggota:id,nama_lengkap')
+            ->with('anggota:id,nama_lengkap,updated_at')
             ->latest('waktu_scan')
             ->limit(50)
             ->get()
             ->map(fn ($a) => [
                 'id' => $a->id,
                 'nama' => $a->anggota->nama_lengkap,
+                'foto' => $a->anggota->fotoPresensiUrl(),
                 'waktu' => $a->waktu_scan->format('H:i'),
                 'metode' => $a->metode,
             ]);

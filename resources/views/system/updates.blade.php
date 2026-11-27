@@ -72,6 +72,7 @@
                     <li><strong>Sertifikat Massal:</strong> pilih peserta Lulus/Lulus Bersyarat yang akan dicetak, lalu pratinjau, unduh 1 PDF, atau unduh ZIP per peserta; tersedia di detail kegiatan dan halaman Ranking.</li>
                     <li><strong>Lembar Jawaban Kertas:</strong> cetak LJK Pretest/Posttest, Afektif, dan Angket hanya untuk peserta tertentu (misalnya yang belum mengisi online); nomor urut tetap sesuai tabel.</li>
                     <li><strong>Tampilan Scan Presensi Lebih Rapi:</strong> satu tombol <em>Scan dengan Kamera</em> yang jelas, kolom scan lebih besar, status tidak dobel, petunjuk ringkas, dan tombol header tidak terpotong di HP.</li>
+                    <li><strong>Foto di Daftar Hadir:</strong> daftar <em>Peserta yang sudah hadir</em> di halaman scan kini menampilkan foto peserta (foto default bila belum unggah).</li>
                 </ul>
             </div>
         </article>

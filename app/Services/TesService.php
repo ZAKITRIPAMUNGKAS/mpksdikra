@@ -260,10 +260,19 @@ class TesService
 
     public function hapusJawabanManual(Event $event, int $anggotaId, string $tipe, int $adminId): bool
     {
+        return $this->ulangTes($event, $anggotaId, $tipe, $adminId, hanyaManual: true);
+    }
+
+    /**
+     * Ulang tes: hapus percobaan (online maupun kertas) beserta jawabannya dan nolkan nilai,
+     * sehingga peserta dapat mengerjakan lagi selama sesi tes dibuka.
+     */
+    public function ulangTes(Event $event, int $anggotaId, string $tipe, int $adminId, bool $hanyaManual = false): bool
+    {
         $mulai = PesertaTesMulai::where('event_id', $event->id)
             ->where('anggota_id', $anggotaId)
             ->where('tipe', $tipe)
-            ->where('sumber', 'manual')
+            ->when($hanyaManual, fn ($q) => $q->where('sumber', 'manual'))
             ->first();
 
         if (! $mulai) {
@@ -281,10 +290,12 @@ class TesService
             PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $anggotaId)->update([$kolom => 0]);
         });
 
-        Log::info('Jawaban tes kertas dihapus', [
+        Log::info('Tes peserta diulang', [
             'event_id' => $event->id,
             'anggota_id' => $anggotaId,
             'tipe' => $tipe,
+            'sumber' => $mulai->sumber,
+            'waktu_selesai' => $mulai->waktu_selesai?->toDateTimeString(),
             'diinput_oleh' => $mulai->diinput_oleh,
             'dihapus_oleh' => $adminId,
         ]);

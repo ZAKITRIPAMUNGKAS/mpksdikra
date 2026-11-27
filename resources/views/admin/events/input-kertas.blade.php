@@ -489,6 +489,13 @@
                                     <div class="mt-1">
                                         @if($online)
                                             <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">Online</span>
+                                            @if(!empty($cfg['ulangUrl']))
+                                                <span class="text-[11px] text-slate-400">{{ $st['waktu']?->translatedFormat('d M H:i') }}</span>
+                                                <button type="submit" form="ulang-{{ $aid }}" data-ulang-tes class="ml-1 inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 hover:text-amber-900 hover:underline cursor-pointer" title="Hapus jawaban &amp; nilai agar peserta bisa mengerjakan ulang">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                    Ulang Tes
+                                                </button>
+                                            @endif
                                         @elseif($manual)
                                             <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">Kertas</span>
                                             <span class="text-[11px] text-slate-400">{{ $st['waktu']?->translatedFormat('d M H:i') }}</span>
@@ -559,6 +566,12 @@
         </form>
 
         @foreach($peserta as $ep)
+            @if(!empty($cfg['ulangUrl']) && ($baris[$ep->anggota_id]['status'] ?? null) === 'online')
+                <form id="ulang-{{ $ep->anggota_id }}" method="POST" action="{{ str_replace('__ID__', $ep->anggota_id, $cfg['ulangUrl']) }}" class="hidden"
+                      onsubmit="return confirm({{ \Illuminate\Support\Js::from(str_replace(':nama', $ep->anggota->nama_lengkap, $cfg['ulangKonfirmasi'])) }})">
+                    @csrf
+                </form>
+            @endif
             @if(($baris[$ep->anggota_id]['status'] ?? null) === 'manual')
                 <form id="hapus-{{ $ep->anggota_id }}" method="POST" action="{{ str_replace('__ID__', $ep->anggota_id, $cfg['destroyUrl']) }}" class="hidden"
                       onsubmit="return confirm({{ \Illuminate\Support\Js::from(str_replace(':nama', $ep->anggota->nama_lengkap, $cfg['hapusKonfirmasi'])) }})">

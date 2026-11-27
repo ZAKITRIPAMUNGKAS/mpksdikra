@@ -219,6 +219,78 @@ class TesManualTest extends TestCase
         $this->assertSame(1, PesertaTesMulai::count());
     }
 
+    public function test_admin_can_reset_finished_online_test_and_participant_can_retake(): void
+    {
+        $anggota = $this->peserta();
+        SesiTes::create(['event_id' => $this->event->id, 'tipe' => 'posttest', 'status' => 'aktif', 'durasi_menit' => 30]);
+        $mulai = PesertaTesMulai::create([
+            'event_id' => $this->event->id,
+            'anggota_id' => $anggota->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => now()->subMinutes(10),
+            'waktu_selesai' => now(),
+        ]);
+        foreach (Soal::where('tipe', 'posttest')->get() as $soal) {
+            JawabanPeserta::create([
+                'event_id' => $this->event->id,
+                'anggota_id' => $anggota->id,
+                'soal_id' => $soal->id,
+                'pilihan_id' => $soal->pilihan()->where('is_benar', true)->value('id'),
+            ]);
+        }
+        app(TesService::class)->grade($this->event, $anggota->id, 'posttest');
+        $this->assertEquals(100.0, (float) PenilaianAkhir::where('anggota_id', $anggota->id)->value('nilai_posttest'));
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.tes-manual.index', [$this->event, 'posttest']))
+            ->assertOk()
+            ->assertSee('form="ulang-'.$anggota->id.'"', false)
+            ->assertSee('Ulang Tes');
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.tes-manual.ulang', [$this->event, 'posttest', $anggota->id]))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($mulai);
+        $this->assertSame(0, JawabanPeserta::count());
+        $this->assertEquals(0.0, (float) PenilaianAkhir::where('anggota_id', $anggota->id)->value('nilai_posttest'));
+        $this->assertFalse(app(TesService::class)->hasSubmitted($this->event, $anggota->id, 'posttest'));
+
+        $this->actingAs($anggota->user)
+            ->get(route('portal.tes.show', [$this->event, 'posttest']))
+            ->assertOk();
+        $baru = PesertaTesMulai::where('anggota_id', $anggota->id)->where('tipe', 'posttest')->first();
+        $this->assertNotNull($baru);
+        $this->assertNull($baru->waktu_selesai);
+    }
+
+    public function test_reset_rejects_unfinished_test_and_participant_outside_event(): void
+    {
+        $anggota = $this->peserta();
+        PesertaTesMulai::create([
+            'event_id' => $this->event->id,
+            'anggota_id' => $anggota->id,
+            'tipe' => 'posttest',
+            'waktu_mulai' => now()->subMinutes(2),
+        ]);
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.tes-manual.ulang', [$this->event, 'posttest', $anggota->id]))
+            ->assertSessionHas('error');
+        $this->assertSame(1, PesertaTesMulai::count());
+
+        $luar = Anggota::factory()->create(['user_id' => User::factory()->create(['role' => 'anggota'])->id]);
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.tes-manual.ulang', [$this->event, 'posttest', $luar->id]))
+            ->assertNotFound();
+
+        $fasilitator = User::factory()->create(['role' => 'fasilitator', 'status' => 'aktif']);
+        $this->actingAs($fasilitator)
+            ->post(route('admin.events.tes-manual.ulang', [$this->event, 'posttest', $anggota->id]))
+            ->assertForbidden();
+    }
+
     public function test_admin_can_print_question_and_answer_sheets(): void
     {
         $this->peserta();

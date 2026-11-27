@@ -197,6 +197,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/tes-manual/{tipe}', [TesManualController::class, 'index'])->name('events.tes-manual.index');
         Route::post('/events/{event}/tes-manual/{tipe}', [TesManualController::class, 'store'])->name('events.tes-manual.store');
         Route::delete('/events/{event}/tes-manual/{tipe}/{anggota}', [TesManualController::class, 'destroy'])->whereNumber('anggota')->name('events.tes-manual.destroy');
+        Route::post('/events/{event}/tes-manual/{tipe}/{anggota}/ulang', [TesManualController::class, 'ulang'])->whereNumber('anggota')->name('events.tes-manual.ulang');
         Route::get('/events/{event}/tes-manual/{tipe}/cetak/{lembar}', [TesManualController::class, 'cetak'])->whereIn('lembar', ['soal', 'jawaban'])->name('events.tes-manual.cetak');
 
         Route::get('/events/{event}/angket-kertas/{jenis}', [AngketKertasController::class, 'index'])->whereIn('jenis', ['afektif', 'angket'])->name('events.angket-kertas.index');

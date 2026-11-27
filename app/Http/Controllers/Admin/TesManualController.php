@@ -99,8 +99,10 @@ class TesManualController extends Controller
             ],
             'storeUrl' => route('admin.events.tes-manual.store', [$event, $tipe]),
             'destroyUrl' => route('admin.events.tes-manual.destroy', [$event, $tipe, '__ID__']),
+            'ulangUrl' => route('admin.events.tes-manual.ulang', [$event, $tipe, '__ID__']),
+            'ulangKonfirmasi' => 'Ulang '.strtolower($label).' untuk :nama? Jawaban dan nilai '.strtolower($label).'-nya dihapus, lalu peserta bisa mengerjakan lagi saat sesi tes dibuka.',
             'hapusKonfirmasi' => 'Hapus input kertas '.strtolower($label).' untuk :nama? Nilainya kembali 0 dan peserta bisa mengerjakan lagi.',
-            'onlinePesan' => 'Sudah mengerjakan online — nilai tidak bisa ditimpa dari sini.',
+            'onlinePesan' => 'Sudah mengerjakan online. Klik Ulang Tes bila peserta perlu mengerjakan ulang.',
             'semuaOnlinePesan' => 'Semua peserta sudah mengerjakan online.',
             'simpanLabel' => 'Simpan & Hitung Nilai',
         ];
@@ -190,6 +192,33 @@ class TesManualController extends Controller
         return $dihapus
             ? back()->with('success', 'Input kertas '.$tipe.' dihapus. Peserta kembali berstatus belum mengerjakan.')
             : back()->with('error', 'Tidak ada input kertas untuk dihapus. Nilai online tidak bisa dihapus dari sini.');
+    }
+
+    /**
+     * Ulang tes peserta yang sudah selesai (online maupun kertas): jawaban & nilai dihapus,
+     * peserta dapat mengerjakan kembali selama sesi tes dibuka.
+     */
+    public function ulang(Event $event, string $tipe, int $anggota): RedirectResponse
+    {
+        abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
+
+        $terdaftar = $event->peserta()->where('anggota_id', $anggota)->exists();
+        abort_unless($terdaftar, 404);
+
+        if (! $this->tes->hasSubmitted($event, $anggota, $tipe)) {
+            return back()->with('error', 'Peserta belum menyelesaikan '.$tipe.', jadi belum ada yang perlu diulang.');
+        }
+
+        DB::transaction(function () use ($event, $tipe, $anggota) {
+            $this->tes->ulangTes($event, $anggota, $tipe, (int) auth()->id());
+            $this->nilai->hitungUlang($event);
+        });
+
+        $label = $tipe === 'pretest' ? 'Pretest' : 'Posttest';
+        $sesiAktif = SesiTes::where('event_id', $event->id)->where('tipe', $tipe)->where('status', 'aktif')->exists();
+
+        return back()->with('success', $label.' peserta direset. Peserta bisa mengerjakan ulang'
+            .($sesiAktif ? ' sekarang.' : ' setelah sesi '.strtolower($label).' dibuka.'));
     }
 
     public function cetak(Request $request, Event $event, string $tipe, string $lembar): Response

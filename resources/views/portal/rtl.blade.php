@@ -34,6 +34,9 @@
                 </span>
                 <h1 class="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight">Rencana Tindak Lanjut (RTL)</h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5 font-normal">{{ $event->nama_event }}</p>
+                @unless($event->rtl_wajib ?? true)
+                    <p class="mt-1.5 text-xs font-semibold text-emerald-700">RTL pada kegiatan ini bersifat opsional dan tidak memengaruhi kelulusan.</p>
+                @endunless
             </div>
         </div>
     </div>

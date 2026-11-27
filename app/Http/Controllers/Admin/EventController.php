@@ -19,6 +19,7 @@ use App\Models\RtlSoal;
 use App\Models\SesiTes;
 use App\Models\Soal;
 use App\Models\User;
+use App\Services\NilaiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -227,6 +228,12 @@ class EventController extends Controller
     {
         $event->update($this->validated($request, $event));
 
+        // Aturan nilai/kelulusan berubah: segarkan nilai tersimpan agar sertifikat & ranking konsisten.
+        $aturanNilai = ['rtl_wajib', 'gunakan_grade', 'bobot_kognitif', 'bobot_psikomotor', 'bobot_afektif', 'bobot_keaktifan'];
+        if ($event->wasChanged($aturanNilai) && PenilaianAkhir::where('event_id', $event->id)->exists()) {
+            app(NilaiService::class)->hitungUlang($event);
+        }
+
         return redirect()
             ->route('admin.events.show', $event)
             ->with('success', 'Event diperbarui.');
@@ -268,6 +275,7 @@ class EventController extends Controller
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             'lokasi' => ['nullable', 'string', 'max:255'],
+            'link_grup_wa' => ['nullable', 'url', 'max:255', 'starts_with:https://chat.whatsapp.com/'],
             'deskripsi' => ['nullable', 'string'],
             'kuota' => ['nullable', 'integer', 'min:1', 'max:65535'],
             'status' => ['required', 'in:persiapan,berlangsung,selesai'],
@@ -288,6 +296,10 @@ class EventController extends Controller
             'bobot_afektif' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'bobot_keaktifan' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'gunakan_grade' => ['boolean'],
+            'rtl_wajib' => ['boolean'],
+        ], [
+            'link_grup_wa.url' => 'Link grup WhatsApp tidak valid.',
+            'link_grup_wa.starts_with' => 'Link grup WhatsApp harus diawali https://chat.whatsapp.com/ (salin dari menu Undang via link di grup).',
         ]);
 
         if ($request->boolean('hapus_ttd_kiri')) {

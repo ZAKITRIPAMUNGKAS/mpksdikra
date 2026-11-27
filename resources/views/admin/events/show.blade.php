@@ -287,7 +287,7 @@
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'peserta'" class="p-3.5 sm:p-5 space-y-3.5 sm:space-y-4">
             {{-- Header Tab Peserta --}}
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+            <div class="flex flex-col justify-between gap-2.5 pb-3 border-b border-slate-100">
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">Kader Peserta</h2>
@@ -301,7 +301,7 @@
                 </div>
                 
                 {{-- Bento Action Cluster --}}
-                <div class="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-2">
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-1.5 sm:gap-2 [&>*]:whitespace-nowrap">
                     @if($canManage)
                     <a href="{{ route('admin.events.enroll', $event) }}" class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold transition shadow-2xs">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
@@ -314,15 +314,82 @@
                         <span class="truncate">ID Card (A4)</span>
                     </a>
                     @if($canManage)
-                    <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" class="inline-block" onsubmit="return confirm('Kirim notifikasi pengingat kegiatan via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
-                        @csrf
-                        <button type="submit" class="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                    <a href="{{ route('admin.events.peserta.excel', $event) }}" title="Unduh biodata lengkap peserta kegiatan ini (Excel)" data-peserta-excel class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span class="truncate">Biodata (Excel)</span>
+                    </a>
+                    @php
+                        $semuaNomorWa = $peserta->pluck('anggota')->filter(fn ($a) => $a && $a->no_wa)->unique('id')
+                            ->map(fn ($a) => '+'.\App\Services\WhatsAppNotificationService::formatNomor($a->no_wa))->unique()->values();
+                    @endphp
+                    @if($semuaNomorWa->isNotEmpty())
+                    <button type="button" data-salin-nomor-wa title="Salin semua nomor WA peserta (satu nomor per baris)"
+                        x-data="{ ok: false, nomor: {{ \Illuminate\Support\Js::from($semuaNomorWa->implode(PHP_EOL)) }},
+                            async salin() { try { await navigator.clipboard.writeText(this.nomor); } catch (e) { const t = document.createElement('textarea'); t.value = this.nomor; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); } this.ok = true; setTimeout(() => this.ok = false, 2000); } }"
+                        @click="salin()"
+                        class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <span class="truncate" x-text="ok ? 'Tersalin ✓' : 'Salin Nomor WA ({{ $semuaNomorWa->count() }})'">Salin Nomor WA ({{ $semuaNomorWa->count() }})</span>
+                    </button>
+                    @endif
+                    @php $pesanJarkoman = \App\Services\WhatsAppNotificationService::pesanJarkomanEvent($event); @endphp
+                    <div x-data="{ open: false, disalin: false, async salin() { try { await navigator.clipboard.writeText(this.$refs.pesan.value); } catch (e) { this.$refs.pesan.select(); document.execCommand('copy'); } this.disalin = true; setTimeout(() => this.disalin = false, 2000); } }" class="inline-block" data-jarkoman-panel>
+                        <button type="button" @click="open = true" class="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition shadow-2xs cursor-pointer">
                             <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                             </svg>
-                            <span class="truncate">Broadcast WA</span>
+                            <span class="truncate">Jarkoman Pengingat</span>
                         </button>
-                    </form>
+                        <template x-teleport="body">
+                            <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="jarkoman-judul">
+                                <div class="absolute inset-0 bg-slate-900/50" @click="open = false"></div>
+                                <div class="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5">
+                                    <div class="flex items-start justify-between gap-3 mb-3">
+                                        <div>
+                                            <h3 id="jarkoman-judul" class="text-base font-bold text-slate-900">Jarkoman Pengingat</h3>
+                                            <p class="text-xs text-slate-500">Kirim pengingat kegiatan ke {{ $totalPeserta }} peserta aktif.</p>
+                                        </div>
+                                        <button type="button" @click="open = false" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+
+                                    @if($event->link_grup_wa)
+                                        <div class="mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+                                            Link grup WA ikut dalam pesan: <span class="font-semibold break-all">{{ $event->link_grup_wa }}</span>
+                                        </div>
+                                    @else
+                                        <div class="mb-3 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                                            Link grup WhatsApp belum diisi. <a href="{{ route('admin.events.edit', $event) }}" class="font-bold underline">Isi di Edit Kegiatan</a> agar ikut di jarkoman.
+                                        </div>
+                                    @endif
+
+                                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Pratinjau pesan</label>
+                                    <textarea x-ref="pesan" readonly rows="11" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 font-mono leading-relaxed resize-none">{{ $pesanJarkoman }}</textarea>
+                                    <p class="mt-1 text-[11px] text-slate-500">Pesan otomatis per peserta memakai nama masing-masing.</p>
+
+                                    <div class="mt-4 grid gap-2">
+                                        <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" onsubmit="return confirm('Kirim pengingat via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
+                                            @csrf
+                                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition cursor-pointer">
+                                                Kirim ke Semua Peserta ({{ $totalPeserta }})
+                                            </button>
+                                        </form>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <a href="https://wa.me/?text={{ rawurlencode($pesanJarkoman) }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition">
+                                                Bagikan via WhatsApp
+                                            </a>
+                                            <button type="button" @click="salin()" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer">
+                                                <span x-text="disalin ? 'Tersalin ✓' : 'Salin Pesan'">Salin Pesan</span>
+                                            </button>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500">"Kirim ke Semua" mengirim langsung lewat WhatsApp Gateway. "Bagikan" membuka WhatsApp untuk diteruskan ke grup/kontak.</p>
+                                        <p class="text-[11px] font-semibold text-amber-700">Perhatian: kirim massal sekaligus berisiko membuat nomor gateway diblokir WhatsApp (batas aman sekitar 10 pesan per jam). Untuk peserta banyak, lebih aman pakai "Bagikan via WhatsApp" ke grup.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                     @endif
                     @endif
                 </div>
@@ -446,14 +513,25 @@
                         @if($canManage)
                         <div class="flex items-center gap-1 shrink-0">
                             @if($p->anggota->no_wa)
-                            <form method="POST" action="{{ route('admin.events.peserta.remind-wa', [$event, $p]) }}">
-                                @csrf
-                                <button type="submit" title="Kirim Pengingat WA ke peserta ini" class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs cursor-pointer">
+                            @php
+                                $pesanWaPeserta = \App\Services\WhatsAppNotificationService::pesanPengingatEvent($p->anggota, $event);
+                                $nomorWaPeserta = \App\Services\WhatsAppNotificationService::formatNomor($p->anggota->no_wa);
+                            @endphp
+                            <div>
+                                <button type="button" title="Pengingat WA ke peserta ini" data-wa-peserta
+                                    @click="$dispatch('wa-peserta', {{ \Illuminate\Support\Js::from([
+                                        'nama' => $p->anggota->nama_lengkap,
+                                        'nomor' => '+'.$nomorWaPeserta,
+                                        'pesan' => $pesanWaPeserta,
+                                        'chatUrl' => \App\Services\WhatsAppNotificationService::makeUrl($p->anggota->no_wa, $pesanWaPeserta),
+                                        'action' => route('admin.events.peserta.remind-wa', [$event, $p]),
+                                    ]) }})"
+                                    class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs cursor-pointer">
                                     <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                                     </svg>
                                 </button>
-                            </form>
+                            </div>
                             @endif
                             <a href="{{ route('admin.events.certificate', [$event, $p]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-200 hover:bg-sky-50 hover:text-sky-900 text-xs font-semibold text-slate-700 transition shadow-2xs">
                                 <svg class="w-3.5 h-3.5 text-sky-600 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -476,6 +554,66 @@
                     @endforelse
                 </div>
             </div>
+
+            {{-- Popup pilihan pengingat WA per peserta (satu modal untuk semua baris) --}}
+            @if($canManage && $totalPeserta > 0)
+            <div x-data="{
+                    open: false, d: {}, tersalin: '',
+                    async salin(teks, label) {
+                        try { await navigator.clipboard.writeText(teks); }
+                        catch (e) { const t = document.createElement('textarea'); t.value = teks; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+                        this.tersalin = label; setTimeout(() => this.tersalin = '', 2000);
+                    }
+                }"
+                @wa-peserta.window="d = $event.detail; tersalin = ''; open = true" data-wa-peserta-modal>
+                <template x-teleport="body">
+                    <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="wa-peserta-judul">
+                        <div class="absolute inset-0 bg-slate-900/50" @click="open = false"></div>
+                        <div class="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="min-w-0">
+                                    <h3 id="wa-peserta-judul" class="text-base font-bold text-slate-900">Pengingat WhatsApp</h3>
+                                    <p class="text-sm font-semibold text-slate-700 truncate" x-text="d.nama"></p>
+                                    <p class="text-xs font-mono text-slate-500" x-text="d.nomor"></p>
+                                </div>
+                                <button type="button" @click="open = false" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+
+                            <div class="grid gap-2">
+                                <a :href="d.chatUrl" target="_blank" rel="noopener" @click="open = false"
+                                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition">
+                                    Buka Chat WhatsApp (pesan sudah terisi)
+                                </a>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" @click="salin(d.nomor, 'nomor')" class="inline-flex items-center justify-center px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer">
+                                        <span x-text="tersalin === 'nomor' ? 'Nomor tersalin ✓' : 'Salin Nomor'">Salin Nomor</span>
+                                    </button>
+                                    <button type="button" @click="salin(d.pesan, 'pesan')" class="inline-flex items-center justify-center px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer">
+                                        <span x-text="tersalin === 'pesan' ? 'Pesan tersalin ✓' : 'Salin Pesan'">Salin Pesan</span>
+                                    </button>
+                                </div>
+
+                                <details class="mt-1 rounded-lg border border-slate-200 bg-slate-50/70">
+                                    <summary class="px-3 py-2 text-xs font-semibold text-slate-600 cursor-pointer">Lihat isi pesan</summary>
+                                    <pre class="px-3 pb-3 text-[11px] text-slate-700 whitespace-pre-wrap font-sans" x-text="d.pesan"></pre>
+                                </details>
+
+                                <form method="POST" :action="d.action" class="mt-2 pt-3 border-t border-slate-100"
+                                      onsubmit="return confirm('Kirim otomatis lewat nomor WA Gateway? Jangan terlalu sering agar nomor gateway tidak diblokir WhatsApp.')">
+                                    @csrf
+                                    <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition cursor-pointer">
+                                        Kirim Otomatis (WA Gateway)
+                                    </button>
+                                    <p class="mt-1.5 text-[11px] text-amber-700">Kirim otomatis memakai nomor gateway. Batasi sekitar 10 pesan per jam agar nomor tidak diblokir. Untuk banyak peserta, lebih aman pakai "Buka Chat".</p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            @endif
 
             {{-- Seksi Penugasan Fasilitator Bento Multi-Kolom --}}
             @if($canManage)
@@ -1746,7 +1884,10 @@
                         <div class="space-y-1.5">
                             @if($event->status === 'selesai')
                             <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block">
-                                Unduh Batch Sertifikat
+                                Unduh Batch Sertifikat (1 PDF)
+                            </a>
+                            <a href="{{ route('admin.events.certificates.zip', $event) }}" class="w-full text-center py-2 px-2 border border-indigo-300 bg-white hover:bg-indigo-50 text-indigo-800 rounded-lg text-xs font-semibold shadow-2xs transition block">
+                                Unduh Per Peserta (ZIP)
                             </a>
                             @else
                             <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">

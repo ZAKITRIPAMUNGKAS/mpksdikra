@@ -1758,3 +1758,19 @@ Pola berguna dari referensi:
     - Vitest: 10 tests lulus 100%.
     - Laravel Pint: Lulus bersih (0 code style issues).
     - Frontend Assets: Vite production build sukses dan terkompilasi optimal.
+### 2026-11-27 — Link grup WA & Jarkoman Pengingat
+- Kolom baru `events.link_grup_wa` (nullable, maks 255, wajib diawali `https://chat.whatsapp.com/`), diisi di form Buat/Edit Kegiatan.
+- `WhatsAppNotificationService::pesanPengingatEvent()` menyertakan link grup bila ada; `pesanJarkomanEvent()` = pesan umum tanpa nama peserta.
+- Tombol "Broadcast WA" di detail kegiatan diganti "Jarkoman Pengingat" (modal): pratinjau, Kirim ke Semua Peserta (gateway, `remind-wa-batch`), Bagikan via `wa.me/?text=`, Salin Pesan.
+- Deploy wajib `php artisan migrate`. Test: `tests/Feature/JarkomanGrupWaTest.php` (gateway di-fake).
+
+### 2026-11-27 — RTL opsional & sertifikat ZIP
+- Kolom `events.rtl_wajib` (boolean, default true = perilaku lama). Bila false, `NilaiService::tentukanStatusKelulusan()` mengabaikan RTL; portal menampilkan RTL "Opsional". Sakelar di form Edit Kegiatan.
+- Route `admin.events.certificates.zip` (`EventOutputController::certificatesZip`): ZIP berisi 1 PDF per peserta Lulus/Lulus Bersyarat (urut nama, `NNN-nama.pdf`). Syarat sama dengan batch PDF (status selesai). Butuh ekstensi PHP zip.
+- Update event yang mengubah `rtl_wajib`, `gunakan_grade`, atau `bobot_*` memanggil `NilaiService::hitungUlang()` (bila sudah ada penilaian) agar status/sertifikat tersimpan tidak basi.
+- 2026-11-27: `composer update` keamanan (Laravel 12.74.0, Symfony 7.4.24, PhpSpreadsheet 5.12.0, CommonMark 2.10.10); `composer audit` 0 advisory. Server produksi perlu `composer install --no-dev` setelah pull.
+
+### 2026-11-27 — Pengingat WA per peserta & export peserta BA
+- Ikon WA per peserta di detail kegiatan membuka popup (satu modal `data-wa-peserta-modal`): Buka Chat WhatsApp (pesan terisi, dari HP admin, pilihan utama), Salin Nomor, Salin Pesan, Kirim Otomatis (gateway, dengan konfirmasi + peringatan batas ±10 pesan/jam). Latar: nomor gateway sempat diblokir WhatsApp setelah jarkoman massal 26 orang.
+- Route `admin.events.peserta.excel`: biodata lengkap peserta aktif (format `AnggotaExport`), urut PCM lalu nama, tanpa duplikat, khusus admin (fasilitator/eksekutif 403 karena berisi NIK).
+- Tombol "Salin Nomor WA (N)" menyalin semua nomor peserta aktif (+62…, satu per baris) untuk membuat grup.

@@ -165,9 +165,42 @@ class WhatsAppNotificationService
             ."📍 Lokasi: *{$lokasi}*\n\n"
             ."Silakan masuk ke Portal Kader untuk mengunduh *ID Card Digital* dan materi kegiatan:\n"
             ."🔗 {$portalUrl}\n\n"
+            .self::barisGrupWa($event)
             ."Pastikan hadir tepat waktu dan membawa perlengkapan ibadah pribadi.\n\n"
             ."Wassalamu'alaikum Wr. Wb.\n\n"
             .'— *Panitia Baitul Arqam MPKSDI PDM Karanganyar*';
+    }
+
+    /**
+     * Jarkoman umum (tanpa nama peserta) untuk dibagikan ke grup/kontak mana pun.
+     */
+    public static function pesanJarkomanEvent(Event $event): string
+    {
+        $namaEvent = $event->nama_event ?: 'Baitul Arqam';
+        $tanggal = $event->tanggal_mulai?->translatedFormat('l, d F Y') ?? '-';
+        if ($event->tanggal_mulai && $event->tanggal_selesai && ! $event->tanggal_selesai->isSameDay($event->tanggal_mulai)) {
+            $tanggal .= ' s.d. '.$event->tanggal_selesai->translatedFormat('l, d F Y');
+        }
+        $lokasi = $event->lokasi ?: 'Gedung Dakwah Muhammadiyah Karanganyar';
+
+        return "Assalamu'alaikum Wr. Wb.\n\n"
+            ."*JARKOMAN PENGINGAT*\n"
+            ."Yth. Bapak/Ibu peserta *{$namaEvent}*,\n\n"
+            ."🗓 Tanggal: *{$tanggal}*\n"
+            ."📍 Lokasi: *{$lokasi}*\n\n"
+            ."Mohon masuk ke Portal Kader untuk mengunduh *ID Card (QR presensi)* dan melihat jadwal:\n"
+            .'🔗 '.route('login')."\n\n"
+            .self::barisGrupWa($event)
+            ."Mohon hadir tepat waktu dan membawa perlengkapan ibadah pribadi.\n\n"
+            ."Wassalamu'alaikum Wr. Wb.\n\n"
+            .'— *Panitia Baitul Arqam MPKSDI PDM Karanganyar*';
+    }
+
+    private static function barisGrupWa(Event $event): string
+    {
+        return $event->link_grup_wa
+            ? "👥 Gabung grup WhatsApp peserta untuk info terbaru:\n{$event->link_grup_wa}\n\n"
+            : '';
     }
 
     /**

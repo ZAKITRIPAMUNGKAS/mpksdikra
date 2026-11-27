@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\AnggotaExport;
 use App\Exports\LaporanEventExport;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
@@ -123,38 +124,7 @@ class EventOutputController extends Controller
         @ini_set('memory_limit', '512M');
         @ini_set('max_execution_time', '300');
 
-        abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
-
-        $this->nilai->hitungUlang($event);
-
-        $lulusAnggotaIds = PenilaianAkhir::where('event_id', $event->id)
-            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
-            ->pluck('anggota_id')
-            ->all();
-
-        abort_if(empty($lulusAnggotaIds), 404, 'Tidak ada peserta yang dinyatakan lulus untuk dicetak sertifikatnya.');
-
-        $pesertas = EventPeserta::where('event_id', $event->id)
-            ->whereIn('anggota_id', $lulusAnggotaIds)
-            ->where('status_aktif', true)
-            ->with(['anggota'])
-            ->get()
-            ->sortBy('anggota.nama_lengkap')
-            ->values();
-
-        $event->load(['sesi', 'fasilitator']);
-
-        $items = $pesertas->map(function ($ep) use ($event) {
-            $nilai = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $ep->anggota_id)->first();
-            $verifyUrl = route('landing').'?verify='.urlencode($nilai?->verification_hash ?? '');
-            $qrPng = $this->qr->qrPngDataUriForText($verifyUrl, 4, 1);
-
-            return [
-                'peserta' => $ep,
-                'nilai' => $nilai,
-                'qrPng' => $qrPng,
-            ];
-        });
+        $items = $this->itemSertifikatLulus($event);
 
         $pdf = Pdf::loadView('admin.events.certificates-batch-pdf', compact('event', 'items'))
             ->setPaper('a4', 'landscape');
@@ -166,6 +136,113 @@ class EventOutputController extends Controller
         }
 
         return $pdf->stream("sertifikat-massal-{$slug}.pdf");
+    }
+
+    /**
+     * Unduh massal: satu file ZIP berisi satu PDF sertifikat per peserta lulus.
+     */
+    public function certificatesZip(Event $event)
+    {
+        @ini_set('memory_limit', '512M');
+        @ini_set('max_execution_time', '600');
+
+        abort_unless(class_exists(\ZipArchive::class), 500, 'Ekstensi PHP zip belum aktif di server.');
+
+        $items = $this->itemSertifikatLulus($event);
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'sertifikat-');
+        $zip = new \ZipArchive;
+        abort_unless($zip->open($zipPath, \ZipArchive::OVERWRITE) === true, 500, 'Gagal membuat file ZIP.');
+
+        try {
+            $this->isiZipSertifikat($zip, $event, $items);
+        } catch (\Throwable $e) {
+            $zip->close();
+            @unlink($zipPath);
+            throw $e;
+        }
+        $zip->close();
+
+        $slug = str($event->nama_event)->slug();
+
+        return response()->download($zipPath, "sertifikat-{$slug}.zip", ['Content-Type' => 'application/zip'])
+            ->deleteFileAfterSend(true);
+    }
+
+    private function isiZipSertifikat(\ZipArchive $zip, Event $event, $items): void
+    {
+        foreach ($items as $i => $item) {
+            $peserta = $item['peserta'];
+            $nilai = $item['nilai'];
+            $qrPng = $item['qrPng'];
+
+            $nama = str($peserta->anggota->nama_lengkap ?? 'peserta')->slug()->value() ?: 'peserta';
+            $file = sprintf('%03d-%s.pdf', $i + 1, $nama);
+
+            $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
+                ->setPaper('a4', 'landscape');
+            $zip->addFromString($file, $pdf->output());
+            unset($pdf);
+        }
+    }
+
+    /**
+     * Peserta aktif berstatus Lulus/Lulus Bersyarat beserta nilai & QR verifikasi, urut nama.
+     */
+    private function itemSertifikatLulus(Event $event)
+    {
+        abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
+
+        $this->nilai->hitungUlang($event);
+
+        $nilaiLulus = PenilaianAkhir::where('event_id', $event->id)
+            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
+            ->get()
+            ->keyBy('anggota_id');
+
+        abort_if($nilaiLulus->isEmpty(), 404, 'Tidak ada peserta yang dinyatakan lulus untuk dicetak sertifikatnya.');
+
+        $pesertas = EventPeserta::where('event_id', $event->id)
+            ->whereIn('anggota_id', $nilaiLulus->keys()->all())
+            ->where('status_aktif', true)
+            ->with(['anggota'])
+            ->get()
+            ->sortBy('anggota.nama_lengkap')
+            ->values();
+
+        $event->load(['sesi', 'fasilitator']);
+
+        return $pesertas->map(function ($ep) use ($nilaiLulus) {
+            $nilai = $nilaiLulus->get($ep->anggota_id);
+            $verifyUrl = route('landing').'?verify='.urlencode($nilai?->verification_hash ?? '');
+
+            return [
+                'peserta' => $ep,
+                'nilai' => $nilai,
+                'qrPng' => $this->qr->qrPngDataUriForText($verifyUrl, 4, 1),
+            ];
+        });
+    }
+
+    /**
+     * Biodata lengkap peserta aktif kegiatan (format sama dengan export Pangkalan Data Anggota).
+     * Urut PCM lalu nama, tanpa duplikat. Berisi NIK/kontak, jadi khusus admin.
+     */
+    public function pesertaExcel(Event $event)
+    {
+        abort_unless(auth()->user()?->isAdmin(), 403);
+
+        $anggotas = $event->pesertaAktif()->with('anggota.user')->get()
+            ->pluck('anggota')->filter()->unique('id')
+            ->sortBy(fn ($a) => mb_strtolower(($a->pcm ?: $a->kecamatan ?: 'zzz').'|'.$a->nama_lengkap))
+            ->values();
+
+        $nama = preg_replace('/[^A-Za-z0-9]+/', '_', $event->nama_event) ?: 'Kegiatan';
+
+        return Excel::download(
+            new AnggotaExport($anggotas, 'PESERTA '.mb_strtoupper($event->nama_event)),
+            'Peserta_'.trim($nama, '_').'_'.date('Ymd_His').'.xlsx'
+        );
     }
 
     public function exportExcel(Event $event)

@@ -179,7 +179,7 @@
                                 <span class="truncate">Rencana Tindak Lanjut</span>
                             </span>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ $ep->progress['rtl'] ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' }}">
-                                {{ $ep->progress['rtl'] ? '✓ Terkirim' : 'Belum' }}
+                                {{ $ep->progress['rtl'] ? '✓ Terkirim' : (($ep->event->rtl_wajib ?? true) ? 'Belum' : 'Opsional') }}
                             </span>
                         </a>
                     </div>

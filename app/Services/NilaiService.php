@@ -300,7 +300,7 @@ class NilaiService
             }
         }
 
-        $hasRtl = RtlSoal::where('event_id', $event->id)->exists();
+        $hasRtl = ($event->rtl_wajib ?? true) && RtlSoal::where('event_id', $event->id)->exists();
         $rtlSelesai = true;
         if ($hasRtl) {
             $rtlSelesai = Rtl::where('event_id', $event->id)

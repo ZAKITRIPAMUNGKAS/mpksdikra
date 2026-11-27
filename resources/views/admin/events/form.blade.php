@@ -66,6 +66,16 @@
                             <input name="lokasi" value="{{ old('lokasi', $event->lokasi ?? '') }}" placeholder="Contoh: Gedung Dakwah Muhammadiyah Karanganyar"
                                 class="w-full px-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition shadow-2xs">
                         </div>
+                        <div class="sm:col-span-2 sm:order-last">
+                            <label for="link_grup_wa" class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Link Grup WhatsApp Peserta</label>
+                            <input id="link_grup_wa" type="url" name="link_grup_wa" value="{{ old('link_grup_wa', $event->link_grup_wa ?? '') }}" placeholder="https://chat.whatsapp.com/xxxxxxxx"
+                                class="w-full px-3.5 py-2.5 bg-slate-50/70 border {{ $errors->has('link_grup_wa') ? 'border-rose-400' : 'border-slate-200' }} rounded-lg text-xs sm:text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition shadow-2xs">
+                            @error('link_grup_wa')
+                                <p class="mt-1 text-xs font-semibold text-rose-700">{{ $message }}</p>
+                            @else
+                                <p class="mt-1 text-[11px] text-slate-500">Opsional. Di grup WhatsApp: Info grup &rarr; Undang via link &rarr; Salin link. Link ini otomatis ikut di jarkoman pengingat.</p>
+                            @enderror
+                        </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Kapasitas Kuota (Orang)</label>
                             <input type="number" name="kuota" min="1" value="{{ old('kuota', $event->kuota ?? '') }}" placeholder="Kosongkan jika tanpa batas"
@@ -252,6 +262,20 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {{-- Toggle RTL wajib --}}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+                        <div>
+                            <span class="text-xs font-bold text-slate-800">📝 RTL Wajib untuk Kelulusan</span>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Aktif: peserta yang belum mengirim RTL berstatus Lulus Bersyarat. Nonaktif: RTL opsional, tidak memengaruhi kelulusan.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="hidden" name="rtl_wajib" value="0">
+                            <input type="checkbox" name="rtl_wajib" value="1" class="sr-only peer"
+                                @checked(old('rtl_wajib', isset($event) ? ($event->rtl_wajib ?? true) : true))>
+                            <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-sky-600 peer-focus:ring-2 peer-focus:ring-sky-300 transition-all after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                        </label>
                     </div>
 
                     {{-- Toggle Grade A/B/C --}}

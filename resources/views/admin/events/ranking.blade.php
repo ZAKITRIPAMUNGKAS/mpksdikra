@@ -35,6 +35,9 @@
                     </svg>
                     <span>Cetak Semua Sertifikat (PDF)</span>
                 </a>
+                <a href="{{ route('admin.events.certificates.zip', $event) }}" class="inline-flex items-center gap-2 px-3.5 py-2 border border-indigo-300 bg-white hover:bg-indigo-50 text-indigo-800 text-xs font-semibold rounded-lg shadow-2xs transition">
+                    <span>Unduh Sertifikat per Peserta (ZIP)</span>
+                </a>
                 @endif
                 <a href="{{ route('admin.events.exportExcel', $event) }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

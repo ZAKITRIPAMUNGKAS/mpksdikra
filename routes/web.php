@@ -88,6 +88,8 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/export-excel', [EventOutputController::class, 'exportExcel'])->middleware('event_access')->name('events.exportExcel');
         Route::get('/events/{event}/id-cards-batch', [EventOutputController::class, 'idCardsBatch'])->middleware('event_access')->name('events.idcards.batch');
         Route::get('/events/{event}/certificates-batch', [EventOutputController::class, 'certificatesBatch'])->middleware('event_access')->name('events.certificates.batch');
+        Route::get('/events/{event}/certificates-zip', [EventOutputController::class, 'certificatesZip'])->middleware('event_access')->name('events.certificates.zip');
+        Route::get('/events/{event}/peserta-excel', [EventOutputController::class, 'pesertaExcel'])->middleware('event_access')->name('events.peserta.excel');
         Route::get('/events/{event}/outbound', [OutboundKelompokController::class, 'index'])->middleware('event_access')->name('events.outbound.index');
         Route::get('/events/{event}/outbound-pdf', [OutboundKelompokController::class, 'exportPdf'])->middleware('event_access')->name('events.outbound.pdf');
         Route::get('/events/{event}/presentasi', [PresentasiController::class, 'show'])->middleware('event_access')->name('events.presentasi');

@@ -16,6 +16,7 @@ class Event extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'lokasi',
+        'link_grup_wa',
         'deskripsi',
         'kuota',
         'status',
@@ -34,6 +35,7 @@ class Event extends Model
         'bobot_afektif',
         'bobot_keaktifan',
         'gunakan_grade',
+        'rtl_wajib',
         'created_by',
     ];
 
@@ -49,6 +51,7 @@ class Event extends Model
             'bobot_afektif' => 'float',
             'bobot_keaktifan' => 'float',
             'gunakan_grade' => 'boolean',
+            'rtl_wajib' => 'boolean',
         ];
     }
 

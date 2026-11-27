@@ -13,13 +13,13 @@
             <div class="flex flex-wrap items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#005c8a] text-white shadow-2xs">
                     <svg class="w-3.5 h-3.5 text-[#f8bb00]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-                    <span>Versi 2.6.0 Stable</span>
+                    <span>Versi 2.7.0 Stable</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Sistem Normal</span>
                 </span>
-                <span class="text-xs text-slate-500">26 November 2026</span>
+                <span class="text-xs text-slate-500">27 November 2026</span>
             </div>
 
             <div>
@@ -54,12 +54,56 @@
             </a>
         </div>
 
-        {{-- Versi 2.6.0 (Terbaru) --}}
-        <article class="bg-white rounded-xl border border-emerald-200/80 p-4 sm:p-5 shadow-2xs">
+        {{-- Versi 2.7.0 (Terbaru) --}}
+        <article class="bg-white rounded-xl border border-emerald-200/80 p-4 sm:p-5 shadow-2xs" data-rilis="2.7.0">
             <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">v2.6.0</span>
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">v2.7.0</span>
                     <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Terbaru</span>
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pengingat WhatsApp, RTL Opsional, Sertifikat Massal &amp; Hasil Audit E2E</h3>
+                </div>
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400 shrink-0">27 Nov 2026</span>
+            </div>
+
+            <div class="mt-3 space-y-3 text-xs text-slate-600 leading-relaxed">
+                <div>
+                    <p class="font-bold text-slate-800 mb-1">WhatsApp &amp; Komunikasi Peserta</p>
+                    <ul class="space-y-1.5 list-disc pl-4">
+                        <li><strong>Link Grup WhatsApp per Kegiatan:</strong> kolom baru di Buat/Edit Kegiatan (hanya menerima link <em>chat.whatsapp.com</em>); otomatis ikut di pesan pengingat dan jarkoman.</li>
+                        <li><strong>Jarkoman Pengingat:</strong> jendela pratinjau pesan dengan pilihan <em>Bagikan via WhatsApp</em> ke grup (utama), <em>Salin Pesan</em>, atau kirim otomatis ke semua peserta lewat gateway.</li>
+                        <li><strong>Popup Pengingat per Peserta:</strong> ikon WA kini menawarkan <em>Buka Chat</em> (pesan sudah terisi), <em>Salin Nomor</em>, <em>Salin Pesan</em>, atau kirim otomatis dengan konfirmasi.</li>
+                        <li><strong>Batas Aman Gateway:</strong> pengingat otomatis dibatasi 10 pesan per jam agar nomor gateway tidak diblokir WhatsApp (dapat diatur lewat <code>WA_PENGINGAT_PER_JAM</code>).</li>
+                        <li><strong>Kontak Admin BA:</strong> tombol Helpdesk di Login, Cek Status, dan Beranda kini ke WhatsApp Admin BA MPKSDI KRA (0856-0171-9683).</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-bold text-slate-800 mb-1">Penilaian, Kelulusan &amp; Sertifikat</p>
+                    <ul class="space-y-1.5 list-disc pl-4">
+                        <li><strong>RTL Opsional per Kegiatan:</strong> sakelar <em>RTL Wajib untuk Kelulusan</em>; bila dimatikan RTL tidak memengaruhi kelulusan, dan teks syarat di Ranking, Laporan, Berita Acara, Presentasi, serta dashboard peserta ikut menyesuaikan.</li>
+                        <li><strong>Hitung Ulang Otomatis:</strong> perubahan RTL wajib, bobot nilai, atau grade langsung memperbarui status kelulusan tersimpan.</li>
+                        <li><strong>Unduh Sertifikat Massal (ZIP):</strong> satu PDF per peserta lulus, urut nama, dari detail kegiatan maupun halaman Ranking.</li>
+                        <li><strong>Verifikasi QR Sertifikat:</strong> memindai QR pada sertifikat kini membuka halaman verifikasi resmi (nama, cabang, kegiatan, tanggal, status).</li>
+                        <li><strong>Afektif &amp; Angket Sekali Kirim:</strong> setelah dikirim, isian terkunci; seluruh butir angket wajib diisi.</li>
+                        <li><strong>Status di Dashboard Peserta:</strong> status kelulusan tampil setelah kegiatan selesai; tombol sertifikat hanya untuk peserta yang lulus.</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-bold text-slate-800 mb-1">Data Peserta &amp; Keamanan</p>
+                    <ul class="space-y-1.5 list-disc pl-4">
+                        <li><strong>Biodata Peserta BA (Excel):</strong> unduh biodata lengkap peserta per kegiatan, urut PCM lalu nama, tanpa duplikat (khusus admin), serta tombol <em>Salin Nomor WA</em> seluruh peserta.</li>
+                        <li><strong>Excel Lebih Rapi &amp; Aman:</strong> NIK, NBM, dan nomor WA tersimpan sebagai teks tanpa tanda petik; isian berawalan <code>=</code> tidak dieksekusi sebagai rumus.</li>
+                        <li><strong>Pembaruan Keamanan Pustaka:</strong> Laravel 12.74, Symfony 7.4.24, PhpSpreadsheet 5.12 &mdash; seluruh peringatan keamanan dependensi tertutup.</li>
+                        <li><strong>Audit End-to-End:</strong> pengujian menyeluruh sisi admin &amp; peserta (laptop dan HP) beserta perbaikan temuannya; ZIP sertifikat lebih hemat memori dan tampilan popup tetap rapi di semua ukuran layar.</li>
+                    </ul>
+                </div>
+            </div>
+        </article>
+
+        {{-- Versi 2.6.0 --}}
+        <article class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs">
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a] text-white">v2.6.0</span>
                     <h3 class="font-bold text-slate-900 text-sm sm:text-base">Overhaul UI Mobile &amp; Keamanan Ujian CBT</h3>
                 </div>
                 <span class="text-[11px] sm:text-xs font-medium text-slate-400 shrink-0">26 Nov 2026</span>

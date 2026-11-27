@@ -342,9 +342,9 @@
                             <span class="truncate">Jarkoman Pengingat</span>
                         </button>
                         <template x-teleport="body">
-                            <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="jarkoman-judul">
-                                <div class="absolute inset-0 bg-slate-900/50" @click="open = false"></div>
-                                <div class="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5">
+                            <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" style="z-index: 90;" role="dialog" aria-modal="true" aria-labelledby="jarkoman-judul">
+                                <div class="absolute inset-0 bg-slate-900/50" style="background-color: rgba(15, 23, 42, 0.5);" @click="open = false"></div>
+                                <div class="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5" style="max-width: 32rem; max-height: 92vh;">
                                     <div class="flex items-start justify-between gap-3 mb-3">
                                         <div>
                                             <h3 id="jarkoman-judul" class="text-base font-bold text-slate-900">Jarkoman Pengingat</h3>
@@ -570,9 +570,9 @@
                 }"
                 @wa-peserta.window="d = $event.detail; tersalin = ''; open = true" data-wa-peserta-modal>
                 <template x-teleport="body">
-                    <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="wa-peserta-judul">
-                        <div class="absolute inset-0 bg-slate-900/50" @click="open = false"></div>
-                        <div class="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5">
+                    <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4" style="z-index: 90;" role="dialog" aria-modal="true" aria-labelledby="wa-peserta-judul">
+                        <div class="absolute inset-0 bg-slate-900/50" style="background-color: rgba(15, 23, 42, 0.5);" @click="open = false"></div>
+                        <div class="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-5" style="max-width: 28rem; max-height: 92vh;">
                             <div class="flex items-start justify-between gap-3 mb-3">
                                 <div class="min-w-0">
                                     <h3 id="wa-peserta-judul" class="text-base font-bold text-slate-900">Pengingat WhatsApp</h3>

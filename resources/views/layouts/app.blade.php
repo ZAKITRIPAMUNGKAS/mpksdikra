@@ -267,7 +267,7 @@
                             </svg>
                             <span class="truncate" :class="{ 'lg:hidden': sidebarCollapsed }">Update Sistem</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20 shrink-0" :class="{ 'lg:hidden': sidebarCollapsed }">v2.6</span>
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a]/10 text-[#005c8a] border border-[#005c8a]/20 shrink-0" :class="{ 'lg:hidden': sidebarCollapsed }">v2.7</span>
                     </a>
                 </div>
 

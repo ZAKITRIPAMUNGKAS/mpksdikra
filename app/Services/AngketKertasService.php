@@ -223,6 +223,29 @@ class AngketKertasService
         return true;
     }
 
+    /**
+     * Reset isian online peserta (semua jawaban kegiatan ini) agar peserta bisa mengisi ulang dari portal.
+     */
+    public function ulangOnline(Event $event, int $anggotaId, string $jenis, int $adminId): bool
+    {
+        if (! $this->sudahOnline($event, $anggotaId, $jenis)) {
+            return false;
+        }
+
+        $model = $jenis === 'afektif' ? AfektifJawaban::class : AngketJawaban::class;
+        $jumlah = $model::where('event_id', $event->id)->where('anggota_id', $anggotaId)->delete();
+
+        Log::info('Isian online diulang', [
+            'event_id' => $event->id,
+            'anggota_id' => $anggotaId,
+            'instrumen' => $jenis,
+            'jawaban_dihapus' => $jumlah,
+            'diulang_oleh' => $adminId,
+        ]);
+
+        return true;
+    }
+
     public function hitungUlangNilai(Event $event, string $jenis): void
     {
         if ($jenis === 'afektif') {

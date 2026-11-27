@@ -205,6 +205,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::get('/events/{event}/angket-kertas/{jenis}', [AngketKertasController::class, 'index'])->whereIn('jenis', ['afektif', 'angket'])->name('events.angket-kertas.index');
         Route::post('/events/{event}/angket-kertas/{jenis}', [AngketKertasController::class, 'store'])->whereIn('jenis', ['afektif', 'angket'])->name('events.angket-kertas.store');
         Route::delete('/events/{event}/angket-kertas/{jenis}/{anggota}', [AngketKertasController::class, 'destroy'])->whereIn('jenis', ['afektif', 'angket'])->whereNumber('anggota')->name('events.angket-kertas.destroy');
+        Route::post('/events/{event}/angket-kertas/{jenis}/{anggota}/ulang', [AngketKertasController::class, 'ulang'])->where('jenis', 'afektif')->whereNumber('anggota')->name('events.angket-kertas.ulang');
         Route::get('/events/{event}/angket-kertas/{jenis}/cetak/{lembar}', [AngketKertasController::class, 'cetak'])->whereIn('jenis', ['afektif', 'angket'])->whereIn('lembar', ['pernyataan', 'jawaban'])->name('events.angket-kertas.cetak');
     });
 

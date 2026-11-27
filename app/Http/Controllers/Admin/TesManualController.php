@@ -100,6 +100,7 @@ class TesManualController extends Controller
             'storeUrl' => route('admin.events.tes-manual.store', [$event, $tipe]),
             'destroyUrl' => route('admin.events.tes-manual.destroy', [$event, $tipe, '__ID__']),
             'ulangUrl' => route('admin.events.tes-manual.ulang', [$event, $tipe, '__ID__']),
+            'ulangLabel' => 'Ulang Tes',
             'ulangKonfirmasi' => 'Ulang '.strtolower($label).' untuk :nama? Jawaban dan nilai '.strtolower($label).'-nya dihapus, lalu peserta bisa mengerjakan lagi saat sesi tes dibuka.',
             'hapusKonfirmasi' => 'Hapus input kertas '.strtolower($label).' untuk :nama? Nilainya kembali 0 dan peserta bisa mengerjakan lagi.',
             'onlinePesan' => 'Sudah mengerjakan online. Klik Ulang Tes bila peserta perlu mengerjakan ulang.',

@@ -490,10 +490,10 @@
                                         @if($online)
                                             <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-200">Online</span>
                                             @if(!empty($cfg['ulangUrl']))
-                                                <span class="text-[11px] text-slate-400">{{ $st['waktu']?->translatedFormat('d M H:i') }}</span>
-                                                <button type="submit" form="ulang-{{ $aid }}" data-ulang-tes class="ml-1 inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 hover:text-amber-900 hover:underline cursor-pointer" title="Hapus jawaban &amp; nilai agar peserta bisa mengerjakan ulang">
+                                                @if($st['waktu'])<span class="text-[11px] text-slate-400">{{ $st['waktu']->translatedFormat('d M H:i') }}</span>@endif
+                                                <button type="submit" form="ulang-{{ $aid }}" data-ulang-tes class="ml-1 inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-semibold text-amber-700 hover:text-amber-900 hover:underline cursor-pointer" title="Hapus jawaban &amp; nilai agar peserta bisa mengerjakan ulang">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                                    Ulang Tes
+                                                    {{ $cfg['ulangLabel'] ?? 'Ulang Tes' }}
                                                 </button>
                                             @endif
                                         @elseif($manual)

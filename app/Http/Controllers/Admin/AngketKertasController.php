@@ -77,7 +77,12 @@ class AngketKertasController extends Controller
             'storeUrl' => route('admin.events.angket-kertas.store', [$event, $jenis]),
             'destroyUrl' => route('admin.events.angket-kertas.destroy', [$event, $jenis, '__ID__']),
             'hapusKonfirmasi' => 'Hapus input kertas '.strtolower($nama).' untuk :nama? Jawabannya dihapus dan peserta bisa mengisi lagi.',
-            'onlinePesan' => 'Sudah mengisi lewat portal — jawaban online tidak ditimpa dari sini.',
+            'onlinePesan' => $jenis === 'afektif'
+                ? 'Sudah mengisi lewat portal. Klik Ulang Pengisian bila peserta perlu mengisi ulang.'
+                : 'Sudah mengisi lewat portal — jawaban online tidak ditimpa dari sini.',
+            'ulangUrl' => $jenis === 'afektif' ? route('admin.events.angket-kertas.ulang', [$event, $jenis, '__ID__']) : null,
+            'ulangKonfirmasi' => 'Ulang kuesioner afektif untuk :nama? Semua jawaban dan nilai afektif-nya dihapus, lalu peserta bisa mengisi lagi dari portal.',
+            'ulangLabel' => 'Ulang Pengisian',
             'semuaOnlinePesan' => 'Semua peserta sudah mengisi online.',
             'simpanLabel' => $jenis === 'afektif' ? 'Simpan & Hitung Nilai' : 'Simpan',
         ];
@@ -163,6 +168,31 @@ class AngketKertasController extends Controller
         return $dihapus
             ? back()->with('success', 'Input kertas dihapus. Peserta bisa mengisi lagi.')
             : back()->with('error', 'Tidak ada input kertas untuk dihapus. Jawaban online tidak bisa dihapus dari sini.');
+    }
+
+    /**
+     * Ulang kuesioner afektif peserta yang sudah mengisi online: jawaban & nilai afektif dihapus.
+     */
+    public function ulang(Event $event, string $jenis, int $anggota): RedirectResponse
+    {
+        abort_unless($jenis === 'afektif', 404);
+        abort_unless($event->peserta()->where('anggota_id', $anggota)->exists(), 404);
+
+        $diulang = DB::transaction(function () use ($event, $jenis, $anggota) {
+            $ok = $this->angket->ulangOnline($event, $anggota, $jenis, (int) auth()->id());
+            if ($ok) {
+                $this->angket->hitungUlangNilai($event, $jenis);
+            }
+
+            return $ok;
+        });
+
+        if (! $diulang) {
+            return back()->with('error', 'Peserta belum mengisi kuesioner afektif online, jadi belum ada yang perlu diulang.');
+        }
+
+        return back()->with('success', 'Kuesioner afektif peserta direset. Peserta bisa mengisi ulang'
+            .($event->isianDibuka('afektif') ? ' sekarang dari portal.' : ' setelah pengisian afektif dibuka.'));
     }
 
     public function cetak(Request $request, Event $event, string $jenis, string $lembar): Response

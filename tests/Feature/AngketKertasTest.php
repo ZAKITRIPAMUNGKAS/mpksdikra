@@ -255,4 +255,62 @@ class AngketKertasTest extends TestCase
         $this->simpan('angket', [$a->id => '5432'])->assertSessionHasNoErrors()->assertSessionHas('success');
         $this->assertSame(4, AngketJawaban::where('anggota_id', $a->id)->count());
     }
+
+    public function test_admin_bisa_ulang_afektif_online_lalu_peserta_isi_lagi(): void
+    {
+        $a = $this->peserta();
+        $butir = AfektifButir::whereHas('subAspek', fn ($q) => $q->where('aktif', true))->orderBy('id')->get();
+        $this->actingAs($a->user)
+            ->post(route('portal.afektif.save', $this->event), ['jawaban' => $butir->mapWithKeys(fn ($b) => [$b->id => 4])->all()])
+            ->assertSessionHas('success');
+        $this->assertSame(3, AfektifJawaban::where('anggota_id', $a->id)->count());
+        $this->assertGreaterThan(0, (float) PenilaianAkhir::where('anggota_id', $a->id)->value('nilai_afektif'));
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.events.angket-kertas.index', [$this->event, 'afektif']))
+            ->assertOk()
+            ->assertSee('data-ulang-tes', false)
+            ->assertSee('Ulang Pengisian')
+            ->assertSee(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $a->id]), false);
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $a->id]))
+            ->assertSessionHas('success');
+        $this->assertSame(0, AfektifJawaban::where('anggota_id', $a->id)->count());
+        $this->assertEqualsWithDelta(0.0, (float) PenilaianAkhir::where('anggota_id', $a->id)->value('nilai_afektif'), 0.001);
+
+        // Belum ada isian -> tidak ada yang diulang.
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $a->id]))
+            ->assertSessionHas('error');
+
+        $this->actingAs($a->user)
+            ->post(route('portal.afektif.save', $this->event), ['jawaban' => $butir->mapWithKeys(fn ($b) => [$b->id => 3])->all()])
+            ->assertSessionHas('success');
+        $this->assertSame(3, AfektifJawaban::where('anggota_id', $a->id)->where('skor', 3)->count());
+    }
+
+    public function test_ulang_afektif_tidak_untuk_kertas_angket_atau_non_admin(): void
+    {
+        $kertas = $this->peserta();
+        $this->simpan('afektif', [$kertas->id => '444'])->assertSessionHasNoErrors();
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $kertas->id]))
+            ->assertSessionHas('error');
+        $this->assertSame(3, AfektifJawaban::where('anggota_id', $kertas->id)->count());
+
+        $this->actingAs($this->admin)
+            ->post('/admin/events/'.$this->event->id.'/angket-kertas/angket/'.$kertas->id.'/ulang')
+            ->assertNotFound();
+
+        $lain = User::factory()->create(['role' => 'anggota', 'status' => 'aktif']);
+        $bukanPeserta = Anggota::factory()->create(['user_id' => $lain->id]);
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $bukanPeserta->id]))
+            ->assertNotFound();
+
+        $this->actingAs($kertas->user)
+            ->post(route('admin.events.angket-kertas.ulang', [$this->event, 'afektif', $kertas->id]))
+            ->assertForbidden();
+    }
 }

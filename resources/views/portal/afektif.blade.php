@@ -72,6 +72,12 @@
                 <p class="mt-1">Jawaban tersimpan dan tidak dapat diubah lagi. Hubungi panitia bila ada kekeliruan.</p>
                 <a href="{{ route('portal.dashboard') }}" class="mt-3 inline-flex items-center min-h-11 px-4 rounded-xl bg-white border border-emerald-300 text-emerald-800 font-bold text-xs">Kembali ke Beranda</a>
             </div>
+        @elseif(! empty($ditutup))
+            <div role="status" data-isian-ditutup class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-sm text-slate-700">
+                <p class="font-bold text-slate-900">&#128274; Kuesioner sikap (afektif) sedang ditutup.</p>
+                <p class="mt-1">Panitia belum membuka atau sudah menutup pengisian. Silakan isi setelah dibuka kembali oleh panitia.</p>
+                <a href="{{ route('portal.dashboard') }}" class="mt-3 inline-flex items-center min-h-11 px-4 rounded-xl bg-white border border-slate-300 text-slate-700 font-bold text-xs">Kembali ke Beranda</a>
+            </div>
         @else
     <form method="POST" action="{{ route('portal.afektif.save', $event) }}" class="space-y-4 sm:space-y-6">
         @csrf

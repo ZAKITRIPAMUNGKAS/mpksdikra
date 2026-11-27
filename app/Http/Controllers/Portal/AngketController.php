@@ -34,14 +34,19 @@ class AngketController extends Controller
 
         $diisiKertas = $anggota && InputKertas::ada($event->id, $anggota->id, 'angket');
         $sudahDikirim = ! empty($jawabanLama);
+        $ditutup = ! $event->isianDibuka('angket');
 
-        return view('portal.angket', compact('event', 'items', 'jawabanLama', 'komentarLama', 'diisiKertas', 'sudahDikirim'));
+        return view('portal.angket', compact('event', 'items', 'jawabanLama', 'komentarLama', 'diisiKertas', 'sudahDikirim', 'ditutup'));
     }
 
     public function save(Request $request, Event $event): RedirectResponse
     {
         $this->authorize('participate', $event);
         $anggota = auth()->user()->anggota;
+
+        if (! $event->isianDibuka('angket')) {
+            return back()->with('warning', 'Angket evaluasi sedang ditutup panitia. Silakan isi setelah dibuka kembali.');
+        }
 
         if (InputKertas::ada($event->id, $anggota->id, 'angket')) {
             return back()->with('warning', 'Angket Anda sudah diisikan panitia dari lembar kertas.');

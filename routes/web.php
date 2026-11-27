@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AbsensiController;
 use App\Http\Controllers\Admin\AfektifController;
+use App\Http\Controllers\Admin\AksesIsianController;
 use App\Http\Controllers\Admin\AnggotaController as AdminAnggotaController;
 use App\Http\Controllers\Admin\AnggotaImportController;
 use App\Http\Controllers\Admin\AngketController;
@@ -170,6 +171,7 @@ Route::middleware(['auth', 'role:admin,admin_cabang,fasilitator,executive'])->pr
         Route::delete('/events/{event}/soal/{soal}', [SoalController::class, 'destroy'])->name('events.soal.destroy');
         Route::post('/events/{event}/soal/{tipe}/open', [SoalController::class, 'openSession'])->name('events.soal.open');
         Route::post('/events/{event}/soal/{tipe}/close', [SoalController::class, 'closeSession'])->name('events.soal.close');
+        Route::post('/events/{event}/akses-isian/{jenis}', [AksesIsianController::class, 'update'])->whereIn('jenis', ['afektif', 'angket'])->name('events.akses-isian');
 
         Route::post('/events/{event}/psikomotor/template', [PsikomotorController::class, 'storeTemplate'])->name('events.psikomotor.template');
         Route::delete('/events/{event}/psikomotor/template/{template}', [PsikomotorController::class, 'destroyTemplate'])->name('events.psikomotor.template.destroy');

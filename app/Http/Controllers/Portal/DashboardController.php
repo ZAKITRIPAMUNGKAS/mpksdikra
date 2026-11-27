@@ -34,6 +34,8 @@ class DashboardController extends Controller
                 'hadir_count' => Absensi::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->count(),
                 'total_sesi' => (int) ($ep->event?->sesi_count ?? 0),
                 'rtl_wajib' => (bool) $ep->event?->rtlSyaratKelulusan(),
+                'afektif_dibuka' => $ep->event?->isianDibuka('afektif') ?? true,
+                'angket_dibuka' => $ep->event?->isianDibuka('angket') ?? true,
                 'status_kelulusan' => $ep->event?->status === 'selesai'
                     ? PenilaianAkhir::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->value('status_kelulusan')
                     : null,

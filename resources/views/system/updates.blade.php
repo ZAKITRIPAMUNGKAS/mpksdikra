@@ -74,6 +74,7 @@
                     <li><strong>Tampilan Scan Presensi Lebih Rapi:</strong> satu tombol <em>Scan dengan Kamera</em> yang jelas, kolom scan lebih besar, status tidak dobel, petunjuk ringkas, dan tombol header tidak terpotong di HP.</li>
                     <li><strong>Foto di Daftar Hadir:</strong> daftar <em>Peserta yang sudah hadir</em> di halaman scan kini menampilkan foto peserta (foto default bila belum unggah).</li>
                     <li><strong>Ulang Pretest/Posttest:</strong> di halaman Kelola Pretest/Posttest, peserta yang sudah selesai mengerjakan online punya tombol <em>Ulang Tes</em>; jawaban dan nilainya dihapus sehingga peserta bisa mengerjakan lagi saat sesi tes dibuka.</li>
+                    <li><strong>Buka/Tutup Afektif &amp; Angket Evaluasi:</strong> seperti Pretest/Posttest, admin dapat menutup dan membuka kembali pengisian online kuesioner afektif dan angket evaluasi dari detail kegiatan; saat ditutup peserta melihat pemberitahuan dan isian ditolak (default: dibuka).</li>
                 </ul>
             </div>
         </article>

@@ -30,14 +30,19 @@ class AfektifController extends Controller
 
         $diisiKertas = InputKertas::ada($event->id, auth()->user()->anggota->id, 'afektif');
         $sudahDikirim = $existing->isNotEmpty();
+        $ditutup = ! $event->isianDibuka('afektif');
 
-        return view('portal.afektif', compact('event', 'subAspek', 'existing', 'diisiKertas', 'sudahDikirim'));
+        return view('portal.afektif', compact('event', 'subAspek', 'existing', 'diisiKertas', 'sudahDikirim', 'ditutup'));
     }
 
     public function save(Request $request, Event $event): RedirectResponse
     {
         $this->authorize('participate', $event);
         $anggota = auth()->user()->anggota;
+
+        if (! $event->isianDibuka('afektif')) {
+            return back()->with('warning', 'Kuesioner sikap sedang ditutup panitia. Silakan isi setelah dibuka kembali.');
+        }
 
         return DB::transaction(function () use ($event, $request, $anggota) {
             abort_unless($event->pesertaAktif()->where('anggota_id', $anggota->id)->lockForUpdate()->first(), 403);

@@ -155,8 +155,9 @@
                                 </svg>
                                 <span class="truncate">Afektif</span>
                             </span>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ ($ep->progress['afektif'] ?? false) ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' }}">
-                                {{ ($ep->progress['afektif'] ?? false) ? '✓ Sudah' : 'Belum' }}
+                            @php $afektifDitutup = ! ($ep->progress['afektif'] ?? false) && ! ($ep->progress['afektif_dibuka'] ?? true); @endphp
+                            <span @if($afektifDitutup) data-isian-ditutup-chip @endif class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ ($ep->progress['afektif'] ?? false) ? 'bg-emerald-50 text-emerald-700' : ($afektifDitutup ? 'bg-slate-100 text-slate-500' : 'bg-amber-50 text-amber-800') }}">
+                                {{ ($ep->progress['afektif'] ?? false) ? '✓ Sudah' : ($afektifDitutup ? 'Ditutup' : 'Belum') }}
                             </span>
                         </a>
 
@@ -167,8 +168,9 @@
                                 </svg>
                                 <span class="truncate">Angket Evaluasi</span>
                             </span>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ ($ep->progress['angket'] ?? false) ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' }}">
-                                {{ ($ep->progress['angket'] ?? false) ? '✓ Sudah' : 'Belum' }}
+                            @php $angketDitutup = ! ($ep->progress['angket'] ?? false) && ! ($ep->progress['angket_dibuka'] ?? true); @endphp
+                            <span @if($angketDitutup) data-isian-ditutup-chip @endif class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ ($ep->progress['angket'] ?? false) ? 'bg-emerald-50 text-emerald-700' : ($angketDitutup ? 'bg-slate-100 text-slate-500' : 'bg-amber-50 text-amber-800') }}">
+                                {{ ($ep->progress['angket'] ?? false) ? '✓ Sudah' : ($angketDitutup ? 'Ditutup' : 'Belum') }}
                             </span>
                         </a>
 

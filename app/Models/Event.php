@@ -36,7 +36,17 @@ class Event extends Model
         'bobot_keaktifan',
         'gunakan_grade',
         'rtl_wajib',
+        'afektif_status',
+        'angket_status',
         'created_by',
+    ];
+
+    /** Isian online yang dapat dibuka/ditutup admin. */
+    public const ISIAN_BUKA_TUTUP = ['afektif', 'angket'];
+
+    protected $attributes = [
+        'afektif_status' => 'aktif',
+        'angket_status' => 'aktif',
     ];
 
     protected function casts(): array
@@ -112,6 +122,16 @@ class Event extends Model
     public function angketItem(): HasMany
     {
         return $this->hasMany(AngketItem::class)->orderBy('urutan');
+    }
+
+    /**
+     * Apakah pengisian online afektif/angket sedang dibuka untuk peserta.
+     */
+    public function isianDibuka(string $jenis): bool
+    {
+        abort_unless(in_array($jenis, self::ISIAN_BUKA_TUTUP, true), 404);
+
+        return ($this->{$jenis.'_status'} ?? 'aktif') !== 'tutup';
     }
 
     /**

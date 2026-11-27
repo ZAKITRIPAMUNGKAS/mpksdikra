@@ -66,6 +66,12 @@
                 Jawaban Anda untuk formulir ini sudah diisikan panitia dari <b>lembar kertas</b>, sehingga tidak perlu diisi lagi di sini.
                 Hubungi panitia bila ada yang perlu diperbaiki.
             </div>
+        @elseif(! empty($sudahDikirim))
+            <div role="status" data-isian-terkunci class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-sm text-emerald-900">
+                <p class="font-bold">&#10003; Kuesioner sikap (afektif) sudah Anda kirim.</p>
+                <p class="mt-1">Jawaban tersimpan dan tidak dapat diubah lagi. Hubungi panitia bila ada kekeliruan.</p>
+                <a href="{{ route('portal.dashboard') }}" class="mt-3 inline-flex items-center min-h-11 px-4 rounded-xl bg-white border border-emerald-300 text-emerald-800 font-bold text-xs">Kembali ke Beranda</a>
+            </div>
         @else
     <form method="POST" action="{{ route('portal.afektif.save', $event) }}" class="space-y-4 sm:space-y-6">
         @csrf

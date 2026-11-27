@@ -118,6 +118,7 @@ class RtlOpsionalDanSertifikatZipTest extends TestCase
             $names[] = $zip->getNameIndex($i);
         }
         $zip->close();
+        @unlink($path);
         sort($names);
         $this->assertSame(['001-peserta-dua.pdf', '002-peserta-satu.pdf'], $names);
     }

@@ -29,8 +29,9 @@ class AfektifController extends Controller
             ->pluck('skor', 'butir_id');
 
         $diisiKertas = InputKertas::ada($event->id, auth()->user()->anggota->id, 'afektif');
+        $sudahDikirim = $existing->isNotEmpty();
 
-        return view('portal.afektif', compact('event', 'subAspek', 'existing', 'diisiKertas'));
+        return view('portal.afektif', compact('event', 'subAspek', 'existing', 'diisiKertas', 'sudahDikirim'));
     }
 
     public function save(Request $request, Event $event): RedirectResponse
@@ -44,6 +45,11 @@ class AfektifController extends Controller
 
             if (InputKertas::ada($event->id, $anggota->id, 'afektif')) {
                 return back()->with('warning', 'Kuesioner sikap Anda sudah diisikan panitia dari lembar kertas.');
+            }
+
+            // Afektif masuk nilai akhir: hanya boleh dikirim sekali.
+            if (AfektifJawaban::where('event_id', $event->id)->where('anggota_id', $anggota->id)->exists()) {
+                return back()->with('warning', 'Kuesioner sikap sudah Anda kirim dan tidak dapat diubah. Hubungi panitia bila ada kekeliruan.');
             }
 
             $butirIds = AfektifButir::whereHas('subAspek', fn ($q) => $q->where('event_id', $event->id)->where('aktif', true))

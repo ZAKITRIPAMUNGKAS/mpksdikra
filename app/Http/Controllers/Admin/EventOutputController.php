@@ -13,6 +13,8 @@ use App\Services\ImageCutoutService;
 use App\Services\NilaiService;
 use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -150,18 +152,26 @@ class EventOutputController extends Controller
 
         $items = $this->itemSertifikatLulus($event);
 
-        $zipPath = tempnam(sys_get_temp_dir(), 'sertifikat-');
+        $base = storage_path('app/tmp');
+        File::ensureDirectoryExists($base);
+        $this->bersihkanSisaZip($base);
+
+        $kerja = $base.'/sertifikat-'.Str::random(16);
+        File::ensureDirectoryExists($kerja);
+        $zipPath = $kerja.'.zip';
         $zip = new \ZipArchive;
-        abort_unless($zip->open($zipPath, \ZipArchive::OVERWRITE) === true, 500, 'Gagal membuat file ZIP.');
+        abort_unless($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true, 500, 'Gagal membuat file ZIP.');
 
         try {
-            $this->isiZipSertifikat($zip, $event, $items);
-        } catch (\Throwable $e) {
+            $this->isiZipSertifikat($zip, $event, $items, $kerja);
             $zip->close();
+        } catch (\Throwable $e) {
+            @$zip->close();
             @unlink($zipPath);
             throw $e;
+        } finally {
+            File::deleteDirectory($kerja);
         }
-        $zip->close();
 
         $slug = str($event->nama_event)->slug();
 
@@ -169,7 +179,11 @@ class EventOutputController extends Controller
             ->deleteFileAfterSend(true);
     }
 
-    private function isiZipSertifikat(\ZipArchive $zip, Event $event, $items): void
+    /**
+     * Tiap PDF ditulis ke file sementara lalu ditambahkan dengan addFile(), agar memori tidak
+     * menumpuk seluruh isi PDF sampai ZIP ditutup.
+     */
+    private function isiZipSertifikat(\ZipArchive $zip, Event $event, $items, string $kerja): void
     {
         foreach ($items as $i => $item) {
             $peserta = $item['peserta'];
@@ -181,8 +195,21 @@ class EventOutputController extends Controller
 
             $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
                 ->setPaper('a4', 'landscape');
-            $zip->addFromString($file, $pdf->output());
+            file_put_contents($kerja.'/'.$file, $pdf->output());
             unset($pdf);
+            $zip->addFile($kerja.'/'.$file, $file);
+        }
+    }
+
+    /**
+     * Hapus ZIP/folder kerja sertifikat yang tertinggal lebih dari 1 jam (unduhan terputus).
+     */
+    private function bersihkanSisaZip(string $base): void
+    {
+        foreach (glob($base.'/sertifikat-*') ?: [] as $path) {
+            if (@filemtime($path) < now()->subHour()->getTimestamp()) {
+                is_dir($path) ? File::deleteDirectory($path) : @unlink($path);
+            }
         }
     }
 
@@ -193,7 +220,9 @@ class EventOutputController extends Controller
     {
         abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
 
-        $this->nilai->hitungUlang($event);
+        if (! auth()->user()?->isExecutive()) {
+            $this->nilai->hitungUlang($event);
+        }
 
         $nilaiLulus = PenilaianAkhir::where('event_id', $event->id)
             ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])

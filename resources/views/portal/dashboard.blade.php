@@ -66,7 +66,8 @@
                     + (int) $ep->progress['posttest']
                     + (int) ($ep->progress['afektif'] ?? false)
                     + (int) ($ep->progress['angket'] ?? false)
-                    + (int) $ep->progress['rtl'];
+                    + (int) (($ep->progress['rtl_wajib'] ?? true) && $ep->progress['rtl']);
+                $totalTasks = 4 + (int) ($ep->progress['rtl_wajib'] ?? true);
                 $totalSesi = (int) ($ep->progress['total_sesi'] ?? 0);
                 $hadirCount = (int) ($ep->progress['hadir_count'] ?? 0);
             @endphp
@@ -100,10 +101,10 @@
                     <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
                         <div class="flex items-center justify-between text-xs mb-1.5">
                             <span class="font-semibold text-slate-700">Progres Tugas &amp; Evaluasi</span>
-                            <span class="font-bold text-[#005c8a]">{{ $doneTasks }}/5 Selesai</span>
+                            <span class="font-bold text-[#005c8a]">{{ $doneTasks }}/{{ $totalTasks }} Selesai</span>
                         </div>
                         <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden mb-2">
-                            <div class="h-full rounded-full bg-sky-600 transition-all" style="width: {{ round(($doneTasks / 5) * 100) }}%"></div>
+                            <div class="h-full rounded-full bg-sky-600 transition-all" style="width: {{ round(($doneTasks / $totalTasks) * 100) }}%"></div>
                         </div>
                         <div class="flex flex-wrap gap-1.5">
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium {{ $ep->progress['pretest'] ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80' : 'bg-white text-slate-500 border border-slate-200' }}">
@@ -113,7 +114,7 @@
                                 {{ $ep->progress['posttest'] ? '✓ Posttest Selesai' : 'Posttest Belum' }}
                             </span>
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium {{ $ep->progress['rtl'] ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80' : 'bg-white text-slate-500 border border-slate-200' }}">
-                                {{ $ep->progress['rtl'] ? '✓ RTL Terkirim' : 'RTL Belum' }}
+                                {{ $ep->progress['rtl'] ? '✓ RTL Terkirim' : (($ep->progress['rtl_wajib'] ?? true) ? 'RTL Belum' : 'RTL Opsional') }}
                             </span>
                         </div>
                     </div>
@@ -179,12 +180,23 @@
                                 <span class="truncate">Rencana Tindak Lanjut</span>
                             </span>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ $ep->progress['rtl'] ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' }}">
-                                {{ $ep->progress['rtl'] ? '✓ Terkirim' : (($ep->event->rtl_wajib ?? true) ? 'Belum' : 'Opsional') }}
+                                {{ $ep->progress['rtl'] ? '✓ Terkirim' : (($ep->progress['rtl_wajib'] ?? true) ? 'Belum' : 'Opsional') }}
                             </span>
                         </a>
                     </div>
 
-                    @if($ep->event->status === 'selesai')
+                    @php $statusLulus = $ep->progress['status_kelulusan'] ?? null; @endphp
+                    @if($ep->event->status === 'selesai' && $statusLulus === 'Tidak Lulus')
+                    <div data-status-kelulusan class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700">
+                        <p class="font-bold text-slate-900">Status: Tidak Lulus</p>
+                        <p class="mt-0.5">Kehadiran belum memenuhi batas minimal, sehingga sertifikat tidak diterbitkan. Hubungi panitia bila ada pertanyaan.</p>
+                    </div>
+                    @elseif($ep->event->status === 'selesai' && ! $statusLulus)
+                    <div data-status-kelulusan class="w-full px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-900">
+                        Hasil kelulusan sedang diproses panitia. Sertifikat dapat diunduh setelah hasil ditetapkan.
+                    </div>
+                    @elseif($ep->event->status === 'selesai')
+                    <p data-status-kelulusan class="text-xs font-semibold text-emerald-800">Status: {{ $statusLulus }}</p>
                     <a href="{{ route('portal.sertifikat.download', $ep->event) }}" class="min-h-12 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>

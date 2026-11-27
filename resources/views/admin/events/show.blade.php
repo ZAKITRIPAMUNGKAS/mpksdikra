@@ -320,7 +320,8 @@
                     </a>
                     @php
                         $semuaNomorWa = $peserta->pluck('anggota')->filter(fn ($a) => $a && $a->no_wa)->unique('id')
-                            ->map(fn ($a) => '+'.\App\Services\WhatsAppNotificationService::formatNomor($a->no_wa))->unique()->values();
+                            ->map(fn ($a) => \App\Services\WhatsAppNotificationService::formatNomor($a->no_wa))
+                            ->filter(fn ($n) => strlen($n) >= 10)->map(fn ($n) => '+'.$n)->unique()->values();
                     @endphp
                     @if($semuaNomorWa->isNotEmpty())
                     <button type="button" data-salin-nomor-wa title="Salin semua nomor WA peserta (satu nomor per baris)"
@@ -369,22 +370,22 @@
                                     <p class="mt-1 text-[11px] text-slate-500">Pesan otomatis per peserta memakai nama masing-masing.</p>
 
                                     <div class="mt-4 grid gap-2">
-                                        <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" onsubmit="return confirm('Kirim pengingat via WhatsApp Gateway ke seluruh peserta aktif ({{ $totalPeserta }} orang)?')">
-                                            @csrf
-                                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition cursor-pointer">
-                                                Kirim ke Semua Peserta ({{ $totalPeserta }})
-                                            </button>
-                                        </form>
                                         <div class="grid grid-cols-2 gap-2">
-                                            <a href="https://wa.me/?text={{ rawurlencode($pesanJarkoman) }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition">
+                                            <a href="https://wa.me/?text={{ rawurlencode($pesanJarkoman) }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition">
                                                 Bagikan via WhatsApp
                                             </a>
-                                            <button type="button" @click="salin()" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer">
+                                            <button type="button" @click="salin()" class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold transition cursor-pointer">
                                                 <span x-text="disalin ? 'Tersalin ✓' : 'Salin Pesan'">Salin Pesan</span>
                                             </button>
                                         </div>
-                                        <p class="text-[11px] text-slate-500">"Kirim ke Semua" mengirim langsung lewat WhatsApp Gateway. "Bagikan" membuka WhatsApp untuk diteruskan ke grup/kontak.</p>
-                                        <p class="text-[11px] font-semibold text-amber-700">Perhatian: kirim massal sekaligus berisiko membuat nomor gateway diblokir WhatsApp (batas aman sekitar 10 pesan per jam). Untuk peserta banyak, lebih aman pakai "Bagikan via WhatsApp" ke grup.</p>
+                                        <p class="text-[11px] text-slate-500">"Bagikan" membuka WhatsApp di HP/laptop Anda untuk diteruskan ke grup peserta (paling aman).</p>
+                                        <form method="POST" action="{{ route('admin.events.peserta.remind-wa-batch', $event) }}" class="mt-2 pt-3 border-t border-slate-100" onsubmit="return confirm('Kirim pengingat via WhatsApp Gateway ke peserta aktif ({{ $totalPeserta }} orang)? Pengiriman dibatasi {{ config('arqam.wa_pengingat_per_jam') ?: 'tanpa' }} pesan per jam.')">
+                                            @csrf
+                                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition cursor-pointer">
+                                                Kirim Otomatis ke Semua Peserta ({{ $totalPeserta }}) via Gateway
+                                            </button>
+                                            <p class="mt-1.5 text-[11px] font-semibold text-amber-700">Kirim massal berisiko membuat nomor gateway diblokir WhatsApp. Sistem membatasi {{ config('arqam.wa_pengingat_per_jam') ?: 'tanpa' }} pengingat per jam; sisanya perlu dikirim lagi nanti.</p>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -425,12 +426,12 @@
                     </div>
                     <div class="my-1 space-y-1 text-[10px] sm:text-xs">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="inline-flex items-center gap-1 text-slate-600"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>Laki-laki</span>
-                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap">{{ $totalLaki }} peserta</span>
+                            <span class="inline-flex items-center gap-1 text-slate-600 min-w-0 truncate"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>Laki-laki</span>
+                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap shrink-0">{{ $totalLaki }}<span class="hidden sm:inline"> peserta</span></span>
                         </div>
                         <div class="flex items-center justify-between gap-1">
-                            <span class="inline-flex items-center gap-1 text-slate-600"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>Perempuan</span>
-                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap">{{ $totalPerempuan }} peserta</span>
+                            <span class="inline-flex items-center gap-1 text-slate-600 min-w-0 truncate"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>Perempuan</span>
+                            <span class="font-bold tabular-nums text-slate-900 whitespace-nowrap shrink-0">{{ $totalPerempuan }}<span class="hidden sm:inline"> peserta</span></span>
                         </div>
                         <div class="flex h-1.5 overflow-hidden rounded-full bg-slate-200" aria-label="Komposisi gender peserta">
                             <span class="bg-sky-500" style="width: {{ $totalPeserta > 0 ? round(($totalLaki / $totalPeserta) * 100) : 0 }}%"></span>
@@ -512,10 +513,12 @@
                         {{-- Right: Actions Bento Cluster --}}
                         @if($canManage)
                         <div class="flex items-center gap-1 shrink-0">
-                            @if($p->anggota->no_wa)
+                            @php
+                                $nomorWaPeserta = $p->anggota->no_wa ? \App\Services\WhatsAppNotificationService::formatNomor($p->anggota->no_wa) : '';
+                            @endphp
+                            @if(strlen($nomorWaPeserta) >= 10)
                             @php
                                 $pesanWaPeserta = \App\Services\WhatsAppNotificationService::pesanPengingatEvent($p->anggota, $event);
-                                $nomorWaPeserta = \App\Services\WhatsAppNotificationService::formatNomor($p->anggota->no_wa);
                             @endphp
                             <div>
                                 <button type="button" title="Pengingat WA ke peserta ini" data-wa-peserta
@@ -606,7 +609,7 @@
                                     <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition cursor-pointer">
                                         Kirim Otomatis (WA Gateway)
                                     </button>
-                                    <p class="mt-1.5 text-[11px] text-amber-700">Kirim otomatis memakai nomor gateway. Batasi sekitar 10 pesan per jam agar nomor tidak diblokir. Untuk banyak peserta, lebih aman pakai "Buka Chat".</p>
+                                    <p class="mt-1.5 text-[11px] text-amber-700">Kirim otomatis memakai nomor gateway dan dibatasi {{ config('arqam.wa_pengingat_per_jam') ?: 'tanpa' }} pengingat per jam agar nomor tidak diblokir. Untuk banyak peserta, lebih aman pakai "Buka Chat".</p>
                                 </form>
                             </div>
                         </div>

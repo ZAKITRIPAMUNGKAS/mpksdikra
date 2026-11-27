@@ -114,6 +114,14 @@ class Event extends Model
         return $this->hasMany(AngketItem::class)->orderBy('urutan');
     }
 
+    /**
+     * RTL menjadi syarat kelulusan bila diwajibkan (default) dan kegiatan memiliki soal RTL.
+     */
+    public function rtlSyaratKelulusan(): bool
+    {
+        return ($this->rtl_wajib ?? true) && $this->rtlSoal()->exists();
+    }
+
     public function rtlSoal(): HasMany
     {
         return $this->hasMany(RtlSoal::class)->orderBy('urutan');

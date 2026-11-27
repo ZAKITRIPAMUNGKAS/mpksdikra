@@ -12,6 +12,7 @@ use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 class PesertaController extends Controller
@@ -172,8 +173,19 @@ class PesertaController extends Controller
         }
 
         $pesan = WhatsAppNotificationService::pesanPengingatEvent($anggota, $event);
-        $result = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
         $waUrl = WhatsAppNotificationService::makeUrl($anggota->no_wa, $pesan);
+
+        if ($this->sisaKuotaPengingat() === 0) {
+            return back()
+                ->with('warning', $this->pesanKuotaHabis().' Kirim manual lewat tombol berikut.')
+                ->with('wa_url', $waUrl)
+                ->with('wa_nama', $anggota->nama_lengkap);
+        }
+
+        $result = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
+        if ($result['success']) {
+            $this->catatPengingatTerkirim();
+        }
 
         if ($result['success']) {
             return back()->with('success', "Pesan pengingat WhatsApp berhasil dikirim ke {$anggota->nama_lengkap}.");
@@ -195,6 +207,11 @@ class PesertaController extends Controller
 
         $sukses = 0;
         $gagal = 0;
+        $tertunda = 0;
+
+        if ($this->sisaKuotaPengingat() === 0) {
+            return back()->with('warning', $this->pesanKuotaHabis().' Gunakan "Bagikan via WhatsApp" ke grup peserta.');
+        }
 
         foreach ($pesertaAktif as $p) {
             $anggota = $p->anggota;
@@ -204,14 +221,27 @@ class PesertaController extends Controller
                 continue;
             }
 
+            if ($this->sisaKuotaPengingat() === 0) {
+                $tertunda++;
+
+                continue;
+            }
+
             $pesan = WhatsAppNotificationService::pesanPengingatEvent($anggota, $event);
             $res = WhatsAppNotificationService::kirimOtomatis($anggota->no_wa, $pesan);
 
             if ($res['success']) {
                 $sukses++;
+                $this->catatPengingatTerkirim();
             } else {
                 $gagal++;
             }
+        }
+
+        if ($tertunda > 0) {
+            return back()->with('warning', "Pengingat WA terkirim ke {$sukses} peserta. {$tertunda} peserta belum dikirim karena batas aman "
+                .config('arqam.wa_pengingat_per_jam').' pesan per jam tercapai'.($gagal > 0 ? ", {$gagal} gagal" : '')
+                .'. Lanjutkan satu jam lagi atau bagikan via grup WhatsApp.');
         }
 
         if ($sukses > 0 && $gagal === 0) {
@@ -223,5 +253,30 @@ class PesertaController extends Controller
         }
 
         return back()->with('error', 'Gagal mengirim pengingat WA ke seluruh peserta. Pastikan token WhatsApp Gateway sudah aktif di konfigurasi.');
+    }
+
+    /** Sisa kuota pengingat jam ini; null = tanpa batas. */
+    private function sisaKuotaPengingat(): ?int
+    {
+        $batas = (int) config('arqam.wa_pengingat_per_jam', 10);
+        if ($batas <= 0) {
+            return null;
+        }
+
+        return max(0, $batas - RateLimiter::attempts('wa-pengingat-event'));
+    }
+
+    private function catatPengingatTerkirim(): void
+    {
+        if ((int) config('arqam.wa_pengingat_per_jam', 10) > 0) {
+            RateLimiter::hit('wa-pengingat-event', 3600);
+        }
+    }
+
+    private function pesanKuotaHabis(): string
+    {
+        $menit = max(1, (int) ceil(RateLimiter::availableIn('wa-pengingat-event') / 60));
+
+        return 'Batas aman '.config('arqam.wa_pengingat_per_jam').' pengingat WA per jam sudah tercapai (agar nomor gateway tidak diblokir). Coba lagi sekitar '.$menit.' menit lagi.';
     }
 }

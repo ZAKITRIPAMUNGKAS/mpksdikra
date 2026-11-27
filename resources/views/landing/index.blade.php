@@ -1405,7 +1405,7 @@
                             <p class="text-xs text-slate-600 leading-relaxed">
                                 Belum menemukan solusi yang Anda cari? Tim admin dan instruktur kami siap membantu verifikasi atau pertanyaan seputar perkaderan.
                             </p>
-                            <a href="https://wa.me/6281226309576" target="_blank"
+                            <a href="{{ \App\Services\WhatsAppNotificationService::urlHelpdesk() }}" target="_blank"
                                class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#005c8a] to-[#01b0f5] hover:from-[#004b73] hover:to-[#0284c7] text-white font-bold text-xs shadow-xs hover:shadow-md transition duration-200 hover:scale-[1.02] active:scale-[0.98]">
                                 <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.966.526 1.761.807 2.796.807 3.18 0 5.767-2.586 5.768-5.766 0-3.18-2.587-5.767-5.768-5.767zm0 10.373c-.933 0-1.636-.263-2.428-.733l-.174-.103-1.782.467.476-1.737-.113-.181c-.53-.847-.809-1.579-.808-2.502.001-2.535 2.064-4.597 4.599-4.597 2.534 0 4.596 2.062 4.597 4.597 0 2.536-2.062 4.598-4.597 4.598zm5.736-12.355c-2.433-2.435-5.67-3.778-9.117-3.78-7.098 0-12.875 5.776-12.878 12.877-.001 2.27.6 4.484 1.739 6.459l-1.849 6.757 6.91-1.813c1.905 1.039 4.053 1.587 6.24 1.588h.005c7.097 0 12.875-5.776 12.878-12.878.001-3.441-1.34-6.678-3.774-9.11z"/></svg>
                                 <span>Hubungi WhatsApp Helpdesk</span>
@@ -1620,7 +1620,7 @@
 
                     {{-- Contact Cards with Clean SVG Badges --}}
                     <div class="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 max-w-lg">
-                        <a href="https://wa.me/6281226309576" target="_blank" rel="noopener noreferrer"
+                        <a href="{{ \App\Services\WhatsAppNotificationService::urlHelpdesk() }}" target="_blank" rel="noopener noreferrer"
                            class="group inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 text-xs text-slate-700 hover:text-emerald-700 transition-all duration-300 shadow-2xs card-lift-sm">
                             <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1629,7 +1629,7 @@
                             </div>
                             <div class="text-left">
                                 <span class="text-xs text-slate-400 uppercase font-bold block leading-none">WhatsApp</span>
-                                <span class="font-bold text-slate-800 group-hover:text-emerald-700 text-xs">0812-2630-9576</span>
+                                <span class="font-bold text-slate-800 group-hover:text-emerald-700 text-xs">{{ trim(chunk_split((string) config('arqam.wa_admin.nomor'), 4, '-'), '-') }}</span>
                             </div>
                         </a>
 

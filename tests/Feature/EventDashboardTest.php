@@ -84,7 +84,7 @@ class EventDashboardTest extends TestCase
         $response->assertSee('Laki-laki');
         $response->assertSee('Perempuan');
         $response->assertSee('1 peserta');
-        $response->assertSee('0 peserta');
+        $response->assertSee('0<span class="hidden sm:inline"> peserta</span>', false);
     }
 
     public function test_event_dashboard_works_with_active_sesi_tes_and_soal(): void

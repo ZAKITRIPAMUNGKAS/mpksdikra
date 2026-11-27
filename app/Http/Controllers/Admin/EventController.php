@@ -231,7 +231,15 @@ class EventController extends Controller
         // Aturan nilai/kelulusan berubah: segarkan nilai tersimpan agar sertifikat & ranking konsisten.
         $aturanNilai = ['rtl_wajib', 'gunakan_grade', 'bobot_kognitif', 'bobot_psikomotor', 'bobot_afektif', 'bobot_keaktifan'];
         if ($event->wasChanged($aturanNilai) && PenilaianAkhir::where('event_id', $event->id)->exists()) {
-            app(NilaiService::class)->hitungUlang($event);
+            try {
+                app(NilaiService::class)->hitungUlang($event);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return redirect()
+                    ->route('admin.events.show', $event)
+                    ->with('warning', 'Event diperbarui, tetapi hitung ulang nilai gagal. Buka halaman Ranking untuk menyegarkan nilai peserta.');
+            }
         }
 
         return redirect()

@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\AfektifJawaban;
 use App\Models\AngketJawaban;
 use App\Models\EventPeserta;
+use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
 use App\Models\Rtl;
 use Illuminate\View\View;
@@ -32,6 +33,10 @@ class DashboardController extends Controller
                 'rtl' => Rtl::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->whereIn('status', ['terkirim', 'disetujui'])->exists(),
                 'hadir_count' => Absensi::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->count(),
                 'total_sesi' => (int) ($ep->event?->sesi_count ?? 0),
+                'rtl_wajib' => (bool) $ep->event?->rtlSyaratKelulusan(),
+                'status_kelulusan' => $ep->event?->status === 'selesai'
+                    ? PenilaianAkhir::where('event_id', $ep->event_id)->where('anggota_id', $anggota->id)->value('status_kelulusan')
+                    : null,
             ];
         }
 

@@ -240,8 +240,12 @@
         (1) Presensi kehadiran kegiatan 100% atau bersyarat &ge; 75%, 
         (2) Evaluasi kognitif pretest, posttest, dan N-Gain, 
         (3) Uji praktik psikomotorik ibadah dan keaktifan forum, 
-        (4) Angket afektif komitmen ideologi, serta 
-        (5) Pengumpulan tugas Rencana Tindak Lanjut (RTL), Dewan Instruktur bersama Pimpinan MPKSDI Karanganyar menetapkan hasil sebagai berikut:
+        @if($event->rtlSyaratKelulusan())
+        (4) Angket afektif komitmen ideologi, serta
+        (5) Pengumpulan tugas Rencana Tindak Lanjut (RTL), Dewan Instruktur bersama
+        @else
+        serta (4) Angket afektif komitmen ideologi, Dewan Instruktur bersama
+        @endif Pimpinan MPKSDI Karanganyar menetapkan hasil sebagai berikut:
     </div>
 
     {{-- 4. Rekapitulasi Statistik Kelulusan --}}

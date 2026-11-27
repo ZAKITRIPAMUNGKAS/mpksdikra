@@ -424,7 +424,11 @@
         <b>Pedoman Standar Nilai &amp; Kelulusan Baitul Arqam MPKSDI:</b><br>
         1. <b>Nilai Akhir (NA)</b> = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Praktik Lapangan + 10% Poin Keaktifan) + 25% Afektif (Angket Sikap &amp; Kedisiplinan).<br>
         @if($tesKertas->isNotEmpty())<sup style="color:#b45309;font-weight:bold;">K</sup> = nilai pretest/posttest diinput admin dari lembar jawaban kertas, dinilai dengan kunci jawaban yang sama.<br>@endif
+        @if($event->rtlSyaratKelulusan())
         2. <b>Syarat Kelulusan Terpadu</b>: Presensi kehadiran &ge; 100%, menyelesaikan Posttest, dan menyerahkan RTL dinyatakan <i>Lulus</i>; presensi 75% s.d. 99% atau tugas RTL/Posttest dalam proses dinyatakan <i>Lulus Bersyarat</i>; kehadiran &lt; 75% dinyatakan <i>Tidak Lulus</i>.
+        @else
+        2. <b>Syarat Kelulusan Terpadu</b>: Presensi kehadiran &ge; 100% dan menyelesaikan Posttest dinyatakan <i>Lulus</i>; presensi 75% s.d. 99% atau Posttest dalam proses dinyatakan <i>Lulus Bersyarat</i>; kehadiran &lt; 75% dinyatakan <i>Tidak Lulus</i>. RTL bersifat opsional pada kegiatan ini.
+        @endif
     </div>
 
     {{-- 6. Lembar Pengesahan Tanda Tangan --}}

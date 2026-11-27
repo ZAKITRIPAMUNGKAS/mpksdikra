@@ -18,6 +18,16 @@ return [
         'jenis' => ['tanya', 'jawab', 'kultum', 'imam', 'adzan', 'juara_outbound'],
     ],
 
+    // Kontak WhatsApp Admin BA (tombol Helpdesk/bantuan lupa sandi di login, cek status, beranda).
+    'wa_admin' => [
+        'nomor' => env('WA_ADMIN_NOMOR', '085601719683'),
+        'nama' => env('WA_ADMIN_NAMA', 'Admin BA MPKSDI KRA'),
+    ],
+
+    // Batas pengingat kegiatan via WA Gateway per jam (seluruh admin). 0 = tanpa batas.
+    // Melindungi nomor gateway dari pemblokiran WhatsApp karena pesan massal berulang.
+    'wa_pengingat_per_jam' => (int) env('WA_PENGINGAT_PER_JAM', 10),
+
     'kehadiran' => [
         'lulus' => 100.0,
         'lulus_bersyarat' => 75.0,

@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Anggota;
 use App\Models\Event;
 use App\Models\PenilaianAkhir;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class LandingController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        // QR sertifikat mengarah ke /?verify=<hash> (sertifikat yang sudah tercetak tetap memakai format ini).
+        if ($request->filled('verify')) {
+            return $this->verifikasiSertifikat((string) $request->query('verify'));
+        }
+
         $totalKader = Anggota::count();
         $totalAktif = Anggota::whereHas('user', fn ($q) => $q->where('status', 'aktif'))->count();
         $totalEvent = Event::count();
@@ -71,5 +77,32 @@ class LandingController extends Controller
             'maxKader',
             'totalRanting'
         ));
+    }
+
+    /**
+     * Verifikasi publik keaslian sertifikat. Hanya menampilkan data minimum (tanpa NIK/kontak).
+     */
+    private function verifikasiSertifikat(string $hash): View
+    {
+        $hash = strtolower(trim($hash));
+        $nilai = null;
+
+        if (preg_match('/^[a-f0-9]{64}$/', $hash)) {
+            $nilai = PenilaianAkhir::with(['event', 'anggota'])
+                ->where('verification_hash', $hash)
+                ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
+                ->whereHas('event', fn ($q) => $q->where('status', 'selesai'))
+                ->first();
+
+            $aktif = $nilai && $nilai->event->pesertaAktif()->where('anggota_id', $nilai->anggota_id)->exists();
+            if (! $aktif) {
+                $nilai = null;
+            }
+        }
+
+        return view('landing.verifikasi', [
+            'nilai' => $nilai,
+            'kode' => substr($hash, 0, 16),
+        ]);
     }
 }

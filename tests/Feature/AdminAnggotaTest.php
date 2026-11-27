@@ -248,9 +248,10 @@ class AdminAnggotaTest extends TestCase
 
         // Verifikasi Kolom dan Nilai Lengkap Formulir
         $this->assertStringContainsString('Ahmad Dahlan Putra', $html);
-        $this->assertStringContainsString("'3313020101900001", $html);
-        $this->assertStringContainsString("'1234567", $html);
-        $this->assertStringContainsString("'081234567890", $html);
+        $this->assertStringContainsString('>3313020101900001<', $html);
+        $this->assertStringNotContainsString("'3313020101900001", $html);
+        $this->assertStringContainsString('>1234567<', $html);
+        $this->assertStringContainsString('>081234567890<', $html);
         $this->assertStringContainsString('kader@test.com', $html);
         $this->assertStringContainsString('S1 / D4 (Sarjana)', $html);
         $this->assertStringContainsString('SD Muhammadiyah 1', $html);

@@ -107,7 +107,7 @@ class JarkomanGrupWaTest extends TestCase
             ->assertOk()
             ->assertSee('data-jarkoman-panel', false)
             ->assertSee('Jarkoman Pengingat')
-            ->assertSee('Kirim ke Semua Peserta (1)')
+            ->assertSee('Kirim Otomatis ke Semua Peserta (1) via Gateway')
             ->assertSee('https://wa.me/?text=', false)
             ->assertSee(rawurlencode(self::LINK), false);
     }

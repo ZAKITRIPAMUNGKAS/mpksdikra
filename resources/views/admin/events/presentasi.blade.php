@@ -496,7 +496,7 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         </div>
                         <h3 class="text-lg font-black text-emerald-950 uppercase tracking-tight">LULUS MURNI</h3>
-                        <p class="text-xs text-emerald-800 mt-1">Kehadiran 100%, nilai akademik kompeten, dan berkas tugas RTL tuntas.</p>
+                        <p class="text-xs text-emerald-800 mt-1">Kehadiran 100%, nilai akademik kompeten{{ $event->rtlSyaratKelulusan() ? ', dan berkas tugas RTL tuntas' : '' }}.</p>
                         <div class="my-4">
                             <span class="text-6xl font-black text-emerald-900">{{ $lulusCount }}</span>
                             <span class="text-sm font-bold text-emerald-700 block mt-1">{{ $lulusPersen }}% dari Total Peserta</span>
@@ -512,7 +512,7 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         </div>
                         <h3 class="text-lg font-black text-amber-950 uppercase tracking-tight">LULUS BERSYARAT</h3>
-                        <p class="text-xs text-amber-800 mt-1">Kehadiran 75-99% atau masih menyelesaikan tugas perbaikan RTL.</p>
+                        <p class="text-xs text-amber-800 mt-1">Kehadiran 75-99%{{ $event->rtlSyaratKelulusan() ? ' atau masih menyelesaikan tugas perbaikan RTL' : ' atau Posttest belum dikerjakan' }}.</p>
                         <div class="my-4">
                             <span class="text-6xl font-black text-amber-900">{{ $bersyaratCount }}</span>
                             <span class="text-sm font-bold text-amber-700 block mt-1">{{ $bersyaratPersen }}% dari Total Peserta</span>

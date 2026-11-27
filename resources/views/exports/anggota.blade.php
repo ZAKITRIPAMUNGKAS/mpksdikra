@@ -158,8 +158,8 @@
             <td style="text-align: center; border: 1px solid #cbd5e1;">
                 {{ $a->created_at ? $a->created_at->format('d/m/Y H:i') : '-' }}
             </td>
-            <td style="text-align: center; border: 1px solid #cbd5e1;">'{{ $a->nik }}</td>
-            <td style="text-align: center; border: 1px solid #cbd5e1;">@if($a->nbm)'{{ $a->nbm }}@else-@endif</td>
+            <td style="text-align: center; border: 1px solid #cbd5e1;">{{ $a->nik }}</td>
+            <td style="text-align: center; border: 1px solid #cbd5e1;">@if($a->nbm){{ $a->nbm }}@else-@endif</td>
             <td style="font-weight: bold; border: 1px solid #cbd5e1;">{{ $a->nama_lengkap }}</td>
             <td style="text-align: center; border: 1px solid #cbd5e1;">
                 {{ $a->jenis_kelamin === 'L' ? 'Laki-laki' : ($a->jenis_kelamin === 'P' ? 'Perempuan' : ($a->jenis_kelamin ?? '-')) }}
@@ -174,7 +174,7 @@
             <td style="text-align: center; border: 1px solid #cbd5e1;">{{ $a->status_pernikahan ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->nama_ayah ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->nama_ibu ?? '-' }}</td>
-            <td style="text-align: left; border: 1px solid #cbd5e1;">@if($a->no_wa)'{{ $a->no_wa }}@else-@endif</td>
+            <td style="text-align: left; border: 1px solid #cbd5e1;">@if($a->no_wa){{ $a->no_wa }}@else-@endif</td>
             <td style="text-align: left; border: 1px solid #cbd5e1;">{{ $email }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->alamat_rumah ?? '-' }}</td>
             <td style="border: 1px solid #cbd5e1;">{{ $a->desa_kelurahan ?? '-' }}</td>

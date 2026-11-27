@@ -68,7 +68,7 @@
                         </div>
                         <div class="sm:col-span-2 sm:order-last">
                             <label for="link_grup_wa" class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Link Grup WhatsApp Peserta</label>
-                            <input id="link_grup_wa" type="url" name="link_grup_wa" value="{{ old('link_grup_wa', $event->link_grup_wa ?? '') }}" placeholder="https://chat.whatsapp.com/xxxxxxxx"
+                            <input id="link_grup_wa" type="url" name="link_grup_wa" oninvalid="this.setCustomValidity('Masukkan link grup lengkap, diawali https://chat.whatsapp.com/')" oninput="this.setCustomValidity('')" value="{{ old('link_grup_wa', $event->link_grup_wa ?? '') }}" placeholder="https://chat.whatsapp.com/xxxxxxxx"
                                 class="w-full px-3.5 py-2.5 bg-slate-50/70 border {{ $errors->has('link_grup_wa') ? 'border-rose-400' : 'border-slate-200' }} rounded-lg text-xs sm:text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition shadow-2xs">
                             @error('link_grup_wa')
                                 <p class="mt-1 text-xs font-semibold text-rose-700">{{ $message }}</p>
@@ -272,7 +272,7 @@
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
                             <input type="hidden" name="rtl_wajib" value="0">
-                            <input type="checkbox" name="rtl_wajib" value="1" class="sr-only peer"
+                            <input type="checkbox" name="rtl_wajib" value="1" role="switch" aria-label="RTL wajib untuk kelulusan" class="sr-only peer"
                                 @checked(old('rtl_wajib', isset($event) ? ($event->rtl_wajib ?? true) : true))>
                             <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-sky-600 peer-focus:ring-2 peer-focus:ring-sky-300 transition-all after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
                         </label>
@@ -286,7 +286,7 @@
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
                             <input type="hidden" name="gunakan_grade" value="0">
-                            <input type="checkbox" name="gunakan_grade" value="1" class="sr-only peer"
+                            <input type="checkbox" name="gunakan_grade" value="1" role="switch" aria-label="Gunakan grade A/B/C" class="sr-only peer"
                                 @checked(old('gunakan_grade', isset($event) ? $event->gunakan_grade : false))>
                             <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-sky-600 peer-focus:ring-2 peer-focus:ring-sky-300 transition-all after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
                         </label>

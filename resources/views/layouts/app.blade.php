@@ -73,7 +73,7 @@
             </a>
 
             {{-- Close button for mobile drawer --}}
-            <button type="button" @click="sidebarOpen = false" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" aria-label="Tutup Menu">
+            <button type="button" @click="sidebarOpen = false" class="lg:hidden min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" aria-label="Tutup Menu">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -328,7 +328,7 @@
                 {{-- Logout Button --}}
                 <form method="POST" action="{{ route('logout') }}" class="inline shrink-0" :class="{ 'lg:w-full lg:flex lg:justify-center': sidebarCollapsed }">
                     @csrf
-                    <button type="submit" title="Keluar dari sistem" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition flex items-center justify-center">
+                    <button type="submit" title="Keluar dari sistem" aria-label="Keluar" class="min-w-11 min-h-11 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>

@@ -29,5 +29,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="WA_GATEWAY_TOKEN" value="token-dummy-test" force="true"/>
+        <env name="WA_PENGINGAT_PER_JAM" value="0" force="true"/>
     </php>
 </phpunit>

@@ -24,7 +24,7 @@
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Ranking Nilai Akhir Peserta</h1>
                 <p class="text-xs text-slate-600 mt-1 max-w-3xl font-normal leading-relaxed">
                     NA = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Rubrik + 10% Keaktifan) + 25% Afektif.
-                    <span class="block mt-0.5 text-slate-500">Syarat Kelulusan Terpadu: Presensi 100% + Posttest Selesai + RTL Terkirim (Lulus). Presensi 75%–99% atau tugas RTL/Posttest pending dinyatakan Lulus Bersyarat. Presensi &lt;75% dinyatakan Tidak Lulus.</span>
+                    <span class="block mt-0.5 text-slate-500">@if($event->rtlSyaratKelulusan())Syarat Kelulusan Terpadu: Presensi 100% + Posttest Selesai + RTL Terkirim (Lulus). Presensi 75%–99% atau tugas RTL/Posttest pending dinyatakan Lulus Bersyarat. Presensi &lt;75% dinyatakan Tidak Lulus.@else Syarat Kelulusan Terpadu: Presensi 100% + Posttest Selesai (Lulus). Presensi 75%–99% atau Posttest pending dinyatakan Lulus Bersyarat. Presensi &lt;75% dinyatakan Tidak Lulus. RTL tidak menjadi syarat kelulusan pada kegiatan ini.@endif</span>
                 </p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">

@@ -271,8 +271,10 @@ class WhatsAppNotificationService
     /**
      * Pesan bantuan lupa sandi untuk kader ke Helpdesk MPKSDI
      */
-    public static function urlBantuanLupaSandi(string $helpdeskNoWa = '6281226000000'): string
+    public static function urlBantuanLupaSandi(?string $helpdeskNoWa = null): string
     {
+        $helpdeskNoWa ??= (string) config('arqam.wa_admin.nomor');
+
         $pesan = "Assalamu'alaikum Admin MPKSDI PDM Karanganyar. Mohon bantuan, saya lupa kata sandi akun Portal Kader saya.\n\n"
             ."Nama Lengkap: \n"
             ."NIK: \n"
@@ -280,5 +282,13 @@ class WhatsAppNotificationService
             .'Mohon dapat dibantu reset sandi akun saya. Terima kasih.';
 
         return self::makeUrl($helpdeskNoWa, $pesan);
+    }
+
+    /**
+     * Link chat ke WhatsApp Admin BA (tanpa pesan bawaan khusus).
+     */
+    public static function urlHelpdesk(): string
+    {
+        return 'https://wa.me/'.self::formatNomor((string) config('arqam.wa_admin.nomor'));
     }
 }

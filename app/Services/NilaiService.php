@@ -13,7 +13,6 @@ use App\Models\PesertaTesMulai;
 use App\Models\PsikomotorNilai;
 use App\Models\PsikomotorTemplate;
 use App\Models\Rtl;
-use App\Models\RtlSoal;
 use App\Models\SesiTes;
 use Illuminate\Contracts\Database\ConcurrencyErrorDetector;
 use Illuminate\Support\Collection;
@@ -300,7 +299,7 @@ class NilaiService
             }
         }
 
-        $hasRtl = ($event->rtl_wajib ?? true) && RtlSoal::where('event_id', $event->id)->exists();
+        $hasRtl = $event->rtlSyaratKelulusan();
         $rtlSelesai = true;
         if ($hasRtl) {
             $rtlSelesai = Rtl::where('event_id', $event->id)

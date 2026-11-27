@@ -1774,3 +1774,16 @@ Pola berguna dari referensi:
 - Ikon WA per peserta di detail kegiatan membuka popup (satu modal `data-wa-peserta-modal`): Buka Chat WhatsApp (pesan terisi, dari HP admin, pilihan utama), Salin Nomor, Salin Pesan, Kirim Otomatis (gateway, dengan konfirmasi + peringatan batas ±10 pesan/jam). Latar: nomor gateway sempat diblokir WhatsApp setelah jarkoman massal 26 orang.
 - Route `admin.events.peserta.excel`: biodata lengkap peserta aktif (format `AnggotaExport`), urut PCM lalu nama, tanpa duplikat, khusus admin (fasilitator/eksekutif 403 karena berisi NIK).
 - Tombol "Salin Nomor WA (N)" menyalin semua nomor peserta aktif (+62…, satu per baris) untuk membuat grup.
+
+### 2026-11-27 — Perbaikan hasil audit E2E Orca (run_343585edb3fa: Codex admin, Codex peserta, Claude review)
+- QR sertifikat `/?verify=<hash>` kini menampilkan halaman verifikasi (`landing.verifikasi`): nama, PCM, kegiatan, tanggal, status; hanya untuk kegiatan selesai, status Lulus/Lulus Bersyarat, peserta aktif; tanpa NIK/kontak.
+- Keputusan pengguna: Afektif & Angket portal **hanya bisa dikirim sekali** lalu terkunci (server menolak kiriman ulang, UI menampilkan "sudah dikirim"). Angket wajib semua butir divalidasi di server.
+- `Event::rtlSyaratKelulusan()` = satu sumber aturan RTL (wajib && ada soal); dipakai NilaiService, teks syarat di Ranking, Laporan PDF, Berita Acara, Presentasi, dan progres dashboard peserta (RTL opsional tidak dihitung, chip "RTL Opsional").
+- Dashboard peserta menampilkan status kelulusan saat kegiatan selesai; Tidak Lulus tidak melihat tombol sertifikat.
+- Batas pengingat WA gateway `config('arqam.wa_pengingat_per_jam')` (env `WA_PENGINGAT_PER_JAM`, default 10, 0 = tanpa batas) untuk remind & remind-batch (RateLimiter `wa-pengingat-event`); notifikasi aktivasi akun tidak dibatasi. Di modal Jarkoman, "Bagikan via WhatsApp" jadi aksi utama.
+- ZIP sertifikat: PDF ditulis ke `storage/app/tmp/sertifikat-*` lalu `addFile` (hemat memori), folder kerja dihapus, sisa >1 jam dibersihkan. GET oleh executive tidak memicu hitung ulang.
+- `update()` event: kegagalan hitung ulang → flash warning, bukan 500.
+- `AnggotaExport` memakai value binder: nomor ≥6 digit/berawalan 0 disimpan sebagai teks (tanpa apostrof), teks berawalan = + - @ disimpan sebagai teks (anti formula injection).
+- Test hermetik: `phpunit.xml` memaksa `WA_GATEWAY_TOKEN` dummy & `WA_PENGINGAT_PER_JAM=0`; `Tests\TestCase` memanggil `Http::preventStrayRequests()` (test tidak bisa mengirim WA sungguhan).
+- Catatan lingkungan: di PowerShell, `WA_GATEWAY_TOKEN=` kosong menghapus variabel sehingga token asli dari .env terbaca; untuk server uji pakai nilai palsu (mis. `disabled-audit`).
+- 2026-11-27: Kontak WA Admin BA = `config('arqam.wa_admin.nomor')` (env `WA_ADMIN_NOMOR`, default 085601719683 "Admin BA MPKSDI KRA") untuk tombol helpdesk/lupa sandi di login, cek status, beranda. Nomor pengirim Fonnte TIDAK diatur di kode: ditentukan device yang terhubung ke `WA_GATEWAY_TOKEN` di dashboard Fonnte.

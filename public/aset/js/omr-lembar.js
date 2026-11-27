@@ -8,6 +8,7 @@
     const MAX_DIM = 1600;
     const BATAS_ISI = 0.4;
     const BATAS_RAGU = 0.55;
+    const NAMA_TIPE = { pretest: 'Pretest', posttest: 'Posttest', afektif: 'Kuesioner Afektif', angket: 'Angket Evaluasi' };
 
     function checksum(eventId, tipe, anggotaId) {
         const s = eventId + '|' + tipe + '|' + anggotaId;
@@ -219,13 +220,22 @@
             nilai = nilai * 2 + (f > 0.5 ? 1 : 0);
         }
         const anggotaId = Math.floor(nilai / 4096);
-        if (nilai % 4096 !== checksum(ctx.eventId, ctx.tipe, anggotaId)) return null;
-        return { map, anggotaId };
+        if (nilai % 4096 !== checksum(ctx.eventId, ctx.tipe, anggotaId)) return { cocok: false, nilai };
+        return { cocok: true, map, anggotaId };
+    }
+
+    /** Lembar kegiatan ini tetapi untuk instrumen lain (mis. lembar Posttest dipindai di halaman Pretest). */
+    function tipeLain(nilai, ctx) {
+        const anggotaId = Math.floor(nilai / 4096);
+        for (const t of Object.keys(NAMA_TIPE)) {
+            if (t !== ctx.tipe && nilai % 4096 === checksum(ctx.eventId, t, anggotaId)) return t;
+        }
+        return null;
     }
 
     function temukanLembar(img, L, ctx) {
         const blobs = cariBlob(img);
-        if (blobs.length < 4) return null;
+        if (blobs.length < 4) return { gagal: 'pojok' };
         const K = 6;
         const urut = (f) => blobs.slice().sort((a, b) => f(a) - f(b)).slice(0, K);
         const pojok = [
@@ -243,16 +253,26 @@
                         kombinasi.push([a + b + c + d, [pojok[0][a], pojok[1][b], pojok[2][c], pojok[3][d]]]);
         kombinasi.sort((p, q) => p[0] - q[0]);
 
+        let kodeSalah = null;
         for (const [, q] of kombinasi) {
             if (new Set(q).size < 4) continue;
             if (Math.abs(luasQuad(q.map(b => [b.x, b.y]))) < minLuas) continue;
+            const salah = [];
             for (let rot = 0; rot < 4; rot++) {
                 const quad = [0, 1, 2, 3].map(i => q[(i + rot) % 4]);
                 const hasil = cobaPeta(img, L, quad, quad, ctx);
-                if (hasil) return Object.assign(hasil, { sudut: quad.map(b => [b.x, b.y]) });
+                if (hasil && hasil.cocok) return Object.assign(hasil, { sudut: quad.map(b => [b.x, b.y]) });
+                if (hasil) salah.push(hasil.nilai);
             }
+            // Hanya kombinasi pojok pertama yang lolos uji bentuk dipakai untuk diagnosis, agar tidak ada tebakan kebetulan.
+            if (kodeSalah === null && salah.length) kodeSalah = salah;
         }
-        return null;
+        if (kodeSalah === null) return { gagal: 'pojok' };
+        for (const nilai of kodeSalah) {
+            const t = tipeLain(nilai, ctx);
+            if (t) return { gagal: 'tipe', tipe: t };
+        }
+        return { gagal: 'kode' };
     }
 
     function bacaJawaban(img, L, map) {
@@ -314,8 +334,13 @@
         const g = canvas.getContext('2d', { willReadFrequently: true });
         const img = siapkan(g.getImageData(0, 0, canvas.width, canvas.height));
         const lembar = temukanLembar(img, L, ctx);
-        if (!lembar) {
-            return { ok: false, pesan: 'Lembar tidak dikenali. Pastikan keempat kotak hitam di pojok terlihat, foto lurus dari atas, terang, dan lembar ini milik tes yang sama.' };
+        if (lembar.gagal) {
+            const pesan = {
+                pojok: 'Keempat kotak hitam di pojok lembar tidak terlihat semua. Foto ulang seluruh lembar (jangan terpotong), lurus dari atas, cukup terang, tanpa bayangan tangan.',
+                tipe: 'Ini lembar ' + (NAMA_TIPE[lembar.tipe] || lembar.tipe) + ', bukan ' + (NAMA_TIPE[ctx.tipe] || ctx.tipe) + '. Pindai di halaman ' + (NAMA_TIPE[lembar.tipe] || lembar.tipe) + '.',
+                kode: 'Kotak pojok terlihat, tetapi kode lembar di bagian atas tidak cocok. Pastikan baris kode tidak tertutup/tercoret/terlipat, dan lembar dicetak dari kegiatan ini (cetak ulang bila jumlah soal/kegiatan berubah).',
+            };
+            return { ok: false, alasan: lembar.gagal, pesan: pesan[lembar.gagal] };
         }
         const hasil = bacaJawaban(img, L, lembar.map);
         return {

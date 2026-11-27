@@ -160,7 +160,7 @@
                 if (++kosongBeruntun >= 3) menunggu = null;
                 this.kameraPesan = menunggu !== null
                     ? 'Terbaca. Ganti ke lembar berikutnya…'
-                    : 'Arahkan kamera ke lembar jawaban sampai keempat kotak hitam terlihat.';
+                    : (r.alasan === 'tipe' || r.alasan === 'kode' ? r.pesan : 'Arahkan kamera ke lembar jawaban sampai keempat kotak hitam terlihat.');
                 return;
             }
             kosongBeruntun = 0;

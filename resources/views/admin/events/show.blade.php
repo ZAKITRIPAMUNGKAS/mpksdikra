@@ -1302,12 +1302,12 @@
         {{-- PAGE TAB 6: FEEDBACK & EVALUASI PENYELENGGARAAN                --}}
         {{-- ============================================================== --}}
         <div x-show="activeTab === 'feedback' || activeTab === 'angket'" class="p-4 sm:p-5 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100" data-feedback-header>
+                <div class="min-w-0 lg:flex-1">
                     <h2 class="font-bold text-slate-900 text-sm sm:text-base tracking-tight">Feedback &amp; Evaluasi Penyelenggaraan</h2>
-                    <p class="text-xs text-slate-500 font-normal">Instrumen angket evaluasi kepuasan kader (Skala Likert 1–5), analisis mutu sarana &amp; narasumber, serta masukan konstruktif peserta.</p>
+                    <p class="text-xs text-slate-500 font-normal max-w-2xl">Instrumen angket evaluasi kepuasan kader (Skala Likert 1–5), analisis mutu sarana &amp; narasumber, serta masukan konstruktif peserta.</p>
                 </div>
-                <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap lg:flex-nowrap lg:shrink-0 lg:justify-end [&>*]:shrink-0 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
                     @if($canManage)
                     <x-akses-isian-toggle :event="$event" jenis="angket" label="angket evaluasi" />
                     @endif
@@ -1888,19 +1888,22 @@
                                 <svg class="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
                                 <span>Sertifikat Resmi 2 Sisi</span>
                             </span>
-                            <p class="text-[11px] text-slate-600 mt-1">Unduh seluruh sertifikat kader lulus sekaligus dalam 1 PDF (Hal 1: Sertifikat QR; Hal 2: Transkrip JP).</p>
+                            <p class="text-[11px] text-slate-600 mt-1">Cetak kapan saja, termasuk sebelum kegiatan selesai. Depan: sertifikat ber-QR; belakang: transkrip. Bisa bolak-balik (duplex) atau depan/belakang terpisah.</p>
                         </div>
                         <div class="space-y-1.5">
-                            @if($event->status === 'selesai')
-                            <button type="button" onclick="document.getElementById('dialog-sertifikat')?.showModal()" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block cursor-pointer">
+                            @if($totalPeserta > 0)
+                            <button type="button" onclick="document.getElementById('dialog-sertifikat')?.showModal()" data-cetak-sertifikat class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block cursor-pointer">
                                 Pilih &amp; Cetak Sertifikat (PDF / ZIP)
                             </button>
+                            @php $jumlahLulusSertifikat = collect($pesertaSertifikat)->whereIn('badge', \App\Support\SertifikatPilihan::STATUS_LULUS)->count(); @endphp
+                            @if($jumlahLulusSertifikat > 0)
                             <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-1.5 px-2 border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-800 rounded-lg text-[11px] font-semibold transition block">
-                                Langsung Unduh Semua (1 PDF)
+                                Langsung Unduh {{ $jumlahLulusSertifikat }} Peserta Lulus (1 PDF)
                             </a>
+                            @endif
                             @else
                             <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
-                                Status Selesai Diperlukan
+                                Belum Ada Peserta Aktif
                             </span>
                             @endif
                             @if($canManage)
@@ -2131,20 +2134,8 @@
     />
     @endif
 
-    @if($event->status === 'selesai')
-    <x-bulk-print-dialog
-        id="dialog-sertifikat"
-        title="Pilih Peserta untuk Cetak Sertifikat"
-        subtitle="Hanya peserta aktif berstatus Lulus / Lulus Bersyarat yang tersedia. Anda bisa mencetak sebagian atau seluruhnya."
-        :items="$pesertaSertifikat"
-        quickBadge="Lulus"
-        quickBadgeLabel="Hanya Lulus Murni"
-        :actions="[
-            ['label' => 'Pratinjau PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_blank', 'download' => false, 'class' => 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700'],
-            ['label' => 'Unduh ZIP', 'url' => route('admin.events.certificates.zip', $event), 'target' => '_self', 'download' => false, 'class' => 'border border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-indigo-800'],
-            ['label' => 'Unduh 1 PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_self', 'download' => true, 'class' => 'bg-indigo-600 hover:bg-indigo-700 text-white'],
-        ]"
-    />
+    @if($totalPeserta > 0)
+    <x-sertifikat-print-dialog id="dialog-sertifikat" :event="$event" :items="$pesertaSertifikat" />
     @endif
 
 </div>

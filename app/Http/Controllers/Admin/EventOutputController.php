@@ -13,6 +13,7 @@ use App\Services\ImageCutoutService;
 use App\Services\NilaiService;
 use App\Services\QrService;
 use App\Support\KertasSertifikat;
+use App\Support\SertifikatPilihan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -36,21 +37,10 @@ class EventOutputController extends Controller
 
         $tesKertas = PesertaTesMulai::tesKertasMap($event->id);
 
-        $pesertaSertifikat = $ranking
-            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
-            ->filter(fn ($p) => $p->anggota && $epMap->has($p->anggota_id))
-            ->map(fn ($p) => [
-                'id' => (int) $epMap->get($p->anggota_id),
-                'nama' => $p->anggota->nama_lengkap,
-                'meta' => trim(($p->anggota->pcm ?: $p->anggota->kecamatan ?: '-').' • NA '.number_format((float) $p->nilai_akhir, 1)),
-                'badge' => $p->status_kelulusan,
-                'badgeClass' => $p->status_kelulusan === 'Lulus'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-amber-50 text-amber-800 border-amber-200',
-            ])
-            ->sortBy('nama', SORT_NATURAL | SORT_FLAG_CASE)
-            ->values()
-            ->all();
+        $pesertaSertifikat = SertifikatPilihan::items(
+            $event->pesertaAktif()->with('anggota')->get(),
+            PenilaianAkhir::where('event_id', $event->id)->get()->keyBy('anggota_id')
+        );
 
         return view('admin.events.ranking', compact('event', 'ranking', 'epMap', 'tesKertas', 'pesertaSertifikat'));
     }
@@ -121,19 +111,26 @@ class EventOutputController extends Controller
         return $pdf->stream("berita-acara-yudisium-{$slug}.pdf");
     }
 
-    public function certificate(Event $event, EventPeserta $peserta)
+    /**
+     * Sertifikat satu peserta untuk panitia: bisa dicetak kapan saja dengan status nilai saat itu
+     * (belum lulus dicetak sebagai "Peserta"). Portal peserta tetap menunggu kegiatan selesai & lulus.
+     */
+    public function certificate(Request $request, Event $event, EventPeserta $peserta)
     {
         abort_unless((int) $peserta->event_id === (int) $event->id, 403);
-        abort_unless($event->status === 'selesai', 403, 'Sertifikat tersedia setelah event selesai.');
-        $nilai = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $peserta->anggota_id)->firstOrFail();
-        abort_unless($nilai->status_kelulusan !== 'Tidak Lulus', 403, 'Peserta tidak lulus tidak mendapat sertifikat.');
 
-        $verifyUrl = route('landing').'?verify='.urlencode($nilai->verification_hash);
-        $qrPng = $this->qr->qrPngDataUriForText($verifyUrl, 4, 1);
+        if (! auth()->user()?->isExecutive()) {
+            $this->nilai->hitungUlangPeserta($event, (int) $peserta->anggota_id);
+        }
+        $nilai = PenilaianAkhir::where('event_id', $event->id)->where('anggota_id', $peserta->anggota_id)->first()
+            ?? new PenilaianAkhir(['event_id' => $event->id, 'anggota_id' => $peserta->anggota_id]);
+
+        $qrPng = $this->qrSertifikat($nilai);
+        $sisi = SertifikatPilihan::sisi($request);
 
         $event->load(['sesi', 'fasilitator']);
 
-        $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
+        $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng', 'sisi'))
             ->setPaper(KertasSertifikat::dompdf(), 'landscape');
 
         return $pdf->download('sertifikat-'.str($peserta->anggota->nama_lengkap)->slug().'.pdf');
@@ -144,9 +141,14 @@ class EventOutputController extends Controller
         @ini_set('memory_limit', '512M');
         @ini_set('max_execution_time', '300');
 
-        $items = $this->itemSertifikatLulus($event, EventPeserta::selectedIdsFromRequest($request));
+        $items = $this->itemSertifikat($event, EventPeserta::selectedIdsFromRequest($request));
+        $sisi = SertifikatPilihan::sisi($request);
+        if ($sisi === 'belakang' && $request->boolean('balik')) {
+            // Bolak-balik manual: tumpukan hasil cetak sisi depan dibalik, jadi urutan sisi belakang ikut dibalik.
+            $items = $items->reverse()->values();
+        }
 
-        $pdf = Pdf::loadView('admin.events.certificates-batch-pdf', compact('event', 'items'))
+        $pdf = Pdf::loadView('admin.events.certificates-batch-pdf', compact('event', 'items', 'sisi'))
             ->setPaper(KertasSertifikat::dompdf(), 'landscape');
 
         $slug = str($event->nama_event)->slug();
@@ -168,7 +170,7 @@ class EventOutputController extends Controller
 
         abort_unless(class_exists(\ZipArchive::class), 500, 'Ekstensi PHP zip belum aktif di server.');
 
-        $items = $this->itemSertifikatLulus($event, EventPeserta::selectedIdsFromRequest($request));
+        $items = $this->itemSertifikat($event, EventPeserta::selectedIdsFromRequest($request));
 
         $base = storage_path('app/tmp');
         File::ensureDirectoryExists($base);
@@ -232,48 +234,56 @@ class EventOutputController extends Controller
     }
 
     /**
-     * Peserta aktif berstatus Lulus/Lulus Bersyarat beserta nilai & QR verifikasi, urut nama.
+     * Item sertifikat untuk dicetak panitia, kapan saja (tidak menunggu status kegiatan Selesai).
+     * Tanpa pilihan: semua peserta aktif berstatus Lulus/Lulus Bersyarat. Dengan pilihan: peserta aktif
+     * terpilih apa pun statusnya; yang belum lulus dicetak sebagai "Peserta".
      *
      * @param  array<int, int>  $selectedIds
      */
-    private function itemSertifikatLulus(Event $event, array $selectedIds = [])
+    private function itemSertifikat(Event $event, array $selectedIds = [])
     {
-        abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
-
         if (! auth()->user()?->isExecutive()) {
             $this->nilai->hitungUlang($event);
         }
 
-        $nilaiLulus = PenilaianAkhir::where('event_id', $event->id)
-            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
-            ->get()
-            ->keyBy('anggota_id');
-
-        abort_if($nilaiLulus->isEmpty(), 404, 'Tidak ada peserta yang dinyatakan lulus untuk dicetak sertifikatnya.');
+        $nilai = PenilaianAkhir::where('event_id', $event->id)->get()->keyBy('anggota_id');
+        $idLulus = $nilai->whereIn('status_kelulusan', SertifikatPilihan::STATUS_LULUS)->keys()->all();
 
         $pesertas = EventPeserta::where('event_id', $event->id)
-            ->when($selectedIds !== [], fn ($q) => $q->whereIn('id', $selectedIds))
-            ->whereIn('anggota_id', $nilaiLulus->keys()->all())
             ->where('status_aktif', true)
+            ->whereHas('anggota')
+            ->when(
+                $selectedIds !== [],
+                fn ($q) => $q->whereIn('id', $selectedIds),
+                fn ($q) => $q->whereIn('anggota_id', $idLulus)
+            )
             ->with(['anggota'])
             ->get()
-            ->sortBy('anggota.nama_lengkap')
+            ->sortBy('anggota.nama_lengkap', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
 
-        abort_if($pesertas->isEmpty(), 404, 'Tidak ada peserta terpilih yang dinyatakan lulus untuk dicetak sertifikatnya.');
+        abort_if($pesertas->isEmpty(), 404, $selectedIds !== []
+            ? 'Tidak ada peserta aktif terpilih untuk dicetak sertifikatnya.'
+            : 'Belum ada peserta berstatus lulus. Gunakan tombol "Pilih & Cetak Sertifikat" untuk memilih peserta sebelum nilai final.');
 
         $event->load(['sesi', 'fasilitator']);
 
-        return $pesertas->map(function ($ep) use ($nilaiLulus) {
-            $nilai = $nilaiLulus->get($ep->anggota_id);
-            $verifyUrl = route('landing').'?verify='.urlencode($nilai?->verification_hash ?? '');
+        return $pesertas->map(function ($ep) use ($event, $nilai) {
+            $n = $nilai->get($ep->anggota_id) ?? new PenilaianAkhir(['event_id' => $event->id, 'anggota_id' => $ep->anggota_id]);
 
             return [
                 'peserta' => $ep,
-                'nilai' => $nilai,
-                'qrPng' => $this->qr->qrPngDataUriForText($verifyUrl, 4, 1),
+                'nilai' => $n,
+                'qrPng' => $this->qrSertifikat($n),
             ];
         });
+    }
+
+    private function qrSertifikat(PenilaianAkhir $nilai): string
+    {
+        $verifyUrl = route('landing').'?verify='.urlencode((string) $nilai->verification_hash);
+
+        return $this->qr->qrPngDataUriForText($verifyUrl, 4, 1);
     }
 
     /**

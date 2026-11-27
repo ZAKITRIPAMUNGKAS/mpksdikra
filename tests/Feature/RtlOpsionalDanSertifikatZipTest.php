@@ -146,7 +146,7 @@ class RtlOpsionalDanSertifikatZipTest extends TestCase
         $this->assertSame('Lulus', PenilaianAkhir::where('event_id', $event->id)->value('status_kelulusan'));
     }
 
-    public function test_zip_ditolak_bila_kegiatan_belum_selesai(): void
+    public function test_zip_tanpa_peserta_lulus_atau_pilihan_memberi_404_jelas(): void
     {
         $admin = $this->admin();
         $event = Event::create([
@@ -154,6 +154,7 @@ class RtlOpsionalDanSertifikatZipTest extends TestCase
             'status' => 'persiapan', 'created_by' => $admin->id,
         ]);
 
-        $this->actingAs($admin)->get(route('admin.events.certificates.zip', $event))->assertForbidden();
+        // Admin boleh mencetak kapan saja; tanpa peserta lulus dan tanpa pilihan, tidak ada yang dicetak.
+        $this->actingAs($admin)->get(route('admin.events.certificates.zip', $event))->assertNotFound();
     }
 }

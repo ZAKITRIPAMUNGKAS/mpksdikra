@@ -28,7 +28,7 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
-                @if($event->status === 'selesai')
+                @if(count($pesertaSertifikat) > 0)
                 <button type="button" onclick="document.getElementById('dialog-sertifikat-ranking')?.showModal()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -129,19 +129,7 @@
     </div>
 </div>
 
-@if($event->status === 'selesai')
-<x-bulk-print-dialog
-    id="dialog-sertifikat-ranking"
-    title="Pilih Peserta untuk Cetak Sertifikat"
-    subtitle="Hanya peserta aktif berstatus Lulus / Lulus Bersyarat yang tersedia. Centang seluruhnya atau sebagian peserta saja."
-    :items="$pesertaSertifikat"
-    quickBadge="Lulus"
-    quickBadgeLabel="Hanya Lulus Murni"
-    :actions="[
-        ['label' => 'Pratinjau PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_blank', 'download' => false, 'class' => 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700'],
-        ['label' => 'Unduh ZIP', 'url' => route('admin.events.certificates.zip', $event), 'target' => '_self', 'download' => false, 'class' => 'border border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-indigo-800'],
-        ['label' => 'Unduh 1 PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_self', 'download' => true, 'class' => 'bg-indigo-600 hover:bg-indigo-700 text-white'],
-    ]"
-/>
+@if(count($pesertaSertifikat) > 0)
+<x-sertifikat-print-dialog id="dialog-sertifikat-ranking" :event="$event" :items="$pesertaSertifikat" />
 @endif
 @endsection

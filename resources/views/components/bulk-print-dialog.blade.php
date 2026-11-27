@@ -8,10 +8,16 @@
     'quickBadgeLabel' => null,
     'excludeBadge' => null,
     'excludeBadgeLabel' => null,
+    'defaultBadges' => null,
+    'sendAllIds' => false,
 ])
 
 @php
     $itemList = collect($items)->values()->all();
+    // Centangan awal: semua item, atau hanya item ber-badge tertentu (mis. Lulus) bila defaultBadges diisi.
+    $awalTerpilih = $defaultBadges === null
+        ? array_column($itemList, 'id')
+        : array_values(array_column(array_filter($itemList, fn ($i) => in_array($i['badge'] ?? null, $defaultBadges, true)), 'id'));
 @endphp
 
 <dialog id="{{ $id }}"
@@ -19,7 +25,7 @@
     aria-labelledby="{{ $id }}-title"
     x-data="{
         items: @js($itemList),
-        selected: @js(array_column($itemList, 'id')),
+        selected: @js($awalTerpilih),
         q: '',
         activeAction: { url: '', target: '_self', download: false },
         init() {
@@ -124,7 +130,7 @@
         </div>
 
         {{-- Participant Checkbox List --}}
-        <div class="flex-1 overflow-y-auto px-4 py-2.5 sm:px-5 divide-y divide-slate-100">
+        <div class="flex-1 min-h-32 overflow-y-auto px-4 py-2.5 sm:px-5 divide-y divide-slate-100" style="min-height: 8rem;">
             <template x-if="items.length === 0">
                 <p class="py-8 text-center text-xs text-slate-400">Belum ada peserta yang memenuhi syarat untuk dicetak.</p>
             </template>
@@ -150,13 +156,17 @@
             </template>
         </div>
 
+        @if(trim($slot) !== '')
+            <div class="px-4 py-3 sm:px-5 border-t border-slate-100 shrink-0 overflow-y-auto" style="max-height: 30vh;">{{ $slot }}</div>
+        @endif
+
         {{-- Footer Form & Actions --}}
         <div class="px-4 py-3 sm:px-5 border-t border-slate-100 bg-slate-50/60 flex flex-wrap items-center justify-between gap-2 shrink-0">
-            <form x-ref="printForm" method="GET" :action="activeAction.url" :target="activeAction.target || '_self'" class="hidden">
+            <form x-ref="printForm" id="{{ $id }}-form" method="GET" :action="activeAction.url" :target="activeAction.target || '_self'" class="hidden">
                 <template x-if="activeAction.download">
                     <input type="hidden" name="download" value="1">
                 </template>
-                <template x-if="selected.length > 0 && selected.length < items.length">
+                <template x-if="selected.length > 0 && ({{ $sendAllIds ? 'true' : 'false' }} || selected.length < items.length)">
                     <input type="hidden" name="peserta_ids" :value="selected.join(',')">
                 </template>
             </form>
@@ -167,7 +177,7 @@
                 <span x-show="selected.length < items.length" x-text="'Mencetak ' + selected.length + ' peserta terpilih.'"></span>
             </span>
 
-            <div class="flex flex-wrap items-center gap-2 ml-auto">
+            <div class="grid grid-cols-2 w-full sm:flex sm:w-auto sm:flex-wrap items-center gap-2 sm:ml-auto [&>button]:whitespace-nowrap">
                 <button type="button" @click="$el.closest('dialog').close()" class="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-600 cursor-pointer">
                     Batal
                 </button>

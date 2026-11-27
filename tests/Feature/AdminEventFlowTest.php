@@ -230,7 +230,7 @@ class AdminEventFlowTest extends TestCase
         $this->assertSame('selesai', $event->fresh()->status);
     }
 
-    public function test_admin_certificate_forbidden_when_event_not_finished(): void
+    public function test_admin_bisa_cetak_sertifikat_sebelum_kegiatan_selesai(): void
     {
         $admin = $this->admin();
         $event = Event::create($this->payload(['status' => 'berlangsung']) + ['created_by' => $admin->id]);
@@ -249,12 +249,19 @@ class AdminEventFlowTest extends TestCase
             'status_kelulusan' => 'Lulus',
         ]);
 
+        // Panitia boleh mencetak kapan saja (mis. untuk dibagikan saat penutupan).
         $this->actingAs($admin)
             ->get(route('admin.events.certificate', [$event, $peserta]))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        // Portal peserta tetap menunggu kegiatan selesai.
+        $this->actingAs($anggotaUser)
+            ->get(route('portal.sertifikat.download', $event))
             ->assertForbidden();
     }
 
-    public function test_admin_certificate_forbidden_when_not_lulus(): void
+    public function test_admin_bisa_cetak_sertifikat_peserta_belum_lulus_sebagai_peserta(): void
     {
         $admin = $this->admin();
         $event = Event::create($this->payload(['status' => 'selesai']) + ['created_by' => $admin->id]);
@@ -275,6 +282,11 @@ class AdminEventFlowTest extends TestCase
 
         $this->actingAs($admin)
             ->get(route('admin.events.certificate', [$event, $peserta]))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->actingAs($anggotaUser)
+            ->get(route('portal.sertifikat.download', $event))
             ->assertForbidden();
     }
 

@@ -110,12 +110,12 @@
             {{-- Tombol Tindakan Cepat Ramping --}}
             <div class="flex items-center gap-2 shrink-0">
                 @if($totalPeserta > 0)
-                <a href="{{ route('admin.events.idcards.batch', $event) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-900 border border-sky-200 hover:bg-sky-100 text-xs font-semibold shadow-2xs transition">
+                <button type="button" onclick="document.getElementById('dialog-idcards')?.showModal()" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-900 border border-sky-200 hover:bg-sky-100 text-xs font-semibold shadow-2xs transition cursor-pointer">
                     <svg class="w-3.5 h-3.5 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                     </svg>
                     <span>Cetak ID Card Massal (A4)</span>
-                </a>
+                </button>
                 @endif
                 @if($canManage)
                 <a href="{{ route('admin.events.enroll', $event) }}" class="inline-flex items-center justify-center gap-1 px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-semibold shadow-2xs transition">
@@ -309,10 +309,10 @@
                     </a>
                     @endif
                     @if($totalPeserta > 0)
-                    <a href="{{ route('admin.events.idcards.batch', $event) }}" target="_blank" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs">
+                    <button type="button" onclick="document.getElementById('dialog-idcards')?.showModal()" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs cursor-pointer">
                         <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                         <span class="truncate">ID Card (A4)</span>
-                    </a>
+                    </button>
                     @if($canManage)
                     <a href="{{ route('admin.events.peserta.excel', $event) }}" title="Unduh biodata lengkap peserta kegiatan ini (Excel)" data-peserta-excel class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs">
                         <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -1886,11 +1886,11 @@
                         </div>
                         <div class="space-y-1.5">
                             @if($event->status === 'selesai')
-                            <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block">
-                                Unduh Batch Sertifikat (1 PDF)
-                            </a>
-                            <a href="{{ route('admin.events.certificates.zip', $event) }}" class="w-full text-center py-2 px-2 border border-indigo-300 bg-white hover:bg-indigo-50 text-indigo-800 rounded-lg text-xs font-semibold shadow-2xs transition block">
-                                Unduh Per Peserta (ZIP)
+                            <button type="button" onclick="document.getElementById('dialog-sertifikat')?.showModal()" class="w-full text-center py-2 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition block cursor-pointer">
+                                Pilih &amp; Cetak Sertifikat (PDF / ZIP)
+                            </button>
+                            <a href="{{ route('admin.events.certificates.batch', $event) }}?download=1" class="w-full text-center py-1.5 px-2 border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-800 rounded-lg text-[11px] font-semibold transition block">
+                                Langsung Unduh Semua (1 PDF)
                             </a>
                             @else
                             <span class="w-full text-center py-2 px-2 bg-slate-200 text-slate-500 rounded-lg text-[11px] font-semibold block cursor-not-allowed">
@@ -2110,6 +2110,35 @@
             </div>
         </div>
     </template>
+    @endif
+
+    @if($totalPeserta > 0)
+    <x-bulk-print-dialog
+        id="dialog-idcards"
+        title="Pilih Peserta untuk Cetak ID Card (A4)"
+        subtitle="Centang seluruh peserta atau pilih sebagian yang ingin dicetak ke format A4 (2x2 kartu per halaman)."
+        :items="$pesertaIdCards"
+        :actions="[
+            ['label' => 'Buka Preview PDF', 'url' => route('admin.events.idcards.batch', $event), 'target' => '_blank', 'download' => false, 'class' => 'border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-900'],
+            ['label' => 'Unduh PDF', 'url' => route('admin.events.idcards.batch', $event), 'target' => '_self', 'download' => true, 'class' => 'bg-sky-600 hover:bg-sky-700 text-white'],
+        ]"
+    />
+    @endif
+
+    @if($event->status === 'selesai')
+    <x-bulk-print-dialog
+        id="dialog-sertifikat"
+        title="Pilih Peserta untuk Cetak Sertifikat"
+        subtitle="Hanya peserta aktif berstatus Lulus / Lulus Bersyarat yang tersedia. Anda bisa mencetak sebagian atau seluruhnya."
+        :items="$pesertaSertifikat"
+        quickBadge="Lulus"
+        quickBadgeLabel="Hanya Lulus Murni"
+        :actions="[
+            ['label' => 'Pratinjau PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_blank', 'download' => false, 'class' => 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700'],
+            ['label' => 'Unduh ZIP', 'url' => route('admin.events.certificates.zip', $event), 'target' => '_self', 'download' => false, 'class' => 'border border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-indigo-800'],
+            ['label' => 'Unduh 1 PDF', 'url' => route('admin.events.certificates.batch', $event), 'target' => '_self', 'download' => true, 'class' => 'bg-indigo-600 hover:bg-indigo-700 text-white'],
+        ]"
+    />
     @endif
 
 </div>

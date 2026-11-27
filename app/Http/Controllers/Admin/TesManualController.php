@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventPeserta;
 use App\Models\JawabanPeserta;
 use App\Models\PenilaianAkhir;
 use App\Models\PesertaTesMulai;
@@ -93,8 +94,8 @@ class TesManualController extends Controller
                 ->values()->all(),
             'kosong' => ['pesan' => 'Bank soal '.strtolower($label).' masih kosong.', 'url' => route('admin.events.soal.index', [$event, $tipe]), 'link' => 'Tambahkan soal'],
             'cetak' => [
-                ['label' => 'Cetak Lembar Soal', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'soal']), 'tabBaru' => true],
-                ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'jawaban']), 'tabBaru' => false],
+                ['label' => 'Cetak Lembar Soal', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'soal']), 'tabBaru' => true, 'pilihPeserta' => false],
+                ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.tes-manual.cetak', [$event, $tipe, 'jawaban']), 'tabBaru' => false, 'pilihPeserta' => true],
             ],
             'storeUrl' => route('admin.events.tes-manual.store', [$event, $tipe]),
             'destroyUrl' => route('admin.events.tes-manual.destroy', [$event, $tipe, '__ID__']),
@@ -191,7 +192,7 @@ class TesManualController extends Controller
             : back()->with('error', 'Tidak ada input kertas untuk dihapus. Nilai online tidak bisa dihapus dari sini.');
     }
 
-    public function cetak(Event $event, string $tipe, string $lembar): Response
+    public function cetak(Request $request, Event $event, string $tipe, string $lembar): Response
     {
         abort_unless(in_array($tipe, ['pretest', 'posttest'], true), 404);
 
@@ -206,7 +207,13 @@ class TesManualController extends Controller
             return response()->view('admin.events.tes-manual-soal', compact('event', 'tipe', 'label', 'soal', 'durasi'));
         }
 
-        $peserta = $event->pesertaAktif()->whereHas('anggota')->with('anggota')->get()->sortBy('anggota.nama_lengkap')->values();
+        $semuaPeserta = $event->pesertaAktif()->whereHas('anggota')->with('anggota')->get()->sortBy('anggota.nama_lengkap')->values();
+        $semuaPeserta->each(fn ($ep, $i) => $ep->setAttribute('no_urut', $i + 1));
+        $selectedIds = EventPeserta::selectedIdsFromRequest($request);
+        $peserta = $selectedIds !== []
+            ? $semuaPeserta->whereIn('id', $selectedIds)->values()
+            : $semuaPeserta;
+        abort_if($selectedIds !== [] && $peserta->isEmpty(), 404, 'Tidak ada peserta terpilih untuk dicetak.');
 
         try {
             $layout = LembarJawabanLayout::build($soal->count(), $this->labelPilihan($soal));

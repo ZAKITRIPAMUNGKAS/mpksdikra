@@ -55,7 +55,7 @@
     $latar ??= \App\Support\LembarJawabanGrafik::latarDataUri($L);
     $satuan ??= 'soal';
     $tanggal = $event->tanggal_mulai?->translatedFormat('d F Y');
-    $lembarList = $peserta->map(fn ($ep, $i) => ['no' => $i + 1, 'id' => $ep->anggota_id, 'nama' => $ep->anggota->nama_lengkap, 'cabang' => $ep->anggota->pcm ?: $ep->anggota->kecamatan])
+    $lembarList = $peserta->map(fn ($ep, $i) => ['no' => $ep->no_urut ?? ($i + 1), 'id' => $ep->anggota_id, 'nama' => $ep->anggota->nama_lengkap, 'cabang' => $ep->anggota->pcm ?: $ep->anggota->kecamatan])
         ->push(['no' => null, 'id' => 0, 'nama' => null, 'cabang' => null]);
 @endphp
 @foreach($lembarList as $lj)

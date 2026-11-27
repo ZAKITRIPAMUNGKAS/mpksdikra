@@ -176,10 +176,47 @@ class EventController extends Controller
             ->latest()
             ->get();
 
+        $pesertaIdCards = $peserta
+            ->filter(fn ($p) => $p->anggota !== null)
+            ->sortBy('anggota.nama_lengkap')
+            ->values()
+            ->map(fn ($p) => [
+                'id' => (int) $p->id,
+                'nama' => $p->anggota->nama_lengkap,
+                'meta' => trim(($p->anggota->pcm ?: $p->anggota->kecamatan ?: '-').($p->anggota->nbm ? ' • NBM '.$p->anggota->nbm : '')),
+                'badge' => null,
+                'badgeClass' => '',
+            ])->all();
+
+        $nilaiLulusMap = PenilaianAkhir::where('event_id', $event->id)
+            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
+            ->get()
+            ->keyBy('anggota_id');
+
+        $pesertaSertifikat = $peserta
+            ->filter(fn ($p) => $p->anggota !== null && $nilaiLulusMap->has($p->anggota_id))
+            ->sortBy('anggota.nama_lengkap')
+            ->values()
+            ->map(function ($p) use ($nilaiLulusMap) {
+                $nilai = $nilaiLulusMap->get($p->anggota_id);
+
+                return [
+                    'id' => (int) $p->id,
+                    'nama' => $p->anggota->nama_lengkap,
+                    'meta' => trim(($p->anggota->pcm ?: $p->anggota->kecamatan ?: '-').' • NA '.number_format((float) $nilai->nilai_akhir, 1)),
+                    'badge' => $nilai->status_kelulusan,
+                    'badgeClass' => $nilai->status_kelulusan === 'Lulus'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-amber-50 text-amber-800 border-amber-200',
+                ];
+            })->all();
+
         return view('admin.events.show', compact(
             'event',
             'sesi',
             'peserta',
+            'pesertaIdCards',
+            'pesertaSertifikat',
             'totalSesi',
             'totalPeserta',
             'totalLaki',

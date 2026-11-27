@@ -299,10 +299,55 @@
                 <p class="text-xs text-slate-500">Cetak untuk peserta yang mengerjakan di kertas. Lembar jawaban sudah bernama dan bernomor sesuai urutan tabel di bawah (plus 1 lembar kosong).</p>
                 <div class="flex flex-wrap gap-2">
                     @foreach($cfg['cetak'] as $c)
-                        <a href="{{ $c['url'] }}" @if($c['tabBaru']) target="_blank" rel="noopener" @endif class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">{{ $c['label'] }}</a>
+                        @if(!empty($c['pilihPeserta']))
+                            <button type="button" onclick="document.getElementById('dialog-ljk-kertas')?.showModal()" class="px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-xs font-semibold text-sky-900 transition cursor-pointer">{{ $c['label'] }}</button>
+                        @else
+                            <a href="{{ $c['url'] }}" @if($c['tabBaru']) target="_blank" rel="noopener" @endif class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition">{{ $c['label'] }}</a>
+                        @endif
                     @endforeach
                 </div>
             </div>
+            @php
+                $ljkPrintAction = collect($cfg['cetak'])->first(fn ($c) => !empty($c['pilihPeserta']));
+            @endphp
+            @if($ljkPrintAction)
+                @php
+                    $pesertaLjkDialog = $peserta->values()->map(function ($ep, $i) use ($baris) {
+                        $kode = $baris[$ep->anggota_id]['status'] ?? 'belum';
+                        $badgeLabel = match ($kode) {
+                            'online' => 'Online',
+                            'manual' => 'Kertas',
+                            'sedang' => 'Mengerjakan',
+                            default => 'Belum',
+                        };
+                        $badgeClass = match ($kode) {
+                            'online' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                            'manual' => 'bg-amber-50 text-amber-800 border-amber-200',
+                            'sedang' => 'bg-sky-50 text-sky-700 border-sky-200',
+                            default => 'bg-slate-100 text-slate-600 border-slate-200',
+                        };
+
+                        return [
+                            'id' => (int) $ep->id,
+                            'nama' => ($i + 1).'. '.$ep->anggota->nama_lengkap,
+                            'meta' => $ep->anggota->pcm ?: ($ep->anggota->kecamatan ?: '-'),
+                            'badge' => $badgeLabel,
+                            'badgeClass' => $badgeClass,
+                        ];
+                    })->all();
+                @endphp
+                <x-bulk-print-dialog
+                    id="dialog-ljk-kertas"
+                    title="Pilih Peserta untuk {{ $ljkPrintAction['label'] }}"
+                    subtitle="Centang semua atau hanya peserta tertentu yang membutuhkan lembar jawaban kertas (nomor urut tetap mengikuti tabel)."
+                    :items="$pesertaLjkDialog"
+                    excludeBadge="Online"
+                    excludeBadgeLabel="Pilih Belum Online"
+                    :actions="[
+                        ['label' => 'Unduh Lembar Jawaban (PDF)', 'url' => $ljkPrintAction['url'], 'target' => '_self', 'download' => false, 'class' => 'bg-sky-600 hover:bg-sky-700 text-white'],
+                    ]"
+                />
+            @endif
             @if($cfg['kunci'] !== null)
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="font-bold text-slate-900 text-sm">Kunci Jawaban ({{ $cfg['jumlah'] }} soal)</h2>

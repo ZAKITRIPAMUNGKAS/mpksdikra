@@ -13,7 +13,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#005c8a] text-white shadow-2xs">
                     <svg class="w-3.5 h-3.5 text-[#f8bb00]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-                    <span>Versi 2.7.0 Stable</span>
+                    <span>Versi 2.7.1 Stable</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -54,12 +54,32 @@
             </a>
         </div>
 
-        {{-- Versi 2.7.0 (Terbaru) --}}
-        <article class="bg-white rounded-xl border border-emerald-200/80 p-4 sm:p-5 shadow-2xs" data-rilis="2.7.0">
+        {{-- Versi 2.7.1 (Terbaru) --}}
+        <article class="bg-white rounded-xl border border-emerald-200/80 p-4 sm:p-5 shadow-2xs" data-rilis="2.7.1">
             <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">v2.7.0</span>
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">v2.7.1</span>
                     <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Terbaru</span>
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pilih Peserta Sebelum Cetak Massal</h3>
+                </div>
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400 shrink-0">27 Nov 2026</span>
+            </div>
+
+            <div class="mt-3 space-y-3 text-xs text-slate-600 leading-relaxed">
+                <ul class="space-y-1.5 list-disc pl-4">
+                    <li><strong>Dialog Pilih Peserta:</strong> tombol cetak massal kini membuka daftar centang dengan pencarian, <em>Pilih Semua</em>, <em>Kosongkan</em>, dan penghitung jumlah terpilih.</li>
+                    <li><strong>ID Card Massal (A4):</strong> cetak seluruh atau sebagian peserta saja (pratinjau atau unduh PDF).</li>
+                    <li><strong>Sertifikat Massal:</strong> pilih peserta Lulus/Lulus Bersyarat yang akan dicetak, lalu pratinjau, unduh 1 PDF, atau unduh ZIP per peserta; tersedia di detail kegiatan dan halaman Ranking.</li>
+                    <li><strong>Lembar Jawaban Kertas:</strong> cetak LJK Pretest/Posttest, Afektif, dan Angket hanya untuk peserta tertentu (misalnya yang belum mengisi online); nomor urut tetap sesuai tabel.</li>
+                </ul>
+            </div>
+        </article>
+
+        {{-- Versi 2.7.0 --}}
+        <article class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs" data-rilis="2.7.0">
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#005c8a] text-white">v2.7.0</span>
                     <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pengingat WhatsApp, RTL Opsional, Sertifikat Massal &amp; Hasil Audit E2E</h3>
                 </div>
                 <span class="text-[11px] sm:text-xs font-medium text-slate-400 shrink-0">27 Nov 2026</span>

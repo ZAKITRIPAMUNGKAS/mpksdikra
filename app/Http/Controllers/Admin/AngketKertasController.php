@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventPeserta;
 use App\Services\AngketKertasService;
 use App\Support\LembarJawabanGrafik;
 use App\Support\LembarJawabanLayout;
@@ -70,8 +71,8 @@ class AngketKertasController extends Controller
                 ? ['pesan' => 'Kuesioner sikap belum punya butir aktif.', 'url' => route('admin.events.afektif', $event), 'link' => 'Tambahkan butir afektif']
                 : ['pesan' => 'Angket kepuasan belum punya butir.', 'url' => route('admin.events.show', [$event, 'tab' => 'feedback', 'sub_feedback' => 'kelola']), 'link' => 'Siapkan butir angket'],
             'cetak' => [
-                ['label' => 'Cetak Lembar Pernyataan', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'pernyataan']), 'tabBaru' => true],
-                ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'jawaban']), 'tabBaru' => false],
+                ['label' => 'Cetak Lembar Pernyataan', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'pernyataan']), 'tabBaru' => true, 'pilihPeserta' => false],
+                ['label' => 'Cetak Lembar Jawaban', 'url' => route('admin.events.angket-kertas.cetak', [$event, $jenis, 'jawaban']), 'tabBaru' => false, 'pilihPeserta' => true],
             ],
             'storeUrl' => route('admin.events.angket-kertas.store', [$event, $jenis]),
             'destroyUrl' => route('admin.events.angket-kertas.destroy', [$event, $jenis, '__ID__']),
@@ -164,7 +165,7 @@ class AngketKertasController extends Controller
             : back()->with('error', 'Tidak ada input kertas untuk dihapus. Jawaban online tidak bisa dihapus dari sini.');
     }
 
-    public function cetak(Event $event, string $jenis, string $lembar): Response
+    public function cetak(Request $request, Event $event, string $jenis, string $lembar): Response
     {
         $this->cekJenis($jenis);
 
@@ -185,11 +186,19 @@ class AngketKertasController extends Controller
         @ini_set('memory_limit', '512M');
         $latar = LembarJawabanGrafik::latarDataUri($layout);
 
+        $semuaPeserta = $this->peserta($event);
+        $semuaPeserta->each(fn ($ep, $i) => $ep->setAttribute('no_urut', $i + 1));
+        $selectedIds = EventPeserta::selectedIdsFromRequest($request);
+        $pesertaDipilih = $selectedIds !== []
+            ? $semuaPeserta->whereIn('id', $selectedIds)->values()
+            : $semuaPeserta;
+        abort_if($selectedIds !== [] && $pesertaDipilih->isEmpty(), 404, 'Tidak ada peserta terpilih untuk dicetak.');
+
         $pdf = Pdf::loadView('admin.events.tes-manual-cetak', [
             'event' => $event,
             'tipe' => $jenis,
             'label' => $nama,
-            'peserta' => $this->peserta($event),
+            'peserta' => $pesertaDipilih,
             'layout' => $layout,
             'latar' => $latar,
             'satuan' => 'butir',

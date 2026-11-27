@@ -13,6 +13,7 @@ use App\Services\ImageCutoutService;
 use App\Services\NilaiService;
 use App\Services\QrService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -34,7 +35,23 @@ class EventOutputController extends Controller
 
         $tesKertas = PesertaTesMulai::tesKertasMap($event->id);
 
-        return view('admin.events.ranking', compact('event', 'ranking', 'epMap', 'tesKertas'));
+        $pesertaSertifikat = $ranking
+            ->whereIn('status_kelulusan', ['Lulus', 'Lulus Bersyarat'])
+            ->filter(fn ($p) => $p->anggota && $epMap->has($p->anggota_id))
+            ->map(fn ($p) => [
+                'id' => (int) $epMap->get($p->anggota_id),
+                'nama' => $p->anggota->nama_lengkap,
+                'meta' => trim(($p->anggota->pcm ?: $p->anggota->kecamatan ?: '-').' • NA '.number_format((float) $p->nilai_akhir, 1)),
+                'badge' => $p->status_kelulusan,
+                'badgeClass' => $p->status_kelulusan === 'Lulus'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200',
+            ])
+            ->sortBy('nama', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->all();
+
+        return view('admin.events.ranking', compact('event', 'ranking', 'epMap', 'tesKertas', 'pesertaSertifikat'));
     }
 
     public function report(Event $event)
@@ -121,19 +138,19 @@ class EventOutputController extends Controller
         return $pdf->download('sertifikat-'.str($peserta->anggota->nama_lengkap)->slug().'.pdf');
     }
 
-    public function certificatesBatch(Event $event)
+    public function certificatesBatch(Request $request, Event $event)
     {
         @ini_set('memory_limit', '512M');
         @ini_set('max_execution_time', '300');
 
-        $items = $this->itemSertifikatLulus($event);
+        $items = $this->itemSertifikatLulus($event, EventPeserta::selectedIdsFromRequest($request));
 
         $pdf = Pdf::loadView('admin.events.certificates-batch-pdf', compact('event', 'items'))
             ->setPaper('a4', 'landscape');
 
         $slug = str($event->nama_event)->slug();
 
-        if (request()->has('download')) {
+        if ($request->has('download')) {
             return $pdf->download("sertifikat-massal-{$slug}.pdf");
         }
 
@@ -143,14 +160,14 @@ class EventOutputController extends Controller
     /**
      * Unduh massal: satu file ZIP berisi satu PDF sertifikat per peserta lulus.
      */
-    public function certificatesZip(Event $event)
+    public function certificatesZip(Request $request, Event $event)
     {
         @ini_set('memory_limit', '512M');
         @ini_set('max_execution_time', '600');
 
         abort_unless(class_exists(\ZipArchive::class), 500, 'Ekstensi PHP zip belum aktif di server.');
 
-        $items = $this->itemSertifikatLulus($event);
+        $items = $this->itemSertifikatLulus($event, EventPeserta::selectedIdsFromRequest($request));
 
         $base = storage_path('app/tmp');
         File::ensureDirectoryExists($base);
@@ -215,8 +232,10 @@ class EventOutputController extends Controller
 
     /**
      * Peserta aktif berstatus Lulus/Lulus Bersyarat beserta nilai & QR verifikasi, urut nama.
+     *
+     * @param  array<int, int>  $selectedIds
      */
-    private function itemSertifikatLulus(Event $event)
+    private function itemSertifikatLulus(Event $event, array $selectedIds = [])
     {
         abort_unless($event->status === 'selesai', 403, 'Sertifikat massal tersedia setelah status kegiatan selesai.');
 
@@ -232,12 +251,15 @@ class EventOutputController extends Controller
         abort_if($nilaiLulus->isEmpty(), 404, 'Tidak ada peserta yang dinyatakan lulus untuk dicetak sertifikatnya.');
 
         $pesertas = EventPeserta::where('event_id', $event->id)
+            ->when($selectedIds !== [], fn ($q) => $q->whereIn('id', $selectedIds))
             ->whereIn('anggota_id', $nilaiLulus->keys()->all())
             ->where('status_aktif', true)
             ->with(['anggota'])
             ->get()
             ->sortBy('anggota.nama_lengkap')
             ->values();
+
+        abort_if($pesertas->isEmpty(), 404, 'Tidak ada peserta terpilih yang dinyatakan lulus untuk dicetak sertifikatnya.');
 
         $event->load(['sesi', 'fasilitator']);
 
@@ -282,12 +304,15 @@ class EventOutputController extends Controller
         );
     }
 
-    public function idCardsBatch(Event $event)
+    public function idCardsBatch(Request $request, Event $event)
     {
         @ini_set('memory_limit', '512M');
         @ini_set('max_execution_time', '300');
 
+        $selectedIds = EventPeserta::selectedIdsFromRequest($request);
+
         $peserta = $event->pesertaAktif()
+            ->when($selectedIds !== [], fn ($q) => $q->whereIn('id', $selectedIds))
             ->whereHas('anggota')
             ->with(['anggota.user'])
             ->get()
@@ -295,7 +320,7 @@ class EventOutputController extends Controller
             ->sortBy('anggota.nama_lengkap')
             ->values();
 
-        abort_if($peserta->isEmpty(), 404, 'Belum ada peserta aktif pada kegiatan ini.');
+        abort_if($peserta->isEmpty(), 404, $selectedIds !== [] ? 'Tidak ada peserta terpilih untuk dicetak ID Card.' : 'Belum ada peserta aktif pada kegiatan ini.');
 
         $cards = $peserta->map(function ($ep) {
             if (! $ep->anggota) {

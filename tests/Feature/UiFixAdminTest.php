@@ -176,7 +176,7 @@ class UiFixAdminTest extends TestCase
         $response->assertSee('getUserMedia', false);
         $response->assertSee('facingMode', false);
         $response->assertSee('qr-scanner', false);
-        $response->assertSee('Scan QR atau ketik kode peserta...');
+        $response->assertSee('Scan QR / ketik kode peserta');
     }
 
     public function test_soal_form_displays_server_validation_errors_and_preserves_old_input(): void

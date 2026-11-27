@@ -5,7 +5,7 @@
     <title>Sertifikat Baitul Arqam - {{ $peserta->anggota->nama_lengkap }}</title>
     <style>
         @page {
-            size: 297mm 210mm;
+            size: 330mm 215mm;
             margin: 0;
         }
         * {
@@ -23,8 +23,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 297mm;
-            height: 210mm;
+            width: 330mm;
+            height: 215mm;
             z-index: -1000;
         }
         .page-content {

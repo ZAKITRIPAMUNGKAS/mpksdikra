@@ -12,6 +12,7 @@ use App\Models\PesertaTesMulai;
 use App\Services\ImageCutoutService;
 use App\Services\NilaiService;
 use App\Services\QrService;
+use App\Support\KertasSertifikat;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -133,7 +134,7 @@ class EventOutputController extends Controller
         $event->load(['sesi', 'fasilitator']);
 
         $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper(KertasSertifikat::dompdf(), 'landscape');
 
         return $pdf->download('sertifikat-'.str($peserta->anggota->nama_lengkap)->slug().'.pdf');
     }
@@ -146,7 +147,7 @@ class EventOutputController extends Controller
         $items = $this->itemSertifikatLulus($event, EventPeserta::selectedIdsFromRequest($request));
 
         $pdf = Pdf::loadView('admin.events.certificates-batch-pdf', compact('event', 'items'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper(KertasSertifikat::dompdf(), 'landscape');
 
         $slug = str($event->nama_event)->slug();
 
@@ -211,7 +212,7 @@ class EventOutputController extends Controller
             $file = sprintf('%03d-%s.pdf', $i + 1, $nama);
 
             $pdf = Pdf::loadView('admin.events.certificate-pdf', compact('event', 'peserta', 'nilai', 'qrPng'))
-                ->setPaper('a4', 'landscape');
+                ->setPaper(KertasSertifikat::dompdf(), 'landscape');
             file_put_contents($kerja.'/'.$file, $pdf->output());
             unset($pdf);
             $zip->addFile($kerja.'/'.$file, $file);

@@ -65,6 +65,21 @@ class TtdTransparanTest extends TestCase
         return [$pekat, $bening];
     }
 
+    /** Jumlah piksel yang tidak transparan penuh (termasuk setengah pekat). */
+    private function terlihat(GdImage $img): int
+    {
+        $n = 0;
+        for ($y = 0; $y < imagesy($img); $y++) {
+            for ($x = 0; $x < imagesx($img); $x++) {
+                if ($this->alpha($img, $x, $y) < 120) {
+                    $n++;
+                }
+            }
+        }
+
+        return $n;
+    }
+
     public function test_latar_putih_jadi_transparan_dan_tepi_dipotong(): void
     {
         $hasil = TtdTransparan::olah($this->gambarTtd([255, 255, 255]));
@@ -85,6 +100,43 @@ class TtdTransparanTest extends TestCase
         $this->assertSame(127, $this->alpha($hasil, imagesx($hasil) - 1, imagesy($hasil) - 1));
         [$pekat] = $this->hitung($hasil);
         $this->assertGreaterThan(1000, $pekat);
+    }
+
+    /** Foto HP: kertas terang di tepi tetapi ada bayangan gelap di tengah (bayangan HP/tangan). */
+    public function test_foto_dengan_bayangan_di_tengah_tidak_menyisakan_kotak(): void
+    {
+        $w = 600;
+        $h = 240;
+        $img = imagecreatetruecolor($w, $h);
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                $jarak = sqrt((($x - 300) / 300) ** 2 + (($y - 120) / 120) ** 2);
+                $v = (int) (165 + 75 * min(1, $jarak)); // tengah 165, tepi 240
+                imagesetpixel($img, $x, $y, imagecolorallocate($img, $v, $v, $v - 6));
+            }
+        }
+        $tinta = imagecolorallocate($img, 20, 30, 90);
+        imagesetthickness($img, 6);
+        imageline($img, 150, 160, 260, 70, $tinta);
+        imageline($img, 260, 70, 330, 170, $tinta);
+        imagearc($img, 400, 120, 120, 80, 0, 300, $tinta);
+
+        $hasil = TtdTransparan::olah($img);
+        [$pekat, $bening] = $this->hitung($hasil);
+        $this->assertGreaterThan(800, $pekat, 'Goresan tetap ada.');
+        $this->assertLessThan(6000, $this->terlihat($hasil), 'Bayangan kertas tidak ikut terlihat (kotak abu-abu).');
+        $this->assertGreaterThan($pekat * 3, $bening);
+    }
+
+    /** Foto redup: kertas abu-abu gelap (±120) — dulu dipaksa latar putih sehingga seluruh kertas jadi kotak. */
+    public function test_foto_redup_kertas_gelap_tetap_transparan(): void
+    {
+        $hasil = TtdTransparan::olah($this->gambarTtd([125, 120, 112]));
+        $this->assertSame(127, $this->alpha($hasil, 0, 0));
+        [$pekat, $bening] = $this->hitung($hasil);
+        $this->assertGreaterThan(800, $pekat);
+        $this->assertLessThan(6000, $this->terlihat($hasil));
+        $this->assertGreaterThan($pekat * 3, $bening);
     }
 
     public function test_png_yang_sudah_transparan_tetap_utuh(): void

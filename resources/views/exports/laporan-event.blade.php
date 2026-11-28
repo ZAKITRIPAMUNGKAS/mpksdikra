@@ -1,27 +1,27 @@
 <table>
     <thead>
         <tr>
-            <th colspan="16" style="font-size: 14pt; font-weight: bold; text-align: center; color: #002b40;">
+            <th colspan="15" style="font-size: 14pt; font-weight: bold; text-align: center; color: #002b40;">
                 PIMPINAN DAERAH MUHAMMADIYAH KABUPATEN KARANGANYAR
             </th>
         </tr>
         <tr>
-            <th colspan="16" style="font-size: 12pt; font-weight: bold; text-align: center; color: #005c8a;">
+            <th colspan="15" style="font-size: 12pt; font-weight: bold; text-align: center; color: #005c8a;">
                 MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
             </th>
         </tr>
         <tr>
-            <th colspan="16" style="font-size: 11pt; font-weight: bold; text-align: center;">
+            <th colspan="15" style="font-size: 11pt; font-weight: bold; text-align: center;">
                 REKAPITULASI HASIL KELULUSAN &amp; EVALUASI PERKADERAN BAITUL ARQAM
             </th>
         </tr>
         <tr>
-            <th colspan="16" style="font-size: 10pt; text-align: center; font-style: italic; color: #475569;">
+            <th colspan="15" style="font-size: 10pt; text-align: center; font-style: italic; color: #475569;">
                 {{ strtoupper($event->nama_event) }}
             </th>
         </tr>
         <tr>
-            <th colspan="16"></th>
+            <th colspan="15"></th>
         </tr>
         <tr>
             <th style="font-weight: bold; text-align: left;">Waktu Pelaksanaan</th>
@@ -29,7 +29,7 @@
             <th style="font-weight: bold; text-align: left;">Total Peserta</th>
             <th colspan="2" style="text-align: left;">: {{ $totalPeserta ?? $ranking->count() }} Orang</th>
             <th style="font-weight: bold; text-align: left;">Lulus Bersyarat</th>
-            <th colspan="7" style="text-align: left;">: {{ $totalBersyarat ?? 0 }} Orang</th>
+            <th colspan="6" style="text-align: left;">: {{ $totalBersyarat ?? 0 }} Orang</th>
         </tr>
         <tr>
             <th style="font-weight: bold; text-align: left;">Lokasi / Tempat</th>
@@ -37,7 +37,7 @@
             <th style="font-weight: bold; text-align: left;">Lulus Murni</th>
             <th colspan="2" style="text-align: left;">: {{ $totalLulus ?? 0 }} Orang</th>
             <th style="font-weight: bold; text-align: left;">Tidak Lulus</th>
-            <th colspan="7" style="text-align: left;">: {{ $totalTidakLulus ?? 0 }} Orang</th>
+            <th colspan="6" style="text-align: left;">: {{ $totalTidakLulus ?? 0 }} Orang</th>
         </tr>
         <tr>
             <th style="font-weight: bold; text-align: left;">Sasaran Jenjang</th>
@@ -45,14 +45,13 @@
             <th style="font-weight: bold; text-align: left;">Rata-rata Nilai</th>
             <th colspan="2" style="text-align: left;">: {{ number_format($rerataNA ?? 0, 2) }}</th>
             <th style="font-weight: bold; text-align: left;">Dicetak Pada</th>
-            <th colspan="7" style="text-align: left;">: {{ now()->format('d/m/Y H:i') }} WIB</th>
+            <th colspan="6" style="text-align: left;">: {{ now()->format('d/m/Y H:i') }} WIB</th>
         </tr>
         <tr>
-            <th colspan="16"></th>
+            <th colspan="15"></th>
         </tr>
         <tr style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center;">
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center;">Ranking</th>
-            <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center;">NIK</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center;">NBM</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: left;">Nama Lengkap Kader</th>
             <th style="background-color: #002b40; color: #ffffff; font-weight: bold; text-align: center;">L/P</th>
@@ -76,7 +75,6 @@
         @endphp
         <tr>
             <td style="text-align: center; font-weight: bold;">{{ $p->ranking ?? '-' }}</td>
-            <td style="text-align: center; mso-number-format:'\@';">{{ $p->anggota->nik }}</td>
             <td style="text-align: center; mso-number-format:'\@';">{{ $p->anggota->nbm ?? '-' }}</td>
             <td>{{ $p->anggota->nama_lengkap }}</td>
             <td style="text-align: center;">{{ $p->anggota->jenis_kelamin ?? '-' }}</td>
@@ -94,20 +92,20 @@
         </tr>
         @empty
         <tr>
-            <td colspan="16" style="text-align: center; font-style: italic;">Belum ada data peserta terdaftar.</td>
+            <td colspan="15" style="text-align: center; font-style: italic;">Belum ada data peserta terdaftar.</td>
         </tr>
         @endforelse
         <tr>
-            <td colspan="16"></td>
+            <td colspan="15"></td>
         </tr>
         <tr>
-            <td colspan="16" style="font-size: 8pt; font-style: italic; color: #64748b;">
+            <td colspan="15" style="font-size: 8pt; font-style: italic; color: #64748b;">
                 * NA = 40% Kognitif (70% Posttest + 30% N-Gain) + 35% Psikomotor (90% Praktik + 10% Keaktifan) + 25% Afektif. Kehadiran minimal 75%.
             </td>
         </tr>
         @if($tesKertas->isNotEmpty())
         <tr>
-            <td colspan="16" style="font-size: 8pt; font-style: italic; color: #92400e;">
+            <td colspan="15" style="font-size: 8pt; font-style: italic; color: #92400e;">
                 * Sel Pretest/Posttest berlatar kuning = nilai diinput admin dari lembar jawaban kertas (dinilai dengan kunci jawaban yang sama).
             </td>
         </tr>

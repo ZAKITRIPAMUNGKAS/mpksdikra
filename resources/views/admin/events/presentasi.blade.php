@@ -26,7 +26,6 @@
             inset: 0;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(14px) scale(0.985);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -34,36 +33,83 @@
             overflow-y: auto;
             z-index: 0;
             pointer-events: none;
+            backface-visibility: hidden;
         }
-
         .slide.active {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
             z-index: 10;
             pointer-events: auto;
         }
+        .slide.keluar {
+            visibility: visible;
+            z-index: 5;
+        }
+
+        /* Bilah progres di atas panggung */
+        .progres-deck {
+            position: absolute; top: 0; left: 0; height: 3px; z-index: 30;
+            background: linear-gradient(90deg, #f8bb00, #ffd95a);
+            box-shadow: 0 0 10px rgba(248, 187, 0, .6);
+            transition: width .6s cubic-bezier(.65, 0, .35, 1);
+        }
 
         @media (prefers-reduced-motion: no-preference) {
-            .slide {
-                transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                            transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                            visibility 0.38s;
+            /* ---- Efek GESER (berlapis, seperti PPT "Push/Cover") ---- */
+            [data-efek="geser"] .slide.active { animation: geserMasuk .75s cubic-bezier(.77, 0, .18, 1) both; }
+            [data-efek="geser"] .slide.keluar { animation: geserKeluar .75s cubic-bezier(.77, 0, .18, 1) both; }
+            [data-efek="geser"][data-arah="mundur"] .slide.active { animation-name: geserMasukMundur; }
+            [data-efek="geser"][data-arah="mundur"] .slide.keluar { animation-name: geserKeluarMundur; }
+            @keyframes geserMasuk {
+                from { transform: translate3d(100%, 0, 0); box-shadow: -30px 0 60px rgba(0, 0, 0, .45); }
+                to   { transform: translate3d(0, 0, 0);    box-shadow: -30px 0 60px rgba(0, 0, 0, 0); }
             }
-            .anim-item {
-                opacity: 0;
-                transform: translateY(10px);
-                transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1),
-                            transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+            @keyframes geserKeluar {
+                from { transform: translate3d(0, 0, 0) scale(1); opacity: 1; filter: brightness(1); }
+                to   { transform: translate3d(-28%, 0, 0) scale(.9); opacity: .35; filter: brightness(.55); }
             }
-            .slide.active .anim-item {
-                opacity: 1;
-                transform: translateY(0);
+            @keyframes geserMasukMundur {
+                from { transform: translate3d(-100%, 0, 0); box-shadow: 30px 0 60px rgba(0, 0, 0, .45); }
+                to   { transform: translate3d(0, 0, 0);     box-shadow: 30px 0 60px rgba(0, 0, 0, 0); }
             }
-            .d-1 { transition-delay: 0.06s; }
-            .d-2 { transition-delay: 0.12s; }
-            .d-3 { transition-delay: 0.18s; }
-            .d-4 { transition-delay: 0.24s; }
+            @keyframes geserKeluarMundur {
+                from { transform: translate3d(0, 0, 0) scale(1); opacity: 1; filter: brightness(1); }
+                to   { transform: translate3d(28%, 0, 0) scale(.9); opacity: .35; filter: brightness(.55); }
+            }
+
+            /* ---- Efek ZOOM ---- */
+            [data-efek="zoom"] .slide.active { animation: zoomMasuk .7s cubic-bezier(.16, 1, .3, 1) both; }
+            [data-efek="zoom"] .slide.keluar { animation: zoomKeluar .5s cubic-bezier(.7, 0, .84, 0) both; }
+            [data-efek="zoom"][data-arah="mundur"] .slide.active { animation-name: zoomMasukMundur; }
+            [data-efek="zoom"][data-arah="mundur"] .slide.keluar { animation-name: zoomKeluarMundur; }
+            @keyframes zoomMasuk        { from { transform: scale(.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+            @keyframes zoomKeluar       { from { transform: scale(1); opacity: 1; }   to { transform: scale(1.15); opacity: 0; } }
+            @keyframes zoomMasukMundur  { from { transform: scale(1.15); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+            @keyframes zoomKeluarMundur { from { transform: scale(1); opacity: 1; }   to { transform: scale(.82); opacity: 0; } }
+
+            /* ---- Efek PUDAR ---- */
+            [data-efek="pudar"] .slide.active { animation: pudarMasuk .6s ease both; }
+            [data-efek="pudar"] .slide.keluar { animation: pudarKeluar .6s ease both; }
+            @keyframes pudarMasuk  { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
+            @keyframes pudarKeluar { from { opacity: 1; } to { opacity: 0; } }
+
+            /* ---- Isi slide muncul bertahap setelah slide masuk ---- */
+            .slide.active .anim-item { animation: isiMuncul .65s cubic-bezier(.16, 1, .3, 1) both; animation-delay: .35s; }
+            .slide.active .d-1 { animation-delay: .38s; }
+            .slide.active .d-2 { animation-delay: .5s; }
+            .slide.active .d-3 { animation-delay: .62s; }
+            .slide.active .d-4 { animation-delay: .74s; }
+            @keyframes isiMuncul {
+                from { opacity: 0; transform: translate3d(0, 22px, 0); filter: blur(4px); }
+                to   { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+            }
+
+            /* ---- Grafik batang tumbuh dari kiri ---- */
+            .slide.active div[style^="width"] {
+                transform-origin: left center;
+                animation: batangTumbuh 1s cubic-bezier(.22, 1, .36, 1) .7s both;
+            }
+            @keyframes batangTumbuh { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         }
 
         .slide-bg-accent {
@@ -109,10 +155,13 @@
                 page-break-after: auto !important;
                 break-after: auto !important;
             }
-            .anim-item {
+            .anim-item, .slide, div[style^="width"] {
                 opacity: 1 !important;
                 transform: none !important;
+                filter: none !important;
+                animation: none !important;
             }
+            .progres-deck { display: none !important; }
             #top-controls, #bottom-controls, #toc-drawer {
                 display: none !important;
             }
@@ -145,6 +194,11 @@
                     <span class="hidden md:inline" x-text="isAutoPlay ? 'Jeda' : 'Auto'"></span>
                 </button>
 
+                <button type="button" @click="gantiEfek()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-slate-200 transition" title="Ganti Efek Transisi (Tombol T)" data-ganti-efek>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h11m0 0l-3-3m3 3l-3 3M20 17H9m0 0l3-3m-3 3l3 3"/></svg>
+                    <span class="hidden md:inline" x-text="'Efek: ' + namaEfek[efek]"></span>
+                </button>
+
                 <button type="button" @click="toggleDrawer()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-slate-200 transition" title="Daftar Slide (Tombol O)">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/></svg>
                     <span class="hidden md:inline">Daftar Slide</span>
@@ -174,13 +228,17 @@
         {{-- STAGE 10 SLIDE --}}
         <main id="presentation-stage"
               class="flex-1 relative overflow-hidden"
+              :data-arah="arah"
+              :data-efek="efek"
               @touchstart="handleTouchStart($event)"
               @touchend="handleTouchEnd($event)">
+
+            <div class="progres-deck" :style="'width: ' + (currentSlide / totalSlides * 100) + '%'"></div>
 
             {{-- ============================================================== --}}
             {{-- SLIDE 1: COVER JUDUL PELATIHAN                                 --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="{ 'active': currentSlide === 1 }" id="slide-1" style="background: linear-gradient(135deg, #001f30 0%, #003552 55%, #005c8a 100%); color: white;">
+            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="kelasSlide(1)" id="slide-1" style="background: linear-gradient(135deg, #001f30 0%, #003552 55%, #005c8a 100%); color: white;">
                 <div class="relative z-10 flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3.5">
                         <div class="w-12 h-12 rounded-2xl bg-white p-1.5 shadow-lg flex items-center justify-center shrink-0">
@@ -240,7 +298,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 2: RINGKASAN EKSEKUTIF & BOBOT PENILAIAN                 --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 2 }" id="slide-2">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(2)" id="slide-2">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -341,7 +399,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 3: DEMOGRAFI & PROFIL KADER PESERTA                      --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 3 }" id="slide-3">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(3)" id="slide-3">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200">
@@ -451,7 +509,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 4: AGENDA SESI & KEDISIPLINAN PRESENSI                   --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 4 }" id="slide-4">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(4)" id="slide-4">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -522,7 +580,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 5: EVALUASI KOGNITIF (PRETEST, POSTTEST & N-GAIN)        --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 5 }" id="slide-5">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(5)" id="slide-5">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -601,7 +659,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 6: PRAKTIK IBADAH, SIKAP & KEAKTIFAN FORUM               --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 6 }" id="slide-6">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(6)" id="slide-6">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -696,7 +754,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 7: YUDISIUM KELULUSAN & DISTRIBUSI PREDIKAT              --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 7 }" id="slide-7">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(7)" id="slide-7">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -802,7 +860,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 8: PENGHARGAAN KADER TERBAIK (TOP 3 + TOP 10)            --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 8 }" id="slide-8">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(8)" id="slide-8">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -890,7 +948,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 9: PROGRES RTL & EVALUASI PENYELENGGARAAN (ANGKET)       --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="{ 'active': currentSlide === 9 }" id="slide-9">
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(9)" id="slide-9">
                 <div class="slide-bg-accent"></div>
 
                 <div class="relative z-10 flex items-center justify-between pb-3 border-b border-slate-200 gap-4">
@@ -996,7 +1054,7 @@
             {{-- ============================================================== --}}
             {{-- SLIDE 10: PENUTUP & AMANAH GERAKAN                             --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="{ 'active': currentSlide === 10 }" id="slide-10" style="background: linear-gradient(135deg, #001c2b 0%, #002e47 60%, #005c8a 100%); color: white;">
+            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="kelasSlide(10)" id="slide-10" style="background: linear-gradient(135deg, #001c2b 0%, #002e47 60%, #005c8a 100%); color: white;">
                 <div class="relative z-10 flex items-center justify-between">
                     <span class="text-xs uppercase tracking-widest font-black text-[#f8bb00]">Penutup Baitul Arqam</span>
                     <span class="text-xs text-slate-300">MPKSDI PDM Karanganyar</span>
@@ -1068,7 +1126,7 @@
         </div>
         <div class="pt-3 border-t border-white/10 text-[11px] text-slate-400 space-y-1">
             <p>Navigasi: Panah Kiri/Kanan, Spasi, Geser Layar (Swipe).</p>
-            <p>Pintasan: <b>F</b> Layar Penuh &bull; <b>O</b> Daftar Slide &bull; <b>H</b> Bersih &bull; <b>P</b> Cetak PDF.</p>
+            <p>Pintasan: <b>F</b> Layar Penuh &bull; <b>O</b> Daftar Slide &bull; <b>H</b> Bersih &bull; <b>T</b> Efek Transisi &bull; <b>P</b> Cetak PDF.</p>
         </div>
     </aside>
 
@@ -1082,6 +1140,12 @@
                 isDrawerOpen: false,
                 hideChrome: false,
                 touchStartX: 0,
+                arah: 'maju',
+                keluar: null,
+                keluarTimer: null,
+                efek: 'geser',
+                daftarEfek: ['geser', 'zoom', 'pudar'],
+                namaEfek: { geser: 'Geser', zoom: 'Zoom', pudar: 'Pudar' },
                 slideTitles: [
                     'Sampul Judul Kegiatan',
                     'Ringkasan Eksekutif & Bobot',
@@ -1095,26 +1159,42 @@
                     'Penutup & Amanah Gerakan',
                 ],
                 init() {
+                    const tersimpan = localStorage.getItem('arqam-ppt-efek');
+                    if (this.daftarEfek.includes(tersimpan)) {
+                        this.efek = tersimpan;
+                    }
                     const urlParams = new URLSearchParams(window.location.search);
                     const initial = parseInt(urlParams.get('slide'), 10);
                     if (initial && initial >= 1 && initial <= this.totalSlides) {
                         this.currentSlide = initial;
                     }
                 },
-                nextSlide() {
-                    if (this.currentSlide < this.totalSlides) {
-                        this.currentSlide++;
+                kelasSlide(n) {
+                    return { active: this.currentSlide === n, keluar: this.keluar === n && this.currentSlide !== n };
+                },
+                pindahKe(num) {
+                    if (num < 1 || num > this.totalSlides || num === this.currentSlide) {
+                        return;
                     }
+                    this.arah = num > this.currentSlide ? 'maju' : 'mundur';
+                    this.keluar = this.currentSlide;
+                    this.currentSlide = num;
+                    clearTimeout(this.keluarTimer);
+                    this.keluarTimer = setTimeout(() => { this.keluar = null; }, 800);
+                },
+                gantiEfek() {
+                    const i = this.daftarEfek.indexOf(this.efek);
+                    this.efek = this.daftarEfek[(i + 1) % this.daftarEfek.length];
+                    localStorage.setItem('arqam-ppt-efek', this.efek);
+                },
+                nextSlide() {
+                    this.pindahKe(this.currentSlide + 1);
                 },
                 prevSlide() {
-                    if (this.currentSlide > 1) {
-                        this.currentSlide--;
-                    }
+                    this.pindahKe(this.currentSlide - 1);
                 },
                 goToSlide(num) {
-                    if (num >= 1 && num <= this.totalSlides) {
-                        this.currentSlide = num;
-                    }
+                    this.pindahKe(num);
                 },
                 toggleAutoPlay() {
                     this.isAutoPlay = !this.isAutoPlay;
@@ -1171,6 +1251,9 @@
                     } else if (e.key === 'o' || e.key === 'O' || e.key === 'm' || e.key === 'M') {
                         e.preventDefault();
                         this.toggleDrawer();
+                    } else if (e.key === 't' || e.key === 'T') {
+                        e.preventDefault();
+                        this.gantiEfek();
                     } else if (e.key === 'p' || e.key === 'P') {
                         e.preventDefault();
                         this.printPdf();

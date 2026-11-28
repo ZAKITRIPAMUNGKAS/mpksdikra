@@ -16,6 +16,8 @@ use App\Models\PsikomotorNilai;
 use App\Models\PsikomotorTemplate;
 use App\Models\Rtl;
 use App\Services\NilaiService;
+use App\Support\AwanKata;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PresentasiController extends Controller
@@ -274,6 +276,23 @@ class PresentasiController extends Controller
             ->orderByDesc('total')
             ->get();
 
+        // Slide "Suara Kader" ala Mentimeter: awan kata + kartu jawaban anonim.
+        $perasaanTeks = AngketKomentar::where('event_id', $event->id)
+            ->when($aktifIds->isNotEmpty(), fn ($q) => $q->whereIn('anggota_id', $aktifIds))
+            ->whereNotNull('perasaan')
+            ->where('perasaan', '!=', '')
+            ->latest()
+            ->pluck('perasaan')
+            ->map(fn ($t) => trim((string) $t))
+            ->filter()
+            ->values();
+        $perasaanResponden = $perasaanTeks->count();
+        $awanKata = AwanKata::dari($perasaanTeks);
+        $perasaanKartu = $perasaanTeks
+            ->map(fn ($t) => Str::limit(preg_replace('/\s+/u', ' ', $t), 150))
+            ->take(8)
+            ->values();
+
         return view('admin.events.presentasi', compact(
             'event',
             'totalPeserta',
@@ -335,7 +354,10 @@ class PresentasiController extends Controller
             'angketRerataTotal',
             'angketKategoriStats',
             'angketKomentarList',
-            'angketPerasaanList'
+            'angketPerasaanList',
+            'perasaanResponden',
+            'awanKata',
+            'perasaanKartu'
         ));
     }
 }

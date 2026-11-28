@@ -54,7 +54,9 @@
             transition: width .6s cubic-bezier(.65, 0, .35, 1);
         }
 
-        @media (prefers-reduced-motion: no-preference) {
+        /* Animasi sengaja tidak mengikuti setelan "kurangi animasi" OS: banyak laptop Windows mematikannya
+           sehingga transisi tidak pernah tampil. Panitia bisa memilih efek "Tanpa" (tombol Efek / T). */
+        @media screen {
             /* ---- Efek GESER (berlapis, seperti PPT "Push/Cover") ---- */
             [data-efek="geser"] .slide.active { animation: geserMasuk .75s cubic-bezier(.77, 0, .18, 1) both; }
             [data-efek="geser"] .slide.keluar { animation: geserKeluar .75s cubic-bezier(.77, 0, .18, 1) both; }
@@ -94,18 +96,31 @@
             @keyframes pudarKeluar { from { opacity: 1; } to { opacity: 0; } }
 
             /* ---- Isi slide muncul bertahap setelah slide masuk ---- */
-            .slide.active .anim-item { animation: isiMuncul .65s cubic-bezier(.16, 1, .3, 1) both; animation-delay: .35s; }
-            .slide.active .d-1 { animation-delay: .38s; }
-            .slide.active .d-2 { animation-delay: .5s; }
-            .slide.active .d-3 { animation-delay: .62s; }
-            .slide.active .d-4 { animation-delay: .74s; }
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .anim-item { animation: isiMuncul .65s cubic-bezier(.16, 1, .3, 1) both; animation-delay: .35s; }
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .d-1 { animation-delay: .38s; }
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .d-2 { animation-delay: .5s; }
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .d-3 { animation-delay: .62s; }
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .d-4 { animation-delay: .74s; }
             @keyframes isiMuncul {
                 from { opacity: 0; transform: translate3d(0, 22px, 0); filter: blur(4px); }
                 to   { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
             }
 
+            /* ---- Suara Kader: kata & kartu "meletup" satu per satu ala Mentimeter ---- */
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .kata-awan,
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active .kartu-suara {
+                animation: letupMuncul .55s cubic-bezier(.34, 1.56, .64, 1) both;
+                animation-delay: var(--d, .4s);
+            }
+            @keyframes letupMuncul {
+                from { opacity: 0; transform: scale(.4) translate3d(0, 12px, 0); }
+                to   { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+            }
+            .kata-awan { display: inline-block; transition: transform .2s; }
+            .kata-awan:hover { transform: scale(1.08); }
+
             /* ---- Grafik batang tumbuh dari kiri ---- */
-            .slide.active div[style^="width"] {
+            #presentation-stage:not([data-efek="tanpa"]) .slide.active div[style^="width"] {
                 transform-origin: left center;
                 animation: batangTumbuh 1s cubic-bezier(.22, 1, .36, 1) .7s both;
             }
@@ -155,7 +170,7 @@
                 page-break-after: auto !important;
                 break-after: auto !important;
             }
-            .anim-item, .slide, div[style^="width"] {
+            .anim-item, .slide, div[style^="width"], .kata-awan, .kartu-suara {
                 opacity: 1 !important;
                 transform: none !important;
                 filter: none !important;
@@ -225,7 +240,7 @@
             Tampilkan Kontrol (H)
         </button>
 
-        {{-- STAGE 10 SLIDE --}}
+        {{-- STAGE 11 SLIDE --}}
         <main id="presentation-stage"
               class="flex-1 relative overflow-hidden"
               :data-arah="arah"
@@ -392,7 +407,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>MPKSDI PDM Karanganyar &bull; {{ $event->nama_event }}</span>
-                    <span class="font-semibold" x-text="'Slide 2 / ' + totalSlides">Slide 2 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 2 / ' + totalSlides">Slide 2 / 11</span>
                 </div>
             </section>
 
@@ -502,7 +517,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Terintegrasi dengan Pangkalan Data Kader MPKSDI PDM Karanganyar</span>
-                    <span class="font-semibold" x-text="'Slide 3 / ' + totalSlides">Slide 3 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 3 / ' + totalSlides">Slide 3 / 11</span>
                 </div>
             </section>
 
@@ -573,7 +588,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Pemindaian Presensi QR Kamera &amp; Checklist Sesi Fasilitator</span>
-                    <span class="font-semibold" x-text="'Slide 4 / ' + totalSlides">Slide 4 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 4 / ' + totalSlides">Slide 4 / 11</span>
                 </div>
             </section>
 
@@ -652,7 +667,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Kalkulasi Kognitif: {{ round($bobot['posttest_dalam_kognitif'] * 100) }}% Posttest + {{ round($bobot['ngain_dalam_kognitif'] * 100) }}% N-Gain</span>
-                    <span class="font-semibold" x-text="'Slide 5 / ' + totalSlides">Slide 5 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 5 / ' + totalSlides">Slide 5 / 11</span>
                 </div>
             </section>
 
@@ -747,7 +762,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Penilaian Terpadu Aspek Psikomotorik, Afektif, dan Keaktifan</span>
-                    <span class="font-semibold" x-text="'Slide 6 / ' + totalSlides">Slide 6 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 6 / ' + totalSlides">Slide 6 / 11</span>
                 </div>
             </section>
 
@@ -853,7 +868,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Rentang Nilai Akhir: {{ $minNilaiAkhir }} &ndash; {{ $maxNilaiAkhir }} (Rerata {{ $avgNilaiAkhir }})</span>
-                    <span class="font-semibold" x-text="'Slide 7 / ' + totalSlides">Slide 7 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 7 / ' + totalSlides">Slide 7 / 11</span>
                 </div>
             </section>
 
@@ -941,7 +956,7 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Peringkat disusun berdasarkan Nilai Akhir &amp; Posttest tertinggi</span>
-                    <span class="font-semibold" x-text="'Slide 8 / ' + totalSlides">Slide 8 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 8 / ' + totalSlides">Slide 8 / 11</span>
                 </div>
             </section>
 
@@ -1047,14 +1062,78 @@
 
                 <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
                     <span>Data RTL dan Angket Penyelenggaraan Terintegrasi (Digital &amp; Kertas)</span>
-                    <span class="font-semibold" x-text="'Slide 9 / ' + totalSlides">Slide 9 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 9 / ' + totalSlides">Slide 9 / 11</span>
                 </div>
             </section>
 
             {{-- ============================================================== --}}
-            {{-- SLIDE 10: PENUTUP & AMANAH GERAKAN                             --}}
+            {{-- SLIDE 10: SUARA KADER (ALA MENTIMETER) — PERASAAN MENGIKUTI     --}}
             {{-- ============================================================== --}}
-            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="kelasSlide(10)" id="slide-10" style="background: linear-gradient(135deg, #001c2b 0%, #002e47 60%, #005c8a 100%); color: white;">
+            @php
+                $pastel = [['#e8f0ff', '#1d3f8f'], ['#ffe6ef', '#8f1d45'], ['#e3f6ee', '#11613f'], ['#efe8ff', '#4a2a91'], ['#fff1dc', '#8a4b00'], ['#e0f5fa', '#0b5566']];
+            @endphp
+            <section class="slide px-6 py-5 sm:px-10 sm:py-7" :class="kelasSlide(10)" id="slide-10" style="background: #f6f6fa;" data-slide-suara>
+                <div class="relative z-10 flex items-start justify-between gap-4">
+                    <div class="anim-item d-1 min-w-0">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#196cff] block">Bagian IX &bull; Suara Kader</span>
+                        <h2 class="text-2xl sm:text-4xl font-black text-[#101834] tracking-tight leading-tight mt-1">
+                            Bagaimana perasaan Anda setelah mengikuti {{ $event->nama_event }}?
+                        </h2>
+                    </div>
+                </div>
+
+                @if($perasaanResponden > 0)
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-4 items-stretch">
+                        {{-- Awan kata --}}
+                        <div class="{{ $perasaanKartu->isNotEmpty() ? 'lg:col-span-7' : 'lg:col-span-12' }} rounded-3xl bg-white shadow-[0_2px_24px_rgba(16,24,52,0.06)] px-6 py-8 flex items-center justify-center min-h-[16rem]">
+                            <div class="flex flex-wrap items-center justify-center content-center gap-x-5 gap-y-1 max-w-3xl text-center" data-awan-kata>
+                                @forelse($awanKata as $i => $k)
+                                    <span class="kata-awan font-extrabold leading-tight tracking-tight"
+                                          style="font-size: calc({{ $k['ukuran'] }} * clamp(0.62rem, 1.05vw, 1rem)); color: {{ $k['warna'] }}; --d: {{ number_format(0.45 + $i * 0.05, 2) }}s;"
+                                          title="{{ $k['jumlah'] }} jawaban">{{ $k['kata'] }}</span>
+                                @empty
+                                    <span class="text-sm text-slate-400">Jawaban terlalu singkat untuk dibuat awan kata.</span>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        {{-- Kartu jawaban anonim --}}
+                        @if($perasaanKartu->isNotEmpty())
+                            <div class="lg:col-span-5 columns-1 sm:columns-2 gap-3 [column-fill:_balance]" data-kartu-suara>
+                                @foreach($perasaanKartu as $i => $teks)
+                                    @php [$bg, $fg] = $pastel[$i % count($pastel)]; @endphp
+                                    <div class="kartu-suara break-inside-avoid mb-3 rounded-2xl px-4 py-3 text-[12.5px] leading-snug font-semibold"
+                                         style="background: {{ $bg }}; color: {{ $fg }}; --d: {{ number_format(0.6 + $i * 0.12, 2) }}s;">
+                                        {{ $teks }}
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="relative z-10 my-auto py-10 text-center anim-item d-2">
+                        <div class="inline-flex w-16 h-16 rounded-2xl bg-white shadow-sm items-center justify-center text-3xl mb-3">&#128172;</div>
+                        <p class="text-base font-bold text-slate-700">Belum ada jawaban perasaan dari peserta.</p>
+                        <p class="text-sm text-slate-500 mt-1">Jawaban muncul di sini setelah peserta mengisi angket evaluasi.</p>
+                    </div>
+                @endif
+
+                <div class="relative z-10 pt-2.5 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
+                    <span>Jawaban terbuka angket evaluasi &bull; ditampilkan anonim</span>
+                    <span class="flex items-center gap-4">
+                        <span class="inline-flex items-center gap-1.5 font-bold text-[#101834] text-sm" title="Jumlah responden">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+                            {{ $perasaanResponden }}
+                        </span>
+                        <span class="font-semibold" x-text="'Slide 10 / ' + totalSlides">Slide 10 / 11</span>
+                    </span>
+                </div>
+            </section>
+
+            {{-- ============================================================== --}}
+            {{-- SLIDE 11: PENUTUP & AMANAH GERAKAN                             --}}
+            {{-- ============================================================== --}}
+            <section class="slide px-6 py-6 sm:px-12 sm:py-9" :class="kelasSlide(11)" id="slide-11" style="background: linear-gradient(135deg, #001c2b 0%, #002e47 60%, #005c8a 100%); color: white;">
                 <div class="relative z-10 flex items-center justify-between">
                     <span class="text-xs uppercase tracking-widest font-black text-[#f8bb00]">Penutup Baitul Arqam</span>
                     <span class="text-xs text-slate-300">MPKSDI PDM Karanganyar</span>
@@ -1077,7 +1156,7 @@
 
                 <div class="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300">
                     <span>Nashrun minallahi wa fathun qarib</span>
-                    <span class="font-semibold" x-text="'Slide 10 / ' + totalSlides">Slide 10 / 10</span>
+                    <span class="font-semibold" x-text="'Slide 11 / ' + totalSlides">Slide 11 / 11</span>
                 </div>
             </section>
 
@@ -1134,7 +1213,7 @@
         function livePresentation() {
             return {
                 currentSlide: 1,
-                totalSlides: 10,
+                totalSlides: 11,
                 isAutoPlay: false,
                 autoPlayTimer: null,
                 isDrawerOpen: false,
@@ -1144,8 +1223,8 @@
                 keluar: null,
                 keluarTimer: null,
                 efek: 'geser',
-                daftarEfek: ['geser', 'zoom', 'pudar'],
-                namaEfek: { geser: 'Geser', zoom: 'Zoom', pudar: 'Pudar' },
+                daftarEfek: ['geser', 'zoom', 'pudar', 'tanpa'],
+                namaEfek: { geser: 'Geser', zoom: 'Zoom', pudar: 'Pudar', tanpa: 'Tanpa' },
                 slideTitles: [
                     'Sampul Judul Kegiatan',
                     'Ringkasan Eksekutif & Bobot',
@@ -1156,6 +1235,7 @@
                     'Yudisium & Sebaran Predikat',
                     'Kader Terbaik & Top 10',
                     'Progres RTL & Evaluasi Angket',
+                    'Suara Kader (Perasaan Peserta)',
                     'Penutup & Amanah Gerakan',
                 ],
                 init() {

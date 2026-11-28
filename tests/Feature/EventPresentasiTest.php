@@ -116,6 +116,12 @@ class EventPresentasiTest extends TestCase
             'komentar' => 'Sangat mencerahkan bagi kader cabang.',
         ]);
 
+        AngketKomentar::create([
+            'event_id' => $event->id,
+            'anggota_id' => $anggotaNonAktif->id,
+            'perasaan' => 'Rahasia nonaktif',
+        ]);
+
         $response = $this->actingAs($admin)->get(route('admin.events.presentasi', $event));
 
         $response->assertOk();
@@ -126,6 +132,12 @@ class EventPresentasiTest extends TestCase
         $response->assertSee('LULUS MURNI');
         $response->assertSee('Ringkasan Eksekutif');
         $response->assertSee('Sangat mencerahkan bagi kader cabang.');
+        // Slide Suara Kader ala Mentimeter: awan kata & kartu anonim dari jawaban perasaan peserta aktif.
+        $response->assertSee('data-slide-suara', false);
+        $response->assertSee('data-awan-kata', false);
+        $response->assertSee('terinspirasi');
+        $response->assertDontSee('Rahasia nonaktif');
+        $response->assertSee('totalSlides: 11', false);
     }
 
     public function test_guest_cannot_access_live_presentation(): void

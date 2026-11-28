@@ -5,161 +5,150 @@
     $statusTeks = $statusLulus ? $nilai->status_kelulusan : 'Peserta';
 @endphp
 @if($sisi !== 'belakang')
-    {{-- ==================== HALAMAN 1: SERTIFIKAT UTAMA ==================== --}}
-    <div class="page-content" style="text-align: center;">
+    {{-- ==================== HALAMAN 1: SERTIFIKAT UTAMA (F4 landscape, mengisi lembar) ==================== --}}
+    @php
+        $namaPenerima = strtoupper($peserta->anggota->nama_lengkap);
+        $ukuranNama = mb_strlen($namaPenerima) > 60 ? 20 : (mb_strlen($namaPenerima) > 40 ? 24 : 30);
+        $ukuranKegiatan = mb_strlen($event->nama_event) > 70 ? 11 : (mb_strlen($event->nama_event) > 45 ? 12.5 : 14);
+    @endphp
+    <div class="page-content" style="text-align: center; padding-top: 7mm;">
 
-        {{-- Header Top: Logos Centered --}}
-        <div style="margin-bottom: 1.5mm;">
-            <table style="margin: 0 auto; border-collapse: collapse;">
-                <tr>
-                    <td style="vertical-align: middle; padding-right: 3.5mm;">
-                        @if($logoMuhammadiyah)
-                            <img src="{{ $logoMuhammadiyah }}" style="height: 13mm; width: auto;" alt="Logo Muhammadiyah">
-                        @endif
-                    </td>
-                    <td style="vertical-align: middle; padding-right: 3.5mm; color: #c59b27; font-size: 13pt; line-height: 1;">|</td>
-                    <td style="vertical-align: middle;">
-                        @if($logoMpksdi)
-                            <img src="{{ $logoMpksdi }}" style="height: 13mm; width: auto;" alt="Logo MPKSDI">
-                        @endif
-                    </td>
-                </tr>
-            </table>
-            <div style="font-size: 10pt; font-weight: bold; color: #0a3d34; letter-spacing: 0.5px; margin-top: 1.5mm;">
-                PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR
-            </div>
-            <div style="font-size: 8.2pt; font-weight: bold; color: #0284c7; letter-spacing: 0.5px; margin-top: 0.5mm;">
-                MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
-            </div>
-            <div style="margin: 1.5mm auto 2mm; font-size: 6.5pt; color: #c59b27;">
-                &#8212;&#8212;&#8212;&#8212;
-                @if($goldDiamond)
-                    <img src="{{ $goldDiamond }}" style="height: 2.2mm; width: 2.2mm; vertical-align: middle;" alt="&bull;">
-                @else
-                    &bull;
-                @endif
-                &#8212;&#8212;&#8212;&#8212;
-            </div>
+        {{-- Kop: logo & lembaga --}}
+        <table style="margin: 0 auto; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: middle; padding-right: 5mm;">
+                    @if($logoMuhammadiyah)
+                        <img src="{{ $logoMuhammadiyah }}" style="height: 14mm; width: auto;" alt="Logo Muhammadiyah">
+                    @endif
+                </td>
+                <td style="vertical-align: middle; padding-right: 5mm; color: #c59b27; font-size: 18pt; line-height: 1;">|</td>
+                <td style="vertical-align: middle;">
+                    @if($logoMpksdi)
+                        <img src="{{ $logoMpksdi }}" style="height: 14mm; width: auto;" alt="Logo MPKSDI">
+                    @endif
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 13pt; font-weight: bold; color: #0a3d34; letter-spacing: 1px; margin-top: 1.8mm;">
+            PIMPINAN DAERAH MUHAMMADIYAH KARANGANYAR
+        </div>
+        <div style="font-size: 10pt; font-weight: bold; color: #0284c7; letter-spacing: 0.6px; margin-top: 0.8mm;">
+            MAJELIS PEMBINAAN KADER DAN SUMBER DAYA INSANI (MPKSDI)
         </div>
 
         {{-- Judul & Nomor --}}
-        <div class="serif" style="font-size: 26pt; font-weight: bold; color: #064e3b; letter-spacing: 3px; line-height: 1;">
+        <div class="serif" style="font-size: 38pt; font-weight: bold; color: #064e3b; letter-spacing: 8px; line-height: 1; margin-top: 3.5mm;">
             SERTIFIKAT
         </div>
-        <div style="margin: 1mm auto 1.5mm; font-size: 7pt; color: #c59b27;">
+        <div style="margin: 1.5mm auto 1.2mm; font-size: 8pt; color: #c59b27;">
+            &#8212;&#8212;&#8212;&#8212;&#8212;
             @if($goldDiamond)
-                <img src="{{ $goldDiamond }}" style="height: 2mm; width: 2mm; vertical-align: middle;" alt="&bull;">
-                &nbsp;
-                <img src="{{ $goldDiamond }}" style="height: 2.5mm; width: 2.5mm; vertical-align: middle;" alt="&bull;">
-                &nbsp;
-                <img src="{{ $goldDiamond }}" style="height: 2mm; width: 2mm; vertical-align: middle;" alt="&bull;">
+                <img src="{{ $goldDiamond }}" style="height: 2.6mm; width: 2.6mm; vertical-align: middle;" alt="&bull;">
+                <img src="{{ $goldDiamond }}" style="height: 3.2mm; width: 3.2mm; vertical-align: middle;" alt="&bull;">
+                <img src="{{ $goldDiamond }}" style="height: 2.6mm; width: 2.6mm; vertical-align: middle;" alt="&bull;">
             @else
                 &bull; &bull; &bull;
             @endif
+            &#8212;&#8212;&#8212;&#8212;&#8212;
         </div>
-        <div style="font-size: 8.2pt; font-weight: bold; color: #1e293b; margin-bottom: 2mm;">
+        <div style="font-size: 10pt; font-weight: bold; color: #1e293b; letter-spacing: 0.4px;">
             Nomor: {{ $event->generateNomorSertifikat($peserta->id) }}
         </div>
 
         {{-- Penerima --}}
-        <div style="font-size: 9pt; font-style: italic; color: #475569; margin-bottom: 0.5mm;">
+        <div style="font-size: 12pt; font-style: italic; color: #475569; margin-top: 3.5mm;">
             Diberikan kepada:
         </div>
-        <div class="serif" style="font-size: 20pt; font-weight: bold; color: #064e3b; text-decoration: underline; line-height: 1.1; margin-bottom: 1.5mm;">
-            {{ strtoupper($peserta->anggota->nama_lengkap) }}
+        <div class="serif" style="font-size: {{ $ukuranNama }}pt; font-weight: bold; color: #064e3b; line-height: 1.15; margin-top: 1mm;">
+            {{ $namaPenerima }}
         </div>
-        <div style="font-size: 8.5pt; font-weight: bold; color: #334155; margin-bottom: 2mm;">
+        <div style="width: 150mm; margin: 1.5mm auto 0; border-top: 1.2px solid #c59b27; height: 1px;"></div>
+        <div style="font-size: 11pt; font-weight: bold; color: #334155; margin-top: 2mm;">
             @if($peserta->anggota->nbm)
-                NBM: {{ $peserta->anggota->nbm }} &bull;
+                NBM: {{ $peserta->anggota->nbm }} &nbsp;&bull;&nbsp;
             @endif
             Utusan: PCM {{ $peserta->anggota->pcm ?: ($peserta->anggota->kecamatan ?: 'Karanganyar') }}
         </div>
 
-        {{-- Pernyataan Kelulusan --}}
-        <div style="font-size: 8.5pt; color: #334155; margin-bottom: 1.5mm;">
+        {{-- Pernyataan & kegiatan --}}
+        <div style="font-size: 11pt; color: #334155; margin-top: 3.5mm;">
             {{ ! $statusLulus ? 'Telah mengikuti' : ($nilai->status_kelulusan === 'Lulus Bersyarat' ? 'Telah memenuhi persyaratan kelulusan bersyarat' : 'Telah memenuhi persyaratan kelulusan') }} pada kegiatan:
         </div>
-
-        {{-- Ribbon Event Name --}}
-        <div style="margin: 0 auto 2mm;">
-            <div style="display: inline-block; background: #064e3b; border: 1.5px solid #d4af37; border-radius: 18px; padding: 4.5px 22px; color: #ffffff; font-weight: bold; font-size: 10.5pt; letter-spacing: 0.5px; text-transform: uppercase;">
+        <div style="margin: 2mm auto 0;">
+            <div style="display: inline-block; background: #064e3b; border: 2px solid #d4af37; border-radius: 24px; padding: 6px 34px; color: #ffffff; font-weight: bold; font-size: {{ $ukuranKegiatan }}pt; letter-spacing: 0.8px; text-transform: uppercase; max-width: 250mm;">
                 {{ $event->nama_event }}
             </div>
         </div>
-
-        {{-- Waktu & Lokasi --}}
-        <div style="font-size: 8pt; color: #334155; line-height: 1.35; max-width: 220mm; margin: 0 auto 2mm;">
-            yang diselenggarakan pada tanggal {{ $tanggalEventFormatted }}
-            @if($event->lokasi)bertempat di {{ $event->lokasi }}@endif,
+        <div style="font-size: 10pt; color: #334155; line-height: 1.4; margin: 2.5mm auto 0;">
+            yang diselenggarakan pada tanggal <b>{{ $tanggalEventFormatted }}</b>
+            @if($event->lokasi)bertempat di <b>{{ $event->lokasi }}</b>@endif,
             {{ $statusLulus ? 'dan berdasarkan evaluasi dinyatakan:' : 'sebagai:' }}
         </div>
 
-        {{-- Status Kelulusan Formal (Bebas AI Slop, Elegan & Berwibawa) --}}
-        <div style="margin: 2mm auto 3mm; text-align: center;">
-            <table style="margin: 0 auto; border-collapse: collapse;">
-                <tr>
-                    <td style="width: 32mm; vertical-align: middle; padding-right: 4mm;">
-                        <div style="border-top: 1px solid #c59b27; height: 1px;"></div>
-                    </td>
-                    <td style="vertical-align: middle; text-align: center; white-space: nowrap;">
-                        <span class="serif" style="font-size: 15pt; font-weight: bold; color: #064e3b; letter-spacing: 5px;">
-                            {{ strtoupper($statusTeks) }}
+        {{-- Status --}}
+        <table style="margin: 2mm auto 0; border-collapse: collapse;">
+            <tr>
+                <td style="width: 45mm; vertical-align: middle; padding-right: 5mm;">
+                    <div style="border-top: 1.2px solid #c59b27; height: 1px;"></div>
+                </td>
+                <td style="vertical-align: middle; text-align: center; white-space: nowrap;">
+                    <span class="serif" style="font-size: 21pt; font-weight: bold; color: #064e3b; letter-spacing: 7px;">
+                        {{ strtoupper($statusTeks) }}
+                    </span>
+                    @if($statusLulus && $nilai->grade)
+                        <span style="font-size: 11pt; font-weight: bold; color: #334155; letter-spacing: 1.5px; margin-left: 2.5mm;">
+                            (PREDIKAT {{ strtoupper($nilai->grade) }})
                         </span>
-                        @if($statusLulus && $nilai->grade)
-                            <span style="font-size: 9pt; font-weight: bold; color: #334155; letter-spacing: 1.5px; margin-left: 2mm;">
-                                (PREDIKAT {{ strtoupper($nilai->grade) }})
-                            </span>
-                        @endif
-                    </td>
-                    <td style="width: 32mm; vertical-align: middle; padding-left: 4mm;">
-                        <div style="border-top: 1px solid #c59b27; height: 1px;"></div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+                    @endif
+                </td>
+                <td style="width: 45mm; vertical-align: middle; padding-left: 5mm;">
+                    <div style="border-top: 1.2px solid #c59b27; height: 1px;"></div>
+                </td>
+            </tr>
+        </table>
 
-        {{-- Signatures Table (3 Kolom) --}}
-        <table style="width: 100%; border-collapse: collapse; margin-top: 1mm;">
+        {{-- Tanda tangan & QR --}}
+        <table style="width: 100%; border-collapse: collapse; margin-top: 2mm;">
             <tr>
                 {{-- MoT / Penandatangan Kiri --}}
-                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 7.8pt; color: #1e293b;">
+                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 9.5pt; color: #1e293b;">
                     Karanganyar, {{ $tanggalTerbit }}<br>
                     <b>{{ $jabatanKiri }}</b>
-                    <div style="height: 14mm; position: relative;">
+                    <div style="height: 15mm;">
                         @if($signatureMot)
-                            <img src="{{ $signatureMot }}" style="height: 13mm; max-width: 45mm; display: block; margin: 0 auto;" alt="Ttd MoT">
+                            <img src="{{ $signatureMot }}" style="height: 14.5mm; max-width: 55mm; display: block; margin: 0.3mm auto 0;" alt="Ttd MoT">
                         @endif
                     </div>
                     <b><u>{{ $namaKiri }}</u></b><br>
-                    <span style="font-size: 7pt; color: #475569;">{{ $keteranganKiri }}</span>
+                    <span style="font-size: 8.5pt; color: #475569;">{{ $keteranganKiri }}</span>
                 </td>
 
                 {{-- QR Center --}}
                 <td style="width: 24%; text-align: center; vertical-align: middle;">
-                    @if(isset($qrPng))
-                        <div style="display: inline-block; padding: 1mm; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-                            <img src="{{ $qrPng }}" style="width: 16mm; height: 16mm; display: block; margin: 0 auto;" alt="QR Code">
+                    @if(isset($qrPng) && $qrPng)
+                        <div style="display: inline-block; padding: 1.2mm; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            <img src="{{ $qrPng }}" style="width: 21mm; height: 21mm; display: block; margin: 0 auto;" alt="QR Code">
                         </div>
                     @endif
-                    <div style="font-size: 6.2pt; color: #64748b; margin-top: 1mm;">
+                    <div style="font-size: 7.5pt; color: #64748b; margin-top: 1.2mm;">
                         Verifikasi Pangkalan Data<br>
-                        <span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1px 6px; font-family: monospace; font-size: 6pt; color: #334155; margin-top: 0.5mm;">
+                        <span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1px 7px; font-family: monospace; font-size: 7.5pt; color: #334155; margin-top: 0.6mm;">
                             {{ substr($nilai->verification_hash ?? '9e493fefe15faa89', 0, 16) }}
                         </span>
                     </div>
                 </td>
 
                 {{-- Ketua MPKSDI / Penandatangan Kanan --}}
-                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 7.8pt; color: #1e293b;">
+                <td style="width: 38%; text-align: center; vertical-align: top; font-size: 9.5pt; color: #1e293b;">
                     Karanganyar, {{ $tanggalTerbit }}<br>
                     <b>{{ $jabatanKanan }}</b>
-                    <div style="height: 14mm; position: relative;">
+                    <div style="height: 15mm;">
                         @if($signatureKetua)
-                            <img src="{{ $signatureKetua }}" style="height: 13mm; max-width: 45mm; display: block; margin: 0 auto;" alt="Ttd Ketua">
+                            <img src="{{ $signatureKetua }}" style="height: 14.5mm; max-width: 55mm; display: block; margin: 0.3mm auto 0;" alt="Ttd Ketua">
                         @endif
                     </div>
                     <b><u>{{ $namaKanan }}</u></b><br>
-                    <span style="font-size: 7pt; color: #475569;">{{ $nbmKanan }}</span>
+                    <span style="font-size: 8.5pt; color: #475569;">{{ $nbmKanan }}</span>
                 </td>
             </tr>
         </table>

@@ -150,11 +150,11 @@
                                     <input name="keterangan_penandatangan_kiri" value="{{ old('keterangan_penandatangan_kiri', $event->keterangan_penandatangan_kiri ?? 'Instruktur Utama Perkaderan') }}" maxlength="255" placeholder="Contoh: Instruktur Utama Perkaderan" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Tanda Tangan (PNG Transparan)</label>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Tanda Tangan (PNG/JPG)</label>
                                     @if(isset($event) && $event->ttd_kiri_path)
                                         <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-3">
                                             <div class="flex items-center gap-2">
-                                                <img src="{{ asset('storage/' . $event->ttd_kiri_path) }}" alt="Ttd MoT" class="h-9 max-w-[120px] object-contain border border-dashed border-slate-300 bg-white p-1 rounded">
+                                                <img src="{{ asset('storage/' . $event->ttd_kiri_path) }}" alt="Ttd MoT" class="h-9 max-w-[120px] object-contain border border-dashed border-slate-300 p-1 rounded" style="background-color:#fff;background-image:linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%),linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%);background-size:8px 8px;background-position:0 0,4px 4px;" title="Kotak-kotak = area transparan">
                                                 <span class="text-[11px] text-slate-600 font-medium">Tanda tangan tersimpan</span>
                                             </div>
                                             <label class="flex items-center gap-1.5 text-xs text-rose-600 font-semibold cursor-pointer">
@@ -163,8 +163,8 @@
                                             </label>
                                         </div>
                                     @endif
-                                    <input type="file" name="ttd_kiri" accept=".png,image/png" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-                                    <p class="text-[11px] text-slate-400 mt-1">Disarankan format PNG transparan horizontal, maks 2 MB.</p>
+                                    <input type="file" name="ttd_kiri" accept=".png,.jpg,.jpeg,image/png,image/jpeg" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                                    <p class="text-[11px] text-slate-400 mt-1">Boleh foto TTD di kertas putih (PNG/JPG, maks 4 MB). Latar putih otomatis dibuat transparan dan tepi kosong dipotong.</p>
                                 </div>
                             </div>
 
@@ -187,11 +187,11 @@
                                     <input name="nbm_penandatangan_sertifikat" value="{{ old('nbm_penandatangan_sertifikat', $event->nbm_penandatangan_sertifikat ?? '') }}" maxlength="50" inputmode="numeric" placeholder="Contoh: 864.219" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Tanda Tangan (PNG Transparan)</label>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Tanda Tangan (PNG/JPG)</label>
                                     @if(isset($event) && $event->ttd_kanan_path)
                                         <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-3">
                                             <div class="flex items-center gap-2">
-                                                <img src="{{ asset('storage/' . $event->ttd_kanan_path) }}" alt="Ttd Ketua" class="h-9 max-w-[120px] object-contain border border-dashed border-slate-300 bg-white p-1 rounded">
+                                                <img src="{{ asset('storage/' . $event->ttd_kanan_path) }}" alt="Ttd Ketua" class="h-9 max-w-[120px] object-contain border border-dashed border-slate-300 p-1 rounded" style="background-color:#fff;background-image:linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%),linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%);background-size:8px 8px;background-position:0 0,4px 4px;" title="Kotak-kotak = area transparan">
                                                 <span class="text-[11px] text-slate-600 font-medium">Tanda tangan tersimpan</span>
                                             </div>
                                             <label class="flex items-center gap-1.5 text-xs text-rose-600 font-semibold cursor-pointer">
@@ -200,8 +200,8 @@
                                             </label>
                                         </div>
                                     @endif
-                                    <input type="file" name="ttd_kanan" accept=".png,image/png" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-                                    <p class="text-[11px] text-slate-400 mt-1">Disarankan format PNG transparan, dicetak pada Hal. 1 &amp; Hal. 2, maks 2 MB.</p>
+                                    <input type="file" name="ttd_kanan" accept=".png,.jpg,.jpeg,image/png,image/jpeg" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                                    <p class="text-[11px] text-slate-400 mt-1">Boleh foto TTD di kertas putih (PNG/JPG, maks 4 MB), dicetak pada Hal. 1 &amp; Hal. 2. Latar putih otomatis dibuat transparan.</p>
                                 </div>
                             </div>
                         </div>

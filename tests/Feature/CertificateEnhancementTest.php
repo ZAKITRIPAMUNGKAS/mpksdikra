@@ -302,7 +302,7 @@ class CertificateEnhancementTest extends TestCase
 
         // Must contain formal typography
         $this->assertStringContainsString('LULUS', $html);
-        $this->assertStringContainsString('letter-spacing: 5px', $html);
+        $this->assertStringContainsString('letter-spacing: 7px', $html);
         $this->assertStringContainsString('PREDIKAT A', $html);
         $this->assertStringContainsString('Ust. Fauzi, M.Ag.', $html);
         $this->assertStringContainsString('Pimpinan Korps Instruktur', $html);

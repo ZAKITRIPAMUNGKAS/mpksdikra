@@ -21,6 +21,7 @@ use App\Models\Soal;
 use App\Models\User;
 use App\Services\NilaiService;
 use App\Support\SertifikatPilihan;
+use App\Support\TtdTransparan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -315,8 +316,8 @@ class EventController extends Controller
             'nama_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
             'jabatan_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
             'keterangan_penandatangan_kiri' => ['nullable', 'string', 'max:255'],
-            'ttd_kiri' => ['nullable', 'image', 'mimes:png', 'max:2048'],
-            'ttd_kanan' => ['nullable', 'image', 'mimes:png', 'max:2048'],
+            'ttd_kiri' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:4096'],
+            'ttd_kanan' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:4096'],
             'hapus_ttd_kiri' => ['nullable', 'boolean'],
             'hapus_ttd_kanan' => ['nullable', 'boolean'],
             'bobot_kognitif' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -339,7 +340,7 @@ class EventController extends Controller
             if ($event?->ttd_kiri_path && Storage::disk('public')->exists($event->ttd_kiri_path)) {
                 Storage::disk('public')->delete($event->ttd_kiri_path);
             }
-            $data['ttd_kiri_path'] = $request->file('ttd_kiri')->store('signatures', 'public');
+            $data['ttd_kiri_path'] = TtdTransparan::simpan($request->file('ttd_kiri'));
         }
 
         if ($request->boolean('hapus_ttd_kanan')) {
@@ -351,7 +352,7 @@ class EventController extends Controller
             if ($event?->ttd_kanan_path && Storage::disk('public')->exists($event->ttd_kanan_path)) {
                 Storage::disk('public')->delete($event->ttd_kanan_path);
             }
-            $data['ttd_kanan_path'] = $request->file('ttd_kanan')->store('signatures', 'public');
+            $data['ttd_kanan_path'] = TtdTransparan::simpan($request->file('ttd_kanan'));
         }
 
         unset($data['ttd_kiri'], $data['ttd_kanan'], $data['hapus_ttd_kiri'], $data['hapus_ttd_kanan']);
